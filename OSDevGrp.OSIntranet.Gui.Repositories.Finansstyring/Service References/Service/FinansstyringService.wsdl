@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="urn:osdevgrp:osintranet:1.0.0" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:i0="http://tempuri.org/" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="FinansstyringService" targetNamespace="urn:osdevgrp:osintranet:1.0.0" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:import namespace="http://tempuri.org/" location="http://mother.osdevgrp.dk/osintranet/finansstyringservice.svc?wsdl=wsdl0" />
+  <wsdl:types>
+    <xsd:schema targetNamespace="urn:osdevgrp:osintranet:1.0.0/Imports">
+      <xsd:import schemaLocation="http://mother.osdevgrp.dk/osintranet/finansstyringservice.svc?xsd=xsd0" namespace="urn:osdevgrp:osintranet:1.0.0" />
+      <xsd:import schemaLocation="http://mother.osdevgrp.dk/osintranet/finansstyringservice.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="FinansstyringService_RegnskabslisteGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:RegnskabslisteGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_RegnskabslisteGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RegnskabslisteGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_RegnskabslisteGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontoplanGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:KontoplanGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontoplanGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KontoplanGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontoplanGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontoGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:KontoGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontoGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KontoGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontoGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontoplanGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:BudgetkontoplanGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontoplanGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BudgetkontoplanGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontoplanGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontoGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:BudgetkontoGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontoGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BudgetkontoGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontoGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_DebitorlisteGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:DebitorlisteGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_DebitorlisteGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DebitorlisteGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_DebitorlisteGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_DebitorGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:DebitorGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_DebitorGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DebitorGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_DebitorGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KreditorlisteGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:KreditorlisteGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KreditorlisteGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KreditorlisteGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KreditorlisteGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KreditorGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:KreditorGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KreditorGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KreditorGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KreditorGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_AdressekontolisteGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:AdressekontolisteGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_AdressekontolisteGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AdressekontolisteGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_AdressekontolisteGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_AdressekontoGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:AdressekontoGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_AdressekontoGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AdressekontoGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_AdressekontoGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BogføringerGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:BogføringerGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BogføringerGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BogføringerGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BogføringerGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BogføringslinjeOpret_InputMessage">
+    <wsdl:part name="parameters" element="tns:BogføringslinjeOpret" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BogføringslinjeOpret_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BogføringslinjeOpretResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BogføringslinjeOpret_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BetalingsbetingelserGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:BetalingsbetingelserGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BetalingsbetingelserGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BetalingsbetingelserGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BetalingsbetingelserGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontogrupperGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:KontogrupperGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontogrupperGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KontogrupperGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_KontogrupperGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontogrupperGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:BudgetkontogrupperGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontogrupperGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BudgetkontogrupperGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BudgetkontogrupperGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BrevhovederGet_InputMessage">
+    <wsdl:part name="parameters" element="tns:BrevhovederGet" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BrevhovederGet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BrevhovederGetResponse" />
+  </wsdl:message>
+  <wsdl:message name="FinansstyringService_BrevhovederGet_IntranetFaultBaseFault_FaultMessage">
+    <wsdl:part name="detail" element="tns:IntranetFault" />
+  </wsdl:message>
+  <wsdl:portType name="FinansstyringService">
+    <wsdl:operation name="RegnskabslisteGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/RegnskabslisteGet" message="tns:FinansstyringService_RegnskabslisteGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/RegnskabslisteGetResponse" message="tns:FinansstyringService_RegnskabslisteGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/RegnskabslisteGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_RegnskabslisteGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KontoplanGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontoplanGet" message="tns:FinansstyringService_KontoplanGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontoplanGetResponse" message="tns:FinansstyringService_KontoplanGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontoplanGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_KontoplanGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KontoGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontoGet" message="tns:FinansstyringService_KontoGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontoGetResponse" message="tns:FinansstyringService_KontoGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontoGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_KontoGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BudgetkontoplanGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontoplanGet" message="tns:FinansstyringService_BudgetkontoplanGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontoplanGetResponse" message="tns:FinansstyringService_BudgetkontoplanGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontoplanGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_BudgetkontoplanGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BudgetkontoGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontoGet" message="tns:FinansstyringService_BudgetkontoGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontoGetResponse" message="tns:FinansstyringService_BudgetkontoGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontoGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_BudgetkontoGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DebitorlisteGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/DebitorlisteGet" message="tns:FinansstyringService_DebitorlisteGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/DebitorlisteGetResponse" message="tns:FinansstyringService_DebitorlisteGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/DebitorlisteGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_DebitorlisteGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DebitorGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/DebitorGet" message="tns:FinansstyringService_DebitorGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/DebitorGetResponse" message="tns:FinansstyringService_DebitorGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/DebitorGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_DebitorGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KreditorlisteGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KreditorlisteGet" message="tns:FinansstyringService_KreditorlisteGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KreditorlisteGetResponse" message="tns:FinansstyringService_KreditorlisteGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KreditorlisteGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_KreditorlisteGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KreditorGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KreditorGet" message="tns:FinansstyringService_KreditorGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KreditorGetResponse" message="tns:FinansstyringService_KreditorGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KreditorGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_KreditorGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AdressekontolisteGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/AdressekontolisteGet" message="tns:FinansstyringService_AdressekontolisteGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/AdressekontolisteGetResponse" message="tns:FinansstyringService_AdressekontolisteGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/AdressekontolisteGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_AdressekontolisteGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AdressekontoGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/AdressekontoGet" message="tns:FinansstyringService_AdressekontoGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/AdressekontoGetResponse" message="tns:FinansstyringService_AdressekontoGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/AdressekontoGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_AdressekontoGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BogføringerGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BogføringerGet" message="tns:FinansstyringService_BogføringerGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BogføringerGetResponse" message="tns:FinansstyringService_BogføringerGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BogføringerGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_BogføringerGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BogføringslinjeOpret">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BogføringslinjeOpret" message="tns:FinansstyringService_BogføringslinjeOpret_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BogføringslinjeOpretResponse" message="tns:FinansstyringService_BogføringslinjeOpret_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BogføringslinjeOpretIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_BogføringslinjeOpret_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BetalingsbetingelserGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BetalingsbetingelserGet" message="tns:FinansstyringService_BetalingsbetingelserGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BetalingsbetingelserGetResponse" message="tns:FinansstyringService_BetalingsbetingelserGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BetalingsbetingelserGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_BetalingsbetingelserGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KontogrupperGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontogrupperGet" message="tns:FinansstyringService_KontogrupperGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontogrupperGetResponse" message="tns:FinansstyringService_KontogrupperGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/KontogrupperGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_KontogrupperGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BudgetkontogrupperGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontogrupperGet" message="tns:FinansstyringService_BudgetkontogrupperGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontogrupperGetResponse" message="tns:FinansstyringService_BudgetkontogrupperGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BudgetkontogrupperGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_BudgetkontogrupperGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BrevhovederGet">
+      <wsdl:input wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BrevhovederGet" message="tns:FinansstyringService_BrevhovederGet_InputMessage" />
+      <wsdl:output wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BrevhovederGetResponse" message="tns:FinansstyringService_BrevhovederGet_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:osdevgrp:osintranet:1.0.0/FinansstyringService/BrevhovederGetIntranetFaultBaseFault" name="IntranetFaultBaseFault" message="tns:FinansstyringService_BrevhovederGet_IntranetFaultBaseFault_FaultMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:service name="FinansstyringService">
+    <wsdl:port name="WSHttpBinding_FinansstyringService" binding="i0:WSHttpBinding_FinansstyringService">
+      <soap12:address location="http://mother.osdevgrp.dk/osintranet/finansstyringservice.svc" />
+      <wsa10:EndpointReference>
+        <wsa10:Address>http://mother.osdevgrp.dk/osintranet/finansstyringservice.svc</wsa10:Address>
+        <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
+          <Dns>OSDevGrp.OSIntranet.Services</Dns>
+        </Identity>
+      </wsa10:EndpointReference>
+    </wsdl:port>
+    <wsdl:port name="BasicHttpBinding_FinansstyringService" binding="i0:BasicHttpBinding_FinansstyringService">
+      <soap:address location="http://mother.osdevgrp.dk/osintranet/finansstyringservice.svc/mobile" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

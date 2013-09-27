@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="urn:osdevgrp:osintranet:1.0.0" elementFormDefault="qualified" targetNamespace="urn:osdevgrp:osintranet:1.0.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="RegnskabslisteGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:RegnskabslisteGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="RegnskabslisteGetQuery">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="RegnskabslisteGetQuery" nillable="true" type="tns:RegnskabslisteGetQuery" />
+  <xs:element name="RegnskabslisteGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RegnskabslisteGetResult" nillable="true" type="tns:ArrayOfRegnskabsliste" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfRegnskabsliste">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Regnskabsliste" nillable="true" type="tns:Regnskabsliste" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfRegnskabsliste" nillable="true" type="tns:ArrayOfRegnskabsliste" />
+  <xs:complexType name="Regnskabsliste">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Tabel">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Brevhoved" nillable="true" type="tns:Brevhovedreference" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Regnskabsliste" nillable="true" type="tns:Regnskabsliste" />
+  <xs:complexType name="Tabel">
+    <xs:sequence>
+      <xs:element name="Navn" nillable="true" type="xs:string" />
+      <xs:element name="Nummer" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Tabel" nillable="true" type="tns:Tabel" />
+  <xs:complexType name="Brevhovedreference">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Tabel">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Brevhovedreference" nillable="true" type="tns:Brevhovedreference" />
+  <xs:complexType name="IntranetFault">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ExceptionMessages" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="IntranetFault" nillable="true" type="tns:IntranetFault" />
+  <xs:element name="KontoplanGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:KontoplanGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="KontoplanGetQuery">
+    <xs:sequence>
+      <xs:element name="Regnskabsnummer" type="xs:int" />
+      <xs:element name="StatusDato" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="KontoplanGetQuery" nillable="true" type="tns:KontoplanGetQuery" />
+  <xs:element name="KontoplanGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="KontoplanGetResult" nillable="true" type="tns:ArrayOfKontoplan" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfKontoplan">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Kontoplan" nillable="true" type="tns:Kontoplan" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfKontoplan" nillable="true" type="tns:ArrayOfKontoplan" />
+  <xs:complexType name="Kontoplan">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:KontoBase">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Disponibel" type="xs:decimal" />
+          <xs:element name="Kontogruppe" nillable="true" type="tns:Kontogruppe" />
+          <xs:element minOccurs="0" name="Kredit" type="xs:decimal" />
+          <xs:element minOccurs="0" name="Saldo" type="xs:decimal" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Kontoplan" nillable="true" type="tns:Kontoplan" />
+  <xs:complexType name="KontoBase">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Beskrivelse" nillable="true" type="xs:string" />
+      <xs:element name="Kontonavn" nillable="true" type="xs:string" />
+      <xs:element name="Kontonummer" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Notat" nillable="true" type="xs:string" />
+      <xs:element name="Regnskab" nillable="true" type="tns:Regnskabsliste" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="KontoBase" nillable="true" type="tns:KontoBase" />
+  <xs:complexType name="Kontogruppe">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Tabel">
+        <xs:sequence>
+          <xs:element name="ErAktiver" type="xs:boolean" />
+          <xs:element name="ErPassiver" type="xs:boolean" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Kontogruppe" nillable="true" type="tns:Kontogruppe" />
+  <xs:element name="KontoGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:KontoGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="KontoGetQuery">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:KontoplanGetQuery">
+        <xs:sequence>
+          <xs:element name="Kontonummer" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="KontoGetQuery" nillable="true" type="tns:KontoGetQuery" />
+  <xs:element name="KontoGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="KontoGetResult" nillable="true" type="tns:Konto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="Konto">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Kontoplan">
+        <xs:sequence>
+          <xs:element name="Kreditoplysninger" nillable="true" type="tns:ArrayOfKreditoplysninger" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Konto" nillable="true" type="tns:Konto" />
+  <xs:complexType name="ArrayOfKreditoplysninger">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Kreditoplysninger" nillable="true" type="tns:Kreditoplysninger" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfKreditoplysninger" nillable="true" type="tns:ArrayOfKreditoplysninger" />
+  <xs:complexType name="Kreditoplysninger">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Månedsoplysninger">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Kredit" type="xs:decimal" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Kreditoplysninger" nillable="true" type="tns:Kreditoplysninger" />
+  <xs:complexType name="Månedsoplysninger">
+    <xs:sequence>
+      <xs:element name="Måned" type="xs:int" />
+      <xs:element name="År" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Månedsoplysninger" nillable="true" type="tns:Månedsoplysninger" />
+  <xs:element name="BudgetkontoplanGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:BudgetkontoplanGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BudgetkontoplanGetQuery">
+    <xs:sequence>
+      <xs:element name="Regnskabsnummer" type="xs:int" />
+      <xs:element name="StatusDato" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BudgetkontoplanGetQuery" nillable="true" type="tns:BudgetkontoplanGetQuery" />
+  <xs:element name="BudgetkontoplanGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BudgetkontoplanGetResult" nillable="true" type="tns:ArrayOfBudgetkontoplan" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfBudgetkontoplan">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Budgetkontoplan" nillable="true" type="tns:Budgetkontoplan" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBudgetkontoplan" nillable="true" type="tns:ArrayOfBudgetkontoplan" />
+  <xs:complexType name="Budgetkontoplan">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:KontoBase">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Bogført" type="xs:decimal" />
+          <xs:element minOccurs="0" name="Budget" type="xs:decimal" />
+          <xs:element name="Budgetkontogruppe" nillable="true" type="tns:Budgetkontogruppe" />
+          <xs:element minOccurs="0" name="Disponibel" type="xs:decimal" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Budgetkontoplan" nillable="true" type="tns:Budgetkontoplan" />
+  <xs:complexType name="Budgetkontogruppe">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Tabel">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Budgetkontogruppe" nillable="true" type="tns:Budgetkontogruppe" />
+  <xs:element name="BudgetkontoGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:BudgetkontoGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BudgetkontoGetQuery">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:BudgetkontoplanGetQuery">
+        <xs:sequence>
+          <xs:element name="Kontonummer" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="BudgetkontoGetQuery" nillable="true" type="tns:BudgetkontoGetQuery" />
+  <xs:element name="BudgetkontoGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BudgetkontoGetResult" nillable="true" type="tns:Budgetkonto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="Budgetkonto">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Budgetkontoplan">
+        <xs:sequence>
+          <xs:element name="Budgetoplysninger" nillable="true" type="tns:ArrayOfBudgetoplysninger" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Budgetkonto" nillable="true" type="tns:Budgetkonto" />
+  <xs:complexType name="ArrayOfBudgetoplysninger">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Budgetoplysninger" nillable="true" type="tns:Budgetoplysninger" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBudgetoplysninger" nillable="true" type="tns:ArrayOfBudgetoplysninger" />
+  <xs:complexType name="Budgetoplysninger">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Månedsoplysninger">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Bogført" type="xs:decimal" />
+          <xs:element minOccurs="0" name="Budget" type="xs:decimal" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Budgetoplysninger" nillable="true" type="tns:Budgetoplysninger" />
+  <xs:element name="DebitorlisteGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:DebitorlisteGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="DebitorlisteGetQuery">
+    <xs:sequence>
+      <xs:element name="Regnskabsnummer" type="xs:int" />
+      <xs:element name="StatusDato" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DebitorlisteGetQuery" nillable="true" type="tns:DebitorlisteGetQuery" />
+  <xs:element name="DebitorlisteGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="DebitorlisteGetResult" nillable="true" type="tns:ArrayOfDebitorliste" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfDebitorliste">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Debitorliste" nillable="true" type="tns:Debitorliste" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDebitorliste" nillable="true" type="tns:ArrayOfDebitorliste" />
+  <xs:complexType name="Debitorliste">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:SaldolisteBase">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Debitorliste" nillable="true" type="tns:Debitorliste" />
+  <xs:complexType name="SaldolisteBase">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Telefonliste">
+        <xs:sequence>
+          <xs:element name="Saldo" type="xs:decimal" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="SaldolisteBase" nillable="true" type="tns:SaldolisteBase" />
+  <xs:complexType name="Telefonliste">
+    <xs:sequence>
+      <xs:element name="Navn" nillable="true" type="xs:string" />
+      <xs:element name="Nummer" type="xs:int" />
+      <xs:element minOccurs="0" name="PrimærTelefon" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SekundærTelefon" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Telefonliste" nillable="true" type="tns:Telefonliste" />
+  <xs:element name="DebitorGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:DebitorGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="DebitorGetQuery">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:DebitorlisteGetQuery">
+        <xs:sequence>
+          <xs:element name="Nummer" type="xs:int" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="DebitorGetQuery" nillable="true" type="tns:DebitorGetQuery" />
+  <xs:element name="DebitorGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="DebitorGetResult" nillable="true" type="tns:Debitor" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="Debitor">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:SaldoBase">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Debitor" nillable="true" type="tns:Debitor" />
+  <xs:complexType name="SaldoBase">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:SaldolisteBase">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Adresse1" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Adresse2" nillable="true" type="xs:string" />
+          <xs:element name="Betalingsbetingelse" nillable="true" type="tns:Betalingsbetingelse" />
+          <xs:element minOccurs="0" name="Mailadresse" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="PostnummerBy" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="SaldoBase" nillable="true" type="tns:SaldoBase" />
+  <xs:complexType name="Betalingsbetingelse">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Tabel">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Betalingsbetingelse" nillable="true" type="tns:Betalingsbetingelse" />
+  <xs:element name="KreditorlisteGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:KreditorlisteGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="KreditorlisteGetQuery">
+    <xs:sequence>
+      <xs:element name="Regnskabsnummer" type="xs:int" />
+      <xs:element name="StatusDato" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="KreditorlisteGetQuery" nillable="true" type="tns:KreditorlisteGetQuery" />
+  <xs:element name="KreditorlisteGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="KreditorlisteGetResult" nillable="true" type="tns:ArrayOfKreditorliste" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfKreditorliste">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Kreditorliste" nillable="true" type="tns:Kreditorliste" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfKreditorliste" nillable="true" type="tns:ArrayOfKreditorliste" />
+  <xs:complexType name="Kreditorliste">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:SaldolisteBase">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Kreditorliste" nillable="true" type="tns:Kreditorliste" />
+  <xs:element name="KreditorGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:KreditorGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="KreditorGetQuery">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:KreditorlisteGetQuery">
+        <xs:sequence>
+          <xs:element name="Nummer" type="xs:int" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="KreditorGetQuery" nillable="true" type="tns:KreditorGetQuery" />
+  <xs:element name="KreditorGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="KreditorGetResult" nillable="true" type="tns:Kreditor" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="Kreditor">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:SaldoBase">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Kreditor" nillable="true" type="tns:Kreditor" />
+  <xs:element name="AdressekontolisteGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:AdressekontolisteGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="AdressekontolisteGetQuery">
+    <xs:sequence>
+      <xs:element name="Regnskabsnummer" type="xs:int" />
+      <xs:element name="StatusDato" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AdressekontolisteGetQuery" nillable="true" type="tns:AdressekontolisteGetQuery" />
+  <xs:element name="AdressekontolisteGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="AdressekontolisteGetResult" nillable="true" type="tns:ArrayOfAdressekontoliste" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfAdressekontoliste">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Adressekontoliste" nillable="true" type="tns:Adressekontoliste" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAdressekontoliste" nillable="true" type="tns:ArrayOfAdressekontoliste" />
+  <xs:complexType name="Adressekontoliste">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:SaldolisteBase">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Adressekontoliste" nillable="true" type="tns:Adressekontoliste" />
+  <xs:element name="AdressekontoGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:AdressekontoGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="AdressekontoGetQuery">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AdressekontolisteGetQuery">
+        <xs:sequence>
+          <xs:element name="Nummer" type="xs:int" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="AdressekontoGetQuery" nillable="true" type="tns:AdressekontoGetQuery" />
+  <xs:element name="AdressekontoGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="AdressekontoGetResult" nillable="true" type="tns:Adressekonto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="Adressekonto">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:SaldoBase">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Adressekonto" nillable="true" type="tns:Adressekonto" />
+  <xs:element name="BogføringerGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:BogføringerGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BogføringerGetQuery">
+    <xs:sequence>
+      <xs:element name="Linjer" type="xs:int" />
+      <xs:element name="Regnskabsnummer" type="xs:int" />
+      <xs:element name="StatusDato" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BogføringerGetQuery" nillable="true" type="tns:BogføringerGetQuery" />
+  <xs:element name="BogføringerGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BogføringerGetResult" nillable="true" type="tns:ArrayOfBogføringslinje" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfBogføringslinje">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Bogføringslinje" nillable="true" type="tns:Bogføringslinje" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBogføringslinje" nillable="true" type="tns:ArrayOfBogføringslinje" />
+  <xs:complexType name="Bogføringslinje">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Adressekonto" nillable="true" type="tns:Adressekontoliste" />
+      <xs:element minOccurs="0" name="Bilag" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Budgetkonto" nillable="true" type="tns:Budgetkontoplan" />
+      <xs:element name="Dato" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Debit" type="xs:decimal" />
+      <xs:element name="Konto" nillable="true" type="tns:Kontoplan" />
+      <xs:element minOccurs="0" name="Kredit" type="xs:decimal" />
+      <xs:element name="Løbenr" type="xs:int" />
+      <xs:element name="Tekst" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Bogføringslinje" nillable="true" type="tns:Bogføringslinje" />
+  <xs:element name="BogføringslinjeOpret">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="command" nillable="true" type="tns:BogføringslinjeOpretCommand" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BogføringslinjeOpretCommand">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Adressekonto" type="xs:int" />
+      <xs:element minOccurs="0" name="Bilag" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Budgetkontonummer" nillable="true" type="xs:string" />
+      <xs:element name="Dato" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Debit" type="xs:decimal" />
+      <xs:element name="Kontonummer" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Kredit" type="xs:decimal" />
+      <xs:element name="Regnskabsnummer" type="xs:int" />
+      <xs:element name="Tekst" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BogføringslinjeOpretCommand" nillable="true" type="tns:BogføringslinjeOpretCommand" />
+  <xs:element name="BogføringslinjeOpretResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BogføringslinjeOpretResult" nillable="true" type="tns:BogføringslinjeOpretResp" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BogføringslinjeOpretResp">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Adressekonto" nillable="true" type="tns:Adressekontoliste" />
+      <xs:element name="Advarsler" nillable="true" type="tns:ArrayOfBogføringsadvarselResp" />
+      <xs:element minOccurs="0" name="Bilag" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Budgetkonto" nillable="true" type="tns:Budgetkontoplan" />
+      <xs:element name="Dato" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Debit" type="xs:decimal" />
+      <xs:element name="Konto" nillable="true" type="tns:Kontoplan" />
+      <xs:element minOccurs="0" name="Kredit" type="xs:decimal" />
+      <xs:element name="Løbenr" type="xs:int" />
+      <xs:element name="Tekst" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BogføringslinjeOpretResp" nillable="true" type="tns:BogføringslinjeOpretResp" />
+  <xs:complexType name="ArrayOfBogføringsadvarselResp">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="BogføringsadvarselResp" nillable="true" type="tns:BogføringsadvarselResp" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBogføringsadvarselResp" nillable="true" type="tns:ArrayOfBogføringsadvarselResp" />
+  <xs:complexType name="BogføringsadvarselResp">
+    <xs:sequence>
+      <xs:element name="Advarsel" nillable="true" type="xs:string" />
+      <xs:element name="Beløb" type="xs:decimal" />
+      <xs:element name="Konto" nillable="true" type="tns:KontoBase" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BogføringsadvarselResp" nillable="true" type="tns:BogføringsadvarselResp" />
+  <xs:element name="BetalingsbetingelserGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:BetalingsbetingelserGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BetalingsbetingelserGetQuery">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="BetalingsbetingelserGetQuery" nillable="true" type="tns:BetalingsbetingelserGetQuery" />
+  <xs:element name="BetalingsbetingelserGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BetalingsbetingelserGetResult" nillable="true" type="tns:ArrayOfBetalingsbetingelse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfBetalingsbetingelse">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Betalingsbetingelse" nillable="true" type="tns:Betalingsbetingelse" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBetalingsbetingelse" nillable="true" type="tns:ArrayOfBetalingsbetingelse" />
+  <xs:element name="KontogrupperGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:KontogrupperGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="KontogrupperGetQuery">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="KontogrupperGetQuery" nillable="true" type="tns:KontogrupperGetQuery" />
+  <xs:element name="KontogrupperGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="KontogrupperGetResult" nillable="true" type="tns:ArrayOfKontogruppe" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfKontogruppe">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Kontogruppe" nillable="true" type="tns:Kontogruppe" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfKontogruppe" nillable="true" type="tns:ArrayOfKontogruppe" />
+  <xs:element name="BudgetkontogrupperGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:BudgetkontogrupperGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BudgetkontogrupperGetQuery">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="BudgetkontogrupperGetQuery" nillable="true" type="tns:BudgetkontogrupperGetQuery" />
+  <xs:element name="BudgetkontogrupperGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BudgetkontogrupperGetResult" nillable="true" type="tns:ArrayOfBudgetkontogruppe" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfBudgetkontogruppe">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Budgetkontogruppe" nillable="true" type="tns:Budgetkontogruppe" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBudgetkontogruppe" nillable="true" type="tns:ArrayOfBudgetkontogruppe" />
+  <xs:element name="BrevhovederGet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="query" nillable="true" type="tns:BrevhoverGetQuery" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BrevhoverGetQuery">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="BrevhoverGetQuery" nillable="true" type="tns:BrevhoverGetQuery" />
+  <xs:element name="BrevhovederGetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BrevhovederGetResult" nillable="true" type="tns:ArrayOfBrevhoved" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfBrevhoved">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Brevhoved" nillable="true" type="tns:Brevhoved" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBrevhoved" nillable="true" type="tns:ArrayOfBrevhoved" />
+  <xs:complexType name="Brevhoved">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Brevhovedreference">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CvrNr" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Linje1" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Linje2" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Linje3" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Linje4" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Linje5" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Linje6" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Linje7" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Brevhoved" nillable="true" type="tns:Brevhoved" />
+</xs:schema>
