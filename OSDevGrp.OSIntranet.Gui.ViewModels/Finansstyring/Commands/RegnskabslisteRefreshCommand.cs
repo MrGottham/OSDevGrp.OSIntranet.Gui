@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -18,6 +19,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
 
         private bool _isBusy;
         private readonly IFinansstyringRepository _finansstyringRepository;
+        private readonly SynchronizationContext _synchronizationContext;
         
         #endregion
 
@@ -34,6 +36,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 throw new ArgumentNullException("finansstyringRepository");
             }
             _finansstyringRepository = finansstyringRepository;
+            _synchronizationContext = SynchronizationContext.Current;
         }
 
         #endregion
@@ -87,7 +90,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                                 regnskabViewModel.Navn = regnskabModel.Navn;
                                 continue;
                             }
-                            regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel));
+                            if (_synchronizationContext == null)
+                            {
+                                regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel));
+                                continue;
+                            }
+                            _synchronizationContext.Post(obj => regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(obj as IRegnskabModel)), regnskabModel);
                         }
                     }
                     catch (Exception ex)
@@ -98,7 +106,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                     {
                         _isBusy = false;
                     }
-                }, TaskContinuationOptions.AttachedToParent);
+                });
         }
 
         /// <summary>

@@ -15,13 +15,15 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="OSDevGrp.OSIntranet.Gui.Finansstyring.App">
-      <VisualElements DisplayName="OS Finansstyring" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Finansstyring til OS Intranet" ForegroundText="light" BackgroundColor="#464646">
-        <DefaultTile ShowName="allLogos" />
+      <VisualElements DisplayName="OS Finansstyring" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Finansstyring til OS Intranet" ForegroundText="dark" BackgroundColor="#464646">
+        <DefaultTile ShowName="allLogos" WideLogo="Assets\WideLogo.png" ShortName="OS Finans" />
         <SplashScreen Image="Assets\SplashScreen.png" />
       </VisualElements>
     </Application>
   </Applications>
   <Capabilities>
+    <Capability Name="privateNetworkClientServer" />
+    <Capability Name="internetClientServer" />
     <Capability Name="internetClient" />
   </Capabilities>
 </Package>

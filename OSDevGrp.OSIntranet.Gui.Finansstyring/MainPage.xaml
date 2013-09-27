@@ -10,6 +10,15 @@
 
     <Page.Resources>
         <vm:MainViewModel x:Key="MainViewModel" />
+        <DataTemplate x:Key="RegnskabViewModelDataTemplate">
+            <Grid Width="450" MaxWidth="450">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Margin="10,10,10,10" DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}">
@@ -18,7 +27,12 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-        <GridView Grid.Row="1">
-        </GridView>
+        <ListView Grid.Row="1" ItemsSource="{Binding Path=Regnskaber}" ItemTemplate="{StaticResource RegnskabViewModelDataTemplate}">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
     </Grid>
 </Page>

@@ -1,4 +1,6 @@
-﻿using Windows.UI.Xaml.Navigation;
+﻿using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -12,6 +14,17 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         public MainPage()
         {
             InitializeComponent();
+
+            var regnskabslisteViewModel = ((Grid) Content).DataContext as IRegnskabslisteViewModel;
+            if (regnskabslisteViewModel == null)
+            {
+                return;
+            }
+            var refreshCommand = regnskabslisteViewModel.RefreshCommand;
+            if (refreshCommand.CanExecute(regnskabslisteViewModel))
+            {
+                refreshCommand.Execute(regnskabslisteViewModel);
+            }
         }
 
         /// <summary>
