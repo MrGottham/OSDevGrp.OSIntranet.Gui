@@ -20,6 +20,13 @@
             </Grid>
         </DataTemplate>
     </Page.Resources>
+    
+    <Page.TopAppBar>
+        <AppBar>
+            <Grid>
+            </Grid>
+        </AppBar>
+    </Page.TopAppBar>
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Margin="10,10,10,10" DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}">
         <Grid.RowDefinitions>
