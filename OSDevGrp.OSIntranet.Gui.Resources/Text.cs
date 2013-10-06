@@ -5,6 +5,7 @@
     /// </summary>
     public enum Text
     {
-        Accountings
+        Accountings,
+        Exception
     }
 }

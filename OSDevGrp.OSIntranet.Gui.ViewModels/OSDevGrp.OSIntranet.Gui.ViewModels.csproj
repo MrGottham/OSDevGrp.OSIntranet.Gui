@@ -46,6 +46,7 @@
     <Compile Include="Core\Commands\CommandBase.cs" />
     <Compile Include="Core\Commands\RelayCommand.cs" />
     <Compile Include="Core\Commands\ViewModelCommandBase.cs" />
+    <Compile Include="Core\ExceptionViewModel.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommand.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\RegnskabViewModel.cs" />
