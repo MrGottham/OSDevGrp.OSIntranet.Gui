@@ -6,6 +6,7 @@
     public enum Text
     {
         Accountings,
-        Exception
+        Exception,
+        ExceptionHandler
     }
 }
