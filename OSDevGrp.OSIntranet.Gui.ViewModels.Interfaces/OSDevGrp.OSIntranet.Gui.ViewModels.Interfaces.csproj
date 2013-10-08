@@ -43,6 +43,7 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Core\IExceptionHandlerViewModel.cs" />
     <Compile Include="Core\IExceptionViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabViewModel.cs" />

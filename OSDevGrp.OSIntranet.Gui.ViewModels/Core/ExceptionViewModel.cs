@@ -75,7 +75,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         }
 
         /// <summary>
-        ///  Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
+        /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
         /// </summary>
         public override string DisplayName
         {
