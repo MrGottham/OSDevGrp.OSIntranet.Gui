@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
@@ -34,6 +35,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
             var regnskabslisteViewModel = mainViewModel.Regnskabsliste;
             Assert.That(regnskabslisteViewModel, Is.Not.Null);
             Assert.That(regnskabslisteViewModel, Is.TypeOf<RegnskabslisteViewModel>());
+        }
+
+        /// <summary>
+        /// Tester, at getteren til ExceptionHandler returnerer ViewModel for en exceptionhandler.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionHandlerGetterReturnererExceptionHandlerViewModel()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var exceptionHandlerViewModel = mainViewModel.ExceptionHandler;
+            Assert.That(exceptionHandlerViewModel, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel, Is.TypeOf<ExceptionHandlerViewModel>());
         }
     }
 }

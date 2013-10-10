@@ -1,6 +1,8 @@
 ﻿using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels
@@ -13,6 +15,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
         #region Private variables
 
         private IRegnskabslisteViewModel _regnskabslisteViewModel;
+        private IExceptionHandlerViewModel _exceptionHandlerViewModel;
 
         #endregion
         
@@ -37,6 +40,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
             get
             {
                 return _regnskabslisteViewModel ?? (_regnskabslisteViewModel = new RegnskabslisteViewModel(new FinansstyringRepository()));
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for en exceptionhandler.
+        /// </summary>
+        public virtual IExceptionHandlerViewModel ExceptionHandler
+        {
+            get
+            {
+                return _exceptionHandlerViewModel ?? (_exceptionHandlerViewModel = new ExceptionHandlerViewModel());
             }
         }
 

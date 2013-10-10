@@ -137,5 +137,32 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
             Assert.That(exceptionHandlerViewModel.ShowLast, Is.True);
         }
+
+        /// <summary>
+        /// Tester, at sætteren til ShowLast rejser PropertyChanged ved rettelse af ShowLast.
+        /// </summary>
+        [Test]
+        public void TestAtShowLastSetterRejserPropertyChangedVedRettelseAfShowLast()
+        {
+            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            Assert.That(exceptionHandlerViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            exceptionHandlerViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    Assert.That(e.PropertyName, Is.EqualTo("ShowLast"));
+                    eventCalled = true;
+                };
+
+            Assert.That(eventCalled, Is.False);
+            exceptionHandlerViewModel.ShowLast = exceptionHandlerViewModel.ShowLast;
+            Assert.That(eventCalled, Is.False);
+            exceptionHandlerViewModel.ShowLast = !exceptionHandlerViewModel.ShowLast;
+            Assert.That(eventCalled, Is.True);
+        }
     }
 }

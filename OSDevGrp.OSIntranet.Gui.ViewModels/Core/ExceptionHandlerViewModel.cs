@@ -55,11 +55,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         {
             get
             {
-                if (Last == null)
-                {
-                    return false;
-                }
-                throw new NotImplementedException();
+                return Last != null && _showLast;
             }
             set
             {

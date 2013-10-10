@@ -1,4 +1,5 @@
-﻿using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
+﻿using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
 {
@@ -11,6 +12,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
         /// ViewModel for en liste af regnskaber.
         /// </summary>
         IRegnskabslisteViewModel Regnskabsliste
+        {
+            get;
+        }
+
+        /// <summary>
+        /// ViewModel for en exceptionhandler.
+        /// </summary>
+        IExceptionHandlerViewModel ExceptionHandler
         {
             get;
         }
