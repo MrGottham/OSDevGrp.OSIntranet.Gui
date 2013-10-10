@@ -109,7 +109,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
                 _exceptions.Add(new ExceptionViewModel(exception));
                 return;
             }
-            _synchronizationContext.Post(ex => _exceptions.Add(new ExceptionViewModel(ex as Exception)), exception);
+            using (var waitEvent = new AutoResetEvent(false))
+            {
+                var we = waitEvent;
+                _synchronizationContext.Post(obj =>
+                    {
+                        try
+                        {
+                            _exceptions.Add(new ExceptionViewModel(obj as Exception));
+                        }
+                        finally
+                        {
+                            we.Set();
+                        }
+                    }, exception);
+                waitEvent.WaitOne();
+            }
         }
 
         /// <summary>

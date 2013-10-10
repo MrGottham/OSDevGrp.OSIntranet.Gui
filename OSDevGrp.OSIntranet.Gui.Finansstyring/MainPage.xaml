@@ -22,15 +22,14 @@
     </Page.Resources>
     
     <Page.TopAppBar>
-        <AppBar>
-            <Grid>
-            </Grid>
+        <AppBar Name="ExceptionHandlerAppBar" DataContext="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler}" IsOpen="{Binding Path=ShowLast}" IsSticky="{Binding Path=ShowLast}">
         </AppBar>
     </Page.TopAppBar>
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Margin="10,10,10,10" DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
@@ -41,5 +40,6 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
+        <TextBlock Grid.Row="2" Text="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.Last.Message}" />
     </Grid>
 </Page>
