@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -19,6 +20,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Private variables
 
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
+        private readonly IRegnskabslisteViewModel _regnskabslisteViewModel;
         
         #endregion
 
@@ -31,23 +33,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
-            _exceptionHandlerViewModel = ExceptionHandlerAppBar.DataContext as IExceptionHandlerViewModel;
-            if (_exceptionHandlerViewModel != null)
-            {
-                Application.Current.UnhandledException += UnhandledExceptionEventHandler;
-                TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionEventHandler;
-            }
-
-            var regnskabslisteViewModel = ((Grid) Content).DataContext as IRegnskabslisteViewModel;
-            if (regnskabslisteViewModel == null)
-            {
-                return;
-            }
-            var refreshCommand = regnskabslisteViewModel.RefreshCommand;
-            if (refreshCommand.CanExecute(regnskabslisteViewModel))
-            {
-                refreshCommand.Execute(regnskabslisteViewModel);
-            }
+            _exceptionHandlerViewModel = (IExceptionHandlerViewModel) ExceptionHandlerAppBar.DataContext;
+            _regnskabslisteViewModel = (IRegnskabslisteViewModel) ((Grid) Content).DataContext;
+            
+            Application.Current.UnhandledException += UnhandledExceptionEventHandler;
+            TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionEventHandler;
         }
 
         /// <summary>
@@ -57,6 +47,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// property is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            if (_regnskabslisteViewModel.Regnskaber.Any())
+            {
+                return;
+            }
+            var refreshCommand = _regnskabslisteViewModel.RefreshCommand;
+            if (refreshCommand.CanExecute(_regnskabslisteViewModel))
+            {
+                refreshCommand.Execute(_regnskabslisteViewModel);
+            }
         }
 
         /// <summary>
