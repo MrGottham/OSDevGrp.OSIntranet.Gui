@@ -70,6 +70,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Illegal value for &apos;{0}&apos;: {1}.
+        /// </summary>
+        internal static string IllegalArgumentValue {
+            get {
+                return ResourceManager.GetString("IllegalArgumentValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error in repository method &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string RepositoryError {

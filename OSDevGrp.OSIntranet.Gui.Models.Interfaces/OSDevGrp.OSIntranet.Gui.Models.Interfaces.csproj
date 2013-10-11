@@ -43,6 +43,9 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Core\INyhedModel.cs" />
+    <Compile Include="Core\Nyhedsaktualitet.cs" />
+    <Compile Include="Finansstyring\IBogføringslinjeModel.cs" />
     <Compile Include="Finansstyring\IRegnskabModel.cs" />
     <Compile Include="IModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

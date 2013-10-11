@@ -43,6 +43,7 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Finansstyring\BogføringslinjeModel.cs" />
     <Compile Include="Finansstyring\RegnskabModel.cs" />
     <Compile Include="ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,6 +55,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Models.Interfaces\OSDevGrp.OSIntranet.Gui.Models.Interfaces.csproj">
       <Project>{85324394-8c83-4a51-9bf4-0deb776cf9ab}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Models.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Resources\OSDevGrp.OSIntranet.Gui.Resources.csproj">
+      <Project>{1F572194-E97C-4E22-A027-3412817475E3}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Resources</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

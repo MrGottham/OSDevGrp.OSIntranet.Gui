@@ -121,6 +121,10 @@
     <value>Fejl ved udførelse af kommandoen '{0}': {1}</value>
     <comment>{0} = Typen på kommandoen, {1} = Fejlbesked.</comment>
   </data>
+  <data name="IllegalArgumentValue" xml:space="preserve">
+    <value>Illegal værdi for '{0}': {1}</value>
+    <comment>{0} = Navn på argument, {1} = værdi.</comment>
+  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Fejl i repositorymetode '{0}': {1}</value>
     <comment>{0} = Metodenavn, {1} = Fejlbesked.</comment>

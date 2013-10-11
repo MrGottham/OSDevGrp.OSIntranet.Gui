@@ -6,6 +6,7 @@
     public enum ExceptionMessage
     {
         RepositoryError,
-        CommandError
+        CommandError,
+        IllegalArgumentValue
     }
 }

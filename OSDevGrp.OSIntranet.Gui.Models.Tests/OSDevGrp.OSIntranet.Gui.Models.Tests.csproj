@@ -59,6 +59,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Finansstyring\BogføringslinjeModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabModelTests.cs" />
     <Compile Include="ModelBaseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

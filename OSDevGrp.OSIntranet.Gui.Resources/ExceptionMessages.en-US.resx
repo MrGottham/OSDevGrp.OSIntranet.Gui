@@ -121,6 +121,10 @@
     <value>Error while executing the command '{0}': {1}</value>
     <comment>{0} = Type of the command, {1} = Error message.</comment>
   </data>
+  <data name="IllegalArgumentValue" xml:space="preserve">
+    <value>Illegal value for '{0}': {1}</value>
+    <comment>{0} = Name of argument, {1} = value.</comment>
+  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Error in repository method '{0}': {1}</value>
     <comment>{0} = Method name, {1} = Error message.</comment>
