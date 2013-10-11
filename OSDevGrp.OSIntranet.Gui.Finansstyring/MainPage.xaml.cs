@@ -57,6 +57,20 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         }
 
         /// <summary>
+        /// Eventhandler, der håndterer åbning af applikationens TopAppBar.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void TopAppBarOpenedEventHandler(object sender, object eventArgs)
+        {
+            if (TopAppBar == null)
+            {
+                return;
+            }
+            TopAppBar.IsOpen = _exceptionHandlerViewModel.ShowLast;
+        }
+
+        /// <summary>
         /// Eventhandler, der håndterer uhåndterede exceptions fra applikationen.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>

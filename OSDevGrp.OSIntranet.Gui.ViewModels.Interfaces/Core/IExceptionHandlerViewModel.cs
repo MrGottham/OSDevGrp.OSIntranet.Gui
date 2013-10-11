@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core
 {
@@ -29,6 +30,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core
         /// Exceptions, der er håndteret af exceptionhandleren.
         /// </summary>
         IEnumerable<IExceptionViewModel> Exceptions
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kommando, der kan skjule seneste håndterede exception.
+        /// </summary>
+        ICommand HideCommand
         {
             get;
         }

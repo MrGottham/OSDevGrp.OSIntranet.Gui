@@ -4,6 +4,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using Ploeh.AutoFixture;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
@@ -30,6 +31,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             Assert.That(exceptionHandlerViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.ExceptionHandler)));
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
+            Assert.That(exceptionHandlerViewModel.HideCommand, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.HideCommand, Is.TypeOf<RelayCommand>());
         }
 
         /// <summary>
@@ -163,6 +166,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             Assert.That(eventCalled, Is.False);
             exceptionHandlerViewModel.ShowLast = !exceptionHandlerViewModel.ShowLast;
             Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at Excecute på HideCommand sætter ShowLast til false.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteOnHideCommandSetsShowLastTilFalse()
+        {
+            var fixture = new Fixture();
+
+            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            Assert.That(exceptionHandlerViewModel, Is.Not.Null);
+
+            exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
+            Assert.That(exceptionHandlerViewModel.ShowLast, Is.True);
+
+            var hideCommand = exceptionHandlerViewModel.HideCommand;
+            Assert.That(hideCommand, Is.Not.Null);
+            Assert.That(hideCommand.CanExecute(null), Is.True);
+
+            hideCommand.Execute(null);
+            Assert.That(exceptionHandlerViewModel.ShowLast, Is.False);
         }
     }
 }

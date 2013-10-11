@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
+using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
@@ -17,6 +19,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         #region Private variables
 
         private bool _showLast;
+        private ICommand _hideCommand;
         private readonly ObservableCollection<IExceptionViewModel> _exceptions = new ObservableCollection<IExceptionViewModel>();
         private readonly SynchronizationContext _synchronizationContext;
 
@@ -87,6 +90,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
             get
             {
                 return _exceptions;
+            }
+        }
+
+        /// <summary>
+        /// Kommando, der kan skjule seneste håndterede exception.
+        /// </summary>
+        public virtual ICommand HideCommand
+        {
+            get
+            {
+                return _hideCommand ?? (_hideCommand = new RelayCommand(obj => ShowLast = false));
             }
         }
 

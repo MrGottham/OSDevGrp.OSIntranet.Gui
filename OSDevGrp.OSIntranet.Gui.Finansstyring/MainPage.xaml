@@ -24,14 +24,19 @@
     </Page.Resources>
 
     <Page.TopAppBar>
-        <AppBar Name="ExceptionHandlerAppBar" DataContext="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler}" IsOpen="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.ShowLast, Mode=TwoWay}" IsSticky="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.ShowLast, Mode=TwoWay}">
+        <AppBar Name="ExceptionHandlerAppBar" DataContext="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler}" IsOpen="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.ShowLast, Mode=TwoWay}" IsSticky="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.ShowLast, Mode=TwoWay}" Opened="TopAppBarOpenedEventHandler">
             <Grid DataContext="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.Last}" Style="{StaticResource HighlightedGridStyle}" Height="150" Visibility="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.ShowLast, Mode=TwoWay, Converter={Binding Source={StaticResource BooleanToVisibilityConverter}}}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Margin="40,20,40,0" Style="{StaticResource SubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-                <TextBlock Grid.Row="1" Margin="40,5,40,20" TextWrapping="Wrap" Style="{StaticResource BodyTextStyle}" Text="{Binding Path=Message}"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="40,20,20,20">
+                    <TextBlock Style="{StaticResource SubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextStyle}" Text="{Binding Path=Message}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="20,20,40,20">
+                    
+                </StackPanel>
             </Grid>
         </AppBar>
     </Page.TopAppBar>
