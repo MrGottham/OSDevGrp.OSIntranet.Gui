@@ -2,6 +2,7 @@
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
 {
@@ -11,6 +12,44 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
     /// <typeparam name="TViewModel">Typen på den ViewModel, hvorpå kommandoen skal udføres.</typeparam>
     public abstract class ViewModelCommandBase<TViewModel> : CommandBase where TViewModel : IViewModel
     {
+        #region Private variables
+
+        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Danner basisfunktionalitet til en kommando, der skal udføres på en ViewModel.
+        /// </summary>
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til en exceptionhandler.</param>
+        protected ViewModelCommandBase(IExceptionHandlerViewModel exceptionHandlerViewModel)
+        {
+            if (exceptionHandlerViewModel == null)
+            {
+                throw new ArgumentNullException("exceptionHandlerViewModel");
+            }
+            _exceptionHandlerViewModel = exceptionHandlerViewModel;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// ViewModel for den exceptionhandler, der skal håndtere exceptions.
+        /// </summary>
+        protected virtual IExceptionHandlerViewModel ExceptionHandler
+        {
+            get
+            {
+                return _exceptionHandlerViewModel;
+            }
+        }
+
+        #endregion
+
         #region Methods
 
         /// <summary>
@@ -67,17 +106,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
             }
             if (exception is IntranetGuiRepositoryException)
             {
-                throw exception;
+                ExceptionHandler.HandleException(exception);
+                return;
             }
             if (exception is IntranetGuiBusinessException)
             {
-                throw exception;
+                ExceptionHandler.HandleException(exception);
+                return;
             }
             if (exception is IntranetGuiSystemException)
             {
-                throw exception;
+                ExceptionHandler.HandleException(exception);
+                return;
             }
-            throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.CommandError, GetType().Name, exception.Message), exception);
+            ExceptionHandler.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.CommandError, GetType().Name, exception.Message), exception));
         }
 
         #endregion

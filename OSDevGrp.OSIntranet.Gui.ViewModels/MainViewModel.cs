@@ -39,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
         {
             get
             {
-                return _regnskabslisteViewModel ?? (_regnskabslisteViewModel = new RegnskabslisteViewModel(new FinansstyringRepository()));
+                return _regnskabslisteViewModel ?? (_regnskabslisteViewModel = new RegnskabslisteViewModel(new FinansstyringRepository(), ExceptionHandler));
             }
         }
 

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
@@ -21,6 +22,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private DateTime _statusDato = DateTime.Now;
         private ICommand _refreshCommand;
         private readonly IFinansstyringRepository _finansstyringRepository;
+        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
         private readonly ObservableCollection<IRegnskabViewModel> _regnskaber = new ObservableCollection<IRegnskabViewModel>(); 
 
         #endregion
@@ -31,13 +33,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// Danner ViewModel for en liste indeholdende regnskaber.
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
-        public RegnskabslisteViewModel(IFinansstyringRepository finansstyringRepository)
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel for en exceptionhandler.</param>
+        public RegnskabslisteViewModel(IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
         {
             if (finansstyringRepository == null)
             {
                 throw new ArgumentNullException("finansstyringRepository");
             }
+            if (exceptionHandlerViewModel == null)
+            {
+                throw new ArgumentNullException("exceptionHandlerViewModel");
+            }
             _finansstyringRepository = finansstyringRepository;
+            _exceptionHandlerViewModel = exceptionHandlerViewModel;
             _regnskaber.CollectionChanged += RegnskaberCollectionChangedEventHandler;
         }
         
@@ -94,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return _refreshCommand ?? (_refreshCommand = new RegnskabslisteRefreshCommand(_finansstyringRepository));
+                return _refreshCommand ?? (_refreshCommand = new RegnskabslisteRefreshCommand(_finansstyringRepository, _exceptionHandlerViewModel));
             }
         }
 

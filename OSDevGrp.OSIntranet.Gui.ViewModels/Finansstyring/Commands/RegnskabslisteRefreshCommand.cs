@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
-using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
@@ -29,7 +28,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// Danner kommando til genindlæsning af regnskabslisten.
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
-        public RegnskabslisteRefreshCommand(IFinansstyringRepository finansstyringRepository)
+        /// <param name="exceptionHandlerViewModel">Implementering af en ViewModel til en exceptionhandler.</param>
+        public RegnskabslisteRefreshCommand(IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
+            : base(exceptionHandlerViewModel)
         {
             if (finansstyringRepository == null)
             {
@@ -39,15 +40,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             _synchronizationContext = SynchronizationContext.Current;
         }
 
-        #endregion
-
-        #region Events
-
-        /// <summary>
-        /// Event, der rejses ved exception.
-        /// </summary>
-        public virtual event IntranetGuiEventHandler<IHandleExceptionEventArgs> OnException;
-        
         #endregion
 
         #region Methods
@@ -78,7 +70,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                         {
                             if (t.Exception != null)
                             {
-                                HandleException(t.Exception);
+                                t.Exception.Handle(exception =>
+                                    {
+                                        HandleException(exception);
+                                        return true;
+                                    });
                             }
                             return;
                         }
@@ -107,28 +103,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                         _isBusy = false;
                     }
                 });
-        }
-
-        /// <summary>
-        /// Håndtering af exception ved udførelse af en kommando.
-        /// </summary>
-        /// <param name="exception">Exception.</param>
-        protected override void HandleException(Exception exception)
-        {
-            var error = exception;
-            if (error is AggregateException)
-            {
-                if (error.InnerException != null)
-                {
-                    error = error.InnerException;
-                }
-            }
-            if (OnException != null)
-            {
-                OnException.Invoke(this, new HandleExceptionEventArgs(error));
-                return;
-            }
-            base.HandleException(error);
         }
 
         #endregion

@@ -121,7 +121,7 @@
     <value>Regnskabsliste</value>
   </data>
   <data name="Exception" xml:space="preserve">
-    <value>Problem</value>
+    <value>Der er opstået et problem</value>
   </data>
   <data name="ExceptionHandler" xml:space="preserve">
     <value>Fejlhåndtering</value>

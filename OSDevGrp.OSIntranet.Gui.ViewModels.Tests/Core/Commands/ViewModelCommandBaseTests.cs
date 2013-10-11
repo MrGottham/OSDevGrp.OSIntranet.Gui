@@ -1,9 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -20,8 +20,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         /// </summary>
         private class MyViewModelCommand : ViewModelCommandBase<IViewModel>
         {
+            #region Constructor
+
+            /// <summary>
+            /// Danner egen klasse til test af basisfunktionalitet til en kommando, der skal udføres på en ViewModel.
+            /// </summary>
+            /// <param name="exceptionHandlerViewModel">Implementering af en ViewModel til en exceptionhandler.</param>
+            public MyViewModelCommand(IExceptionHandlerViewModel exceptionHandlerViewModel)
+                : base(exceptionHandlerViewModel)
+            {
+            }
+
+            #endregion
+
             #region Properties
-            
+
             /// <summary>
             /// Handling, der udføres ved evaluering af, om kommandoen kan udføres.
             /// </summary>
@@ -43,6 +56,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             #endregion
             
             #region Methods
+
+            /// <summary>
+            /// Returnerer ViewModel for den exceptionhandler, der skal håndtere exceptions.
+            /// </summary>
+            /// <returns>ViewModel for den exceptionhandler, der skal håndtere exceptions.</returns>
+            public IExceptionHandlerViewModel GetExceptionHandler()
+            {
+                return ExceptionHandler;
+            }
 
             /// <summary>
             /// Returnerer angivelse af, om kommandoen kan udføres på den givne ViewModel.
@@ -79,8 +101,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtConstructorInitiererViewModelCommandBase()
         {
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
+
+            var exceptionHandler = command.GetExceptionHandler();
+            Assert.That(exceptionHandler, Is.Not.Null);
+            Assert.That(exceptionHandler, Is.EqualTo(exceptionHandlerViewModelMock));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis den ViewModel, der skal håndterer exceptions, er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisExceptionHandlerViewModelErNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new MyViewModelCommand(null));
         }
 
         /// <summary>
@@ -90,8 +127,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         public void TestAtCanExecuteReturnererFalseHvisParameterIkkeErAfTypenIViewModel()
         {
             var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var command = new MyViewModelCommand(fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(command, Is.Not.Null);
 
             var result = command.CanExecute(fixture.Create<object>());
@@ -105,9 +143,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         public void TestAtCanExecuteReturnererTrueHvisParameterErAfTypenIViewModel()
         {
             var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var command = new MyViewModelCommand(fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(command, Is.Not.Null);
 
             var result = command.CanExecute(fixture.Create<IViewModel>());
@@ -121,9 +160,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         public void TestAtCanExecuteViderestillerViewModelTilOverride()
         {
             var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var command = new MyViewModelCommand(fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(command, Is.Not.Null);
 
             var viewModelMock = fixture.Create<IViewModel>();
@@ -142,17 +182,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         }
 
         /// <summary>
-        /// Tester, at Execute kaster en IntranetGuiSystemException, hvis parameteren ikke er af typen IViewModel.
+        /// Tester, at Execute kalder exceptionhandleren med en IntranetGuiSystemException, hvis parameteren ikke er af typen IViewModel.
         /// </summary>
         [Test]
-        public void TestAtExecuteKasterIntranetGuiSystemExceptionHvisParameterIkkeErAfTypenIViewModel()
+        public void TestAtExecuteKalderExceptionHandlerViewModelMedIntranetGuiSystemExceptionHvisParameterIkkeErAfTypenIViewModel()
         {
             var fixture = new Fixture();
 
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
-            Assert.Throws<IntranetGuiSystemException>(() => command.Execute(fixture.Create<object>()));
+            command.Execute(fixture.Create<object>());
+
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
         }
 
         /// <summary>
@@ -164,7 +208,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             var fixture = new Fixture();
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
             var actionCalled = false;
@@ -173,6 +219,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             Assert.That(actionCalled, Is.False);
             command.Execute(fixture.Create<IViewModel>());
             Assert.That(actionCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
         /// <summary>
@@ -184,7 +232,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             var fixture = new Fixture();
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
             var viewModelMock = fixture.Create<IViewModel>();
@@ -199,18 +249,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             Assert.That(actionCalled, Is.False);
             command.Execute(viewModelMock);
             Assert.That(actionCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
         /// <summary>
-        /// Tester, at Execute kaster en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
+        /// Tester, at Execute kalder exceptionhandleren med en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
         /// </summary>
         [Test]
-        public void TestAtExecuteKasterIntranetGuiRepositoryExceptionVedIntranetGuiRepositoryException()
+        public void TestAtExecuteKalderExceptionHandlerViewModelMedIntranetGuiRepositoryExceptionVedIntranetGuiRepositoryException()
         {
             var fixture = new Fixture();
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
             var intranetGuiRepositoryException = fixture.Create<IntranetGuiRepositoryException>();
@@ -219,23 +273,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
                     throw intranetGuiRepositoryException;
                 };
 
-            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => command.Execute(fixture.Create<IViewModel>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(intranetGuiRepositoryException.Message));
+            command.Execute(fixture.Create<IViewModel>());
+
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.Equal(intranetGuiRepositoryException)));
         }
 
         /// <summary>
-        /// Tester, at Execute kaster en IntranetGuiBusinessException ved IntranetGuiBusinessException.
+        /// Tester, at Execute kalder exceptionhandleren med en IntranetGuiBusinessException ved IntranetGuiBusinessException.
         /// </summary>
         [Test]
-        public void TestAtExecuteKasterIntranetGuiBusinessExceptionVedIntranetGuiBusinessException()
+        public void TestAtExecuteKalderExceptionHandlerViewModelMedIntranetGuiBusinessExceptionVedIntranetGuiBusinessException()
         {
             var fixture = new Fixture();
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
             var intranetGuiBusinessException = fixture.Create<IntranetGuiBusinessException>();
@@ -244,23 +298,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
                     throw intranetGuiBusinessException;
                 };
 
-            var exception = Assert.Throws<IntranetGuiBusinessException>(() => command.Execute(fixture.Create<IViewModel>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(intranetGuiBusinessException.Message));
+            command.Execute(fixture.Create<IViewModel>());
+
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.Equal(intranetGuiBusinessException)));
         }
 
         /// <summary>
-        /// Tester, at Execute kaster en IntranetGuiSystemException ved IntranetGuiSystemException.
+        /// Tester, at Execute kalder exceptionhandleren med en IntranetGuiSystemException ved IntranetGuiSystemException.
         /// </summary>
         [Test]
-        public void TestAtExecuteKasterIntranetGuiSystemExceptionVedIntranetGuiSystemException()
+        public void TestAtExecuteKalderExceptionHandlerViewModelMedIntranetGuiSystemExceptionVedIntranetGuiSystemException()
         {
             var fixture = new Fixture();
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
             var intranetGuiSystemException = fixture.Create<IntranetGuiSystemException>();
@@ -269,23 +323,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
                     throw intranetGuiSystemException;
                 };
 
-            var exception = Assert.Throws<IntranetGuiSystemException>(() => command.Execute(fixture.Create<IViewModel>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(intranetGuiSystemException.Message));
+            command.Execute(fixture.Create<IViewModel>());
+
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.Equal(intranetGuiSystemException)));
         }
 
         /// <summary>
-        /// Tester, at Execute kaster en IntranetGuiSystemException ved Exception.
+        /// Tester, at Execute kalder exceptionhandleren med en IntranetGuiSystemException ved Exception.
         /// </summary>
         [Test]
-        public void TestAtExecuteKasterIntranetGuiSystemExceptionVedException()
+        public void TestAtExecuteKalderExceptionHandlerViewModelMedIntranetGuiSystemExceptionVedException()
         {
             var fixture = new Fixture();
             fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
 
-            var command = new MyViewModelCommand();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
             var executeException = fixture.Create<Exception>();
@@ -294,13 +348,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
                     throw executeException;
                 };
 
-            var exception = Assert.Throws<IntranetGuiSystemException>(() => command.Execute(fixture.Create<IViewModel>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CommandError, command.GetType().Name, executeException.Message)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.EqualTo(executeException));
+            command.Execute(fixture.Create<IViewModel>());
+
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.NotNull));
         }
     }
 }

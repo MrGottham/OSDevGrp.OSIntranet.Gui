@@ -8,8 +8,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 {
     /// <summary>
@@ -104,17 +102,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             try
             {
-                if (eventArgs.Observed)
-                {
-                    HandleException(eventArgs.Exception);
-                    return;
-                }
                 HandleException(eventArgs.Exception.InnerException ?? eventArgs.Exception);
-                eventArgs.SetObserved();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("UnobservedTaskExceptionEventHandler: {0}", ex.Message);
+            }
+            finally
+            {
+                eventArgs.SetObserved();
             }
         }
 
