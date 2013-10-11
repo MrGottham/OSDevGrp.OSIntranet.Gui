@@ -31,6 +31,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             Assert.That(exceptionHandlerViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.ExceptionHandler)));
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
+            Assert.That(exceptionHandlerViewModel.HideCommandText, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.HideCommandText, Is.Not.Empty);
+            Assert.That(exceptionHandlerViewModel.HideCommandText, Is.EqualTo(Resource.GetText(Text.Hide)));
             Assert.That(exceptionHandlerViewModel.HideCommand, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.HideCommand, Is.TypeOf<RelayCommand>());
         }

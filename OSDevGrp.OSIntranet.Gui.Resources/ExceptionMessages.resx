@@ -117,16 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Accountings" xml:space="preserve">
-    <value>Accountings</value>
+  <data name="CommandError" xml:space="preserve">
+    <value>Error while executing the command '{0}': {1}</value>
+    <comment>{0} = Type of the command, {1} = Error message.</comment>
   </data>
-  <data name="Exception" xml:space="preserve">
-    <value>A problem has occurred</value>
-  </data>
-  <data name="ExceptionHandler" xml:space="preserve">
-    <value>Exception handling</value>
-  </data>
-  <data name="Hide" xml:space="preserve">
-    <value>Hide</value>
+  <data name="RepositoryError" xml:space="preserve">
+    <value>Error in repository method '{0}': {1}</value>
+    <comment>{0} = Method name, {1} = Error message.</comment>
   </data>
 </root>

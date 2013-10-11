@@ -94,6 +94,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         }
 
         /// <summary>
+        /// Tekstangivelse til kommandoen, der kan skjule seneste håndterede exception.
+        /// </summary>
+        public virtual string HideCommandText
+        {
+            get
+            {
+                return Resource.GetText(Text.Hide);
+            }
+        }
+       
+        /// <summary>
         /// Kommando, der kan skjule seneste håndterede exception.
         /// </summary>
         public virtual ICommand HideCommand

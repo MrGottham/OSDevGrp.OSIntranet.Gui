@@ -35,6 +35,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core
         }
 
         /// <summary>
+        /// Tekstangivelse til kommandoen, der kan skjule seneste håndterede exception.
+        /// </summary>
+        string HideCommandText
+        {
+            get;
+        }
+
+        /// <summary>
         /// Kommando, der kan skjule seneste håndterede exception.
         /// </summary>
         ICommand HideCommand

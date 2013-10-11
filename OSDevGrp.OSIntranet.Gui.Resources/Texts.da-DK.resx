@@ -126,4 +126,7 @@
   <data name="ExceptionHandler" xml:space="preserve">
     <value>Fejlhåndtering</value>
   </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Luk</value>
+  </data>
 </root>

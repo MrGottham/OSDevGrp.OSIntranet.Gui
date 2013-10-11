@@ -34,8 +34,8 @@
                     <TextBlock Style="{StaticResource SubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
                     <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextStyle}" Text="{Binding Path=Message}"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Margin="20,20,40,20">
-                    
+                <StackPanel Grid.Column="1" Margin="20,20,40,20" VerticalAlignment="Center">
+                    <Button Style="{StaticResource TextPrimaryButtonStyle}" Content="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.HideCommandText}" Command="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler.HideCommand}"/>
                 </StackPanel>
             </Grid>
         </AppBar>

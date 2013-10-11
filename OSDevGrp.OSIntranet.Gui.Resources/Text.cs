@@ -7,6 +7,7 @@
     {
         Accountings,
         Exception,
-        ExceptionHandler
+        ExceptionHandler,
+        Hide
     }
 }
