@@ -48,6 +48,7 @@
     <Compile Include="Core\Commands\ViewModelCommandBase.cs" />
     <Compile Include="Core\ExceptionHandlerViewModel.cs" />
     <Compile Include="Core\ExceptionViewModel.cs" />
+    <Compile Include="Finansstyring\BogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommand.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\RegnskabViewModel.cs" />

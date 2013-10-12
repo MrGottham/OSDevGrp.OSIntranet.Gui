@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="Core\IExceptionHandlerViewModel.cs" />
     <Compile Include="Core\IExceptionViewModel.cs" />
+    <Compile Include="Finansstyring\IBogføringslinjeViewModel.cs" />
+    <Compile Include="Finansstyring\IReadOnlyBogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabViewModel.cs" />
     <Compile Include="IMainViewModel.cs" />

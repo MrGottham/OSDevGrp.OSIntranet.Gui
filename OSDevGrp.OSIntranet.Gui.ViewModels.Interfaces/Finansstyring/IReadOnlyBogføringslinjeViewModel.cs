@@ -1,45 +1,18 @@
 ﻿using System;
-using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 
-namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
+namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
 {
     /// <summary>
-    /// Interface til modellen for en bogføringslinje.
+    /// Interface til en uredigerbar ViewModel for en bogføringslinje.
     /// </summary>
-    public interface IBogføringslinjeModel : INyhedModel
+    public interface IReadOnlyBogføringslinjeViewModel : IBogføringslinjeViewModel
     {
-        /// <summary>
-        /// Regnskabsnummer, som bogføringslinjen er tilknyttet.
-        /// </summary>
-        int Regnskabsnummer
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Unik identifikation af bogføringslinjen inden for regnskabet.
-        /// </summary>
-        int Løbenummer
-        {
-            get;
-        }
-
         /// <summary>
         /// Bogføringstidspunkt.
         /// </summary>
         DateTime Dato
         {
-            get; 
-            set; 
-        }
-
-        /// <summary>
-        /// Bilag.
-        /// </summary>
-        string Bilag
-        { 
-            get; 
-            set; 
+            get;
         }
 
         /// <summary>
@@ -47,17 +20,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
         /// </summary>
         string Kontonummer
         {
-            get; 
-            set;
+            get;
         }
 
         /// <summary>
         /// Tekst.
         /// </summary>
-        string Tekst 
-        { 
-            get; 
-            set; 
+        string Tekst
+        {
+            get;
         }
 
         /// <summary>
@@ -65,8 +36,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
         /// </summary>
         string Budgetkontonummer
         {
-            get; 
-            set;
+            get;
         }
 
         /// <summary>
@@ -74,8 +44,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
         /// </summary>
         decimal Debit
         {
-            get; 
-            set;
+            get;
         }
 
         /// <summary>
@@ -83,8 +52,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
         /// </summary>
         decimal Kredit
         {
-            get; 
-            set;
+            get;
         }
 
         /// <summary>
@@ -100,8 +68,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
         /// </summary>
         int Adressekonto
         {
-            get; 
-            set;
+            get;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Globalization;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
@@ -31,6 +32,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var debit = fixture.Create<decimal>();
             var kredit = fixture.Create<decimal>();
             var adressekonto = fixture.Create<int>();
+            var nyhedsinformation = string.Format("{0} {1}\r\n{2} {3}", dato.ToShortDateString(), kontonummer, tekst, (debit - kredit).ToString("C"));
             var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer, løbenummer, dato, kontonummer, tekst, debit, kredit)
                 {
                     Bilag = bilag,
@@ -57,6 +59,11 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(bogføringslinjeModel.Kredit, Is.EqualTo(kredit));
             Assert.That(bogføringslinjeModel.Bogført, Is.EqualTo(bogføringslinjeModel.Debit - bogføringslinjeModel.Kredit));
             Assert.That(bogføringslinjeModel.Adressekonto, Is.EqualTo(adressekonto));
+            Assert.That(bogføringslinjeModel.Nyhedsaktualitet, Is.EqualTo(Nyhedsaktualitet.Medium));
+            Assert.That(bogføringslinjeModel.Nyhedsudgivelsestidspunkt, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(bogføringslinjeModel.Nyhedsinformation, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Nyhedsinformation, Is.Not.Empty);
+            Assert.That(bogføringslinjeModel.Nyhedsinformation, Is.EqualTo(nyhedsinformation));
         }
 
         /// <summary>
@@ -202,6 +209,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Dato")]
+        [TestCase("Nyhedsinformation")]
         public void TestAtDatoSetterRejserPropertyChangedVedOpdateringAfDato(string propertyNameToRaise)
         {
             var fixture = new Fixture();
@@ -323,6 +331,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Kontonummer")]
+        [TestCase("Nyhedsinformation")]
         public void TestAtKontonummerSetterRejserPropertyChangedVedOpdateringAfKontonummer(string propertyNameToRaise)
         {
             var fixture = new Fixture();
@@ -392,6 +401,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Tekst")]
+        [TestCase("Nyhedsinformation")]
         public void TestAtTekstSetterRejserPropertyChangedVedOpdateringAfTekst(string propertyNameToRaise)
         {
             var fixture = new Fixture();
@@ -515,6 +525,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         [TestCase("Debit")]
         [TestCase("Bogført")]
+        [TestCase("Nyhedsinformation")]
         public void TestAtDebitSetterRejserPropertyChangedVedOpdateringAfDebit(string propertyNameToRaise)
         {
             var fixture = new Fixture();
@@ -586,6 +597,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         [TestCase("Kredit")]
         [TestCase("Bogført")]
+        [TestCase("Nyhedsinformation")]
         public void TestAtKreditSetterRejserPropertyChangedVedOpdateringAfKredit(string propertyNameToRaise)
         {
             var fixture = new Fixture();

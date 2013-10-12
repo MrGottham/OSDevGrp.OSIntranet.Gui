@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
@@ -32,6 +33,21 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(regnskaber, Is.Not.Null);
             Assert.That(regnskaber, Is.Not.Empty);
             Assert.That(regnskaber.Count(), Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjerGetAsync henter et givent antal bogføringslinjer til et givent regnskab.
+        /// </summary>
+        [Test]
+        public async void TestAtBogføringslinjerGetAsyncHenterBogføringslinjer()
+        {
+            var finansstyringRepository = new FinansstyringRepository();
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var bogføringslinjer = await finansstyringRepository.BogføringslinjerGetAsync(1, DateTime.Now, 50);
+            Assert.That(bogføringslinjer, Is.Not.Null);
+            Assert.That(bogføringslinjer, Is.Not.Empty);
+            Assert.That(bogføringslinjer.Count(), Is.EqualTo(50));
         }
     }
 }

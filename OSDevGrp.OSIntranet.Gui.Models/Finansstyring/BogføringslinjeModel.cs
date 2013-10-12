@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Resources;
 
@@ -21,6 +23,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         private decimal _debit;
         private decimal _kredit;
         private int _adressekonto;
+        private readonly DateTime _nyhedsudgivelsestidspunkt = DateTime.Now;
 
         #endregion
 
@@ -122,6 +125,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 }
                 _dato = value;
                 RaisePropertyChanged("Dato");
+                RaisePropertyChanged("Nyhedsinformation");
             }
         }
 
@@ -166,6 +170,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 }
                 _kontonummer = value;
                 RaisePropertyChanged("Kontonummer");
+                RaisePropertyChanged("Nyhedsinformation");
             }
         }
 
@@ -190,6 +195,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 }
                 _tekst = value;
                 RaisePropertyChanged("Tekst");
+                RaisePropertyChanged("Nyhedsinformation");
             }
         }
 
@@ -235,6 +241,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 _debit = value;
                 RaisePropertyChanged("Debit");
                 RaisePropertyChanged("Bogført");
+                RaisePropertyChanged("Nyhedsinformation");
             }
         }
 
@@ -260,6 +267,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 _kredit = value;
                 RaisePropertyChanged("Kredit");
                 RaisePropertyChanged("Bogført");
+                RaisePropertyChanged("Nyhedsinformation");
             }
         }
 
@@ -291,6 +299,43 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 }
                 _adressekonto = value;
                 RaisePropertyChanged("Adressekonto");
+            }
+        }
+
+        /// <summary>
+        /// Nyhedsaktualitet.
+        /// </summary>
+        public virtual Nyhedsaktualitet Nyhedsaktualitet
+        {
+            get
+            {
+                return Nyhedsaktualitet.Medium;
+            }
+        }
+
+        /// <summary>
+        /// Udgivelsestidspunkt for nyheden.
+        /// </summary>
+        public virtual DateTime Nyhedsudgivelsestidspunkt
+        {
+            get
+            {
+                return _nyhedsudgivelsestidspunkt;
+            }
+        }
+
+        /// <summary>
+        /// Detaljeret nyhedsinformation.
+        /// </summary>
+        public virtual string Nyhedsinformation
+        {
+            get
+            {
+                var nyhedsinformationBuilder = new StringBuilder();
+                nyhedsinformationBuilder.AppendFormat("{0} {1}", Dato.ToString("d"), Kontonummer);
+                nyhedsinformationBuilder.AppendLine();
+                nyhedsinformationBuilder.AppendFormat("{0} {1}", Tekst, Bogført.ToString("C"));
+                return nyhedsinformationBuilder.ToString();
             }
         }
 
