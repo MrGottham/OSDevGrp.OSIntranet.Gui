@@ -86,5 +86,14 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
                 return ResourceManager.GetString("RepositoryError", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to load the resource named &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnableToLoadResource {
+            get {
+                return ResourceManager.GetString("UnableToLoadResource", resourceCulture);
+            }
+        }
     }
 }

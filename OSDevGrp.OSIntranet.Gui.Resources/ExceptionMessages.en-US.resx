@@ -129,4 +129,8 @@
     <value>Error in repository method '{0}': {1}</value>
     <comment>{0} = Method name, {1} = Error message.</comment>
   </data>
+  <data name="UnableToLoadResource" xml:space="preserve">
+    <value>Unable to load the resource named '{0}'.</value>
+    <comment>{0} = Name of resource.</comment>
+  </data>
 </root>

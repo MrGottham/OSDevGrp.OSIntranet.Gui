@@ -129,4 +129,8 @@
     <value>Fejl i repositorymetode '{0}': {1}</value>
     <comment>{0} = Metodenavn, {1} = Fejlbesked.</comment>
   </data>
+  <data name="UnableToLoadResource" xml:space="preserve">
+    <value>Kunne ikke loade ressourcen med navnet '{0}'.</value>
+    <comment>{0} = Navn på ressource.</comment>
+  </data>
 </root>

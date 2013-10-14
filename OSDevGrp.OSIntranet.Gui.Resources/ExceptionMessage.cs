@@ -7,6 +7,7 @@
     {
         RepositoryError,
         CommandError,
-        IllegalArgumentValue
+        IllegalArgumentValue,
+        UnableToLoadResource
     }
 }

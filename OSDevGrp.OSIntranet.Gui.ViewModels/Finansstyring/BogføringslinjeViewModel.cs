@@ -1,4 +1,6 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
@@ -8,6 +10,36 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// </summary>
     public class BogføringslinjeViewModel : ViewModelBase, IReadOnlyBogføringslinjeViewModel
     {
+        #region Private variables
+
+        private readonly IRegnskabViewModel _regnskabViewModel;
+        private readonly IBogføringslinjeModel _bogføringslinjeModel;
+
+        #endregion
+
+        #region Constructor
+        
+        /// <summary>
+        /// Danner ViewModel for en bogføringslinje.
+        /// </summary>
+        /// <param name="regnskabViewModel">ViewModel for regnskabet, som bogføringslinjen skal være tilknyttet.</param>
+        /// <param name="bogføringslinjeModel">Model for bogføringslinjen.</param>
+        public BogføringslinjeViewModel(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel)
+        {
+            if (regnskabViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabViewModel");
+            }
+            if (bogføringslinjeModel == null)
+            {
+                throw new ArgumentNullException("bogføringslinjeModel");
+            }
+            _regnskabViewModel = regnskabViewModel;
+            _bogføringslinjeModel = bogføringslinjeModel;
+        }
+        
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -17,7 +49,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _regnskabViewModel;
             }
         }
 
@@ -28,7 +60,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Løbenummer;
             }
         }
 
@@ -39,7 +71,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Dato;
             }
         }
 
@@ -50,7 +82,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Kontonummer;
             }
         }
 
@@ -61,7 +93,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Tekst;
             }
         }
 
@@ -72,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Budgetkontonummer;
             }
         }
 
@@ -83,7 +115,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Debit;
             }
         }
 
@@ -94,7 +126,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Kredit;
             }
         }
 
@@ -105,7 +137,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Bogført;
             }
         }
 
@@ -116,7 +148,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Adressekonto;
             }
         }
 
@@ -127,7 +159,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Resource.GetEmbeddedResource("Images.Bogføringslinje.png");
             }
         }
 
