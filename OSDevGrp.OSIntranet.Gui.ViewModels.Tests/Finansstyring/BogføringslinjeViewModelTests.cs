@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Resources;
@@ -54,6 +55,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                     mock.Expect(m => m.Adressekonto)
                         .Return(fixture.Create<int>())
                         .Repeat.Any();
+                    mock.Expect(m => m.Nyhedsinformation)
+                        .Return(fixture.Create<string>())
+                        .Repeat.Any();
                     return mock;
                 }));
 
@@ -81,6 +85,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringslinjeViewModel.Image, Is.Not.Null);
             Assert.That(bogføringslinjeViewModel.Image, Is.Not.Empty);
             Assert.That(bogføringslinjeViewModel.Image, Is.EqualTo(TestHelper.GetEmbeddedResource((new Resource()).GetType().Assembly, "Images.Bogføringslinje.png")));
+            Assert.That(bogføringslinjeViewModel.DisplayName, Is.Not.Null);
+            Assert.That(bogføringslinjeViewModel.DisplayName, Is.Not.Empty);
+            Assert.That(bogføringslinjeViewModel.DisplayName, Is.EqualTo(bogføringslinjeModelMock.Nyhedsinformation));
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Løbenummer);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Dato);
@@ -91,6 +98,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Bogført);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto);
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Nyhedsinformation);
         }
 
         /// <summary>
@@ -115,6 +123,81 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
 
             Assert.Throws<ArgumentNullException>(() => new BogføringslinjeViewModel(fixture.Create<IRegnskabViewModel>(), null));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler rejser PropertyChanged, når modellen for bogføringslinjen opdateres.
+        /// </summary>
+        [Test]
+        [TestCase("Løbenummer", "Løbenummer")]
+        [TestCase("Dato", "Dato")]
+        [TestCase("Kontonummer", "Kontonummer")]
+        [TestCase("Tekst", "Tekst")]
+        [TestCase("Budgetkontonummer", "Budgetkontonummer")]
+        [TestCase("Debit", "Debit")]
+        [TestCase("Kredit", "Kredit")]
+        [TestCase("Bogført", "Bogført")]
+        [TestCase("Adressekonto", "Adressekonto")]
+        public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerRejserPropertyChangedOnBogføringslinjeModelUpdate(string propertyNameToRaise, string expectPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+
+            var bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
+            var bogføringslinjeViewModel = new BogføringslinjeViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock);
+            Assert.That(bogføringslinjeViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            bogføringslinjeViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null,  bogføringslinjeModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler kaster en ArgumentNullException, hvis objektet, der rejser eventet er null.
+        /// </summary>
+        [Test]
+        public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+
+            var bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
+            var bogføringslinjeViewModel = new BogføringslinjeViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock);
+            Assert.That(bogføringslinjeViewModel, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler kaster en ArgumentNullException, hvis argumenter til eventet er null.
+        /// </summary>
+        [Test]
+        public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+
+            var bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
+            var bogføringslinjeViewModel = new BogføringslinjeViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock);
+            Assert.That(bogføringslinjeViewModel, Is.Not.Null);
+        
+            Assert.Throws<ArgumentNullException>(() => bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, fixture.Create<object>(), null));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -36,6 +37,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             _regnskabViewModel = regnskabViewModel;
             _bogføringslinjeModel = bogføringslinjeModel;
+            _bogføringslinjeModel.PropertyChanged += PropertyChangedOnBogføringslinjeModelEventHandler;
         }
         
         #endregion
@@ -170,8 +172,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogføringslinjeModel.Nyhedsinformation;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        ///  Eventhandler, der kaldes, når en property ændres på modellen for bogføringslinjen.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnBogføringslinjeModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            RaisePropertyChanged(eventArgs.PropertyName);
         }
 
         #endregion
