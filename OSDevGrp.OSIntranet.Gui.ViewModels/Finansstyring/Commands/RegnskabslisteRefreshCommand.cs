@@ -78,20 +78,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                             }
                             return;
                         }
+                        UpdateRegnskabslisteViewModel(regnskabslisteViewModel, _synchronizationContext);
                         foreach (var regnskabModel in t.Result)
                         {
-                            var regnskabViewModel = regnskabslisteViewModel.Regnskaber.SingleOrDefault(m => m.Nummer == regnskabModel.Nummer);
-                            if (regnskabViewModel != null)
-                            {
-                                regnskabViewModel.Navn = regnskabModel.Navn;
-                                continue;
-                            }
-                            if (_synchronizationContext == null)
-                            {
-                                regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel));
-                                continue;
-                            }
-                            _synchronizationContext.Post(obj => regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(obj as IRegnskabModel)), regnskabModel);
+                            HandleRegnskabModel(regnskabslisteViewModel, regnskabModel, _finansstyringRepository, ExceptionHandler, _synchronizationContext);
                         }
                     }
                     catch (Exception ex)
@@ -103,6 +93,86 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                         _isBusy = false;
                     }
                 });
+        }
+
+        /// <summary>
+        /// Opdaterer ViewModel for regnskabslisten.
+        /// </summary>
+        /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten.</param>
+        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
+        private static void UpdateRegnskabslisteViewModel(IRegnskabslisteViewModel regnskabslisteViewModel, SynchronizationContext synchronizationContext)
+        {
+            if (regnskabslisteViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabslisteViewModel");
+            }
+            if (synchronizationContext == null)
+            {
+                regnskabslisteViewModel.StatusDato = DateTime.Now;
+                return;
+            }
+            using (var waitEvent = new AutoResetEvent(false))
+            {
+                var we = waitEvent;
+                synchronizationContext.Post(obj =>
+                    {
+                        try
+                        {
+                            UpdateRegnskabslisteViewModel(obj as IRegnskabslisteViewModel, null);
+                        }
+                        finally
+                        {
+                            we.Set();
+                        }
+                    }, regnskabslisteViewModel);
+                waitEvent.WaitOne();
+            }
+        }
+
+        /// <summary>
+        /// Håndtering af modeller for hentede regnskaber.
+        /// </summary>
+        /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten, hvorpå hentede modeller skal håndteres.</param>
+        /// <param name="regnskabModel">Model for det hentede regnskab, der skal håndteres.</param>
+        /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af en ViewModel til en exceptionhandler.</param>
+        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
+        private static void HandleRegnskabModel(IRegnskabslisteViewModel regnskabslisteViewModel, IRegnskabModel regnskabModel, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, SynchronizationContext synchronizationContext)
+        {
+            if (regnskabslisteViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabslisteViewModel");
+            }
+            if (regnskabModel == null)
+            {
+                throw new ArgumentNullException("regnskabModel");
+            }
+            if (finansstyringRepository == null)
+            {
+                throw new ArgumentNullException("finansstyringRepository");
+            }
+            if (exceptionHandlerViewModel == null)
+            {
+                throw new ArgumentNullException("exceptionHandlerViewModel");
+            }
+            if (synchronizationContext == null)
+            {
+                var regnskabViewModel = regnskabslisteViewModel.Regnskaber.SingleOrDefault(m => m.Nummer == regnskabModel.Nummer);
+                if (regnskabViewModel != null)
+                {
+                    regnskabViewModel.Navn = regnskabModel.Navn;
+                    regnskabViewModel.StatusDato = regnskabslisteViewModel.StatusDato;
+                    return;
+                }
+                regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel, regnskabslisteViewModel.StatusDato, finansstyringRepository, exceptionHandlerViewModel));
+                return;
+            }
+            var arguments = new Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>(regnskabslisteViewModel, regnskabModel, finansstyringRepository, exceptionHandlerViewModel);
+            synchronizationContext.Post(obj =>
+                {
+                    var tuple = (Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>) obj;
+                    HandleRegnskabModel(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, null);
+                }, arguments);
         }
 
         #endregion

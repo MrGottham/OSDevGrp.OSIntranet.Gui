@@ -138,6 +138,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Kredit", "Kredit")]
         [TestCase("Bogført", "Bogført")]
         [TestCase("Adressekonto", "Adressekonto")]
+        [TestCase("Nyhedsinformation", "Nyhedsinformation")]
+        [TestCase("Nyhedsinformation", "DisplayName")]
         public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerRejserPropertyChangedOnBogføringslinjeModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();

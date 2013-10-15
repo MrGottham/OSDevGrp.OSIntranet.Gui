@@ -195,7 +195,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("eventArgs");
             }
-            RaisePropertyChanged(eventArgs.PropertyName);
+            switch (eventArgs.PropertyName)
+            {
+                case "Nyhedsinformation":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("DisplayName");
+                    break;
+
+                default:
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    break;
+            }
         }
 
         #endregion

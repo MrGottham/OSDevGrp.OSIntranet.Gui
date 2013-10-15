@@ -1,6 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Comparers;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Comparers;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
@@ -12,7 +21,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
+        private DateTime _statusDato;
         private readonly IRegnskabModel _regnskabModel;
+        private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
+        private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>(); 
 
         #endregion
 
@@ -22,14 +34,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// Danner ViewModel for et regnskab.
         /// </summary>
         /// <param name="regnskabModel">Model for et regnskab.</param>
-        public RegnskabViewModel(IRegnskabModel regnskabModel)
+        /// <param name="statusDato">Statusdato for regnskabet.</param>
+        /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel for en exceptionhandler.</param>
+        public RegnskabViewModel(IRegnskabModel regnskabModel, DateTime statusDato, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
         {
             if (regnskabModel == null)
             {
                 throw new ArgumentNullException("regnskabModel");
             }
+            if (finansstyringRepository == null)
+            {
+                throw new ArgumentNullException("finansstyringRepository");
+            }
+            if (exceptionHandlerViewModel == null)
+            {
+                throw new ArgumentNullException("exceptionHandlerViewModel");
+            }
             _regnskabModel = regnskabModel;
             _regnskabModel.PropertyChanged += PropertyChangedOnRegnskabModelEventHandler;
+            _statusDato = statusDato;
+            _bogføringslinjeViewModels.CollectionChanged += CollectionChangedOnBogføringslinjeViewModelsEventHandler;
+            _nyhedViewModels.CollectionChanged += CollectionChangedOnNyhedViewModelsEventHandler;
         }
         
         #endregion
@@ -48,7 +74,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// 
+        /// Navn.
         /// </summary>
         public virtual string Navn
         {
@@ -73,9 +99,83 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
         }
 
+        /// <summary>
+        /// Statusdato for regnskabet.
+        /// </summary>
+        public virtual DateTime StatusDato
+        {
+            get
+            {
+                return _statusDato;
+            }
+            set
+            {
+                if (_statusDato.CompareTo(value) > 0)
+                {
+                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", value), "value");
+                }
+                if (_statusDato.CompareTo(value) == 0)
+                {
+                    return;
+                }
+                _statusDato = value;
+                RaisePropertyChanged("StatusDato");
+            }
+        }
+
+        /// <summary>
+        /// Bogføringslinjer.
+        /// </summary>
+        public virtual IEnumerable<IReadOnlyBogføringslinjeViewModel> Bogføringslinjer
+        {
+            get
+            {
+                var comparer = new BogføringslinjeViewModelComparer();
+                return _bogføringslinjeViewModels.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Nyheder.
+        /// </summary>
+        public virtual IEnumerable<INyhedViewModel> Nyheder
+        {
+            get
+            {
+                var comparer = new NyhedViewModelComparer();
+                return _nyhedViewModels.OrderBy(m => m, comparer);
+            }
+        }
+
         #endregion
         
         #region Methods
+
+        /// <summary>
+        /// Tilføjer en bogføringslinje til regnskabet.
+        /// </summary>
+        /// <param name="bogføringslinjeViewModel">ViewModel for bogføringslinjen, der skal tilføjes regnskabet.</param>
+        public virtual void BogføringslinjeAdd(IReadOnlyBogføringslinjeViewModel bogføringslinjeViewModel)
+        {
+            if (bogføringslinjeViewModel == null)
+            {
+                throw new ArgumentNullException("bogføringslinjeViewModel");
+            }
+            _bogføringslinjeViewModels.Add(bogføringslinjeViewModel);
+        }
+
+        /// <summary>
+        /// Tilføjer en nyhed til regnskabet.
+        /// </summary>
+        /// <param name="nyhedViewModel">ViewModel for nyheden, er skal tilføjes regnskabet.</param>
+        public virtual void NyhedAdd(INyhedViewModel nyhedViewModel)
+        {
+            if (nyhedViewModel == null)
+            {
+                throw new ArgumentNullException("nyhedViewModel");
+            }
+            _nyhedViewModels.Add(nyhedViewModel);
+        }
 
         /// <summary>
         /// Eventhandler, der kaldes, når en property ændres på modellen for regnskabet.
@@ -92,7 +192,63 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("e");
             }
-            RaisePropertyChanged(e.PropertyName);
+            switch (e.PropertyName)
+            {
+                case "Navn":
+                    RaisePropertyChanged(e.PropertyName);
+                    RaisePropertyChanged("DisplayName");
+                    break;
+
+                default:
+                    RaisePropertyChanged(e.PropertyName);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for bogføringslinjer ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnBogføringslinjeViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Bogføringslinjer");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for nyheder ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnNyhedViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Nyheder");
+                    break;
+            }
         }
 
         #endregion

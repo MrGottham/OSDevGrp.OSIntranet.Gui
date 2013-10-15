@@ -85,6 +85,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
         public void TestAtExecuteAdderNyeRegnskaberTilRegnskabslisteViewModel()
         {
             var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
                 {
                     var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
@@ -106,6 +107,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             {
                 var we = waitEvent;
                 var regnskabslisteViewModelMock = MockRepository.GenerateMock<IRegnskabslisteViewModel>();
+                regnskabslisteViewModelMock.Expect(m => m.StatusDato)
+                                           .Return(fixture.Create<DateTime>())
+                                           .Repeat.Any();
                 regnskabslisteViewModelMock.Expect(m => m.Regnskaber)
                                            .Return(new ObservableCollection<IRegnskabViewModel>(new List<IRegnskabViewModel>()))
                                            .Repeat.Any();
@@ -129,6 +133,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                 waitEvent.WaitOne(3000);
 
                 finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+                regnskabslisteViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.LessThanOrEqual(DateTime.Now));
+                regnskabslisteViewModelMock.AssertWasCalled(m => m.StatusDato, opt => opt.Repeat.Times(regnskabCollection.Count));
                 regnskabslisteViewModelMock.AssertWasCalled(m => m.RegnskabAdd(Arg<IRegnskabViewModel>.Is.NotNull), opt => opt.Repeat.Times(regnskabCollection.Count));
                 exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
             }
@@ -141,6 +147,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
         public void TestAtExecuteOpdatererEksisteredeRegnskabIRegnskabslisteViewModel()
         {
             var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
                 {
                     var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
@@ -169,6 +176,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                                      .Repeat.Any();
                 
                 var regnskabslisteViewModelMock = MockRepository.GenerateMock<IRegnskabslisteViewModel>();
+                regnskabslisteViewModelMock.Expect(m => m.StatusDato)
+                                           .Return(fixture.Create<DateTime>())
+                                           .Repeat.Any();
                 regnskabslisteViewModelMock.Expect(m => m.Regnskaber)
                                            .Return(new ObservableCollection<IRegnskabViewModel>(new List<IRegnskabViewModel> { regnskabViewModelMock }))
                                            .Repeat.Any();
@@ -182,7 +192,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                 waitEvent.WaitOne(3000);
 
                 finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+                regnskabslisteViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.LessThanOrEqual(DateTime.Now));
+                regnskabslisteViewModelMock.AssertWasCalled(m => m.StatusDato);
                 regnskabViewModelMock.AssertWasCalled(m => m.Navn = Arg<string>.Is.Equal(regnskabCollection.ElementAt(0).Navn));
+                regnskabViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.Equal(regnskabslisteViewModelMock.StatusDato));
                 regnskabslisteViewModelMock.AssertWasNotCalled(m => m.RegnskabAdd(Arg<IRegnskabViewModel>.Is.Anything));
                 exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
             }

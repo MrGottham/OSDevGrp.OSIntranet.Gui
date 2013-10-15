@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Comparers;
@@ -84,9 +85,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
             var result = comparer.Compare(x, y);
             Assert.That(result, Is.LessThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             x.AssertWasNotCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             y.AssertWasNotCalled(m => m.Nyhedsaktualitet);
         }
 
@@ -116,9 +117,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
             var result = comparer.Compare(x, y);
             Assert.That(result, Is.GreaterThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             x.AssertWasNotCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             y.AssertWasNotCalled(m => m.Nyhedsaktualitet);
         }
 
@@ -154,9 +155,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
             var result = comparer.Compare(x, y);
             Assert.That(result, Is.LessThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             x.AssertWasCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             y.AssertWasCalled(m => m.Nyhedsaktualitet);
         }
 
@@ -192,25 +193,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
             var result = comparer.Compare(x, y);
             Assert.That(result, Is.GreaterThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             x.AssertWasCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
             y.AssertWasCalled(m => m.Nyhedsaktualitet);
         }
 
         /// <summary>
-        /// Tester, at Compare returnerer 0, hvis Nyhedsudgivelsestidspunkt på X er lig Nyhedsudgivelsestidspunkt på Y og Nyhedsaktualitet på X erlig Nyhedsaktualitet på Y.
+        /// Tester, at Compare returnerer sammenligningsresultat, hvis Nyhedsudgivelsestidspunkt på X er lig Nyhedsudgivelsestidspunkt på Y og Nyhedsaktualitet på X erlig Nyhedsaktualitet på Y.
         /// </summary>
         [Test]
-        public void TestAtCompareReturnererZeroHvisNyhedsudgivelsestidspunktOnXEqualsNyhedsudgivelsestidspunktOnYOgNyhedsaktualitetOnXEqualsNyhedsaktualitetOnY()
+        [TestCase("2013-06-30T10:00:00", "2013-06-30T09:00:00", -1)]
+        [TestCase("2013-06-30T10:00:00", "2013-06-30T10:00:00", 0)]
+        [TestCase("2013-06-30T10:00:00", "2013-06-30T11:00:00", 1)]
+        public void TestAtCompareReturnererCompareResultHvisNyhedsudgivelsestidspunktOnXEqualsNyhedsudgivelsestidspunktOnYOgNyhedsaktualitetOnXEqualsNyhedsaktualitetOnY(string xDate, string yDate, int expectCompareResult)
         {
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
-            var dato = fixture.Create<DateTime>();
             var x = MockRepository.GenerateMock<INyhedViewModel>();
             x.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
+             .Return(DateTime.Parse(xDate, new CultureInfo("en-US")))
              .Repeat.Any();
             x.Expect(m => m.Nyhedsaktualitet)
              .Return(Nyhedsaktualitet.Medium)
@@ -218,7 +221,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
 
             var y = MockRepository.GenerateMock<INyhedViewModel>();
             y.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
+             .Return(DateTime.Parse(yDate, new CultureInfo("en-US")))
              .Repeat.Any();
             y.Expect(m => m.Nyhedsaktualitet)
              .Return(Nyhedsaktualitet.Medium)
@@ -228,11 +231,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
             Assert.That(comparer, Is.Not.Null);
 
             var result = comparer.Compare(x, y);
-            Assert.That(result, Is.EqualTo(0));
+            Assert.That(result, Is.EqualTo(expectCompareResult));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(2));
             x.AssertWasCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
+            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(2));
             y.AssertWasCalled(m => m.Nyhedsaktualitet);
         }
     }
