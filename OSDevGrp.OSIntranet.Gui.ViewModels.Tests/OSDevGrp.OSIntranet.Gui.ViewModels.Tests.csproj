@@ -67,6 +67,7 @@
     <Compile Include="Core\NyhedViewModelTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModelTests.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommandTests.cs" />
+    <Compile Include="Finansstyring\Comparers\BogføringslinjeViewModelComparerTests.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabViewModelTests.cs" />
     <Compile Include="MainViewModelTests.cs" />
