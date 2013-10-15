@@ -62,6 +62,7 @@
     <Compile Include="Core\Commands\CommandBaseTests.cs" />
     <Compile Include="Core\Commands\RelayCommandTests.cs" />
     <Compile Include="Core\Commands\ViewModelCommandBaseTests.cs" />
+    <Compile Include="Core\Comparers\NyhedViewModelComparerTests.cs" />
     <Compile Include="Core\ExceptionHandlerViewModelTests.cs" />
     <Compile Include="Core\ExceptionViewModelTests.cs" />
     <Compile Include="Core\NyhedViewModelTests.cs" />

@@ -17,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Comparers
         /// <param name="x">ViewModel for en bogføringslinje.</param>
         /// <param name="y">ViewModel for en bogføringslinje.</param>
         /// <returns>Sammenligningsresultat.</returns>
-        public int Compare(IReadOnlyBogføringslinjeViewModel x, IReadOnlyBogføringslinjeViewModel y)
+        public virtual int Compare(IReadOnlyBogføringslinjeViewModel x, IReadOnlyBogføringslinjeViewModel y)
         {
             if (x == null)
             {
