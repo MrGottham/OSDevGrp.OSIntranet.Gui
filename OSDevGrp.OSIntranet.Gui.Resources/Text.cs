@@ -8,6 +8,7 @@
         Accountings,
         Exception,
         ExceptionHandler,
-        Hide
+        Hide,
+        News
     }
 }

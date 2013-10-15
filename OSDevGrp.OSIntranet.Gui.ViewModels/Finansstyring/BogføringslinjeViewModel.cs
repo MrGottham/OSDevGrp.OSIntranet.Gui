@@ -181,7 +181,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Methods
 
         /// <summary>
-        ///  Eventhandler, der kaldes, når en property ændres på modellen for bogføringslinjen.
+        /// Eventhandler, der kaldes, når en property ændres på modellen for bogføringslinjen.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>

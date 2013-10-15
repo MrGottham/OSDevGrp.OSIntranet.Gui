@@ -129,4 +129,7 @@
   <data name="Hide" xml:space="preserve">
     <value>Hide</value>
   </data>
+  <data name="News" xml:space="preserve">
+    <value>News</value>
+  </data>
 </root>

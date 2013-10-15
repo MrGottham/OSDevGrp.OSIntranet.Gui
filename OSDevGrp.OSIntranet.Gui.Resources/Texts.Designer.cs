@@ -95,5 +95,14 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
                 return ResourceManager.GetString("Hide", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to News.
+        /// </summary>
+        internal static string News {
+            get {
+                return ResourceManager.GetString("News", resourceCulture);
+            }
+        }
     }
 }
