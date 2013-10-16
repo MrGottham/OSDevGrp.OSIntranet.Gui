@@ -18,6 +18,12 @@
       <VisualElements DisplayName="OS Finansstyring" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Finansstyring til OS Intranet" ForegroundText="light" BackgroundColor="#464646">
         <DefaultTile ShowName="allLogos" WideLogo="Assets\WideLogo.png" ShortName="OS Finans" />
         <SplashScreen Image="Assets\SplashScreen.png" />
+        <InitialRotationPreference>
+          <Rotation Preference="portrait" />
+          <Rotation Preference="landscape" />
+          <Rotation Preference="portraitFlipped" />
+          <Rotation Preference="landscapeFlipped" />
+        </InitialRotationPreference>
       </VisualElements>
     </Application>
   </Applications>

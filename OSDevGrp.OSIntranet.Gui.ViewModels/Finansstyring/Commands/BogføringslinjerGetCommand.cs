@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -17,6 +18,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         #region Private constants
 
         private const int AntalBogføringslinjer = 50;
+        private const int DageForNyheder = 7;
 
         #endregion
 
@@ -122,7 +124,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 {
                     return;
                 }
-                regnskabViewModel.BogføringslinjeAdd(new BogføringslinjeViewModel(regnskabViewModel, bogføringslinjeModel));
+                var bogføringslinjeViewModel = new BogføringslinjeViewModel(regnskabViewModel, bogføringslinjeModel);
+                regnskabViewModel.BogføringslinjeAdd(bogføringslinjeViewModel);
+                if (bogføringslinjeModel.Dato.Date.CompareTo(regnskabViewModel.StatusDato.AddDays(DageForNyheder*-1).Date) >= 0 && bogføringslinjeModel.Dato.Date.CompareTo(regnskabViewModel.StatusDato.Date) <= 0)
+                {
+                    regnskabViewModel.NyhedAdd(new NyhedViewModel(bogføringslinjeModel, bogføringslinjeViewModel.Image));
+                }
                 return;
             }
             var arguments = new Tuple<IRegnskabViewModel, IBogføringslinjeModel>(regnskabViewModel, bogføringslinjeModel);

@@ -36,6 +36,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             
             Application.Current.UnhandledException += UnhandledExceptionEventHandler;
             TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionEventHandler;
+
+            SizeChanged += PageSizeChangedEventHandler;
         }
 
         /// <summary>
@@ -126,6 +128,29 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 eventArgs.SetObserved();
             }
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer ændring af størrelse på siden.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PageSizeChangedEventHandler(object sender, SizeChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            if (eventArgs.NewSize.Width < 500)
+            {
+                VisualStateManager.GoToState(this, "MinimalLayout", true);
+                return;
+            }
+            VisualStateManager.GoToState(this, "DefaultLayout", true);
         }
 
         /// <summary>

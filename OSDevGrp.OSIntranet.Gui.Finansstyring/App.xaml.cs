@@ -22,9 +22,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             InitializeComponent();
             Suspending += OnSuspending;
 
-            // TODO: Supported rotations.
-            // TODO: Spilt screen.
             // TODO: Live tiles.
+            // TODO: Settings (pane).
+            // TODO: Panes.
+            // TODO: Search.
+
         }
 
         /// <summary>

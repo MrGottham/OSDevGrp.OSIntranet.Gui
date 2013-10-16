@@ -209,9 +209,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                 finansstyringRepositoryMock.AssertWasCalled(m => m.BogføringslinjerGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato), Arg<int>.Is.Equal(50)));
                 regnskabViewModelMock.AssertWasCalled(m => m.Bogføringslinjer, opt => opt.Repeat.Times(bogføringslinjeModelMockCollection.Count));
                 regnskabViewModelMock.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<IReadOnlyBogføringslinjeViewModel>.Is.NotNull), opt => opt.Repeat.Times(bogføringslinjeModelMockCollection.Count));
-                regnskabViewModelMock.AssertWasCalled(m => m.NyhedAdd(Arg<INyhedViewModel>.Is.NotNull), opt => opt.Repeat.Times(bogføringslinjeModelMockCollection.Count(m => m.Dato.Date.CompareTo(regnskabViewModelMock.StatusDato.Date.AddDays(-7)) >= 0 && m.Dato.Date.CompareTo(regnskabViewModelMock.StatusDato.Date) <= 0)));
+                regnskabViewModelMock.AssertWasCalled(m => m.NyhedAdd(Arg<INyhedViewModel>.Is.NotNull), opt => opt.Repeat.Times(bogføringslinjeModelMockCollection.Count(m => m.Dato.Date.CompareTo(regnskabViewModelMock.StatusDato.AddDays(-7).Date) >= 0 && m.Dato.Date.CompareTo(regnskabViewModelMock.StatusDato.Date) <= 0)));
                 exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
             }
         }
+
+        // TODO: Test at eksisterende linier ikke indsættes.
+        // TODO: Test exceptionhandling.
     }
 }
