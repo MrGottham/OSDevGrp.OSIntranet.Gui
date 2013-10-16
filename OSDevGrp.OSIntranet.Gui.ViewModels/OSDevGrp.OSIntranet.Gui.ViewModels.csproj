@@ -52,6 +52,7 @@
     <Compile Include="Core\ExceptionViewModel.cs" />
     <Compile Include="Core\NyhedViewModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModel.cs" />
+    <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommand.cs" />
     <Compile Include="Finansstyring\Comparers\BogføringslinjeViewModelComparer.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModel.cs" />

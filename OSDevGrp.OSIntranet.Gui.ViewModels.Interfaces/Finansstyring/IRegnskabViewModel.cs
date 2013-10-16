@@ -29,7 +29,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// <summary>
         /// Statusdato for regnskabet.
         /// </summary>
-        DateTime StatusDato 
+        DateTime StatusDato
         { 
             get; 
             set;
