@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Commands\CommandBaseTests.cs" />
+    <Compile Include="Core\Commands\CommandCollectionExecuterCommandTests.cs" />
     <Compile Include="Core\Commands\RelayCommandTests.cs" />
     <Compile Include="Core\Commands\ViewModelCommandBaseTests.cs" />
     <Compile Include="Core\Comparers\NyhedViewModelComparerTests.cs" />
