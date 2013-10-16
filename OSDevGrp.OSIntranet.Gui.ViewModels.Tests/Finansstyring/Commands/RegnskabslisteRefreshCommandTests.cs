@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -202,6 +203,58 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
         }
 
         /// <summary>
+        /// Tester, at Execute kalder OnFinish efter funktionalitet til opdatering m.m.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteKalderOnFinishEfterRefreshFunktionalitet()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            Func<IEnumerable<IRegnskabModel>> regnskabCollectionGetter = () => new List<IRegnskabModel>(0);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
+                                       .Return(Task.Run(regnskabCollectionGetter))
+                                       .Repeat.Any();
+
+            using (var waitEvent = new AutoResetEvent(false))
+            {
+                var we = waitEvent;
+                var regnskabslisteViewModelMock = MockRepository.GenerateMock<IRegnskabslisteViewModel>();
+                var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+                var actionCalled = false;
+                Action<IRegnskabslisteViewModel> onFinish = obj =>
+                    {
+                        try
+                        {
+                            Assert.That(obj, Is.Not.Null);
+                            Assert.That(obj, Is.EqualTo(regnskabslisteViewModelMock));
+                            actionCalled = true;
+                        }
+                        finally
+                        {
+                            we.Set();
+                        }
+                    };
+
+                var command = new RegnskabslisteRefreshCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock, onFinish);
+                Assert.That(command, Is.Not.Null);
+
+                Assert.That(actionCalled, Is.False);
+                command.Execute(regnskabslisteViewModelMock);
+                waitEvent.WaitOne(3000);
+                Assert.That(actionCalled, Is.True);
+
+                finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+                regnskabslisteViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.LessThanOrEqual(DateTime.Now));
+                regnskabslisteViewModelMock.AssertWasNotCalled(m => m.Regnskaber);
+                regnskabslisteViewModelMock.AssertWasNotCalled(m => m.RegnskabAdd(Arg<IRegnskabViewModel>.Is.Anything));
+                exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            }
+        }
+
+        /// <summary>
         /// Tester, at Execute kalder exceptionhandleren med en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
         /// </summary>
         [Test]
@@ -235,6 +288,57 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
                 finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
                 exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at ExecuteRefreshCommandOnRegnskabViewModels kaster en ArgumentNullException, hvis ViewModel for regnskaber er null.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteRefreshCommandOnRegnskabViewModelsKasterArgumentNullExceptionHvisRegnskabslisteViewModelErNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => RegnskabslisteRefreshCommand.ExecuteRefreshCommandOnRegnskabViewModels(null));
+        }
+
+        /// <summary>
+        /// Tester, at ExecuteRefreshCommandOnRegnskabViewModels udfører RefreshCommand på alle ViewModels for regnskaber i listen af regnskaber.
+        /// </summary>
+        [Test]
+        public void TestExecuteRefreshCommandOnRegnskabViewModelsExecutesRefreshCommandOnRegnskabViewModels()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommand>(e => e.FromFactory(() =>
+                {
+                    var commandMock = MockRepository.GenerateMock<ICommand>();
+                    commandMock.Expect(m => m.CanExecute(Arg<object>.Is.NotNull))
+                               .Return(true)
+                               .Repeat.Any();
+                    return commandMock;
+                }));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() =>
+                {
+                    var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+                    regnskabViewModelMock.Expect(m => m.RefreshCommand)
+                                         .Return(fixture.Create<ICommand>())
+                                         .Repeat.Any();
+                    return regnskabViewModelMock;
+                }));
+
+            var regnskabViewModelMockCollection = fixture.CreateMany<IRegnskabViewModel>(25).ToList();
+            var regnskabslisteViewModelMock = MockRepository.GenerateMock<IRegnskabslisteViewModel>();
+            regnskabslisteViewModelMock.Expect(m => m.Regnskaber)
+                                       .Return(regnskabViewModelMockCollection)
+                                       .Repeat.Any();
+
+            RegnskabslisteRefreshCommand.ExecuteRefreshCommandOnRegnskabViewModels(regnskabslisteViewModelMock);
+
+            regnskabslisteViewModelMock.AssertWasCalled(m => m.Regnskaber);
+            foreach (var regnskabViewModelMock in regnskabViewModelMockCollection)
+            {
+                var mock = regnskabViewModelMock;
+                regnskabViewModelMock.AssertWasCalled(m => m.RefreshCommand);
+                regnskabViewModelMock.RefreshCommand.AssertWasCalled(m => m.CanExecute(Arg<IRegnskabViewModel>.Is.Equal(mock)));
+                regnskabViewModelMock.RefreshCommand.AssertWasCalled(m => m.Execute(Arg<IRegnskabViewModel>.Is.Equal(mock)));
             }
         }
     }

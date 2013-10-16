@@ -102,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return _refreshCommand ?? (_refreshCommand = new RegnskabslisteRefreshCommand(_finansstyringRepository, _exceptionHandlerViewModel));
+                return _refreshCommand ?? (_refreshCommand = new RegnskabslisteRefreshCommand(_finansstyringRepository, _exceptionHandlerViewModel, RegnskabslisteRefreshCommand.ExecuteRefreshCommandOnRegnskabViewModels));
             }
         }
 

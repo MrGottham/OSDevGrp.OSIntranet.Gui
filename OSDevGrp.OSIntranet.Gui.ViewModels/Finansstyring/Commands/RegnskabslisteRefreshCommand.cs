@@ -19,10 +19,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         private bool _isBusy;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly SynchronizationContext _synchronizationContext;
+        private readonly Action<IRegnskabslisteViewModel> _onFinish;
         
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Danner kommando til genindlæsning af regnskabslisten.
@@ -30,6 +31,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="exceptionHandlerViewModel">Implementering af en ViewModel til en exceptionhandler.</param>
         public RegnskabslisteRefreshCommand(IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
+            : this(finansstyringRepository, exceptionHandlerViewModel, null)
+        {
+        }
+
+        /// <summary>
+        /// Danner kommando til genindlæsning af regnskabslisten.
+        /// </summary>
+        /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af en ViewModel til en exceptionhandler.</param>
+        /// <param name="onFinish">Callbackmetode, der udføres, når kommandoen er udført fejlfrit.</param>
+        public RegnskabslisteRefreshCommand(IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, Action<IRegnskabslisteViewModel> onFinish)
             : base(exceptionHandlerViewModel)
         {
             if (finansstyringRepository == null)
@@ -37,6 +49,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 throw new ArgumentNullException("finansstyringRepository");
             }
             _finansstyringRepository = finansstyringRepository;
+            _onFinish = onFinish;
             _synchronizationContext = SynchronizationContext.Current;
         }
 
@@ -82,6 +95,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                         foreach (var regnskabModel in t.Result)
                         {
                             HandleRegnskabModel(regnskabslisteViewModel, regnskabModel, _finansstyringRepository, ExceptionHandler, _synchronizationContext);
+                        }
+                        if (_onFinish != null)
+                        {
+                            _onFinish.Invoke(regnskabslisteViewModel);
                         }
                     }
                     catch (Exception ex)
@@ -167,12 +184,44 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel, regnskabslisteViewModel.StatusDato, finansstyringRepository, exceptionHandlerViewModel));
                 return;
             }
-            var arguments = new Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>(regnskabslisteViewModel, regnskabModel, finansstyringRepository, exceptionHandlerViewModel);
-            synchronizationContext.Post(obj =>
+            using (var waitEvent = new AutoResetEvent(false))
+            {
+                var we = waitEvent;
+                var arguments = new Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>(regnskabslisteViewModel, regnskabModel, finansstyringRepository, exceptionHandlerViewModel);
+                synchronizationContext.Post(obj =>
+                    {
+                        try
+                        {
+                            var tuple = (Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>) obj;
+                            HandleRegnskabModel(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, null);
+                        }
+                        finally
+                        {
+                            we.Set();
+                        }
+                    }, arguments);
+                waitEvent.WaitOne();
+            }
+        }
+
+        /// <summary>
+        /// Udfører RefreshCommand på alle ViewModels for regnskaber i listen af regnskaber.
+        /// </summary>
+        /// <param name="regnskabslisteViewModel">ViewModel for en liste af regnskaber.</param>
+        public static void ExecuteRefreshCommandOnRegnskabViewModels(IRegnskabslisteViewModel regnskabslisteViewModel)
+        {
+            if (regnskabslisteViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabslisteViewModel");
+            }
+            foreach (var regnskabViewModel in regnskabslisteViewModel.Regnskaber)
+            {
+                var refreshCommand = regnskabViewModel.RefreshCommand;
+                if (refreshCommand.CanExecute(regnskabViewModel))
                 {
-                    var tuple = (Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>) obj;
-                    HandleRegnskabModel(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, null);
-                }, arguments);
+                    refreshCommand.Execute(regnskabViewModel);
+                }
+            }
         }
 
         #endregion

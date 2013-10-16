@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
     /// <summary>
     /// Interface til en ViewModel for et regnskab.
     /// </summary>
-    public interface IRegnskabViewModel : IViewModel
+    public interface IRegnskabViewModel : IViewModel, IRefreshable
     {
         /// <summary>
         /// Regnskabsnummer.

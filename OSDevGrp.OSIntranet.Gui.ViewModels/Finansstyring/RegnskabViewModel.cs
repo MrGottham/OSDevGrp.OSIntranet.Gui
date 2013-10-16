@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Comparers;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Comparers;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
@@ -22,6 +24,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Private variables
 
         private DateTime _statusDato;
+        private ICommand _refreshCommand;
         private readonly IRegnskabModel _regnskabModel;
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>(); 
@@ -144,6 +147,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 var comparer = new NyhedViewModelComparer();
                 return _nyhedViewModels.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Kommando til genindlæsning og opdatering.
+        /// </summary>
+        public virtual ICommand RefreshCommand
+        {
+            get
+            {
+                if (_refreshCommand != null)
+                {
+                    return _refreshCommand;
+                }
+                var executeCommands = new Collection<ICommand>();
+                _refreshCommand = new CommandCollectionExecuterCommand(executeCommands);
+                return _refreshCommand;
             }
         }
 
