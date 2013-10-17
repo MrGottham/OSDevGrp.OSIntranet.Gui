@@ -8,6 +8,8 @@
         RepositoryError,
         CommandError,
         IllegalArgumentValue,
-        UnableToLoadResource
+        UnableToLoadResource,
+        MissingConfigurationSetting,
+        InvalidConfigurationSettingValue
     }
 }

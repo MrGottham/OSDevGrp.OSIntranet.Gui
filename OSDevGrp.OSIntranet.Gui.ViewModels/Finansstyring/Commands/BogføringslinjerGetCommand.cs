@@ -15,13 +15,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
     /// </summary>
     public class BogføringslinjerGetCommand : ViewModelCommandBase<IRegnskabViewModel>
     {
-        #region Private constants
-
-        private const int AntalBogføringslinjer = 50;
-        private const int DageForNyheder = 7;
-
-        #endregion
-
         #region Private variables
 
         private bool _isBusy;
@@ -69,7 +62,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         protected override void Execute(IRegnskabViewModel regnskabViewModel)
         {
             _isBusy = true;
-            var task = _finansstyringRepository.BogføringslinjerGetAsync(regnskabViewModel.Nummer, regnskabViewModel.StatusDato, AntalBogføringslinjer);
+            var konfiguration = _finansstyringRepository.Konfiguration;
+            var task = _finansstyringRepository.BogføringslinjerGetAsync(regnskabViewModel.Nummer, regnskabViewModel.StatusDato, konfiguration.AntalBogføringslinjer);
             task.ContinueWith(t =>
                 {
                     try
@@ -86,9 +80,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                             }
                             return;
                         }
+                        var dageForNyheder = konfiguration.DageForNyheder;
                         foreach (var bogføringslinjeModel in t.Result.OrderBy(m => m.Dato))
                         {
-                            HandleBogføringslinjeModel(regnskabViewModel, bogføringslinjeModel, _synchronizationContext);
+                            HandleBogføringslinjeModel(regnskabViewModel, bogføringslinjeModel, dageForNyheder, _synchronizationContext);
                         }
                     }
                     catch (Exception ex)
@@ -107,8 +102,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// </summary>
         /// <param name="regnskabViewModel">ViewModel for regnskabet, der skal håndtere den hentede bogføringslinje.</param>
         /// <param name="bogføringslinjeModel">Model for den hentede bogføringslinje.</param>
+        /// <param name="dageForNyheder">Antal dage, som nyheder er gældende.</param>
         /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private static void HandleBogføringslinjeModel(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, SynchronizationContext synchronizationContext)
+        private static void HandleBogføringslinjeModel(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, int dageForNyheder, SynchronizationContext synchronizationContext)
         {
             if (regnskabViewModel == null)
             {
@@ -126,17 +122,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 }
                 var bogføringslinjeViewModel = new BogføringslinjeViewModel(regnskabViewModel, bogføringslinjeModel);
                 regnskabViewModel.BogføringslinjeAdd(bogføringslinjeViewModel);
-                if (bogføringslinjeModel.Dato.Date.CompareTo(regnskabViewModel.StatusDato.AddDays(DageForNyheder*-1).Date) >= 0 && bogføringslinjeModel.Dato.Date.CompareTo(regnskabViewModel.StatusDato.Date) <= 0)
+                if (bogføringslinjeModel.Dato.Date.CompareTo(regnskabViewModel.StatusDato.AddDays(dageForNyheder*-1).Date) >= 0 && bogføringslinjeModel.Dato.Date.CompareTo(regnskabViewModel.StatusDato.Date) <= 0)
                 {
                     regnskabViewModel.NyhedAdd(new NyhedViewModel(bogføringslinjeModel, bogføringslinjeViewModel.Image));
                 }
                 return;
             }
-            var arguments = new Tuple<IRegnskabViewModel, IBogføringslinjeModel>(regnskabViewModel, bogføringslinjeModel);
+            var arguments = new Tuple<IRegnskabViewModel, IBogføringslinjeModel, int>(regnskabViewModel, bogføringslinjeModel, dageForNyheder);
             synchronizationContext.Post(obj =>
                 {
-                    var tuple = (Tuple<IRegnskabViewModel, IBogføringslinjeModel>) obj;
-                    HandleBogføringslinjeModel(tuple.Item1, tuple.Item2, null);
+                    var tuple = (Tuple<IRegnskabViewModel, IBogføringslinjeModel, int>) obj;
+                    HandleBogføringslinjeModel(tuple.Item1, tuple.Item2, tuple.Item3, null);
                 }, arguments);
         }
 

@@ -18,9 +18,41 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
     /// </summary>
     public class FinansstyringRepository : IFinansstyringRepository
     {
-        #region Private constants
+        #region Private variables
 
-        private const string FinansstyringServiceUri = "http://mother/osintranet/finansstyringservice.svc/mobile";
+        private readonly IFinansstyringKonfigurationRepository _finansstyringKonfigurationRepository;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Danner repository, der supporterer finansstyring.
+        /// </summary>
+        /// <param name="finansstyringKonfigurationRepository">Implementering af konfigurationsrepository, der supporterer finansstyring.</param>
+        public FinansstyringRepository(IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository)
+        {
+            if (finansstyringKonfigurationRepository == null)
+            {
+                throw new ArgumentNullException("finansstyringKonfigurationRepository");
+            }
+            _finansstyringKonfigurationRepository = finansstyringKonfigurationRepository;
+        }
+
+        #endregion
+        
+        #region Properties
+
+        /// <summary>
+        /// Returnerer konfigurationsrepositoryet, der supporterer finansstyring.
+        /// </summary>
+        public virtual IFinansstyringKonfigurationRepository Konfiguration
+        {
+            get
+            {
+                return _finansstyringKonfigurationRepository;
+            }
+        }
 
         #endregion
 
@@ -53,13 +85,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// Henter en liste af regnskaber.
         /// </summary>
         /// <returns>Liste af regnskaber.</returns>
-        private static IEnumerable<IRegnskabModel> RegnskabslisteGet()
+        private IEnumerable<IRegnskabModel> RegnskabslisteGet()
         {
             try
             {
                 var result = new List<IRegnskabModel>();
                 var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
-                var endpointAddress = new EndpointAddress(FinansstyringServiceUri);
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
                 var client = new FinansstyringServiceClient(binding, endpointAddress);
                 try
                 {
@@ -100,6 +132,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 }
                 return result;
             }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "RegnskabslisteGet", ex.Message), ex);
@@ -117,13 +153,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="statusDato">Dato, hvorfra bogføringslinjer skal hentes.</param>
         /// <param name="antalBogføringslinjer">Antal bogføringslinjer, der skal hentes.</param>
         /// <returns>Bogføringslinjer til regnskabet.</returns>
-        private static IEnumerable<IBogføringslinjeModel> BogføringslinjerGet(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer)
+        private IEnumerable<IBogføringslinjeModel> BogføringslinjerGet(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer)
         {
             try
             {
                 var result = new List<IBogføringslinjeModel>(antalBogføringslinjer);
                 var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
-                var endpointAddress = new EndpointAddress(FinansstyringServiceUri);
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
                 var client = new FinansstyringServiceClient(binding, endpointAddress);
                 try
                 {
@@ -154,18 +190,31 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                                             {
                                                 continue;
                                             }
-                                            var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer, bogføringslinjeView.Løbenr, bogføringslinjeView.Dato, bogføringslinjeView.Konto.Kontonummer, bogføringslinjeView.Tekst, bogføringslinjeView.Debit, bogføringslinjeView.Kredit);
+                                            var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer,
+                                                                                                bogføringslinjeView
+                                                                                                    .Løbenr,
+                                                                                                bogføringslinjeView.Dato,
+                                                                                                bogføringslinjeView
+                                                                                                    .Konto.Kontonummer,
+                                                                                                bogføringslinjeView
+                                                                                                    .Tekst,
+                                                                                                bogføringslinjeView
+                                                                                                    .Debit,
+                                                                                                bogføringslinjeView
+                                                                                                    .Kredit);
                                             if (string.IsNullOrEmpty(bogføringslinjeView.Bilag) == false)
                                             {
                                                 bogføringslinjeModel.Bilag = bogføringslinjeView.Bilag;
                                             }
                                             if (bogføringslinjeView.Budgetkonto != null)
                                             {
-                                                bogføringslinjeModel.Budgetkontonummer = bogføringslinjeView.Budgetkonto.Kontonummer;
+                                                bogføringslinjeModel.Budgetkontonummer =
+                                                    bogføringslinjeView.Budgetkonto.Kontonummer;
                                             }
                                             if (bogføringslinjeView.Adressekonto != null)
                                             {
-                                                bogføringslinjeModel.Adressekonto = bogføringslinjeView.Adressekonto.Nummer;
+                                                bogføringslinjeModel.Adressekonto =
+                                                    bogføringslinjeView.Adressekonto.Nummer;
                                             }
                                             result.Add(bogføringslinjeModel);
                                         }
@@ -196,6 +245,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     throw;
                 }
                 return result;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
             }
             catch (FaultException ex)
             {

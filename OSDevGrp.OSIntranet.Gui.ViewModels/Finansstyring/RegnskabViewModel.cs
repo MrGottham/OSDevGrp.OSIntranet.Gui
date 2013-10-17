@@ -10,6 +10,7 @@ using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Comparers;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Comparers;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -26,6 +27,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private DateTime _statusDato;
         private ICommand _refreshCommand;
         private readonly IRegnskabModel _regnskabModel;
+        private readonly IFinansstyringRepository _finansstyringRepository;
+        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>(); 
 
@@ -57,6 +60,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _regnskabModel = regnskabModel;
             _regnskabModel.PropertyChanged += PropertyChangedOnRegnskabModelEventHandler;
             _statusDato = statusDato;
+            _finansstyringRepository = finansstyringRepository;
+            _exceptionHandlerViewModel = exceptionHandlerViewModel;
             _bogføringslinjeViewModels.CollectionChanged += CollectionChangedOnBogføringslinjeViewModelsEventHandler;
             _nyhedViewModels.CollectionChanged += CollectionChangedOnNyhedViewModelsEventHandler;
         }
@@ -161,7 +166,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     return _refreshCommand;
                 }
-                var executeCommands = new Collection<ICommand>();
+                var executeCommands = new Collection<ICommand>
+                    {
+                        new BogføringslinjerGetCommand(_finansstyringRepository, _exceptionHandlerViewModel)
+                    };
                 _refreshCommand = new CommandCollectionExecuterCommand(executeCommands);
                 return _refreshCommand;
             }

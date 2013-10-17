@@ -98,7 +98,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                         }
                         if (_onFinish != null)
                         {
-                            _onFinish.Invoke(regnskabslisteViewModel);
+                            InvokeOnFinish(regnskabslisteViewModel, _onFinish, _synchronizationContext);
                         }
                     }
                     catch (Exception ex)
@@ -202,6 +202,35 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                     }, arguments);
                 waitEvent.WaitOne();
             }
+        }
+
+        /// <summary>
+        /// Invoker callbackmetode, der udføres, når kommandoen er udført fejlfrit.
+        /// </summary>
+        /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten, hvormed callbackmetoden skal invokes.</param>
+        /// <param name="onFinish">Callbackmetode, der udføres, når kommandoen er udført fejlfrit.</param>
+        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
+        private static void InvokeOnFinish(IRegnskabslisteViewModel regnskabslisteViewModel, Action<IRegnskabslisteViewModel> onFinish, SynchronizationContext synchronizationContext)
+        {
+            if (regnskabslisteViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabslisteViewModel");
+            }
+            if (onFinish == null)
+            {
+                throw new ArgumentNullException("onFinish");
+            }
+            if (synchronizationContext == null)
+            {
+                onFinish.Invoke(regnskabslisteViewModel);
+                return;
+            }
+            var arguments = new Tuple<IRegnskabslisteViewModel, Action<IRegnskabslisteViewModel>>(regnskabslisteViewModel, onFinish);
+            synchronizationContext.Post(obj =>
+                {
+                    var tuple = (Tuple<IRegnskabslisteViewModel, Action<IRegnskabslisteViewModel>>) obj;
+                    InvokeOnFinish(tuple.Item1, tuple.Item2, null);
+                }, arguments);
         }
 
         /// <summary>

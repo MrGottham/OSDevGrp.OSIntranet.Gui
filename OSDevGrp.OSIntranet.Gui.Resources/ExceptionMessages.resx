@@ -125,6 +125,14 @@
     <value>Illegal value for '{0}': {1}</value>
     <comment>{0} = Name of argument, {1} = value.</comment>
   </data>
+  <data name="InvalidConfigurationSettingValue" xml:space="preserve">
+    <value>The value for the configuration setting named '{0}' is invalid.</value>
+    <comment>{0} = Name of configuration setting.</comment>
+  </data>
+  <data name="MissingConfigurationSetting" xml:space="preserve">
+    <value>The configuration setting named '{0}' is not defined.</value>
+    <comment>{0} = Name of configuration setting.</comment>
+  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Error in repository method '{0}': {1}</value>
     <comment>{0} = Method name, {1} = Error message.</comment>

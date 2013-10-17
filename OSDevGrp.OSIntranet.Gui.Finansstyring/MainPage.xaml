@@ -13,7 +13,7 @@
         <vm:MainViewModel x:Key="MainViewModel"/>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <DataTemplate x:Key="RegnskabViewModelDefaultNavigationDataTemplate">
-            <Grid Margin="0,0,20,0" Width="350" MaxWidth="350">
+            <Grid Margin="0,0,20,0" Width="400" MinWidth="400">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>

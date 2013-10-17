@@ -11,6 +11,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
     public interface IFinansstyringRepository
     {
         /// <summary>
+        /// Returnerer konfigurationsrepositoryet, der supporterer finansstyring.
+        /// </summary>
+        IFinansstyringKonfigurationRepository Konfiguration
+        {
+            get;
+        }
+
+        /// <summary>
         /// Henter en liste af regnskaber.
         /// </summary>
         /// <returns>Liste af regnskaber.</returns>

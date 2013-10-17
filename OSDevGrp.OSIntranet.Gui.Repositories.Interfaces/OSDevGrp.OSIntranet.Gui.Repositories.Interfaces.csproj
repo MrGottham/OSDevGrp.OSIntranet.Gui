@@ -44,6 +44,7 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="IFinansstyringKonfigurationRepository.cs" />
     <Compile Include="IFinansstyringRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
+﻿using System.Collections.Generic;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
@@ -23,5 +24,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
         {
             get;
         }
+
+        /// <summary>
+        /// Tilføjer konfiguration.
+        /// </summary>
+        /// <param name="configurationSettings">Dictionary indeholdende konfiguration.</param>
+        void ApplyConfiguration(IDictionary<string, object> configurationSettings);
     }
 }

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
@@ -30,6 +31,23 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         public MainPage()
         {
             InitializeComponent();
+
+            var roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
+            if (roamingSettings.Values.ContainsKey("FinansstyringServiceUri") == false)
+            {
+                roamingSettings.Values.Add("FinansstyringServiceUri", "http://mother/osintranet/finansstyringservice.svc/mobile");
+            }
+            if (roamingSettings.Values.ContainsKey("AntalBogføringslinjer") == false)
+            {
+                roamingSettings.Values.Add("AntalBogføringslinjer", 50);
+            }
+            if (roamingSettings.Values.ContainsKey("DageForNyheder") == false)
+            {
+                roamingSettings.Values.Add("DageForNyheder", 7);
+            }
+
+            var mainViewModel = (IMainViewModel) Resources["MainViewModel"];
+            mainViewModel.ApplyConfiguration(roamingSettings.Values);
 
             _exceptionHandlerViewModel = (IExceptionHandlerViewModel) ExceptionHandlerAppBar.DataContext;
             _regnskabslisteViewModel = (IRegnskabslisteViewModel) ((Grid) Content).DataContext;

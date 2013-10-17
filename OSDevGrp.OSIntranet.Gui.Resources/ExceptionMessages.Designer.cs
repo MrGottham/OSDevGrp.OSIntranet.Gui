@@ -79,6 +79,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value for the configuration setting named &apos;{0}&apos; is invalid..
+        /// </summary>
+        internal static string InvalidConfigurationSettingValue {
+            get {
+                return ResourceManager.GetString("InvalidConfigurationSettingValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The configuration setting named &apos;{0}&apos; is not defined..
+        /// </summary>
+        internal static string MissingConfigurationSetting {
+            get {
+                return ResourceManager.GetString("MissingConfigurationSetting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error in repository method &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string RepositoryError {

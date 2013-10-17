@@ -26,7 +26,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             // TODO: Settings (pane).
             // TODO: Panes.
             // TODO: Search.
-
         }
 
         /// <summary>

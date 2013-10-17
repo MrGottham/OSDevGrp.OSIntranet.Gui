@@ -125,6 +125,14 @@
     <value>Illegal værdi for '{0}': {1}</value>
     <comment>{0} = Navn på argument, {1} = værdi.</comment>
   </data>
+  <data name="InvalidConfigurationSettingValue" xml:space="preserve">
+    <value>Værdien for konfigurationen med navnet '{0}' er illegal.</value>
+    <comment>{0} = Navn på konfigurationsværdi.</comment>
+  </data>
+  <data name="MissingConfigurationSetting" xml:space="preserve">
+    <value>Konfigurationsværdien med navnet '{0}' er ikke defineret.</value>
+    <comment>{0} = Navn på konfigurationsværdi.</comment>
+  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Fejl i repositorymetode '{0}': {1}</value>
     <comment>{0} = Metodenavn, {1} = Fejlbesked.</comment>

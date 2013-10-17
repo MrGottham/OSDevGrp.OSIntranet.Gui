@@ -43,6 +43,7 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FinansstyringKonfigurationRepository.cs" />
     <Compile Include="FinansstyringRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\Service\Reference.cs">
