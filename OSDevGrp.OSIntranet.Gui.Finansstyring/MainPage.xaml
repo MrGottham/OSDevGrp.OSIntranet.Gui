@@ -13,7 +13,7 @@
         <vm:MainViewModel x:Key="MainViewModel"/>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <DataTemplate x:Key="NyhedViewModelDefaultNavigationDataTemplate">
-            <Grid Width="400" MinWidth="400" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
+            <Grid Width="400" MinWidth="400" MaxWidth="400" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -22,7 +22,7 @@
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="NyhedViewModelDefaultMinimalDataTemplate">
-            <Grid Width="125" MinWidth="125" Height="Auto" MinHeight="75" Style="{StaticResource HighlightedGridStyle}">
+            <Grid Width="125" MinWidth="125" MaxWidth="125" Height="Auto" MinHeight="75" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
