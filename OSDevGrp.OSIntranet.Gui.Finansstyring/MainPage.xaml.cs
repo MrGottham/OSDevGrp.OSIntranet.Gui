@@ -45,6 +45,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 roamingSettings.Values.Add("DageForNyheder", 7);
             }
+            roamingSettings.Values["DageForNyheder"] = 30;
 
             var mainViewModel = (IMainViewModel) Resources["MainViewModel"];
             mainViewModel.ApplyConfiguration(roamingSettings.Values);

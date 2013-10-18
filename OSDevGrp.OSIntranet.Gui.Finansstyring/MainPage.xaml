@@ -12,22 +12,53 @@
     <Page.Resources>
         <vm:MainViewModel x:Key="MainViewModel"/>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <DataTemplate x:Key="NyhedViewModelDefaultNavigationDataTemplate">
+            <Grid Width="400" MinWidth="400" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1" Margin="20,10,20,10" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="NyhedViewModelDefaultMinimalDataTemplate">
+            <Grid Width="125" MinWidth="125" Height="Auto" MinHeight="75" Style="{StaticResource HighlightedGridStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="10,5,10,5" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="RegnskabViewModelDefaultNavigationDataTemplate">
-            <Grid Margin="0,0,20,0" Width="400" MinWidth="400">
+            <Grid Width="Auto" MinWidth="400">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
+                <ListView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelDefaultNavigationDataTemplate}">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="RegnskabViewModelMinimalNavigationDataTemplate">
-            <Grid Margin="0,0,0,10">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" Text="{Binding Path=DisplayName}"/>
+                <ListView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelDefaultMinimalDataTemplate}">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -63,7 +94,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-            <ListView Grid.Row="1" ItemsSource="{Binding Path=Regnskaber}" ItemTemplate="{StaticResource RegnskabViewModelDefaultNavigationDataTemplate}" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <ListView Grid.Row="1" ItemsSource="{Binding Path=Regnskaber}" ItemTemplate="{StaticResource RegnskabViewModelDefaultNavigationDataTemplate}" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -78,7 +109,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-            <ListView Grid.Row="1" ItemsSource="{Binding Path=Regnskaber}" ItemTemplate="{StaticResource RegnskabViewModelMinimalNavigationDataTemplate}" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListView Grid.Row="1" ItemsSource="{Binding Path=Regnskaber}" ItemTemplate="{StaticResource RegnskabViewModelMinimalNavigationDataTemplate}" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
