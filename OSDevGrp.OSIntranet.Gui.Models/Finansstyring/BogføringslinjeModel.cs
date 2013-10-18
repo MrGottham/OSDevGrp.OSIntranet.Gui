@@ -23,7 +23,6 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         private decimal _debit;
         private decimal _kredit;
         private int _adressekonto;
-        private readonly DateTime _nyhedsudgivelsestidspunkt = DateTime.Now;
 
         #endregion
 
@@ -125,6 +124,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 }
                 _dato = value;
                 RaisePropertyChanged("Dato");
+                RaisePropertyChanged("Nyhedsudgivelsestidspunkt");
                 RaisePropertyChanged("Nyhedsinformation");
             }
         }
@@ -320,7 +320,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                return _nyhedsudgivelsestidspunkt;
+                return Dato;
             }
         }
 

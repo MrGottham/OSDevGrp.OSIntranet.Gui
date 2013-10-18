@@ -60,7 +60,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(bogføringslinjeModel.Bogført, Is.EqualTo(bogføringslinjeModel.Debit - bogføringslinjeModel.Kredit));
             Assert.That(bogføringslinjeModel.Adressekonto, Is.EqualTo(adressekonto));
             Assert.That(bogføringslinjeModel.Nyhedsaktualitet, Is.EqualTo(Nyhedsaktualitet.Medium));
-            Assert.That(bogføringslinjeModel.Nyhedsudgivelsestidspunkt, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(bogføringslinjeModel.Nyhedsudgivelsestidspunkt, Is.EqualTo(dato));
             Assert.That(bogføringslinjeModel.Nyhedsinformation, Is.Not.Null);
             Assert.That(bogføringslinjeModel.Nyhedsinformation, Is.Not.Empty);
             Assert.That(bogføringslinjeModel.Nyhedsinformation, Is.EqualTo(nyhedsinformation));
@@ -209,6 +209,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Dato")]
+        [TestCase("Nyhedsudgivelsestidspunkt")]
         [TestCase("Nyhedsinformation")]
         public void TestAtDatoSetterRejserPropertyChangedVedOpdateringAfDato(string propertyNameToRaise)
         {
