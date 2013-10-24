@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Data;
@@ -25,7 +26,13 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// <returns>Konverteret værdi.</returns>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return value == null ? null : ToImage(value as byte[]);
+            if (value == null)
+            {
+                return null;
+            }
+            var task = ToImageAsync(value as byte[]);
+            task.ToString();
+            return null;
         }
 
         /// <summary>
@@ -46,7 +53,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// </summary>
         /// <param name="bytes">Array af bytes, der skal konverteres til et billede.</param>
         /// <returns>Billede.</returns>
-        private static async Task<BitmapImage> ToImage(byte[] bytes)
+        private static async Task<BitmapImage> ToImageAsync(byte[] bytes)
         {
             if (bytes == null)
             {
