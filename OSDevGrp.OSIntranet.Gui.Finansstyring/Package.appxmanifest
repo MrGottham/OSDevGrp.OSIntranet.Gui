@@ -16,6 +16,7 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="OSDevGrp.OSIntranet.Gui.Finansstyring.App">
       <VisualElements DisplayName="OS Finansstyring" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Finansstyring til OS Intranet" ForegroundText="light" BackgroundColor="#464646">
+        <LockScreen Notification="badgeAndTileText" BadgeLogo="Assets\BadgeLogo.png" />
         <DefaultTile ShowName="allLogos" WideLogo="Assets\WideLogo.png" ShortName="OS Finans" />
         <SplashScreen Image="Assets\SplashScreen.png" />
         <InitialRotationPreference>
@@ -25,6 +26,13 @@
           <Rotation Preference="landscapeFlipped" />
         </InitialRotationPreference>
       </VisualElements>
+      <Extensions>
+        <Extension Category="windows.backgroundTasks" EntryPoint="OSDevGrp.OSIntranet.Gui.Finansstyring.FinansstyringBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="timer" />
+          </BackgroundTasks>
+        </Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>

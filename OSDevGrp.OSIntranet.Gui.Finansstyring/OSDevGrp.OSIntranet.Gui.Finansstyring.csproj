@@ -126,6 +126,10 @@
       <Project>{1f572194-e97c-4e22-a027-3412817475e3}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Resources</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.RuntimeComponents\OSDevGrp.OSIntranet.Gui.RuntimeComponents.csproj">
+      <Project>{42660b8e-a55e-4288-8047-82ddeff29af9}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.RuntimeComponents</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces\OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.csproj">
       <Project>{feebf869-1312-40d3-9db8-b5e32d7d7f2c}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces</Name>
@@ -154,6 +158,9 @@
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\BadgeLogo.scale-100.png" />
+    <Content Include="Assets\BadgeLogo.scale-140.png" />
+    <Content Include="Assets\BadgeLogo.scale-180.png" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\Logo.scale-140.png" />
     <Content Include="Assets\Logo.scale-180.png" />
