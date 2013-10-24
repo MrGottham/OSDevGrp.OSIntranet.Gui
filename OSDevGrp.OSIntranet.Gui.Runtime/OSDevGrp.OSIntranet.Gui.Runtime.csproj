@@ -110,8 +110,25 @@
   <ItemGroup>
     <Compile Include="ConfigurationProvider.cs" />
     <Compile Include="FinansstyringsnyhederLoaderBackgroundTask.cs" />
-    <Compile Include="FinansstyringsnyhederShowerBackgroundTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces\OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.csproj">
+      <Project>{edc9e35c-d096-4c89-abb8-7fa7eb0982f3}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Models.Interfaces\OSDevGrp.OSIntranet.Gui.Models.Interfaces.csproj">
+      <Project>{85324394-8c83-4a51-9bf4-0deb776cf9ab}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Models.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring\OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.csproj">
+      <Project>{3b3182f3-e285-4dec-b77b-9e09e9aa79c3}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Repositories.Interfaces\OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.csproj">
+      <Project>{5e8cbc9f-811c-423b-8ad7-3afa33cc42d9}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Repositories.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

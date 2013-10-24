@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.Gui.Runtime;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
+using Windows.ApplicationModel.Background;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -33,11 +34,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
-            var roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
-            roamingSettings.Values.Remove("FinansstyringServiceUri");
-            roamingSettings.Values.Remove("AntalBogføringslinjer");
-            roamingSettings.Values.Remove("DageForNyheder");
-
             var configurationProvider = new ConfigurationProvider();
 
             var mainViewModel = (IMainViewModel) Resources["MainViewModel"];
@@ -59,6 +55,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// property is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            RegisterBackgroundTasks();
             if (_regnskabslisteViewModel.Regnskaber.Any())
             {
                 return;
@@ -68,6 +65,30 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 refreshCommand.Execute(_regnskabslisteViewModel);
             }
+        }
+
+        private async void RegisterBackgroundTasks()
+        {
+            var backgroundAccessStatus = await BackgroundExecutionManager.RequestAccessAsync();
+            if (backgroundAccessStatus != BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity && backgroundAccessStatus != BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity)
+            {
+                return;
+            }
+            foreach (var task in BackgroundTaskRegistration.AllTasks)
+            {
+                if (task.Value.Name == "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringsnyhederLoaderBackgroundTask")
+                {
+                    task.Value.Unregister(true);
+                }
+            }
+
+            var backgoundTaskBuilder = new BackgroundTaskBuilder
+                {
+                    Name = "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringsnyhederLoaderBackgroundTask",
+                    TaskEntryPoint = "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringsnyhederLoaderBackgroundTask"
+                };
+            backgoundTaskBuilder.SetTrigger(new TimeTrigger(15, false));
+            backgoundTaskBuilder.Register();
         }
 
         /// <summary>
