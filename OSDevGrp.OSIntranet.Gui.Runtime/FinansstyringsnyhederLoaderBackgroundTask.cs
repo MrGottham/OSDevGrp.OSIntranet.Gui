@@ -52,8 +52,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <returns>Nyheder til finansstyring.</returns>
-        private static async Task<IEnumerable<INyhedModel>> FinansstyringsnyhederGetAsync(
-            IFinansstyringRepository finansstyringRepository)
+        private static async Task<IEnumerable<INyhedModel>> FinansstyringsnyhederGetAsync(IFinansstyringRepository finansstyringRepository)
         {
             if (finansstyringRepository == null)
             {
@@ -75,7 +74,6 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 return nyheder.OrderByDescending(m => m.Nyhedsudgivelsestidspunkt).ToList();
             }
         }
-
 
         #endregion
     }
