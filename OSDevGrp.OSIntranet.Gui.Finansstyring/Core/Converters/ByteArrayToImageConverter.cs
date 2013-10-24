@@ -36,7 +36,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
                 return null;
             }
             var result = new BitmapImage();
-            Task.Run(() => LoadImageAsync(value as byte[], result));
+            Task.Run(() => LoadImageAsync(value as byte[], result, _synchronizationContext));
             return result;
         }
 
@@ -50,7 +50,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// <returns>Konverteret værdi.</returns>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -58,7 +58,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// </summary>
         /// <param name="bytes">Array af bytes, der skal loades ind i billedet.</param>
         /// <param name="image">Billede, hvori arrayet af bytes skal loades ind i.</param>
-        private async Task LoadImageAsync(byte[] bytes, BitmapSource image)
+        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
+        private static async Task LoadImageAsync(byte[] bytes, BitmapSource image, SynchronizationContext synchronizationContext)
         {
             if (bytes == null)
             {
@@ -68,17 +69,22 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
             {
                 throw new ArgumentNullException("image");
             }
-            using (var memoryStream = new InMemoryRandomAccessStream())
+            if (synchronizationContext == null)
             {
-                await memoryStream.WriteAsync(bytes.AsBuffer());
-                memoryStream.Seek(0);
-                if (_synchronizationContext == null)
+                using (var memoryStream = new InMemoryRandomAccessStream())
                 {
+                    await memoryStream.WriteAsync(bytes.AsBuffer());
+                    memoryStream.Seek(0);
                     await image.SetSourceAsync(memoryStream);
-                    return;
                 }
-                _synchronizationContext.Post(async (obj) => await image.SetSourceAsync((IRandomAccessStream) obj), memoryStream);
+                return;
             }
+            var arguments = new Tuple<byte[], BitmapSource>(bytes, image);
+            synchronizationContext.Post(async obj =>
+                {
+                    var tuple = (Tuple<byte[], BitmapSource>) obj;
+                    await LoadImageAsync(tuple.Item1, tuple.Item2, null);
+                }, arguments);
         }
 
         #endregion
