@@ -126,10 +126,6 @@
       <Project>{1f572194-e97c-4e22-a027-3412817475e3}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Resources</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.RuntimeComponents\OSDevGrp.OSIntranet.Gui.RuntimeComponents.csproj">
-      <Project>{42660b8e-a55e-4288-8047-82ddeff29af9}</Project>
-      <Name>OSDevGrp.OSIntranet.Gui.RuntimeComponents</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Runtime\OSDevGrp.OSIntranet.Gui.Runtime.csproj">
       <Project>{212a5669-b973-4304-9750-da7c8924b4cb}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Runtime</Name>

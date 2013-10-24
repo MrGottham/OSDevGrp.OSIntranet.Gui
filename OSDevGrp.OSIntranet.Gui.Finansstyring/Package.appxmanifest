@@ -27,7 +27,7 @@
         </InitialRotationPreference>
       </VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="OSDevGrp.OSIntranet.Gui.Finansstyring.FinansstyringBackgroundTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringsnyhederShowerBackgroundTask">
           <BackgroundTasks>
             <Task Type="timer" />
           </BackgroundTasks>
