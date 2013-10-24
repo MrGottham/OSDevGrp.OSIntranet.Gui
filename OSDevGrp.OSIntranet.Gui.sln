@@ -41,9 +41,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Gui.Fin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Gui.RuntimeComponents", "OSDevGrp.OSIntranet.Gui.RuntimeComponents\OSDevGrp.OSIntranet.Gui.RuntimeComponents.csproj", "{42660B8E-A55E-4288-8047-82DDEFF29AF9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Gui.Runtime", "OSDevGrp.OSIntranet.Gui.Runtime\OSDevGrp.OSIntranet.Gui.Runtime.csproj", "{212A5669-B973-4304-9750-DA7C8924B4CB}"
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 15
+		SccNumberOfProjects = 16
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Gui.Models.Interfaces\\OSDevGrp.OSIntranet.Gui.Models.Interfaces.csproj
 		SccLocalPath1 = .
@@ -87,6 +89,9 @@ Global
 		SccProjectUniqueName14 = OSDevGrp.OSIntranet.Gui.RuntimeComponents\\OSDevGrp.OSIntranet.Gui.RuntimeComponents.csproj
 		SccLocalPath14 = .
 		SccProjectFilePathRelativizedFromConnection14 = OSDevGrp.OSIntranet.Gui.RuntimeComponents\\
+		SccProjectUniqueName15 = OSDevGrp.OSIntranet.Gui.Runtime\\OSDevGrp.OSIntranet.Gui.Runtime.csproj
+		SccLocalPath15 = .
+		SccProjectFilePathRelativizedFromConnection15 = OSDevGrp.OSIntranet.Gui.Runtime\\
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -259,6 +264,22 @@ Global
 		{42660B8E-A55E-4288-8047-82DDEFF29AF9}.Release|x64.Build.0 = Release|x64
 		{42660B8E-A55E-4288-8047-82DDEFF29AF9}.Release|x86.ActiveCfg = Release|x86
 		{42660B8E-A55E-4288-8047-82DDEFF29AF9}.Release|x86.Build.0 = Release|x86
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|ARM.ActiveCfg = Debug|ARM
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|ARM.Build.0 = Debug|ARM
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|x64.ActiveCfg = Debug|x64
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|x64.Build.0 = Debug|x64
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|x86.ActiveCfg = Debug|x86
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Debug|x86.Build.0 = Debug|x86
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|ARM.ActiveCfg = Release|ARM
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|ARM.Build.0 = Release|ARM
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|x64.ActiveCfg = Release|x64
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|x64.Build.0 = Release|x64
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|x86.ActiveCfg = Release|x86
+		{212A5669-B973-4304-9750-DA7C8924B4CB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

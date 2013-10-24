@@ -130,6 +130,10 @@
       <Project>{42660b8e-a55e-4288-8047-82ddeff29af9}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.RuntimeComponents</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Runtime\OSDevGrp.OSIntranet.Gui.Runtime.csproj">
+      <Project>{212a5669-b973-4304-9750-da7c8924b4cb}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Runtime</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces\OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.csproj">
       <Project>{feebf869-1312-40d3-9db8-b5e32d7d7f2c}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces</Name>
