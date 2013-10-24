@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
@@ -14,6 +13,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
     /// </summary>
     public class ByteArrayToImageConverter : IValueConverter
     {
+        #region Private variables
+
+        private readonly SynchronizationContext _synchronizationContext = SynchronizationContext.Current;
+
+        #endregion
+
         #region Methods
 
         /// <summary>
@@ -30,9 +35,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
             {
                 return null;
             }
-            var task = ToImageAsync(value as byte[]);
-            task.ToString();
-            return null;
+            var result = new BitmapImage();
+            Task.Run(() => LoadImageAsync(value as byte[], result));
+            return result;
         }
 
         /// <summary>
@@ -49,23 +54,30 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         }
 
         /// <summary>
-        /// Konverteres et array af bytes til et billede.
+        /// Loader et array af bytes ind i et billede.
         /// </summary>
-        /// <param name="bytes">Array af bytes, der skal konverteres til et billede.</param>
-        /// <returns>Billede.</returns>
-        private static async Task<BitmapImage> ToImageAsync(byte[] bytes)
+        /// <param name="bytes">Array af bytes, der skal loades ind i billedet.</param>
+        /// <param name="image">Billede, hvori arrayet af bytes skal loades ind i.</param>
+        private async Task LoadImageAsync(byte[] bytes, BitmapSource image)
         {
             if (bytes == null)
             {
                 throw new ArgumentNullException("bytes");
             }
+            if (image == null)
+            {
+                throw new ArgumentNullException("image");
+            }
             using (var memoryStream = new InMemoryRandomAccessStream())
             {
                 await memoryStream.WriteAsync(bytes.AsBuffer());
                 memoryStream.Seek(0);
-                var image = new BitmapImage();
-                await image.SetSourceAsync(memoryStream);
-                return image;
+                if (_synchronizationContext == null)
+                {
+                    await image.SetSourceAsync(memoryStream);
+                    return;
+                }
+                _synchronizationContext.Post(async (obj) => await image.SetSourceAsync((IRandomAccessStream) obj), memoryStream);
             }
         }
 
