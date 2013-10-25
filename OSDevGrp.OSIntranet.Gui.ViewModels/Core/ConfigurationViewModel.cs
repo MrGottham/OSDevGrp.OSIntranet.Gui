@@ -18,11 +18,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         /// <param name="configurationViewModels">Collection af ViewModels indeholdende forskellige konfigurationer.</param>
         public ConfigurationViewModel(IEnumerable<IConfigurationViewModel> configurationViewModels)
         {
+            if (configurationViewModels == null)
+            {
+                throw new ArgumentNullException("configurationViewModels");
+            }
         }
 
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Unikt navn for konfigurationen.
+        /// </summary>
+        public virtual string Configuration
+        {
+            get
+            {
+                return "OSDevGrp.OSIntranet.Gui.ViewModels.Core.ConfigurationViewModel";
+            }
+        }
 
         /// <summary>
         /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen. 

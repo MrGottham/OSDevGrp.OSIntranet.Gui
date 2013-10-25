@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
@@ -26,9 +27,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
 
             var configurationViewModel = new ConfigurationViewModel(fixture.CreateMany<IConfigurationViewModel>(5).ToList());
             Assert.That(configurationViewModel, Is.Not.Null);
+            Assert.That(configurationViewModel.Configuration, Is.Not.Null);
+            Assert.That(configurationViewModel.Configuration, Is.Not.Empty);
+            Assert.That(configurationViewModel.Configuration, Is.EqualTo("OSDevGrp.OSIntranet.Gui.ViewModels.Core.ConfigurationViewModel"));
             Assert.That(configurationViewModel.DisplayName, Is.Not.Null);
             Assert.That(configurationViewModel.DisplayName, Is.Not.Empty);
             Assert.That(configurationViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.Configuration)));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis listen af ViewModels indeholdende forskellige konfigurationer er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisConfigurationViewModelsErNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ConfigurationViewModel(null));
         }
     }
 }
