@@ -34,7 +34,6 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 _roamingSettings.Values.Add("DageForNyheder", 7);
             }
-            _roamingSettings.Values["DageForNyheder"] = 30;
         }
 
         #endregion
