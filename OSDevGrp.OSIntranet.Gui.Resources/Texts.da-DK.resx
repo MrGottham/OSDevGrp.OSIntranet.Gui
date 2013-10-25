@@ -120,6 +120,9 @@
   <data name="Accountings" xml:space="preserve">
     <value>Regnskabsliste</value>
   </data>
+  <data name="Configuration" xml:space="preserve">
+    <value>Konfiguration</value>
+  </data>
   <data name="Exception" xml:space="preserve">
     <value>Der er opstået et problem</value>
   </data>

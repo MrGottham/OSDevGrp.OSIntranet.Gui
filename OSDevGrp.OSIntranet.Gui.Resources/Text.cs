@@ -9,6 +9,7 @@
         Exception,
         ExceptionHandler,
         Hide,
-        News
+        News,
+        Configuration
     }
 }

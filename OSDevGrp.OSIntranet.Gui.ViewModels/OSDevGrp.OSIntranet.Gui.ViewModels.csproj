@@ -50,6 +50,7 @@
     <Compile Include="Core\Comparers\NyhedViewModelComparer.cs" />
     <Compile Include="Core\ExceptionHandlerViewModel.cs" />
     <Compile Include="Core\ExceptionViewModel.cs" />
+    <Compile Include="Core\ConfigurationViewModel.cs" />
     <Compile Include="Core\NyhedViewModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommand.cs" />
