@@ -43,6 +43,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         }
 
         /// <summary>
+        /// Tester, at getteren til FinansstyringKonfiguration returnerer ViewModel indeholdende konfiguration til finansstyring.
+        /// </summary>
+        [Test]
+        public void TestAtFinansstyringKonfigurationGetterReturnererFinansstyringKonfigurationViewModel()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var finansstyringKonfigurationViewModel = mainViewModel.FinansstyringKonfiguration;
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel, Is.TypeOf<FinansstyringKonfigurationViewModel>());
+        }
+
+        /// <summary>
         /// Tester, at getteren til ExceptionHandler returnerer ViewModel for en exceptionhandler.
         /// </summary>
         [Test]

@@ -113,6 +113,22 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
         }
 
+        /// <summary>
+        /// Collection indeholdende navne for de enkelte konfigurationsværdier.
+        /// </summary>
+        public static IEnumerable<string> Keys
+        {
+            get
+            {
+                return new List<string>(3)
+                    {
+                        "FinansstyringServiceUri",
+                        "AntalBogføringslinjer",
+                        "DageForNyheder"
+                    };
+            }
+        }
+
         #endregion
 
         #region Methods

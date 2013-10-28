@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -33,6 +34,23 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var instance = FinansstyringKonfigurationRepository.Instance;
             Assert.That(instance, Is.Not.Null);
             Assert.That(instance, Is.TypeOf<FinansstyringKonfigurationRepository>());
+        }
+
+        /// <summary>
+        /// Tester, at Keys returnerer en colllection af navne for de enkelte konfigurationsværdier.
+        /// </summary>
+        [Test]
+        public void TestAtKeysReturnererCollectionAfNavneForKonfigurationvalues()
+        {
+            var keys = FinansstyringKonfigurationRepository.Keys;
+            Assert.That(keys, Is.Not.Null);
+            Assert.That(keys, Is.Not.Empty);
+
+            var keyArray = keys.ToArray();
+            Assert.That(keyArray.Length, Is.EqualTo(3));
+            Assert.That(keyArray.Contains("FinansstyringServiceUri"), Is.True);
+            Assert.That(keyArray.Contains("AntalBogføringslinjer"), Is.True);
+            Assert.That(keyArray.Contains("DageForNyheder"), Is.True);
         }
 
         /// <summary>

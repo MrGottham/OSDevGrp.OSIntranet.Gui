@@ -18,6 +18,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
         }
 
         /// <summary>
+        /// ViewModel indeholdende konfiguration til finansstyring.
+        /// </summary>
+        IFinansstyringKonfigurationViewModel FinansstyringKonfiguration
+        {
+            get;
+        }
+
+        /// <summary>
         /// ViewModel for en exceptionhandler.
         /// </summary>
         IExceptionHandlerViewModel ExceptionHandler

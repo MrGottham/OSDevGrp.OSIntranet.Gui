@@ -20,6 +20,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
 
         private IRegnskabslisteViewModel _regnskabslisteViewModel;
         private IExceptionHandlerViewModel _exceptionHandlerViewModel;
+        private readonly List<IConfigurationViewModel> _configurationViewModels = new List<IConfigurationViewModel>();
 
         #endregion
         
@@ -44,6 +45,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
             get
             {
                 return _regnskabslisteViewModel ?? (_regnskabslisteViewModel = new RegnskabslisteViewModel(new FinansstyringRepository(FinansstyringKonfigurationRepository), ExceptionHandler));
+            }
+        }
+
+        /// <summary>
+        /// ViewModel indeholdende konfiguration til finansstyring.
+        /// </summary>
+        public virtual IFinansstyringKonfigurationViewModel FinansstyringKonfiguration
+        {
+            get
+            {
+                var finansstyringKonfigurationViewModel = _configurationViewModels.OfType<IFinansstyringKonfigurationViewModel>().FirstOrDefault();
+                if (finansstyringKonfigurationViewModel == null)
+                {
+                    finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(FinansstyringKonfigurationRepository, ExceptionHandler);
+                    _configurationViewModels.Add(finansstyringKonfigurationViewModel);
+                }
+                return finansstyringKonfigurationViewModel;
             }
         }
 
@@ -83,17 +101,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
             {
                 throw new ArgumentNullException("configurationSettings");
             }
-            var finansstyringConfiguration = configurationSettings.Where(configuration =>
-                {
-                    switch (configuration.Key)
-                    {
-                        case "FinansstyringServiceUri":
-                        case "AntalBogføringslinjer":
-                        case "DageForNyheder":
-                            return true;
-                    }
-                    return false;
-                }).ToDictionary(m => m.Key, m => m.Value);
+            var finansstyringConfiguration = configurationSettings.Where(configuration => Repositories.Finansstyring.FinansstyringKonfigurationRepository.Keys.Contains(configuration.Key))
+                                                                  .ToDictionary(m => m.Key, m => m.Value);
             FinansstyringKonfigurationRepository.KonfigurationerAdd(finansstyringConfiguration);
         }
 

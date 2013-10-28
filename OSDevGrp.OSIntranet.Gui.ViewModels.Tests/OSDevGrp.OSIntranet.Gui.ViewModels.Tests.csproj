@@ -64,7 +64,6 @@
     <Compile Include="Core\Commands\RelayCommandTests.cs" />
     <Compile Include="Core\Commands\ViewModelCommandBaseTests.cs" />
     <Compile Include="Core\Comparers\NyhedViewModelComparerTests.cs" />
-    <Compile Include="Core\ConfigurationViewModelTests.cs" />
     <Compile Include="Core\ExceptionHandlerViewModelTests.cs" />
     <Compile Include="Core\ExceptionViewModelTests.cs" />
     <Compile Include="Core\NyhedViewModelTests.cs" />
@@ -72,6 +71,7 @@
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommandTests.cs" />
     <Compile Include="Finansstyring\Comparers\BogføringslinjeViewModelComparerTests.cs" />
+    <Compile Include="Finansstyring\FinansstyringKonfigurationViewModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabViewModelTests.cs" />
     <Compile Include="MainViewModelTests.cs" />
