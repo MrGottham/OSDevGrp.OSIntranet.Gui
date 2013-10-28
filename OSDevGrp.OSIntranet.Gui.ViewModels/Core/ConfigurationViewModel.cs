@@ -40,6 +40,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         }
 
         /// <summary>
+        /// Collection indeholdende navne for de enkelte konfigurationsværdier.
+        /// </summary>
+        public virtual IEnumerable<string> Keys
+        {
+            get
+            {
+                return new List<string>(0);
+            }
+        }
+
+        /// <summary>
         /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen. 
         /// </summary>
         public override string DisplayName
@@ -49,6 +60,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
                 return Resource.GetText(Text.Configuration);
             }
         }
+
+        #endregion
+
+        #region Methods
+
+        public 
 
         #endregion
     }

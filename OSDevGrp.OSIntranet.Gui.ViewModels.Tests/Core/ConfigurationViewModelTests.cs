@@ -30,6 +30,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             Assert.That(configurationViewModel.Configuration, Is.Not.Null);
             Assert.That(configurationViewModel.Configuration, Is.Not.Empty);
             Assert.That(configurationViewModel.Configuration, Is.EqualTo("OSDevGrp.OSIntranet.Gui.ViewModels.Core.ConfigurationViewModel"));
+            Assert.That(configurationViewModel.Keys, Is.Not.Null);
+            Assert.That(configurationViewModel.Keys, Is.Empty);
             Assert.That(configurationViewModel.DisplayName, Is.Not.Null);
             Assert.That(configurationViewModel.DisplayName, Is.Not.Empty);
             Assert.That(configurationViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.Configuration)));
