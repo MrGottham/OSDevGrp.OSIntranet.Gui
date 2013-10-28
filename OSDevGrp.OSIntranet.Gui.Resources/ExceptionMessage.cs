@@ -10,6 +10,8 @@
         IllegalArgumentValue,
         UnableToLoadResource,
         MissingConfigurationSetting,
-        InvalidConfigurationSettingValue
+        InvalidConfigurationSettingValue,
+        ErrorWhileGettingPropertyValue,
+        ErrorWhileSettingPropertyValue
     }
 }

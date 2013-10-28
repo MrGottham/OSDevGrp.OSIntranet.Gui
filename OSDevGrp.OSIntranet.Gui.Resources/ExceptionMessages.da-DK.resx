@@ -121,6 +121,14 @@
     <value>Fejl ved udførelse af kommandoen '{0}': {1}</value>
     <comment>{0} = Typen på kommandoen, {1} = Fejlbesked.</comment>
   </data>
+  <data name="ErrorWhileGettingPropertyValue" xml:space="preserve">
+    <value>Fejl ved returnering af værdi for propertyen med navnet '{0}': {1}</value>
+    <comment>{0} = Navn på property, {1} = Fejlbesked.</comment>
+  </data>
+  <data name="ErrorWhileSettingPropertyValue" xml:space="preserve">
+    <value>Fejl ved opdatering af værdi for propertyen med navnet '{0}': {1}</value>
+    <comment>{0} = Navn på property, {1} = Fejlbesked.</comment>
+  </data>
   <data name="IllegalArgumentValue" xml:space="preserve">
     <value>Illegal værdi for '{0}': {1}</value>
     <comment>{0} = Navn på argument, {1} = værdi.</comment>

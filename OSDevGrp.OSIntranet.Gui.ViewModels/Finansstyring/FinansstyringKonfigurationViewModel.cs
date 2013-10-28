@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
@@ -15,7 +16,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
-
+        private readonly IFinansstyringKonfigurationRepository _finansstyringKonfigurationRepository;
+        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
 
         #endregion
 
@@ -36,6 +38,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("exceptionHandlerViewModel");
             }
+            _finansstyringKonfigurationRepository = finansstyringKonfigurationRepository;
+            _exceptionHandlerViewModel = exceptionHandlerViewModel;
         }
 
         #endregion
@@ -72,6 +76,139 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return Resource.GetText(Text.Configuration);
+            }
+        }
+
+        /// <summary>
+        /// Uri til servicen, der supporterer finansstyring.
+        /// </summary>
+        public virtual string FinansstyringServiceUri
+        {
+            get
+            {
+                try
+                {
+                    return _finansstyringKonfigurationRepository.FinansstyringServiceUri.ToString();
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                    return string.Empty;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "FinansstyringServiceUri", ex.Message), ex));
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                try
+                {
+                    var uri = new Uri(value);
+                    if (_finansstyringKonfigurationRepository.FinansstyringServiceUri == uri)
+                    {
+                        return;
+                    }
+                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"FinansstyringServiceUri", uri}});
+                    RaisePropertyChanged("FinansstyringServiceUri");
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "FinansstyringServiceUri", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Antal bogføringslinjer, der skal hentes.
+        /// </summary>
+        public virtual int AntalBogføringslinjer
+        {
+            get
+            {
+                try
+                {
+                    return _finansstyringKonfigurationRepository.AntalBogføringslinjer;
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "AntalBogføringslinjer", ex.Message), ex));
+                    return 0;
+                }
+            }
+            set
+            {
+                try
+                {
+                    if (_finansstyringKonfigurationRepository.AntalBogføringslinjer == value)
+                    {
+                        return;
+                    }
+                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"AntalBogføringslinjer", value}});
+                    RaisePropertyChanged("AntalBogføringslinjer");
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "AntalBogføringslinjer", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Antal dage, som nyheder er gældende.
+        /// </summary>
+        public virtual int DageForNyheder
+        {
+            get
+            {
+                try
+                {
+                    return _finansstyringKonfigurationRepository.DageForNyheder;
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "DageForNyheder", ex.Message), ex));
+                    return 0;
+                }
+            }
+            set
+            {
+                try
+                {
+                    if (_finansstyringKonfigurationRepository.DageForNyheder == value)
+                    {
+                        return;
+                    }
+                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"DageForNyheder", value}});
+                    RaisePropertyChanged("DageForNyheder");
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DageForNyheder", ex.Message), ex));
+                }
             }
         }
 
