@@ -8,12 +8,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
     public interface IFinansstyringKonfigurationViewModel : IConfigurationViewModel
     {
         /// <summary>
+        /// Label til uri for servicen, der supporterer finansstyring.
+        /// </summary>
+        string FinansstyringServiceUriLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Uri til servicen, der supporterer finansstyring.
         /// </summary>
         string FinansstyringServiceUri
         { 
             get; 
             set; 
+        }
+
+        /// <summary>
+        /// Label til antal bogføringslinjer, der skal hentes.
+        /// </summary>
+        string AntalBogføringslinjerLabel
+        {
+            get;
         }
 
         /// <summary>

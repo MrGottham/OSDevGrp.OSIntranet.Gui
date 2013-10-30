@@ -36,6 +36,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(finansstyringKonfigurationViewModel.Configuration, Is.EqualTo("OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.FinansstyringKonfigurationViewModel"));
             Assert.That(finansstyringKonfigurationViewModel.Keys, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.Keys, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.EqualTo(Resource.GetText(Text.SupportingServiceUri)));
+
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.EqualTo(Resource.GetText(Text.SupportingServiceUri)));
+            
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.Configuration)));

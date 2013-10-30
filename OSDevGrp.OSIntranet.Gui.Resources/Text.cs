@@ -10,6 +10,7 @@
         ExceptionHandler,
         Hide,
         News,
-        Configuration
+        Configuration,
+        SupportingServiceUri
     }
 }

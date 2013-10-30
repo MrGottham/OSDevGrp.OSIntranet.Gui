@@ -135,4 +135,7 @@
   <data name="News" xml:space="preserve">
     <value>Nyhed</value>
   </data>
+  <data name="SupportingServiceUri" xml:space="preserve">
+    <value>Supporterede endpoint for service</value>
+  </data>
 </root>

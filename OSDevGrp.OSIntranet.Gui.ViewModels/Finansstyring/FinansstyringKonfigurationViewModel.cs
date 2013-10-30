@@ -80,6 +80,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Label til uri for servicen, der supporterer finansstyring.
+        /// </summary>
+        public virtual string FinansstyringServiceUriLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.SupportingServiceUri);
+            }
+        }
+
+        /// <summary>
         /// Uri til servicen, der supporterer finansstyring.
         /// </summary>
         public virtual string FinansstyringServiceUri
@@ -121,6 +132,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "FinansstyringServiceUri", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Label til antal bogføringslinjer, der skal hentes.
+        /// </summary>
+        public virtual string AntalBogføringslinjerLabel
+        {
+            get
+            {
+                throw new NotImplementedException();
             }
         }
 

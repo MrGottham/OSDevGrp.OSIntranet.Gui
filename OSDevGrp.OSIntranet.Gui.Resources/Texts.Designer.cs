@@ -113,5 +113,14 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
                 return ResourceManager.GetString("News", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Supporting endpoint for service.
+        /// </summary>
+        internal static string SupportingServiceUri {
+            get {
+                return ResourceManager.GetString("SupportingServiceUri", resourceCulture);
+            }
+        }
     }
 }
