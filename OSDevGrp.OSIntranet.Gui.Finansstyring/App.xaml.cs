@@ -1,6 +1,8 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -79,6 +81,28 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        protected override void OnWindowCreated(WindowCreatedEventArgs args)
+        {
+            SettingsPane.GetForCurrentView().CommandsRequested += SettingsCommandsRequestedEventHandler;
+        }
+
+        private static void SettingsCommandsRequestedEventHandler(SettingsPane settingsPane, SettingsPaneCommandsRequestedEventArgs eventArgs)
+        {
+            if (settingsPane == null)
+            {
+                throw new ArgumentNullException("settingsPane");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var configurationCommand = new SettingsCommand("configuration", Resource.GetText(Text.Configuration), eventHandler =>
+                                                               {
+                                                               });
+            eventArgs.Request.ApplicationCommands.Add(configurationCommand);
+
         }
     }
 }

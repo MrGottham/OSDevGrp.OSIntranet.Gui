@@ -67,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
         }
 
-        private async void RegisterBackgroundTasks()
+        private static async void RegisterBackgroundTasks()
         {
             var backgroundAccessStatus = await BackgroundExecutionManager.RequestAccessAsync();
             if (backgroundAccessStatus != BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity && backgroundAccessStatus != BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity)
