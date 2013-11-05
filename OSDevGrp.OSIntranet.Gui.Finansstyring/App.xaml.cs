@@ -99,8 +99,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 throw new ArgumentNullException("eventArgs");
             }
             var configurationCommand = new SettingsCommand("configuration", Resource.GetText(Text.Configuration), eventHandler =>
-                                                               {
-                                                               });
+                {
+
+                    //var settings = new SettingsFlyout();
+                });
             eventArgs.Request.ApplicationCommands.Add(configurationCommand);
 
         }
