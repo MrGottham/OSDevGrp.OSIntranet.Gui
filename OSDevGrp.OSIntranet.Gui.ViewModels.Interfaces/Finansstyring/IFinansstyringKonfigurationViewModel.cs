@@ -42,6 +42,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Label til antal dage, som nyheder er gældende.
+        /// </summary>
+        string DageForNyhederLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Antal dage, som nyheder er gældende.
         /// </summary>
         int DageForNyheder

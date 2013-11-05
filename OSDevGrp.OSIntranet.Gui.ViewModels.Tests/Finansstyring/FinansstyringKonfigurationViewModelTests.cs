@@ -39,11 +39,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.EqualTo(Resource.GetText(Text.SupportingServiceUri)));
-
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Empty);
-            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.EqualTo(Resource.GetText(Text.SupportingServiceUri)));
-            
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.EqualTo(Resource.GetText(Text.NumberOfAccountingLinesToGet)));
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.EqualTo(Resource.GetText(Text.DaysForNews)));
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.Configuration)));

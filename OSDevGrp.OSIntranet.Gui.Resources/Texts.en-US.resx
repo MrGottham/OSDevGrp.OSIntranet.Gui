@@ -123,6 +123,9 @@
   <data name="Configuration" xml:space="preserve">
     <value>Configuration</value>
   </data>
+  <data name="DaysForNews" xml:space="preserve">
+    <value>Number of days when news is current</value>
+  </data>
   <data name="Exception" xml:space="preserve">
     <value>A problem has occurred</value>
   </data>
@@ -134,6 +137,9 @@
   </data>
   <data name="News" xml:space="preserve">
     <value>News</value>
+  </data>
+  <data name="NumberOfAccountingLinesToGet" xml:space="preserve">
+    <value>Number of accounting lines to get</value>
   </data>
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporting endpoint for service</value>

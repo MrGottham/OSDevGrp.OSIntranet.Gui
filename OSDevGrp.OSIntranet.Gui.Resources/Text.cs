@@ -11,6 +11,8 @@
         Hide,
         News,
         Configuration,
-        SupportingServiceUri
+        SupportingServiceUri,
+        NumberOfAccountingLinesToGet,
+        DaysForNews
     }
 }

@@ -123,6 +123,9 @@
   <data name="Configuration" xml:space="preserve">
     <value>Konfiguration</value>
   </data>
+  <data name="DaysForNews" xml:space="preserve">
+    <value>Antal dage, hvor nyheder er aktuel</value>
+  </data>
   <data name="Exception" xml:space="preserve">
     <value>Der er opstået et problem</value>
   </data>
@@ -134,6 +137,9 @@
   </data>
   <data name="News" xml:space="preserve">
     <value>Nyhed</value>
+  </data>
+  <data name="NumberOfAccountingLinesToGet" xml:space="preserve">
+    <value>Antal bogføringslinjer, der skal hentes</value>
   </data>
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporterede endpoint for service</value>

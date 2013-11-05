@@ -142,7 +142,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Resource.GetText(Text.NumberOfAccountingLinesToGet);
             }
         }
 
@@ -187,6 +187,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "AntalBogføringslinjer", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual string DageForNyhederLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.DaysForNews);
             }
         }
 

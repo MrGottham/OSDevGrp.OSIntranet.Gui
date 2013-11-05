@@ -79,6 +79,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Number of days when news is current.
+        /// </summary>
+        internal static string DaysForNews {
+            get {
+                return ResourceManager.GetString("DaysForNews", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A problem has occurred.
         /// </summary>
         internal static string Exception {
@@ -111,6 +120,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string News {
             get {
                 return ResourceManager.GetString("News", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of accounting lines to get.
+        /// </summary>
+        internal static string NumberOfAccountingLinesToGet {
+            get {
+                return ResourceManager.GetString("NumberOfAccountingLinesToGet", resourceCulture);
             }
         }
         
