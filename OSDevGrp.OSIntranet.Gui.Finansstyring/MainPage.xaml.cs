@@ -25,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         
         #endregion
 
-        #region Methods
+        #region Constructor
 
         /// <summary>
         /// Danner MainPage til Finansstyring.
@@ -34,10 +34,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
-            var configurationProvider = new ConfigurationProvider();
-
             var mainViewModel = (IMainViewModel) Resources["MainViewModel"];
-            mainViewModel.ApplyConfiguration(configurationProvider.Settings);
+            mainViewModel.ApplyConfiguration(ConfigurationProvider.Instance.Settings);
 
             _exceptionHandlerViewModel = (IExceptionHandlerViewModel) ExceptionHandlerAppBar.DataContext;
             _regnskabslisteViewModel = (IRegnskabslisteViewModel) ((Grid) Content).DataContext;
@@ -47,6 +45,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
             SizeChanged += PageSizeChangedEventHandler;
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.

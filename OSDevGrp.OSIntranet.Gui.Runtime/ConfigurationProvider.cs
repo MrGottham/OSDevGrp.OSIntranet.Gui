@@ -11,7 +11,9 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
     {
         #region Private variables
 
+        private static ConfigurationProvider _instance;
         private readonly ApplicationDataContainer _roamingSettings = ApplicationData.Current.RoamingSettings;
+        private readonly static object SyncRoot = new object();
 
         #endregion
 
@@ -48,6 +50,20 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             get
             {
                 return _roamingSettings.Values;
+            }
+        }
+
+        /// <summary>
+        /// Returnerer én og samme instans af leverandøren til konfigurationer.
+        /// </summary>
+        public static ConfigurationProvider Instance
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return _instance ?? (_instance = new ConfigurationProvider());
+                }
             }
         }
 
