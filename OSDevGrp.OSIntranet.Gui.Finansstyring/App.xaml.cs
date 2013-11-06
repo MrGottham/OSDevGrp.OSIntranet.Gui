@@ -1,10 +1,13 @@
 ﻿using System;
+using Callisto.Controls;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.UI;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -100,8 +103,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             var configurationCommand = new SettingsCommand("configuration", Resource.GetText(Text.Configuration), eventHandler =>
                 {
-
-                    //var settings = new SettingsFlyout();
+                    var settingsFlyout = new SettingsFlyout
+                        {
+                            FlyoutWidth = SettingsFlyout.SettingsFlyoutWidth.Narrow,
+                            HeaderText = Resource.GetText(Text.Configuration), 
+                            HeaderBrush = new SolidColorBrush(Colors.DarkBlue),
+                            Content = new ConfigurationUserControl(),
+                            IsOpen = true
+                        };
+                    settingsFlyout.IsOpen = true;
                 });
             eventArgs.Request.ApplicationCommands.Add(configurationCommand);
 

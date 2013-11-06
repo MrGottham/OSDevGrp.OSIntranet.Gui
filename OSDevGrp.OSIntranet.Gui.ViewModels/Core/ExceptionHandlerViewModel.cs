@@ -134,6 +134,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
                 _exceptions.Add(new ExceptionViewModel(exception));
                 return;
             }
+            _synchronizationContext.OperationStarted();
             using (var waitEvent = new AutoResetEvent(false))
             {
                 var we = waitEvent;
