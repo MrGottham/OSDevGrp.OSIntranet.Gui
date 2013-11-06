@@ -83,7 +83,7 @@
         </AppBar>
     </Page.TopAppBar>
 
-    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}">
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}" Margin="2,0,-2,0">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>

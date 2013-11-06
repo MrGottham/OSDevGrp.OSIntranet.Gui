@@ -8,6 +8,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     /// </summary>
     public sealed partial class ConfigurationUserControl
     {
+        #region Constructor
+
         /// <summary>
         /// Danner user control til konfiguration.
         /// </summary>
@@ -20,5 +22,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             var mainViewModel = (IMainViewModel)Resources["MainViewModel"];
             mainViewModel.ApplyConfiguration(configurationProvider.Settings);
         }
+
+        #endregion
     }
 }

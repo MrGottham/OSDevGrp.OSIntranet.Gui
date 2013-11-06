@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:OSDevGrp.OSIntranet.Gui.Finansstyring"
     xmlns:vm="using:OSDevGrp.OSIntranet.Gui.ViewModels"
+    xmlns:converters="using:OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -11,16 +12,27 @@
     d:DesignWidth="400">
     
     <UserControl.Resources>
-        <vm:MainViewModel x:Key="MainViewModel"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Common/CallistoStyles.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <vm:MainViewModel x:Key="MainViewModel"/>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
     
-    <Grid DataContext="{Binding Source={StaticResource MainViewModel}, Path=FinansstyringKonfiguration}">
+    <Grid Background="{StaticResource SettingsFlyoutContentBackgroundThemeBrush}" DataContext="{Binding Source={StaticResource MainViewModel}, Path=FinansstyringKonfiguration}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Margin="5,5,5,5">
-            <TextBlock Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" Foreground="Black" Text="{Binding Path=FinansstyringServiceUriLabel}"/>
-            <TextBox BorderBrush="Black" BorderThickness="1,1,1,1" Text="{Binding Path=FinansstyringServiceUri, Mode=TwoWay}"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,25" DataContext="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler}" Visibility="{Binding Path=ShowLast, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="Red" FontWeight="Bold" TextWrapping="Wrap" Text="{Binding Path=Last.DisplayName}"/>
+            <TextBlock Style="{StaticResource BodyTextStyle}" Foreground="Red" FontStyle="Italic" TextWrapping="Wrap" Text="{Binding Path=Last.Message}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringServiceUriLabel}"/>
+            <TextBox Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" BorderBrush="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Text="{Binding Path=FinansstyringServiceUri, Mode=TwoWay}"/>
         </StackPanel>
     </Grid>
 </UserControl>
