@@ -114,7 +114,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                     settingsFlyout.IsOpen = true;
                 });
             eventArgs.Request.ApplicationCommands.Add(configurationCommand);
-
         }
     }
 }
