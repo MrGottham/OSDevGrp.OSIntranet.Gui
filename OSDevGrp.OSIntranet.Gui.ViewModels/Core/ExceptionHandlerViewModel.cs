@@ -20,8 +20,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
 
         private bool _showLast;
         private ICommand _hideCommand;
-        private readonly ObservableCollection<IExceptionViewModel> _exceptions = new ObservableCollection<IExceptionViewModel>();
+        private readonly int _mainThreadId;
         private readonly SynchronizationContext _synchronizationContext;
+        private readonly ObservableCollection<IExceptionViewModel> _exceptions = new ObservableCollection<IExceptionViewModel>();
 
         #endregion
 
@@ -33,6 +34,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         public ExceptionHandlerViewModel()
         {
             _exceptions.CollectionChanged += ExceptionCollectionChangedEventHandler;
+            _mainThreadId = Environment.CurrentManagedThreadId;
             _synchronizationContext = SynchronizationContext.Current;
         }
 
@@ -129,12 +131,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
             {
                 throw new ArgumentNullException("exception");
             }
-            if (_synchronizationContext == null)
+            if (_synchronizationContext == null || _mainThreadId == Environment.CurrentManagedThreadId)
             {
                 _exceptions.Add(new ExceptionViewModel(exception));
                 return;
             }
-            _synchronizationContext.OperationStarted();
             using (var waitEvent = new AutoResetEvent(false))
             {
                 var we = waitEvent;
