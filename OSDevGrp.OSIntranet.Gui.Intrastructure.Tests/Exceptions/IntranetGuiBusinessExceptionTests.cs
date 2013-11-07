@@ -6,7 +6,7 @@ using Ploeh.AutoFixture;
 namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
 {
     /// <summary>
-    /// Tester systemexception fra OS Intranet.
+    /// Tester forretningsexception fra OS Intranet.
     /// </summary>
     [TestFixture]
     public class IntranetGuiBusinessExceptionTests

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -222,7 +223,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
-        /// Tester, at setteren til FinansstyringServiceUri opdaterer værdien i konfigurationsrepositoryet til finansstyring.
+        /// Tester, at setteren til FinansstyringServiceUri opdaterer værdien i konfigurationsrepositoryet til finansstyring
         /// </summary>
         [Test]
         public void TestAtFinansstyringServiceUriSetterOpdatererValueOnFinansstyringKonfigurationRepository()
@@ -303,6 +304,44 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at setteren til FinansstyringServiceUri kalder exceptionhandleren ved en IntranetGuiValidationException ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("XYZ")]
+        public void TestAtFinansstyringServiceUriSetterKalderExceptionHandlerViewModelVedIntranetGuiValidationException(string illegalValue)
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var exception = (IntranetGuiValidationException) e.Arguments.ElementAt(0);
+                                                 Assert.That(exception, Is.Not.Null);
+                                                 Assert.That(exception.Message, Is.Not.Null);
+                                                 Assert.That(exception.Message, Is.Not.Empty);
+                                                 Assert.That(exception.Message, Is.EqualTo(Resource.GetText(Text.InvalidValueForUri, illegalValue)));
+                                                 Assert.That(exception.ValidationContext, Is.Not.Null);
+                                                 Assert.That(exception.ValidationContext, Is.TypeOf<FinansstyringKonfigurationViewModel>());
+                                                 Assert.That(exception.PropertyName, Is.Not.Null);
+                                                 Assert.That(exception.PropertyName, Is.Not.Empty);
+                                                 Assert.That(exception.PropertyName, Is.EqualTo("FinansstyringServiceUri"));
+                                                 Assert.That(exception.InnerException, Is.Null);
+                                             });
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            finansstyringKonfigurationViewModel.FinansstyringServiceUri = illegalValue;
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.Anything));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
         }
 
         /// <summary>
@@ -1120,6 +1159,35 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateFinansstyringServiceUri returnerer Success for lovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase("http://localhost")]
+        [TestCase("http://www.google.dk")]
+        public void TestAtValidateFinansstyringServiceUriReturnererSuccessForLovligeValues(string value)
+        {
+            var result = FinansstyringKonfigurationViewModel.ValidateFinansstyringServiceUri(value);
+            Assert.That(result, Is.EqualTo(ValidationResult.Success));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateFinansstyringServiceUri returnerer valideringsresultat for ulovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("XYZ")]
+        public void TestAtValidateFinansstyringServiceUriReturnererValidationResultForUlovligeValues(string value)
+        {
+            var result = FinansstyringKonfigurationViewModel.ValidateFinansstyringServiceUri(value);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
+            Assert.That(result.ErrorMessage, Is.Not.Null);
+            Assert.That(result.ErrorMessage, Is.Not.Empty);
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.InvalidValueForUri, value)));
         }
     }
 }

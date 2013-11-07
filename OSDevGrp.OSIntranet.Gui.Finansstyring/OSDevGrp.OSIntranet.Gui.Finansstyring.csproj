@@ -150,6 +150,7 @@
     </Compile>
     <Compile Include="Core\Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Core\Converters\ByteArrayToImageConverter.cs" />
+    <Compile Include="Core\ViewModelValidator.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

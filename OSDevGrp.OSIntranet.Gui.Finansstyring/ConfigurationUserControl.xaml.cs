@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using OSDevGrp.OSIntranet.Gui.Finansstyring.Core;
 using OSDevGrp.OSIntranet.Gui.Runtime;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -57,6 +58,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             var finansstyringKonfiguration = sender as IFinansstyringKonfigurationViewModel;
             if (finansstyringKonfiguration == null)
+            {
+                return;
+            }
+            if (!ViewModelValidator.Validate(finansstyringKonfiguration, eventArgs.PropertyName))
             {
                 return;
             }

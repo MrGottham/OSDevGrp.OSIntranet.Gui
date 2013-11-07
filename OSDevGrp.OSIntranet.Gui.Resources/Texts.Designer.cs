@@ -115,6 +115,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a legal URI value..
+        /// </summary>
+        internal static string InvalidValueForUri {
+            get {
+                return ResourceManager.GetString("InvalidValueForUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to News.
         /// </summary>
         internal static string News {

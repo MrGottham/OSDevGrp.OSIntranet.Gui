@@ -64,6 +64,7 @@
     <Compile Include="Exceptions\IntranetGuiExceptionBaseTests.cs" />
     <Compile Include="Exceptions\IntranetGuiRepositoryExceptionTests.cs" />
     <Compile Include="Exceptions\IntranetGuiSystemExceptionTests.cs" />
+    <Compile Include="Exceptions\IntranetGuiValidationExceptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

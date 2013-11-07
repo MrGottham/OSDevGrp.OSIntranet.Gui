@@ -135,6 +135,10 @@
   <data name="Hide" xml:space="preserve">
     <value>Hide</value>
   </data>
+  <data name="InvalidValueForUri" xml:space="preserve">
+    <value>'{0}' is not a legal URI value.</value>
+    <comment>{0} = Value.</comment>
+  </data>
   <data name="News" xml:space="preserve">
     <value>News</value>
   </data>

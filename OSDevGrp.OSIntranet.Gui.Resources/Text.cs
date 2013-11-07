@@ -13,6 +13,7 @@
         Configuration,
         SupportingServiceUri,
         NumberOfAccountingLinesToGet,
-        DaysForNews
+        DaysForNews,
+        InvalidValueForUri
     }
 }

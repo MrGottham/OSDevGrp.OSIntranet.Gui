@@ -51,6 +51,7 @@
     <Compile Include="Exceptions\IntranetGuiExceptionBase.cs" />
     <Compile Include="Exceptions\IntranetGuiRepositoryException.cs" />
     <Compile Include="Exceptions\IntranetGuiSystemException.cs" />
+    <Compile Include="Exceptions\IntranetGuiValidationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

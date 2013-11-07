@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
@@ -93,6 +94,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Uri til servicen, der supporterer finansstyring.
         /// </summary>
+        [CustomValidation(typeof(FinansstyringKonfigurationViewModel), "ValidateFinansstyringServiceUri")]
         public virtual string FinansstyringServiceUri
         {
             get
@@ -116,6 +118,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 try
                 {
+                    var validationResult = ValidateFinansstyringServiceUri(value);
+                    if (validationResult != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "FinansstyringServiceUri");
+                    }
                     var uri = new Uri(value);
                     if (_finansstyringKonfigurationRepository.FinansstyringServiceUri == uri)
                     {
@@ -191,7 +198,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// 
+        /// Label til antal dage, som nyheder er gældende.
         /// </summary>
         public virtual string DageForNyhederLabel
         {
@@ -243,6 +250,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DageForNyheder", ex.Message), ex));
                 }
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Validerer værdien for uri til servicen, der supporterer finansstyring.
+        /// </summary>
+        /// <param name="value">Værdi, der skal validateres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateFinansstyringServiceUri(string value)
+        {
+            Uri uri;
+            return Uri.TryCreate(value, UriKind.Absolute, out uri)
+                       ? ValidationResult.Success
+                       : new ValidationResult(Resource.GetText(Text.InvalidValueForUri, value));
         }
 
         #endregion
