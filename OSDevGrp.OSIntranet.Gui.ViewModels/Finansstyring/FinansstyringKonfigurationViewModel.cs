@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -121,7 +122,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     var validationResult = ValidateFinansstyringServiceUri(value);
                     if (validationResult != ValidationResult.Success)
                     {
-                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "FinansstyringServiceUri");
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "FinansstyringServiceUri", value);
                     }
                     var uri = new Uri(value);
                     if (_finansstyringKonfigurationRepository.FinansstyringServiceUri == uri)
@@ -263,10 +264,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <returns>Valideringsresultat.</returns>
         public static ValidationResult ValidateFinansstyringServiceUri(string value)
         {
-            Uri uri;
-            return Uri.TryCreate(value, UriKind.Absolute, out uri)
-                       ? ValidationResult.Success
-                       : new ValidationResult(Resource.GetText(Text.InvalidValueForUri, value));
+            return Validation.ValidateUri(value);
         }
 
         #endregion

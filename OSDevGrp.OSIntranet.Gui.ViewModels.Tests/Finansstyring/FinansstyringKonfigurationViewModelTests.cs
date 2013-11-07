@@ -331,6 +331,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(exception.PropertyName, Is.Not.Null);
                                                  Assert.That(exception.PropertyName, Is.Not.Empty);
                                                  Assert.That(exception.PropertyName, Is.EqualTo("FinansstyringServiceUri"));
+                                                 Assert.That(exception.Value, Is.EqualTo(illegalValue));
                                                  Assert.That(exception.InnerException, Is.Null);
                                              });
 

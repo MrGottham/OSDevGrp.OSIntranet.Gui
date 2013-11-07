@@ -68,6 +68,7 @@
     <Compile Include="Core\ExceptionHandlerViewModelTests.cs" />
     <Compile Include="Core\ExceptionViewModelTests.cs" />
     <Compile Include="Core\NyhedViewModelTests.cs" />
+    <Compile Include="Core\Validators\ValidationTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModelTests.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommandTests.cs" />

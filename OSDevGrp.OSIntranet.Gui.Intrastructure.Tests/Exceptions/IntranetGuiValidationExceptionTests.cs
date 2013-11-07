@@ -15,14 +15,19 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
         /// Tester, at konstruktøren danner en valideringsexception uden en inner exception.
         /// </summary>
         [Test]
-        public void TestAtConstructorInitiererIntranetGuiValidationExceptionUdenInnerException()
+        [TestCase(null)]
+        [TestCase("XYZ")]
+        [TestCase(1)]
+        [TestCase(0.5)]
+        public void TestAtConstructorInitiererIntranetGuiValidationExceptionUdenInnerException(object setValue)
         {
             var fixture = new Fixture();
 
             var message = fixture.Create<string>();
             var validationContext = fixture.Create<object>();
             var propertyName = fixture.Create<string>();
-            var exception = new IntranetGuiValidationException(message, validationContext, propertyName);
+            var value = fixture.Create<object>();
+            var exception = new IntranetGuiValidationException(message, validationContext, propertyName, value);
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -32,6 +37,7 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
             Assert.That(exception.PropertyName, Is.Not.Null);
             Assert.That(exception.PropertyName, Is.Not.Empty);
             Assert.That(exception.PropertyName, Is.EqualTo(propertyName));
+            Assert.That(exception.Value, Is.EqualTo(value));
             Assert.That(exception.InnerException, Is.Null);
         }
 
@@ -39,15 +45,20 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
         /// Tester, at konstruktøren danner en valideringsexception med en inner exception.
         /// </summary>
         [Test]
-        public void TestAtConstructorInitiererIntranetGuiValidationExceptionMedInnerException()
+        [TestCase(null)]
+        [TestCase("XYZ")]
+        [TestCase(1)]
+        [TestCase(0.5)]
+        public void TestAtConstructorInitiererIntranetGuiValidationExceptionMedInnerException(object setValue)
         {
             var fixture = new Fixture();
 
             var message = fixture.Create<string>();
             var validationContext = fixture.Create<object>();
             var propertyName = fixture.Create<string>();
+            var value = fixture.Create<object>();
             var innerException = fixture.Create<Exception>();
-            var exception = new IntranetGuiValidationException(message, validationContext, propertyName, innerException);
+            var exception = new IntranetGuiValidationException(message, validationContext, propertyName, value, innerException);
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -57,6 +68,7 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
             Assert.That(exception.PropertyName, Is.Not.Null);
             Assert.That(exception.PropertyName, Is.Not.Empty);
             Assert.That(exception.PropertyName, Is.EqualTo(propertyName));
+            Assert.That(exception.Value, Is.EqualTo(value));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(innerException));
         }
@@ -69,8 +81,8 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
         {
             var fixture = new Fixture();
 
-            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), null, fixture.Create<string>()));
-            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), null, fixture.Create<string>(), fixture.Create<Exception>()));
+            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), null, fixture.Create<string>(), fixture.Create<object>()));
+            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), null, fixture.Create<string>(), fixture.Create<object>(), fixture.Create<Exception>()));
         }
 
         /// <summary>
@@ -83,8 +95,8 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
         {
             var fixture = new Fixture();
 
-            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), fixture.Create<object>(), illegalValue));
-            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), fixture.Create<object>(), illegalValue, fixture.Create<Exception>()));
+            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), fixture.Create<object>(), illegalValue, fixture.Create<object>()));
+            Assert.Throws<ArgumentNullException>(() => new IntranetGuiValidationException(fixture.Create<string>(), fixture.Create<object>(), illegalValue, fixture.Create<object>(), fixture.Create<Exception>()));
         }
     }
 }

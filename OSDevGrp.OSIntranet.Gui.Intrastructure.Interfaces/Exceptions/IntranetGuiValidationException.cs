@@ -11,8 +11,7 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions
 
         private readonly object _validationContext;
         private readonly string _propertyName;
-
-        // TODO: Value.
+        private readonly object _value;
 
         #endregion
 
@@ -24,8 +23,9 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions
         /// <param name="message">Fejlbesked.</param>
         /// <param name="validationContext">Instans af objektet, hvorpå validering er fejlet.</param>
         /// <param name="propertyName">Navn på property, hvor validering er fejlet.</param>
-        public IntranetGuiValidationException(string message, object validationContext, string propertyName)
-            : this(message, validationContext, propertyName, null)
+        /// <param name="value">Værdi, hvormed validering er fejlet.</param>
+        public IntranetGuiValidationException(string message, object validationContext, string propertyName, object value)
+            : this(message, validationContext, propertyName, value, null)
         {
         }
 
@@ -35,8 +35,9 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions
         /// <param name="message">Fejlbesked.</param>
         /// <param name="validationContext">Instans af objektet, hvorpå validering er fejlet.</param>
         /// <param name="propertyName">Navn på property, hvor validering er fejlet.</param>
+        /// <param name="value">Værdi, hvormed validering er fejlet.</param>
         /// <param name="innerException">Inner exception.</param>
-        public IntranetGuiValidationException(string message, object validationContext, string propertyName, Exception innerException)
+        public IntranetGuiValidationException(string message, object validationContext, string propertyName, object value, Exception innerException)
             : base(message, innerException)
         {
             if (validationContext == null)
@@ -49,6 +50,7 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions
             }
             _validationContext = validationContext;
             _propertyName = propertyName;
+            _value = value;
         }
 
         #endregion
@@ -74,6 +76,17 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions
             get
             {
                 return _propertyName;
+            }
+        }
+
+        /// <summary>
+        /// Returnerer værdi, hvormed validering er fejlet.
+        /// </summary>
+        public virtual object Value
+        {
+            get
+            {
+                return _value;
             }
         }
 
