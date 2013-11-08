@@ -157,6 +157,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Antal bogføringslinjer, der skal hentes.
         /// </summary>
+        [CustomValidation(typeof(FinansstyringKonfigurationViewModel), "ValidateAntalBogføringslinjer")]
         public virtual int AntalBogføringslinjer
         {
             get
@@ -180,6 +181,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 try
                 {
+                    var validationResult = ValidateAntalBogføringslinjer(value);
+                    if (validationResult != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "AntalBogføringslinjer", value);
+                    }
                     if (_finansstyringKonfigurationRepository.AntalBogføringslinjer == value)
                     {
                         return;
@@ -212,6 +218,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Antal dage, som nyheder er gældende.
         /// </summary>
+        [CustomValidation(typeof(FinansstyringKonfigurationViewModel), "ValidateDageForNyheder")]
         public virtual int DageForNyheder
         {
             get
@@ -235,6 +242,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 try
                 {
+                    var validationResult = ValidateDageForNyheder(value);
+                    if (validationResult != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "DageForNyheder", value);
+                    }
                     if (_finansstyringKonfigurationRepository.DageForNyheder == value)
                     {
                         return;
@@ -260,11 +272,31 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Validerer værdien for uri til servicen, der supporterer finansstyring.
         /// </summary>
-        /// <param name="value">Værdi, der skal validateres.</param>
+        /// <param name="value">Værdi, der skal valideres.</param>
         /// <returns>Valideringsresultat.</returns>
         public static ValidationResult ValidateFinansstyringServiceUri(string value)
         {
             return Validation.ValidateUri(value);
+        }
+
+        /// <summary>
+        /// Validerer værdien for antal bogføringslinjer, der skal hentes.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateAntalBogføringslinjer(int value)
+        {
+            return Validation.ValidateInterval(value, 10, 250);
+        }
+
+        /// <summary>
+        /// Validerer værdien for antal dage, som nyheder er gældende.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateDageForNyheder(int value)
+        {
+            return Validation.ValidateInterval(value, 0, 30);
         }
 
         #endregion

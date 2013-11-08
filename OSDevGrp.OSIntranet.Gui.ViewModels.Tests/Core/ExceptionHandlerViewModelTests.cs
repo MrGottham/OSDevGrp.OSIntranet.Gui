@@ -70,6 +70,85 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         }
 
         /// <summary>
+        /// Tester, at HandleException kalder OnHandleException, når en exception håndteres.
+        /// </summary>
+        [Test]
+        public void TestAtHandleExceptionKalderOnHandleException()
+        {
+            var fixture = new Fixture();
+
+            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            Assert.That(exceptionHandlerViewModel, Is.Not.Null);
+
+            var exceptionToHandle = fixture.Create<Exception>();
+            var eventCalled = false;
+            exceptionHandlerViewModel.OnHandleException += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.Error, Is.Not.Null);
+                    Assert.That(e.Error, Is.EqualTo(exceptionToHandle));
+                    Assert.That(e.IsHandled, Is.False);
+                    eventCalled = true;
+                };
+
+            Assert.That(eventCalled, Is.False);
+            exceptionHandlerViewModel.HandleException(exceptionToHandle);
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at HandleException tilføjer exception til listen af håndterede exceptions, hvis OnHandleException sætter IsHandled til false.
+        /// </summary>
+        [Test]
+        public void TestAtHandleExceptionAdderExceptionTilExceptionHvisOnHandleExceptionSetsIsHandledTilFalse()
+        {
+            var fixture = new Fixture();
+
+            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            Assert.That(exceptionHandlerViewModel, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
+
+            exceptionHandlerViewModel.OnHandleException += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    e.IsHandled = false;
+                };
+
+            exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Empty);
+            Assert.That(exceptionHandlerViewModel.Exceptions.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Tester, at HandleException ikke tilføjer exception til listen af håndterede exceptions, hvis OnHandleException sætter IsHandled til true.
+        /// </summary>
+        [Test]
+        public void TestAtHandleExceptionIkkeAdderExceptionTilExceptionHvisOnHandleExceptionSetsIsHandledTilTrue()
+        {
+            var fixture = new Fixture();
+
+            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            Assert.That(exceptionHandlerViewModel, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
+
+            exceptionHandlerViewModel.OnHandleException += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    e.IsHandled = true;
+                };
+
+            exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
+            Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
+        }
+
+        /// <summary>
         /// Tester, at Last returnerer seneste håndterede exception.
         /// </summary>
         [Test]

@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
@@ -37,6 +39,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
             _mainThreadId = Environment.CurrentManagedThreadId;
             _synchronizationContext = SynchronizationContext.Current;
         }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// Event, der rejses, når en exception håndteres.
+        /// </summary>
+        public virtual event IntranetGuiEventHandler<IHandleExceptionEventArgs> OnHandleException;
 
         #endregion
 
@@ -133,7 +144,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
             }
             if (_synchronizationContext == null || _mainThreadId == Environment.CurrentManagedThreadId)
             {
-                _exceptions.Add(new ExceptionViewModel(exception));
+                PulishException(exception);
                 return;
             }
             using (var waitEvent = new AutoResetEvent(false))
@@ -143,7 +154,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
                     {
                         try
                         {
-                            _exceptions.Add(new ExceptionViewModel(obj as Exception));
+                            PulishException(exception);
                         }
                         finally
                         {
@@ -151,6 +162,32 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
                         }
                     }, exception);
                 waitEvent.WaitOne();
+            }
+        }
+
+        /// <summary>
+        /// Publiserer og håndterer en exception.
+        /// </summary>
+        /// <param name="exception">Exception, der skal håndteres.</param>
+        private void PulishException(Exception exception)
+        {
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+            if (OnHandleException == null)
+            {
+                _exceptions.Add(new ExceptionViewModel(exception));
+                return;
+            }
+            var eventArgs = new HandleExceptionEventArgs(exception)
+                {
+                    IsHandled = false
+                };
+            OnHandleException.Invoke(this, eventArgs);
+            if (!eventArgs.IsHandled)
+            {
+                _exceptions.Add(new ExceptionViewModel(exception));
             }
         }
 

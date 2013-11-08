@@ -148,4 +148,8 @@
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporting endpoint for service</value>
   </data>
+  <data name="ValueOutsideInterval" xml:space="preserve">
+    <value>The value is outside the interval ({0} - {1}).</value>
+    <comment>{0} = Min value, {1} = Max value.</comment>
+  </data>
 </root>

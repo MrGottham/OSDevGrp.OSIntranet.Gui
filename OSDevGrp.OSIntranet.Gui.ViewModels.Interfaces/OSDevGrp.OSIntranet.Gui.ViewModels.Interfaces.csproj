@@ -58,6 +58,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces\OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.csproj">
+      <Project>{EDC9E35C-D096-4C89-ABB8-7FA7EB0982F3}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Models.Interfaces\OSDevGrp.OSIntranet.Gui.Models.Interfaces.csproj">
       <Project>{85324394-8c83-4a51-9bf4-0deb776cf9ab}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Models.Interfaces</Name>

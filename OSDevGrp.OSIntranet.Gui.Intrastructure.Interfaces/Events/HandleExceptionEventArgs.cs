@@ -43,6 +43,15 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events
             }
         }
 
+        /// <summary>
+        /// Angivelse af, om exception er blevet håndteret.
+        /// </summary>
+        public virtual bool IsHandled
+        {
+            get; 
+            set;
+        }
+
         #endregion
     }
 }

@@ -148,4 +148,8 @@
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporterede endpoint for service</value>
   </data>
+  <data name="ValueOutsideInterval" xml:space="preserve">
+    <value>Værdien er ikke i intervallet ({0} - {1}).</value>
+    <comment>{0} = Min værdi{1} = Max værdi.</comment>
+  </data>
 </root>

@@ -14,5 +14,14 @@ namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events
         {
             get;
         }
+
+        /// <summary>
+        /// Angivelse af, om exception er blevet håndteret.
+        /// </summary>
+        bool IsHandled
+        {
+            get; 
+            set; 
+        }
     }
 }

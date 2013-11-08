@@ -149,5 +149,14 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
                 return ResourceManager.GetString("SupportingServiceUri", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value is outside the interval ({0} - {1})..
+        /// </summary>
+        internal static string ValueOutsideInterval {
+            get {
+                return ResourceManager.GetString("ValueOutsideInterval", resourceCulture);
+            }
+        }
     }
 }

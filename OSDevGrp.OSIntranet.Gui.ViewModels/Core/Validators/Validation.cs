@@ -21,5 +21,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
                        ? ValidationResult.Success
                        : new ValidationResult(Resource.GetText(Text.InvalidValueForUri, value));
         }
+
+        /// <summary>
+        /// Validerer, om værdien er i et givent interval.
+        /// </summary>
+        /// <param name="value">Værdien, der skal valideres.</param>
+        /// <param name="min">Minimun for intervallet, hvori værdien skal være.</param>
+        /// <param name="max">Maksimum for intervallet, hvori værdien skal være.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateInterval(int value, int min, int max)
+        {
+            if (value >= min && value <= max)
+            {
+                return ValidationResult.Success;
+            }
+            return new ValidationResult(Resource.GetText(Text.ValueOutsideInterval, min, max));
+        }
     }
 }

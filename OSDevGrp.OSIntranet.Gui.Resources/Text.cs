@@ -14,6 +14,7 @@
         SupportingServiceUri,
         NumberOfAccountingLinesToGet,
         DaysForNews,
-        InvalidValueForUri
+        InvalidValueForUri,
+        ValueOutsideInterval
     }
 }

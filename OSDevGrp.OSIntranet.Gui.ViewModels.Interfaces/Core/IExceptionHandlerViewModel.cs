@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core
 {
@@ -9,6 +11,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core
     /// </summary>
     public interface IExceptionHandlerViewModel : IViewModel
     {
+        /// <summary>
+        /// Event, der rejses, når en exception håndteres.
+        /// </summary>
+        event IntranetGuiEventHandler<IHandleExceptionEventArgs> OnHandleException;
+
         /// <summary>
         /// Seneste håndteret exception.
         /// </summary>

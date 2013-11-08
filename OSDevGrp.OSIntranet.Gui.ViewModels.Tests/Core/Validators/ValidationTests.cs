@@ -40,5 +40,37 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.InvalidValueForUri, value)));
         }
+
+        /// <summary>
+        /// Tester, at ValidateInterval returnerer Success ved lovlige værdier.
+        /// </summary>
+        [TestCase(0, 0, 30)]
+        [TestCase(1, 0, 30)]
+        [TestCase(15, 0, 30)]
+        [TestCase(29, 0, 30)]
+        [TestCase(30, 0, 30)]
+        public void TestAtValidateIntervalReturnererSuccessVedLovligeValues(int value, int min, int max)
+        {
+            var result = Validation.ValidateInterval(value, min, max);
+            Assert.That(result, Is.EqualTo(ValidationResult.Success));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateInterval returnerer ValidationResult ved ulovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(-10, 0, 30)]
+        [TestCase(-1, 0, 30)]
+        [TestCase(31, 0, 30)]
+        [TestCase(40, 0, 30)]
+        public void TestAtValidateIntervalReturnererValidationResultVedUlovligeValues(int value, int min, int max)
+        {
+            var result = Validation.ValidateInterval(value, min, max);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
+            Assert.That(result.ErrorMessage, Is.Not.Null);
+            Assert.That(result.ErrorMessage, Is.Not.Empty);
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, min, max)));
+        }
     }
 }

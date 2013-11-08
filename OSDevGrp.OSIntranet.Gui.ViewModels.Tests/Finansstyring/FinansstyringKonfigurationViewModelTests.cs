@@ -618,11 +618,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtAntalBogføringslinjerSetterOpdatererValueOnFinansstyringKonfigurationRepository()
         {
-            var fixture = new Fixture();
-
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.AntalBogføringslinjer)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(30)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .WhenCalled(e =>
@@ -646,7 +644,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.AntalBogføringslinjer = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = 50;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.AntalBogføringslinjer);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -660,11 +658,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("AntalBogføringslinjer")]
         public void TestAtAntalBogføringslinjerSetterRejserPropertyChangedVedOpdateringAfValue(string exceptPropertyName)
         {
-            var fixture = new Fixture();
-
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.AntalBogføringslinjer)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(30)
                                                     .Repeat.Any();
 
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
@@ -686,12 +682,52 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 };
 
             Assert.That(eventCalled, Is.False);
-            finansstyringKonfigurationViewModel.AntalBogføringslinjer = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = 50;
             Assert.That(eventCalled, Is.True);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.AntalBogføringslinjer);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at setteren til AntalBogføringslinjer kalder exceptionhandleren ved en IntranetGuiValidationException ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(0)]
+        [TestCase(9)]
+        [TestCase(251)]
+        [TestCase(512)]
+        public void TestAtAntalBogføringslinjerSetterKalderExceptionHandlerViewModelVedIntranetGuiValidationException(int illegalValue)
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var exception = (IntranetGuiValidationException) e.Arguments.ElementAt(0);
+                                                 Assert.That(exception, Is.Not.Null);
+                                                 Assert.That(exception.Message, Is.Not.Null);
+                                                 Assert.That(exception.Message, Is.Not.Empty);
+                                                 Assert.That(exception.Message, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 10, 250)));
+                                                 Assert.That(exception.ValidationContext, Is.Not.Null);
+                                                 Assert.That(exception.ValidationContext, Is.TypeOf<FinansstyringKonfigurationViewModel>());
+                                                 Assert.That(exception.PropertyName, Is.Not.Null);
+                                                 Assert.That(exception.PropertyName, Is.Not.Empty);
+                                                 Assert.That(exception.PropertyName, Is.EqualTo("AntalBogføringslinjer"));
+                                                 Assert.That(exception.Value, Is.EqualTo(illegalValue));
+                                                 Assert.That(exception.InnerException, Is.Null);
+                                             });
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = illegalValue;
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.AntalBogføringslinjer);
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.Anything));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
         }
 
         /// <summary>
@@ -704,7 +740,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.AntalBogføringslinjer)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(30)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<IntranetGuiRepositoryException>())
@@ -715,7 +751,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.AntalBogføringslinjer = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = 50;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.AntalBogføringslinjer);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -732,7 +768,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.AntalBogføringslinjer)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(30)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<IntranetGuiBusinessException>())
@@ -743,7 +779,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.AntalBogføringslinjer = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = 50;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.AntalBogføringslinjer);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -760,7 +796,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.AntalBogføringslinjer)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(30)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<IntranetGuiSystemException>())
@@ -771,7 +807,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.AntalBogføringslinjer = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = 50;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.AntalBogføringslinjer);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -788,7 +824,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.AntalBogføringslinjer)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(30)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<Exception>())
@@ -810,7 +846,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.AntalBogføringslinjer = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = 50;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.AntalBogføringslinjer);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -963,11 +999,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtDageForNyhederSetterOpdatererValueOnFinansstyringKonfigurationRepository()
         {
-            var fixture = new Fixture();
-
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.DageForNyheder)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(7)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .WhenCalled(e =>
@@ -991,7 +1025,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.DageForNyheder = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.DageForNyheder = 14;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -1005,11 +1039,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("DageForNyheder")]
         public void TestAtDageForNyhederSetterRejserPropertyChangedVedOpdateringAfValue(string exceptPropertyName)
         {
-            var fixture = new Fixture();
-
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.DageForNyheder)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(7)
                                                     .Repeat.Any();
             
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
@@ -1031,12 +1063,52 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 };
 
             Assert.That(eventCalled, Is.False);
-            finansstyringKonfigurationViewModel.DageForNyheder = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.DageForNyheder = 14;
             Assert.That(eventCalled, Is.True);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at setteren til DageForNyheder kalder exceptionhandleren ved en IntranetGuiValidationException ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(-10)]
+        [TestCase(-1)]
+        [TestCase(31)]
+        [TestCase(50)]
+        public void TestAtDageForNyhederSetterKalderExceptionHandlerViewModelVedIntranetGuiValidationException(int illegalValue)
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var exception = (IntranetGuiValidationException) e.Arguments.ElementAt(0);
+                                                 Assert.That(exception, Is.Not.Null);
+                                                 Assert.That(exception.Message, Is.Not.Null);
+                                                 Assert.That(exception.Message, Is.Not.Empty);
+                                                 Assert.That(exception.Message, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 0, 30)));
+                                                 Assert.That(exception.ValidationContext, Is.Not.Null);
+                                                 Assert.That(exception.ValidationContext, Is.TypeOf<FinansstyringKonfigurationViewModel>());
+                                                 Assert.That(exception.PropertyName, Is.Not.Null);
+                                                 Assert.That(exception.PropertyName, Is.Not.Empty);
+                                                 Assert.That(exception.PropertyName, Is.EqualTo("DageForNyheder"));
+                                                 Assert.That(exception.Value, Is.EqualTo(illegalValue));
+                                                 Assert.That(exception.InnerException, Is.Null);
+                                             });
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            finansstyringKonfigurationViewModel.DageForNyheder = illegalValue;
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.DageForNyheder);
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.Anything));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
         }
 
         /// <summary>
@@ -1049,7 +1121,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.DageForNyheder)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(7)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<IntranetGuiRepositoryException>())
@@ -1060,7 +1132,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.DageForNyheder = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.DageForNyheder = 14;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -1077,7 +1149,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.DageForNyheder)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(7)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<IntranetGuiBusinessException>())
@@ -1088,7 +1160,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.DageForNyheder = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.DageForNyheder = 14;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -1105,7 +1177,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.DageForNyheder)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(7)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<IntranetGuiSystemException>())
@@ -1116,7 +1188,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.DageForNyheder = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.DageForNyheder = 14;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -1133,7 +1205,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.DageForNyheder)
-                                                    .Return(fixture.Create<int>())
+                                                    .Return(7)
                                                     .Repeat.Any();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull))
                                                     .Throw(fixture.Create<Exception>())
@@ -1155,7 +1227,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
 
-            finansstyringKonfigurationViewModel.DageForNyheder = fixture.Create<int>();
+            finansstyringKonfigurationViewModel.DageForNyheder = 14;
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
@@ -1189,6 +1261,68 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.InvalidValueForUri, value)));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateAntalBogføringslinjer returnerer Success for lovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(10)]
+        [TestCase(15)]
+        [TestCase(250)]
+        public void TestAtValidateAntalBogføringslinjerReturnererSuccessForLovligeValues(int value)
+        {
+            var result = FinansstyringKonfigurationViewModel.ValidateAntalBogføringslinjer(value);
+            Assert.That(result, Is.EqualTo(ValidationResult.Success));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateAntalBogføringslinjer returnerer valideringsresultat for ulovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(0)]
+        [TestCase(9)]
+        [TestCase(251)]
+        [TestCase(512)]
+        public void TestAtValidateAntalBogføringslinjerReturnererValidationResultForUlovligeValues(int value)
+        {
+            var result = FinansstyringKonfigurationViewModel.ValidateAntalBogføringslinjer(value);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
+            Assert.That(result.ErrorMessage, Is.Not.Null);
+            Assert.That(result.ErrorMessage, Is.Not.Empty);
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 10, 250)));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateDageForNyheder returnerer Success for lovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(0)]
+        [TestCase(15)]
+        [TestCase(30)]
+        public void TestAtValidateDageForNyhederReturnererSuccessForLovligeValues(int value)
+        {
+            var result = FinansstyringKonfigurationViewModel.ValidateDageForNyheder(value);
+            Assert.That(result, Is.EqualTo(ValidationResult.Success));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateDageForNyheder returnerer valideringsresultat for ulovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(-10)]
+        [TestCase(-1)]
+        [TestCase(31)]
+        [TestCase(50)]
+        public void TestAtValidateDageForNyhederReturnererValidationResultForUlovligeValues(int value)
+        {
+            var result = FinansstyringKonfigurationViewModel.ValidateDageForNyheder(value);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
+            Assert.That(result.ErrorMessage, Is.Not.Null);
+            Assert.That(result.ErrorMessage, Is.Not.Empty);
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 0, 30)));
         }
     }
 }
