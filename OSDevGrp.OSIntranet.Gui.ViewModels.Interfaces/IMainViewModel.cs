@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -38,5 +39,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
         /// </summary>
         /// <param name="configurationSettings">Dictionary indeholdende konfiguration.</param>
         void ApplyConfiguration(IDictionary<string, object> configurationSettings);
+
+        /// <summary>
+        /// Tilmelder en subscriber, der kan vente på, at events publiseres.
+        /// </summary>
+        /// <typeparam name="TEventArgs">Typen af argumenter til eventet, der skal subscribes på.</typeparam>
+        /// <param name="eventSubscriber">Subscriber, der skal tilmeldes.</param>
+        void Subscribe<TEventArgs>(IEventSubscriber<TEventArgs> eventSubscriber) where TEventArgs : IIntranetGuiEventArgs;
+
+        /// <summary>
+        /// Framelder en subscriber, der venter på, at events publiseres.
+        /// </summary>
+        /// <typeparam name="TEventArgs">Typen af argumenter til eventet, der skal subscribes på.</typeparam>
+        /// <param name="eventSubscriber">Subscriber, der skal frameldes.</param>
+        void Unsubscribe<TEventArgs>(IEventSubscriber<TEventArgs> eventSubscriber) where TEventArgs : IIntranetGuiEventArgs;
     }
 }

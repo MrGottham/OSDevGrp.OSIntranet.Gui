@@ -52,6 +52,7 @@
     <Compile Include="Finansstyring\IReadOnlyBogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabViewModel.cs" />
+    <Compile Include="IEventSubscriber.cs" />
     <Compile Include="IMainViewModel.cs" />
     <Compile Include="IRefreshable.cs" />
     <Compile Include="IViewModel.cs" />

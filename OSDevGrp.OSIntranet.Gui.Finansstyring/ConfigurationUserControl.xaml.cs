@@ -33,6 +33,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             var mainViewModel = (IMainViewModel) Resources["MainViewModel"];
             mainViewModel.ApplyConfiguration(_configurationProvider.Settings);
 
+            // TODO: Subscripe...
+
             var finansstyringKonfiguration = (IFinansstyringKonfigurationViewModel) ((Grid) Content).DataContext;
             finansstyringKonfiguration.PropertyChanged += FinansstyringKonfigurationPropertyChangedEventHandler;
         }

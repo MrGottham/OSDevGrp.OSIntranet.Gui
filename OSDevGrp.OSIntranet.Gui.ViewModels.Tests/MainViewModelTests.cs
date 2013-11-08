@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
 {
@@ -107,6 +112,110 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
             Assert.That(finansstyringKonfigurationRepository.FinansstyringServiceUri, Is.EqualTo(new Uri(Convert.ToString(configurationSettings["FinansstyringServiceUri"]))));
             Assert.That(finansstyringKonfigurationRepository.AntalBogføringslinjer, Is.EqualTo(Convert.ToInt32(configurationSettings["AntalBogføringslinjer"])));
             Assert.That(finansstyringKonfigurationRepository.DageForNyheder, Is.EqualTo(Convert.ToInt32(configurationSettings["DageForNyheder"])));
+        }
+
+        /// <summary>
+        /// Tester, at Subscribe kaster en ArgumentNullException, hvis subscriber, der skal tilmeldes, er null.
+        /// </summary>
+        [Test]
+        public void TestAtSubscribeKasterArgumentNullExceptionHvisEventSubscriberErNull()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => mainViewModel.Subscribe<IIntranetGuiEventArgs>(null));
+        }
+
+        /// <summary>
+        /// Tester, at Subscribe tilmelder en event subscriber.
+        /// </summary>
+        [Test]
+        public void TestAtSubscribeTilmelderSubscriber()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var eventSubscriberMock = MockRepository.GenerateMock<IEventSubscriber<IIntranetGuiEventArgs>>();
+            mainViewModel.Subscribe(eventSubscriberMock);
+
+            var field = mainViewModel.GetType().GetField("_eventSubscribers", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(field, Is.Not.Null);
+
+            // ReSharper disable PossibleNullReferenceException
+            var eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
+            // ReSharper restore PossibleNullReferenceException
+            Assert.That(eventSubscribers, Is.Not.Null);
+            Assert.That(eventSubscribers.Contains(eventSubscriberMock), Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at Unsubscribe kaster en ArgumentNullException, hvis subscriber, der skal frameldes, er null.
+        /// </summary>
+        [Test]
+        public void TestAtUnsubscribeKasterArgumentNullExceptionHvisEventSubscriberErNull()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => mainViewModel.Unsubscribe<IIntranetGuiEventArgs>(null));
+        }
+
+        /// <summary>
+        /// Tester, at Unsubscribe framelder en event subscriber.
+        /// </summary>
+        [Test]
+        public void TestAtUnsubscribeFramelderSubscriber()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var eventSubscriberMock = MockRepository.GenerateMock<IEventSubscriber<IIntranetGuiEventArgs>>();
+            mainViewModel.Subscribe(eventSubscriberMock);
+
+            var field = mainViewModel.GetType().GetField("_eventSubscribers", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(field, Is.Not.Null);
+
+            // ReSharper disable PossibleNullReferenceException
+            var eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
+            // ReSharper restore PossibleNullReferenceException
+            Assert.That(eventSubscribers, Is.Not.Null);
+            Assert.That(eventSubscribers.Contains(eventSubscriberMock), Is.True);
+
+            mainViewModel.Unsubscribe(eventSubscriberMock);
+
+            eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
+            Assert.That(eventSubscribers, Is.Not.Null);
+            Assert.That(eventSubscribers.Contains(eventSubscriberMock), Is.False);
+        }
+
+        /// <summary>
+        /// Tester, at OnEvent kaldes for alle event subscribers, der venter på events, hvor argumenter er af typen HandleExceptionEventArgs.
+        /// </summary>
+        [Test]
+        public void TestAtOnEventKaldesForAlleHandleExceptionEventArgsSubscribers()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IEventSubscriber<IHandleExceptionEventArgs>>(e => e.FromFactory(() => MockRepository.GenerateMock<IEventSubscriber<IHandleExceptionEventArgs>>()));
+
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var exceptionHandlerViewModel = mainViewModel.ExceptionHandler;
+            Assert.That(exceptionHandlerViewModel, Is.Not.Null);
+
+            var eventSubscribers = fixture.CreateMany<IEventSubscriber<IHandleExceptionEventArgs>>(7).ToList();
+            try
+            {
+                eventSubscribers.ForEach(mainViewModel.Subscribe);
+
+                exceptionHandlerViewModel.HandleException(fixture.Create<IntranetGuiSystemException>());
+
+                eventSubscribers.ForEach(m => m.AssertWasCalled(n => n.OnEvent(Arg<IHandleExceptionEventArgs>.Is.NotNull)));
+            }
+            finally
+            {
+                eventSubscribers.ForEach(mainViewModel.Unsubscribe);
+            }
         }
     }
 }
