@@ -11,11 +11,13 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     /// <summary>
     /// User control til konfiguration.
     /// </summary>
-    public sealed partial class ConfigurationUserControl
+    public sealed partial class ConfigurationUserControl : IDisposable
     {
         #region Private variables
 
+        private bool _disposed;
         private readonly ConfigurationProvider _configurationProvider;
+        private readonly IMainViewModel _mainViewModel;
 
         #endregion
 
@@ -30,13 +32,50 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
             _configurationProvider = ConfigurationProvider.Instance;
 
-            var mainViewModel = (IMainViewModel) Resources["MainViewModel"];
-            mainViewModel.ApplyConfiguration(_configurationProvider.Settings);
+            _mainViewModel = (IMainViewModel) Resources["MainViewModel"];
+            _mainViewModel.ApplyConfiguration(_configurationProvider.Settings);
 
             // TODO: Subscripe...
 
             var finansstyringKonfiguration = (IFinansstyringKonfigurationViewModel) ((Grid) Content).DataContext;
             finansstyringKonfiguration.PropertyChanged += FinansstyringKonfigurationPropertyChangedEventHandler;
+        }
+
+        #endregion
+
+        #region IDisposable members
+
+        /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~ConfigurationUserControl()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Frigørelse af ressourcer.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Frigørelse af ressourcer.
+        /// </summary>
+        /// <param name="disposing">Angivelse af, om managed ressourcer også skal frigøres.</param>
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+            }
+            _disposed = true;
         }
 
         #endregion
@@ -76,5 +115,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         }
 
         #endregion
+
     }
 }
