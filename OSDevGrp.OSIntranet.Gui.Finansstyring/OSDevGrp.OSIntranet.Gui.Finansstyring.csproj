@@ -148,6 +148,7 @@
     <Compile Include="ConfigurationUserControl.xaml.cs">
       <DependentUpon>ConfigurationUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\Behaviors\HighlightOnErrorBehavior.cs" />
     <Compile Include="Core\Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Core\Converters\ByteArrayToImageConverter.cs" />
     <Compile Include="Core\ViewModelValidator.cs" />
