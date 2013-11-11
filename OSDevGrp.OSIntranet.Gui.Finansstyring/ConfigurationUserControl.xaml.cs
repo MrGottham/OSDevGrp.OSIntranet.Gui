@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using OSDevGrp.OSIntranet.Gui.Finansstyring.Core;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Runtime;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -11,7 +13,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     /// <summary>
     /// User control til konfiguration.
     /// </summary>
-    public sealed partial class ConfigurationUserControl : IDisposable
+    public sealed partial class ConfigurationUserControl : IDisposable, IEventSubscriber<IHandleExceptionEventArgs>
     {
         #region Private variables
 
@@ -34,8 +36,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
             _mainViewModel = (IMainViewModel) Resources["MainViewModel"];
             _mainViewModel.ApplyConfiguration(_configurationProvider.Settings);
-
-            // TODO: Subscripe...
+            _mainViewModel.Subscribe(this);
 
             var finansstyringKonfiguration = (IFinansstyringKonfigurationViewModel) ((Grid) Content).DataContext;
             finansstyringKonfiguration.PropertyChanged += FinansstyringKonfigurationPropertyChangedEventHandler;
@@ -72,6 +73,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
+            _mainViewModel.Unsubscribe(this);
             if (disposing)
             {
             }
@@ -83,11 +85,33 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Methods
 
         /// <summary>
+        /// Eventhandler, der rejses, når eventet til håndtering af exceptions publiceres.
+        /// </summary>
+        /// <param name="handleExceptionEventArgs"></param>
+        public void OnEvent(IHandleExceptionEventArgs handleExceptionEventArgs)
+        {
+            if (handleExceptionEventArgs == null)
+            {
+                throw new ArgumentNullException("handleExceptionEventArgs");
+            }
+            var validationException = handleExceptionEventArgs.Error as IntranetGuiValidationException;
+            if (validationException == null)
+            {
+                return;
+            }
+            var validationContext = validationException.ValidationContext as IFinansstyringKonfigurationViewModel;
+            if (validationContext == null)
+            {
+                return;
+            }
+        }
+
+        /// <summary>
         /// Eventhandler, der kaldes, når properties ændres på ViewModel for konfiguration til finansstyring.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>
-        public void FinansstyringKonfigurationPropertyChangedEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        private void FinansstyringKonfigurationPropertyChangedEventHandler(object sender, PropertyChangedEventArgs eventArgs)
         {
             if (sender == null)
             {

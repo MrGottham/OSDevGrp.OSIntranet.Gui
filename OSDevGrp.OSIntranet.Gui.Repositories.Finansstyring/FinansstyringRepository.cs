@@ -190,31 +190,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                                             {
                                                 continue;
                                             }
-                                            var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer,
-                                                                                                bogføringslinjeView
-                                                                                                    .Løbenr,
-                                                                                                bogføringslinjeView.Dato,
-                                                                                                bogføringslinjeView
-                                                                                                    .Konto.Kontonummer,
-                                                                                                bogføringslinjeView
-                                                                                                    .Tekst,
-                                                                                                bogføringslinjeView
-                                                                                                    .Debit,
-                                                                                                bogføringslinjeView
-                                                                                                    .Kredit);
+                                            var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer, bogføringslinjeView.Løbenr, bogføringslinjeView.Dato, bogføringslinjeView.Konto.Kontonummer, bogføringslinjeView.Tekst, bogføringslinjeView.Debit, bogføringslinjeView.Kredit);
                                             if (string.IsNullOrEmpty(bogføringslinjeView.Bilag) == false)
                                             {
                                                 bogføringslinjeModel.Bilag = bogføringslinjeView.Bilag;
                                             }
                                             if (bogføringslinjeView.Budgetkonto != null)
                                             {
-                                                bogføringslinjeModel.Budgetkontonummer =
-                                                    bogføringslinjeView.Budgetkonto.Kontonummer;
+                                                bogføringslinjeModel.Budgetkontonummer = bogføringslinjeView.Budgetkonto.Kontonummer;
                                             }
                                             if (bogføringslinjeView.Adressekonto != null)
                                             {
-                                                bogføringslinjeModel.Adressekonto =
-                                                    bogføringslinjeView.Adressekonto.Nummer;
+                                                bogføringslinjeModel.Adressekonto = bogføringslinjeView.Adressekonto.Nummer;
                                             }
                                             result.Add(bogføringslinjeModel);
                                         }
