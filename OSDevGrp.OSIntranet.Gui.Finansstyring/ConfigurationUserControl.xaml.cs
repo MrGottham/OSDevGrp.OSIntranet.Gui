@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using OSDevGrp.OSIntranet.Gui.Finansstyring.Core;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
@@ -6,6 +7,7 @@ using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Runtime;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
@@ -20,6 +22,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         private bool _disposed;
         private readonly ConfigurationProvider _configurationProvider;
         private readonly IMainViewModel _mainViewModel;
+        private readonly static DependencyProperty ValidationErrorsProperty = DependencyProperty.RegisterAttached("ValidationErrors", typeof (IDictionary<string, string>), typeof (ConfigurationUserControl), null);
 
         #endregion
 
@@ -32,6 +35,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
+            ValidationErrors = new Dictionary<string, string>();
+
             _configurationProvider = ConfigurationProvider.Instance;
 
             _mainViewModel = (IMainViewModel) Resources["MainViewModel"];
@@ -40,6 +45,25 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
             var finansstyringKonfiguration = (IFinansstyringKonfigurationViewModel) ((Grid) Content).DataContext;
             finansstyringKonfiguration.PropertyChanged += FinansstyringKonfigurationPropertyChangedEventHandler;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Dictionary indeholdende valideringsfejl.
+        /// </summary>
+        public IDictionary<string, string> ValidationErrors
+        {
+            get
+            {
+                return (IDictionary<string, string>) GetValue(ValidationErrorsProperty);
+            }
+            private set
+            {
+                SetValue(ValidationErrorsProperty, value);
+            }
         }
 
         #endregion
@@ -87,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// <summary>
         /// Eventhandler, der rejses, når eventet til håndtering af exceptions publiceres.
         /// </summary>
-        /// <param name="handleExceptionEventArgs"></param>
+        /// <param name="handleExceptionEventArgs">Argumenter fra eventet, der publiceres.</param>
         public void OnEvent(IHandleExceptionEventArgs handleExceptionEventArgs)
         {
             if (handleExceptionEventArgs == null)
@@ -103,6 +127,23 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             if (validationContext == null)
             {
                 return;
+            }
+            if (string.IsNullOrEmpty(validationException.PropertyName) || string.IsNullOrEmpty(validationException.Message))
+            {
+                return;
+            }
+            try
+            {
+                if (ValidationErrors.ContainsKey(validationException.PropertyName) == false)
+                {
+                    ValidationErrors.Add(validationException.PropertyName, validationException.Message);
+                    return;
+                }
+                ValidationErrors[validationException.PropertyName] = validationException.Message;
+            }
+            finally
+            {
+                handleExceptionEventArgs.IsHandled = true;
             }
         }
 

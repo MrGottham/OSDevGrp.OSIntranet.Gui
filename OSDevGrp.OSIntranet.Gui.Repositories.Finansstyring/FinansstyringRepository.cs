@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.Threading;
 using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -90,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             try
             {
                 var result = new List<IRegnskabModel>();
-                var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
+                var binding = GetBasicHttpBinding();
                 var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
                 var client = new FinansstyringServiceClient(binding, endpointAddress);
                 try
@@ -158,7 +159,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             try
             {
                 var result = new List<IBogføringslinjeModel>(antalBogføringslinjer);
-                var binding = new BasicHttpBinding(BasicHttpSecurityMode.None);
+                var binding = GetBasicHttpBinding();
                 var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
                 var client = new FinansstyringServiceClient(binding, endpointAddress);
                 try
@@ -245,6 +246,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BogføringslinjerGet", ex.Message), ex);
             }
+        }
+
+        /// <summary>
+        /// Returnerer den HTTP binding, der skal benyttes til kommunikation.
+        /// </summary>
+        /// <returns>HTTP binding, der skal benyttes til kommunikation.</returns>
+        private static Binding GetBasicHttpBinding()
+        {
+            return new BasicHttpBinding(BasicHttpSecurityMode.None)
+                {
+                    MaxReceivedMessageSize = 4194304
+                };
         }
 
         #endregion
