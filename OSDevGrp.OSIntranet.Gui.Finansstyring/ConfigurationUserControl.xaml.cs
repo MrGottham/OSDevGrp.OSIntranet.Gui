@@ -134,12 +134,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             try
             {
-                if (ValidationErrors.ContainsKey(validationException.PropertyName) == false)
+                if (ValidationErrors.ContainsKey(validationException.PropertyName))
                 {
-                    ValidationErrors.Add(validationException.PropertyName, validationException.Message);
+                    ValidationErrors[validationException.PropertyName] = validationException.Message;
                     return;
                 }
-                ValidationErrors[validationException.PropertyName] = validationException.Message;
+                ValidationErrors.Add(validationException.PropertyName, validationException.Message);
             }
             finally
             {
