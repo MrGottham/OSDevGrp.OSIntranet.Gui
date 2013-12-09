@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using OSDevGrp.OSIntranet.Gui.Finansstyring.Core;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
@@ -22,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         private bool _disposed;
         private readonly ConfigurationProvider _configurationProvider;
         private readonly IMainViewModel _mainViewModel;
-        private readonly static DependencyProperty ValidationErrorsProperty = DependencyProperty.RegisterAttached("ValidationErrors", typeof (IDictionary<string, string>), typeof (ConfigurationUserControl), null);
+        private static readonly DependencyProperty ValidationErrorProperty = DependencyProperty.RegisterAttached("ValidationError", typeof (string), typeof (ConfigurationUserControl), null);
 
         #endregion
 
@@ -34,8 +33,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         public ConfigurationUserControl()
         {
             InitializeComponent();
-
-            ValidationErrors = new Dictionary<string, string>();
 
             _configurationProvider = ConfigurationProvider.Instance;
 
@@ -52,17 +49,17 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Properties
 
         /// <summary>
-        /// Dictionary indeholdende valideringsfejl.
+        /// Seneste valideringsfejl.
         /// </summary>
-        public IDictionary<string, string> ValidationErrors
+        public string ValidationError
         {
             get
             {
-                return (IDictionary<string, string>) GetValue(ValidationErrorsProperty);
+                return (string) GetValue(ValidationErrorProperty);
             }
             private set
             {
-                SetValue(ValidationErrorsProperty, value);
+                SetValue(ValidationErrorProperty, value);
             }
         }
 
@@ -134,13 +131,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             try
             {
-                if (ValidationErrors.ContainsKey(validationException.PropertyName))
-                {
-                    ValidationErrors[validationException.PropertyName] = validationException.Message;
-                    return;
-                }
-                ValidationErrors.Add(validationException.PropertyName, validationException.Message);
-                ValidationErrors = new Dictionary<string, string>();
+                ValidationError = validationException.Message;
             }
             finally
             {

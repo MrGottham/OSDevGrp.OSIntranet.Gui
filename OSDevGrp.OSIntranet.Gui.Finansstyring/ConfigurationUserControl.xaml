@@ -34,7 +34,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,4,0,11">
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringServiceUriLabel}"/>
-            <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Text="{Binding Path=FinansstyringServiceUri, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=ConfigurationUserControlRoot, Path=ValidationErrors}"/>
+            <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Text="{Binding Path=FinansstyringServiceUri, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=ConfigurationUserControlRoot, Path=ValidationError}"/>
         </StackPanel>
     </Grid>
 </UserControl>
