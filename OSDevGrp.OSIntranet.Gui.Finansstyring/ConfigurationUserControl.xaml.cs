@@ -140,6 +140,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                     return;
                 }
                 ValidationErrors.Add(validationException.PropertyName, validationException.Message);
+                ValidationErrors = new Dictionary<string, string>();
             }
             finally
             {

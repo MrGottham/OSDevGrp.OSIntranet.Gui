@@ -61,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
                 return;
             }
             var errorMessage = eventArgs.NewValue as string;
-            var textBoxStyle = string.IsNullOrEmpty(errorMessage) ? null : (Style) Application.Current.Resources["HighlightTextBoxStyle"];
+            var textBoxStyle = string.IsNullOrEmpty(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
             textBox.Style = textBoxStyle;
         }
 
