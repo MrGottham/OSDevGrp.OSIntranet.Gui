@@ -3,7 +3,6 @@
     x:Class="OSDevGrp.OSIntranet.Gui.Finansstyring.ConfigurationUserControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:OSDevGrp.OSIntranet.Gui.Finansstyring"
     xmlns:vm="using:OSDevGrp.OSIntranet.Gui.ViewModels"
     xmlns:converters="using:OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters"
     xmlns:behaviors="using:OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors"
@@ -20,6 +19,7 @@
             </ResourceDictionary.MergedDictionaries>
             <vm:MainViewModel x:Key="MainViewModel"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:IntegerToStringConverter x:Key="IntegerToStringConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     
@@ -27,14 +27,66 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="0,0,0,25" DataContext="{Binding Source={StaticResource MainViewModel}, Path=ExceptionHandler}" Visibility="{Binding Path=ShowLast, Converter={StaticResource BooleanToVisibilityConverter}}">
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="Red" FontWeight="Bold" TextWrapping="Wrap" Text="{Binding Path=Last.DisplayName}"/>
             <TextBlock Style="{StaticResource BodyTextStyle}" Foreground="Red" FontStyle="Italic" TextWrapping="Wrap" Text="{Binding Path=Last.Message}"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Margin="0,4,0,11">
+        <StackPanel Grid.Row="1" Margin="0,5,0,0">
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringServiceUriLabel}"/>
             <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Text="{Binding Path=FinansstyringServiceUri, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=ConfigurationUserControlRoot, Path=ValidationError}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Margin="0,5,0,0">
+            <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=AntalBogføringslinjerLabel}"/>
+            <ComboBox Style="{StaticResource BlackBorderedComboBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" SelectedValue="{Binding Path=AntalBogføringslinjer, Mode=TwoWay, Converter={StaticResource IntegerToStringConverter}}" SelectedValuePath="Content">
+                <ComboBoxItem>10</ComboBoxItem>
+                <ComboBoxItem>15</ComboBoxItem>
+                <ComboBoxItem>20</ComboBoxItem>
+                <ComboBoxItem>25</ComboBoxItem>
+                <ComboBoxItem>50</ComboBoxItem>
+                <ComboBoxItem>100</ComboBoxItem>
+                <ComboBoxItem>150</ComboBoxItem>
+                <ComboBoxItem>200</ComboBoxItem>
+                <ComboBoxItem>250</ComboBoxItem>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel  Grid.Row="3" Margin="0,5,0,0">
+            <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=DageForNyhederLabel}"/>
+            <ComboBox Style="{StaticResource BlackBorderedComboBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" SelectedValue="{Binding Path=DageForNyheder, Mode=TwoWay, Converter={StaticResource IntegerToStringConverter}}" SelectedValuePath="Content">
+                <ComboBoxItem>0</ComboBoxItem>
+                <ComboBoxItem>1</ComboBoxItem>
+                <ComboBoxItem>2</ComboBoxItem>
+                <ComboBoxItem>3</ComboBoxItem>
+                <ComboBoxItem>4</ComboBoxItem>
+                <ComboBoxItem>5</ComboBoxItem>
+                <ComboBoxItem>6</ComboBoxItem>
+                <ComboBoxItem>7</ComboBoxItem>
+                <ComboBoxItem>8</ComboBoxItem>
+                <ComboBoxItem>9</ComboBoxItem>
+                <ComboBoxItem>10</ComboBoxItem>
+                <ComboBoxItem>11</ComboBoxItem>
+                <ComboBoxItem>12</ComboBoxItem>
+                <ComboBoxItem>13</ComboBoxItem>
+                <ComboBoxItem>14</ComboBoxItem>
+                <ComboBoxItem>15</ComboBoxItem>
+                <ComboBoxItem>16</ComboBoxItem>
+                <ComboBoxItem>17</ComboBoxItem>
+                <ComboBoxItem>18</ComboBoxItem>
+                <ComboBoxItem>19</ComboBoxItem>
+                <ComboBoxItem>20</ComboBoxItem>
+                <ComboBoxItem>21</ComboBoxItem>
+                <ComboBoxItem>22</ComboBoxItem>
+                <ComboBoxItem>23</ComboBoxItem>
+                <ComboBoxItem>24</ComboBoxItem>
+                <ComboBoxItem>25</ComboBoxItem>
+                <ComboBoxItem>26</ComboBoxItem>
+                <ComboBoxItem>27</ComboBoxItem>
+                <ComboBoxItem>28</ComboBoxItem>
+                <ComboBoxItem>29</ComboBoxItem>
+                <ComboBoxItem>30</ComboBoxItem>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </UserControl>

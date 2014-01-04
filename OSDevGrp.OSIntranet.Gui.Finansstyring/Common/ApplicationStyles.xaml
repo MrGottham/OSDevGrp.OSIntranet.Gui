@@ -18,4 +18,13 @@
     <Style x:Key="RedBorderedTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource BorderedTextBoxStyle}">
         <Setter Property="BorderBrush" Value="Red"/>
     </Style>
+    <Style x:Key="BorderedComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="BorderThickness" Value="1,1,1,1"/>
+    </Style>
+    <Style x:Key="BlackBorderedComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource BorderedComboBoxStyle}">
+        <Setter Property="BorderBrush" Value="Black"/>
+    </Style>
+    <Style x:Key="RedBorderedComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource BorderedComboBoxStyle}">
+        <Setter Property="BorderBrush" Value="Red"/>
+    </Style>
 </ResourceDictionary>

@@ -27,7 +27,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             InitializeComponent();
             Suspending += OnSuspending;
 
-            // TODO: Settings (pane) (http://msdn.microsoft.com/en-us/library/windows/apps/hh872190.aspx)
             // TODO: Panes.
             // TODO: Search.
         }

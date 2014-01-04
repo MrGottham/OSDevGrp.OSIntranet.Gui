@@ -168,10 +168,17 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 case "FinansstyringServiceUri": 
                     _configurationProvider.SetValue("FinansstyringServiceUri", finansstyringKonfiguration.FinansstyringServiceUri);
                     break;
+
+                case "AntalBogføringslinjer":
+                    _configurationProvider.SetValue("AntalBogføringslinjer", finansstyringKonfiguration.AntalBogføringslinjer);
+                    break;
+
+                case "DageForNyheder":
+                    _configurationProvider.SetValue("DageForNyheder", finansstyringKonfiguration.DageForNyheder);
+                    break;
             }
         }
 
         #endregion
-
     }
 }
