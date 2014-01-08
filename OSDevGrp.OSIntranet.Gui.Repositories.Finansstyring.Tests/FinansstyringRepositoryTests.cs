@@ -84,5 +84,47 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
+
+        /// <summary>
+        /// Tester, at DebitorlisteGetAsync henter listen af debitorer til et givent regnskab.
+        /// </summary>
+        [Test]
+        public async void TestAtDebitorlisteGetAsyncHenterDebitorliste()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var debitorer = await finansstyringRepository.DebitorlisteGetAsync(1, DateTime.Now);
+            Assert.That(debitorer, Is.Not.Null);
+            Assert.That(debitorer.Count(), Is.GreaterThanOrEqualTo(0));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at KreditorlisteGetAsync henter listen af kreditorer til et givent regnskab.
+        /// </summary>
+        [Test]
+        public async void TestAtKreditorlisteGetAsyncHenterKreditorliste()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var kreditorer = await finansstyringRepository.KreditorlisteGetAsync(1, DateTime.Now);
+            Assert.That(kreditorer, Is.Not.Null);
+            Assert.That(kreditorer.Count(), Is.GreaterThanOrEqualTo(0));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
     }
 }

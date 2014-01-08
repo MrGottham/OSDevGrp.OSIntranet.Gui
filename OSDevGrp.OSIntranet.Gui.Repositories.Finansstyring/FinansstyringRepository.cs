@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Service;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
@@ -79,6 +80,30 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         public virtual Task<IEnumerable<IBogføringslinjeModel>> BogføringslinjerGetAsync(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer)
         {
             Func<IEnumerable<IBogføringslinjeModel>> func = () => BogføringslinjerGet(regnskabsnummer, statusDato, antalBogføringslinjer);
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Henter listen af debitorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsummer">Regnskabsnummer, hvortil listen af debitorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af debitorer.</param>
+        /// <returns>Debitorer i regnskabet.</returns>
+        public virtual Task<IEnumerable<IAdressekontoModel>> DebitorlisteGetAsync(int regnskabsummer, DateTime statusDato)
+        {
+            Func<IEnumerable<IAdressekontoModel>> func = () => DebitorlisteGet(regnskabsummer, statusDato);
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Henter listen af kreditorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsummer">Regnskabsnummer, hvortil listen af kreditorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af kreditorer.</param>
+        /// <returns>Kreditorer i regnskabet.</returns>
+        public virtual Task<IEnumerable<IAdressekontoModel>> KreditorlisteGetAsync(int regnskabsummer, DateTime statusDato)
+        {
+            Func<IEnumerable<IAdressekontoModel>> func = () => KreditorlisteGet(regnskabsummer, statusDato);
             return Task.Run(func);
         }
 
@@ -226,6 +251,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             throw error;
                         }
                     }
+                    client.CloseAsync();
                 }
                 catch
                 {
@@ -245,6 +271,184 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BogføringslinjerGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af debitorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil listen af debitorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af debitorer.</param>
+        /// <returns>Debitorer i regnskabet.</returns>
+        private IEnumerable<IAdressekontoModel> DebitorlisteGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var debitorer = new List<IAdressekontoModel>();
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new DebitorlisteGetQuery
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            StatusDato = statusDato
+                        };
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.DebitorlisteGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    foreach (var debitorView in e.Result)
+                                    {
+                                        try
+                                        {
+                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, debitorView.Nummer, debitorView.Navn, statusDato, debitorView.Saldo)
+                                                {
+                                                    PrimærTelefon = debitorView.PrimærTelefon,
+                                                    SekundærTelefon = debitorView.SekundærTelefon
+                                                };
+                                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.Low);
+                                            debitorer.Add(adressekontoModel);
+                                        }
+                                        catch (ArgumentNullException)
+                                        {
+                                        }
+                                        catch (ArgumentException)
+                                        {
+                                        }
+                                    }
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.DebitorlisteGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return debitorer;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DebitorlisteGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DebitorlisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af kreditorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil listen af kreditorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af kreditorer.</param>
+        /// <returns>Kreditorer i regnskabet.</returns>
+        private IEnumerable<IAdressekontoModel> KreditorlisteGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var kreditorer = new List<IAdressekontoModel>();
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new KreditorlisteGetQuery
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            StatusDato = statusDato
+                        };
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.KreditorlisteGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    foreach (var kreditorView in e.Result)
+                                    {
+                                        try
+                                        {
+                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, kreditorView.Nummer, kreditorView.Navn, statusDato, kreditorView.Saldo)
+                                                {
+                                                    PrimærTelefon = kreditorView.PrimærTelefon,
+                                                    SekundærTelefon = kreditorView.SekundærTelefon
+                                                };
+                                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.High);
+                                            kreditorer.Add(adressekontoModel);
+                                        }
+                                        catch (ArgumentNullException)
+                                        {
+                                        }
+                                        catch (ArgumentException)
+                                        {
+                                        }
+                                    }
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.KreditorlisteGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return kreditorer;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KreditorlisteGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KreditorlisteGet", ex.Message), ex);
             }
         }
 

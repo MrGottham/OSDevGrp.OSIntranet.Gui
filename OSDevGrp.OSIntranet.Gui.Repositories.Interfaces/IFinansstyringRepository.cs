@@ -32,5 +32,21 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <param name="antalBogføringslinjer">Antal bogføringslinjer, der skal hentes.</param>
         /// <returns>Bogføringslinjer til regnskabet.</returns>
         Task<IEnumerable<IBogføringslinjeModel>> BogføringslinjerGetAsync(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer);
+
+        /// <summary>
+        /// Henter listen af debitorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsummer">Regnskabsnummer, hvortil listen af debitorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af debitorer.</param>
+        /// <returns>Debitorer i regnskabet.</returns>
+        Task<IEnumerable<IAdressekontoModel>> DebitorlisteGetAsync(int regnskabsummer, DateTime statusDato);
+
+        /// <summary>
+        /// Henter listen af kreditorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsummer">Regnskabsnummer, hvortil listen af kreditorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af kreditorer.</param>
+        /// <returns>Kreditorer i regnskabet.</returns>
+        Task<IEnumerable<IAdressekontoModel>> KreditorlisteGetAsync(int regnskabsummer, DateTime statusDato);
     }
 }
