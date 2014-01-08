@@ -33,7 +33,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Regnskabet, som adressekontoen er tilknyttet.
         /// </summary>
-        public virtual IRegnskabViewModel Regnskabsnummer
+        public virtual IRegnskabViewModel Regnskab
         {
             get
             {
