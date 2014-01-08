@@ -1,4 +1,5 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
@@ -8,6 +9,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// </summary>
     public class AdressekontoViewModel : ViewModelBase, IAdressekontoViewModel
     {
+        #region Private variables
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Danner ViewModel for en adressekonto.
+        /// </summary>
+        /// <param name="regnskabViewModel">ViewModel for regnskabet, som adressekontoen skal være tilknyttet.</param>
+        /// <param name="adressekontoModel">Model for adressekontoen.</param>
+        /// <param name="displayName">Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.</param>
+        /// <param name="image">Billede, der illustrerer en adressekontoen.</param>
+        public AdressekontoViewModel(IRegnskabViewModel regnskabViewModel, IAdressekontoModel adressekontoModel, string displayName, byte[] image)
+        {
+            
+        }
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -108,9 +128,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// Billede, der illustrerer en adressekontoen.
+        /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
         /// </summary>
-        public virtual byte[] Image
+        public override string DisplayName
         {
             get
             {
@@ -119,9 +139,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
+        /// Billede, der illustrerer en adressekontoen.
         /// </summary>
-        public override string DisplayName
+        public virtual byte[] Image
         {
             get
             {

@@ -81,7 +81,9 @@
       <Name>OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Images\Adressekonto.png" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Bogføringslinje.png" />
   </ItemGroup>
