@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Core\INyhedModel.cs" />
     <Compile Include="Core\Nyhedsaktualitet.cs" />
+    <Compile Include="Finansstyring\IAdressekontoModel.cs" />
     <Compile Include="Finansstyring\IBogføringslinjeModel.cs" />
     <Compile Include="Finansstyring\IRegnskabModel.cs" />
     <Compile Include="IModel.cs" />

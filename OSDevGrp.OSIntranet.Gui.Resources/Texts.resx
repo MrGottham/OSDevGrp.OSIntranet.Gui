@@ -120,6 +120,9 @@
   <data name="Accountings" xml:space="preserve">
     <value>Accountings</value>
   </data>
+  <data name="Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
   <data name="Configuration" xml:space="preserve">
     <value>Configuration</value>
   </data>

@@ -15,6 +15,7 @@
         NumberOfAccountingLinesToGet,
         DaysForNews,
         InvalidValueForUri,
-        ValueOutsideInterval
+        ValueOutsideInterval,
+        Balance
     }
 }

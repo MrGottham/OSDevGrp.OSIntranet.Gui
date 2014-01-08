@@ -120,6 +120,9 @@
   <data name="Accountings" xml:space="preserve">
     <value>Regnskabsliste</value>
   </data>
+  <data name="Balance" xml:space="preserve">
+    <value>Saldo</value>
+  </data>
   <data name="Configuration" xml:space="preserve">
     <value>Konfiguration</value>
   </data>

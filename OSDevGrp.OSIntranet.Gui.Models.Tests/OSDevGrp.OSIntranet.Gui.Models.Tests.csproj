@@ -59,6 +59,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Finansstyring\AdressekontoModelTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabModelTests.cs" />
     <Compile Include="ModelBaseTests.cs" />
@@ -72,6 +73,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Models\OSDevGrp.OSIntranet.Gui.Models.csproj">
       <Project>{a28760ab-2cb2-47fc-9db6-68bb0fcd61e7}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Resources\OSDevGrp.OSIntranet.Gui.Resources.csproj">
+      <Project>{1F572194-E97C-4E22-A027-3412817475E3}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Resources</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
