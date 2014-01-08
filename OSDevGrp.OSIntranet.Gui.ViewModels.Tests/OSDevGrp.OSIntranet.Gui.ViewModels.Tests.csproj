@@ -69,6 +69,7 @@
     <Compile Include="Core\ExceptionViewModelTests.cs" />
     <Compile Include="Core\NyhedViewModelTests.cs" />
     <Compile Include="Core\Validators\ValidationTests.cs" />
+    <Compile Include="Finansstyring\AdressekontoViewModelTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModelTests.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommandTests.cs" />
@@ -111,7 +112,6 @@
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
