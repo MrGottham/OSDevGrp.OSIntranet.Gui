@@ -10,6 +10,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     public class AdressekontoViewModel : ViewModelBase, IAdressekontoViewModel
     {
         #region Private variables
+
+        private readonly IRegnskabViewModel _regnskabViewModel;
+        private readonly IAdressekontoModel _adressekontoModel;
+
         #endregion
 
         #region Constructor
@@ -23,7 +27,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="image">Billede, der illustrerer en adressekontoen.</param>
         public AdressekontoViewModel(IRegnskabViewModel regnskabViewModel, IAdressekontoModel adressekontoModel, string displayName, byte[] image)
         {
-            
+            _regnskabViewModel = regnskabViewModel;
+            _adressekontoModel = adressekontoModel;
         }
 
         #endregion
@@ -37,7 +42,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _regnskabViewModel;
             }
         }
 
@@ -48,7 +53,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _adressekontoModel.Nummer;
             }
         }
 
@@ -59,7 +64,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _adressekontoModel.Navn;
             }
             set
             {
@@ -74,7 +79,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _adressekontoModel.PrimærTelefon;
             }
             set
             {
@@ -89,7 +94,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _adressekontoModel.SekundærTelefon;
             }
             set
             {
