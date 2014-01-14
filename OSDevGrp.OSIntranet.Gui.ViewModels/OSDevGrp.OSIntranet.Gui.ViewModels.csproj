@@ -57,6 +57,7 @@
     <Compile Include="Core\Validators\Validation.cs" />
     <Compile Include="Finansstyring\AdressekontoViewModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModel.cs" />
+    <Compile Include="Finansstyring\Commands\AdressekontoGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommand.cs" />
     <Compile Include="Finansstyring\Comparers\BogføringslinjeViewModelComparer.cs" />

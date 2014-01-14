@@ -1,5 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
@@ -13,6 +17,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
         private readonly IRegnskabViewModel _regnskabViewModel;
         private readonly IAdressekontoModel _adressekontoModel;
+        private readonly string _displayName;
+        private readonly byte[] _image;
+        private readonly IFinansstyringRepository _finansstyringRepository;
+        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
 
         #endregion
 
@@ -25,10 +33,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="adressekontoModel">Model for adressekontoen.</param>
         /// <param name="displayName">Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.</param>
         /// <param name="image">Billede, der illustrerer en adressekontoen.</param>
-        public AdressekontoViewModel(IRegnskabViewModel regnskabViewModel, IAdressekontoModel adressekontoModel, string displayName, byte[] image)
+        /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel for en exceptionhandler.</param>
+        public AdressekontoViewModel(IRegnskabViewModel regnskabViewModel, IAdressekontoModel adressekontoModel, string displayName, byte[] image, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
         {
+            if (regnskabViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabViewModel");
+            }
+            if (adressekontoModel == null)
+            {
+                throw new ArgumentNullException("adressekontoModel");
+            }
+            if (string.IsNullOrEmpty(displayName))
+            {
+                throw new ArgumentNullException("displayName");
+            }
+            if (image == null)
+            {
+                throw new ArgumentNullException("image");
+            }
+            if (finansstyringRepository == null)
+            {
+                throw new ArgumentNullException("finansstyringRepository");
+            }
+            if (exceptionHandlerViewModel == null)
+            {
+                throw new ArgumentNullException("exceptionHandlerViewModel");
+            }
             _regnskabViewModel = regnskabViewModel;
             _adressekontoModel = adressekontoModel;
+            _adressekontoModel.PropertyChanged += PropertyChangedOnAdressekontoModelEventHandler;
+            _displayName = displayName;
+            _image = image;
+            _finansstyringRepository = finansstyringRepository;
+            _exceptionHandlerViewModel = exceptionHandlerViewModel;
         }
 
         #endregion
@@ -68,7 +107,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    _adressekontoModel.Navn = value;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
             }
         }
 
@@ -83,7 +129,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    _adressekontoModel.PrimærTelefon = value;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
             }
         }
 
@@ -98,7 +151,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    _adressekontoModel.SekundærTelefon = value;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
             }
         }
 
@@ -109,11 +169,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _adressekontoModel.StatusDato;
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    _adressekontoModel.StatusDato = value;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
             }
         }
 
@@ -124,11 +191,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _adressekontoModel.Saldo;
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    _adressekontoModel.Saldo = value;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
             }
         }
 
@@ -139,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _displayName;
             }
         }
 
@@ -150,8 +224,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
+                return _image;
+            }
+        }
+
+        /// <summary>
+        /// Kommando til genindlæsning og opdatering.
+        /// </summary>
+        public virtual ICommand RefreshCommand
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på modellen for adressekontoen.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnAdressekontoModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            RaisePropertyChanged(eventArgs.PropertyName);
         }
 
         #endregion

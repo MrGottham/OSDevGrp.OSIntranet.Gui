@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
     /// <summary>
     /// Interface til en ViewModel for en adressekonto.
     /// </summary>
-    public interface IAdressekontoViewModel : IViewModel
+    public interface IAdressekontoViewModel : IViewModel, IRefreshable
     {
         /// <summary>
         /// Regnskabet, som adressekontoen er tilknyttet.
