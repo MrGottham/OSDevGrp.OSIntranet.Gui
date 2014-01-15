@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
@@ -49,7 +50,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
 
-            Assert.Throws<ArgumentNullException>(() => new RegnskabslisteViewModel(null, fixture.Create<IExceptionHandlerViewModel>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => new RegnskabslisteViewModel(null, fixture.Create<IExceptionHandlerViewModel>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("finansstyringRepository"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -61,7 +67,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
-            Assert.Throws<ArgumentNullException>(() => new RegnskabslisteViewModel(fixture.Create<IFinansstyringRepository>(), null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new RegnskabslisteViewModel(fixture.Create<IFinansstyringRepository>(), null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("exceptionHandlerViewModel"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -126,7 +137,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var regnskabslisteViewModel = new RegnskabslisteViewModel(fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabslisteViewModel, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => regnskabslisteViewModel.RegnskabAdd(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => regnskabslisteViewModel.RegnskabAdd(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("regnskab"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -182,6 +198,99 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(eventCalledForRegnskaber, Is.False);
             regnskabslisteViewModel.RegnskabAdd(fixture.Create<IRegnskabViewModel>());
             Assert.That(eventCalledForRegnskaber, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler rejser PropertyChanged, når en ViewModel for et regnskab opdateres.
+        /// </summary>
+        [Test]
+        [TestCase("Nummer")]
+        [TestCase("Navn")]
+        [TestCase("StatusDato")]
+        [TestCase("Bogføringslinjer")]
+        [TestCase("Debitorer")]
+        [TestCase("Kreditorer")]
+        [TestCase("Nyheder")]
+        [TestCase("DisplayName")]
+        public void TestAtRPropertyChangedOnRegnskabViewModelEventHandlerRejserPropertyChangedOnRegnskabViewModelUpdate(string propertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
+            regnskabslisteViewModel.RegnskabAdd(regnskabViewModelMock);
+
+            var eventCalled = false;
+            regnskabslisteViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "Regnskaber", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            regnskabViewModelMock.Raise(m => m.PropertyChanged += null, regnskabViewModelMock, new PropertyChangedEventArgs(propertyName));
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler kaster en ArgumentNullException, hvis objektet, der rejser eventet, er null.
+        /// </summary>
+        [Test]
+        public void TestAtRPropertyChangedOnRegnskabViewModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
+            regnskabslisteViewModel.RegnskabAdd(regnskabViewModelMock);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => regnskabViewModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("sender"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler kaster en ArgumentNullException, hvis argumenter til eventet er null.
+        /// </summary>
+        [Test]
+        public void TestAtRPropertyChangedOnRegnskabViewModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
+            regnskabslisteViewModel.RegnskabAdd(regnskabViewModelMock);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => regnskabViewModelMock.Raise(m => m.PropertyChanged += null, regnskabViewModelMock, null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("e"));
+            Assert.That(exception.InnerException, Is.Null);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
@@ -120,7 +121,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("regnskab");
             }
+            regnskab.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
             _regnskaber.Add(regnskab);
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når en ViewModel for et regnskab opdateres.
+        /// </summary>
+        /// <param name="sender">Object, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnRegnskabViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            RaisePropertyChanged("Regnskaber");
         }
 
         /// <summary>

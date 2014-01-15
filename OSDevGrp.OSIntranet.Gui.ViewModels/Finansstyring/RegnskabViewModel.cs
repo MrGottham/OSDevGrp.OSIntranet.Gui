@@ -30,8 +30,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
-        private readonly ObservableCollection<IAdressekontoViewModel> _debitorer = new ObservableCollection<IAdressekontoViewModel>();
-        private readonly ObservableCollection<IAdressekontoViewModel> _kreditorer = new ObservableCollection<IAdressekontoViewModel>();
+        private readonly ObservableCollection<IAdressekontoViewModel> _debitorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
+        private readonly ObservableCollection<IAdressekontoViewModel> _kreditorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>(); 
 
         #endregion
@@ -65,6 +65,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _finansstyringRepository = finansstyringRepository;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
             _bogføringslinjeViewModels.CollectionChanged += CollectionChangedOnBogføringslinjeViewModelsEventHandler;
+            _debitorerViewModels.CollectionChanged += CollectionChangedOnDebitorViewModelsEventHandler;
+            _kreditorerViewModels.CollectionChanged += CollectionChangedOnKreditorerViewModelsEventHandler;
             _nyhedViewModels.CollectionChanged += CollectionChangedOnNyhedViewModelsEventHandler;
         }
         
@@ -153,7 +155,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 var comparer = new AdressekontoViewModelComparer();
-                return _debitorer.OrderBy(m => m, comparer);
+                return _debitorerViewModels.OrderBy(m => m, comparer);
             }
         }
 
@@ -165,7 +167,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 var comparer = new AdressekontoViewModelComparer();
-                return _kreditorer.OrderBy(m => m, comparer);
+                return _kreditorerViewModels.OrderBy(m => m, comparer);
             }
         }
 
@@ -215,6 +217,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("bogføringslinjeViewModel");
             }
+            bogføringslinjeViewModel.PropertyChanged += PropertyChangedOnBogføringslinjeViewModelEventHandler;
             _bogføringslinjeViewModels.Add(bogføringslinjeViewModel);
         }
 
@@ -228,7 +231,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("adressekontoViewModel");
             }
-            _debitorer.Add(adressekontoViewModel);
+            adressekontoViewModel.PropertyChanged += PropertyChangedOnAdressekontoViewModelForDebitorEventHandler;
+            _debitorerViewModels.Add(adressekontoViewModel);
         }
 
         /// <summary>
@@ -241,7 +245,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("adressekontoViewModel");
             }
-            _kreditorer.Add(adressekontoViewModel);
+            adressekontoViewModel.PropertyChanged += PropertyChangedOnAdressekontoViewModelForKreditorEventHandler;
+            _kreditorerViewModels.Add(adressekontoViewModel);
         }
 
         /// <summary>
@@ -254,6 +259,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("nyhedViewModel");
             }
+            nyhedViewModel.PropertyChanged += PropertyChangedOnNyhedViewModelEventHandler;
             _nyhedViewModels.Add(nyhedViewModel);
         }
 
@@ -286,6 +292,78 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en bogføringslinje.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnBogføringslinjeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            RaisePropertyChanged("Bogføringslinjer");
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for adressekontoen til en debitor.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnAdressekontoViewModelForDebitorEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            RaisePropertyChanged("Debitorer");
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for adressekontoen til en kreditor.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnAdressekontoViewModelForKreditorEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            RaisePropertyChanged("Kreditorer");
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en nyhed.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnNyhedViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            RaisePropertyChanged("Nyheder");
+        }
+
+        /// <summary>
         /// Eventhandler, der kaldes, når collection af ViewModels for bogføringslinjer ændres.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -304,6 +382,52 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case NotifyCollectionChangedAction.Add:
                     RaisePropertyChanged("Bogføringslinjer");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for debitorer ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnDebitorViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Debitorer");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for kreditorer ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnKreditorerViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Kreditorer");
                     break;
             }
         }
