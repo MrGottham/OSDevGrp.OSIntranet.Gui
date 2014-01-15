@@ -16,6 +16,8 @@
         DaysForNews,
         InvalidValueForUri,
         ValueOutsideInterval,
-        Balance
+        Balance,
+        Debtor,
+        Creditor
     }
 }

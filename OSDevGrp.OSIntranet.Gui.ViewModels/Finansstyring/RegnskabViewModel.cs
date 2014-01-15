@@ -196,7 +196,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 var executeCommands = new Collection<ICommand>
                     {
-                        new BogføringslinjerGetCommand(_finansstyringRepository, _exceptionHandlerViewModel)
+                        new BogføringslinjerGetCommand(_finansstyringRepository, _exceptionHandlerViewModel),
+                        new DebitorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel),
+                        new KreditorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel)
                     };
                 _refreshCommand = new CommandCollectionExecuterCommand(executeCommands);
                 return _refreshCommand;

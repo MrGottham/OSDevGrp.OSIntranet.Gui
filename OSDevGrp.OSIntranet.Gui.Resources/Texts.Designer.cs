@@ -88,11 +88,29 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Creditor.
+        /// </summary>
+        internal static string Creditor {
+            get {
+                return ResourceManager.GetString("Creditor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number of days when news is current.
         /// </summary>
         internal static string DaysForNews {
             get {
                 return ResourceManager.GetString("DaysForNews", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debtor.
+        /// </summary>
+        internal static string Debtor {
+            get {
+                return ResourceManager.GetString("Debtor", resourceCulture);
             }
         }
         

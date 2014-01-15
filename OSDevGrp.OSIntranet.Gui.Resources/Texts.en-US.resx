@@ -126,8 +126,14 @@
   <data name="Configuration" xml:space="preserve">
     <value>Configuration</value>
   </data>
+  <data name="Creditor" xml:space="preserve">
+    <value>Creditor</value>
+  </data>
   <data name="DaysForNews" xml:space="preserve">
     <value>Number of days when news is current</value>
+  </data>
+  <data name="Debtor" xml:space="preserve">
+    <value>Debtor</value>
   </data>
   <data name="Exception" xml:space="preserve">
     <value>A problem has occurred</value>
