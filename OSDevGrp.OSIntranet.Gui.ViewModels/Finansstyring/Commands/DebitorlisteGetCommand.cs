@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -93,6 +95,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                                 adressekontoViewModel = adressekontoViewModelCollection.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
                             }
                         }
+                        foreach (var adressekontoViewModel in adressekontoViewModelCollection)
+                        {
+                            var refreshCommand = adressekontoViewModel.RefreshCommand;
+                            if (refreshCommand.CanExecute(adressekontoViewModel))
+                            {
+                                refreshCommand.Execute(adressekontoViewModel);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -127,9 +137,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 var adressekontoViewModel = regnskabViewModel.Debitorer.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
                 if (adressekontoViewModel == null)
                 {
-                    regnskabViewModel.DebitorAdd(new AdressekontoViewModel(regnskabViewModel, adressekontoModel, Resource.GetText(Text.Debtor), Resource.GetEmbeddedResource("Images.Adressekonto.png"), _finansstyringRepository, ExceptionHandler));
-                    return;
+                    adressekontoViewModel = new AdressekontoViewModel(regnskabViewModel, adressekontoModel, Resource.GetText(Text.Debtor), Resource.GetEmbeddedResource("Images.Adressekonto.png"), _finansstyringRepository, ExceptionHandler);
+                    regnskabViewModel.DebitorAdd(adressekontoViewModel);
+                    if (adressekontoModel.StatusDato.Date.CompareTo(regnskabViewModel.StatusDato.Date.AddDays(dageForNyheder*-1)) >= 0 && adressekontoModel.StatusDato.Date.CompareTo(regnskabViewModel.StatusDato.Date) <= 0)
+                    {
+                        adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.Low);
+                        regnskabViewModel.NyhedAdd(new NyhedViewModel(adressekontoModel, adressekontoViewModel.Image));
+                    }
                 }
+                adressekontoViewModel.Navn = adressekontoModel.Navn;
+                adressekontoViewModel.PrimærTelefon = adressekontoModel.PrimærTelefon;
+                adressekontoViewModel.SekundærTelefon = adressekontoModel.SekundærTelefon;
+                adressekontoViewModel.StatusDato = adressekontoModel.StatusDato;
+                adressekontoViewModel.Saldo = adressekontoModel.Saldo;
                 return;
             }
             var arguments = new Tuple<IRegnskabViewModel, IAdressekontoModel, int>(regnskabViewModel, adressekontoModel, dageForNyheder);

@@ -265,7 +265,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             Func<IEnumerable<IRegnskabModel>> regnskabCollectionGetter = () =>
                 {
-                    throw fixture.Create<IntranetGuiRepositoryException>();
+                    throw new IntranetGuiRepositoryException(fixture.Create<string>());
                 };
             var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
