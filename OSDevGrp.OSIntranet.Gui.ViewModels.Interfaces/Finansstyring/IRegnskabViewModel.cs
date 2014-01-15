@@ -44,6 +44,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Debitorer.
+        /// </summary>
+        IEnumerable<IAdressekontoViewModel> Debitorer
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kreditorer.
+        /// </summary>
+        IEnumerable<IAdressekontoViewModel> Kreditorer
+        {
+            get;
+        }
+        
+        /// <summary>
         /// Nyheder.
         /// </summary>
         IEnumerable<INyhedViewModel> Nyheder
@@ -56,6 +72,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// </summary>
         /// <param name="bogføringslinjeViewModel">ViewModel for bogføringslinjen, der skal tilføjes regnskabet.</param>
         void BogføringslinjeAdd(IReadOnlyBogføringslinjeViewModel bogføringslinjeViewModel);
+
+        /// <summary>
+        /// Tilføjerer en debitor til regnskabet.
+        /// </summary>
+        /// <param name="adressekontoViewModel">ViewModel for adressekontoen, der skal tilføjes som debitor.</param>
+        void DebitorAdd(IAdressekontoViewModel adressekontoViewModel);
+
+        /// <summary>
+        /// Tilføjerer en kreditor til regnskabet.
+        /// </summary>
+        /// <param name="adressekontoViewModel">ViewModel for adressekontoen, der skal tilføjes som kreditor.</param>
+        void KreditorAdd(IAdressekontoViewModel adressekontoViewModel);
 
         /// <summary>
         /// Tilføjer en nyhed til regnskabet.

@@ -74,6 +74,7 @@
     <Compile Include="Finansstyring\Commands\AdressekontoGetCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommandTests.cs" />
+    <Compile Include="Finansstyring\Comparers\AdressekontoViewModelComparerTests.cs" />
     <Compile Include="Finansstyring\Comparers\BogføringslinjeViewModelComparerTests.cs" />
     <Compile Include="Finansstyring\FinansstyringKonfigurationViewModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModelTests.cs" />

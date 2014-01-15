@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -15,6 +16,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
+        private ICommand _refreshCommand;
         private readonly IRegnskabViewModel _regnskabViewModel;
         private readonly IAdressekontoModel _adressekontoModel;
         private readonly string _displayName;
@@ -235,7 +237,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _refreshCommand ?? (_refreshCommand = new AdressekontoGetCommand(_finansstyringRepository, _exceptionHandlerViewModel));
             }
         }
 

@@ -339,7 +339,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             Func<IEnumerable<IBogføringslinjeModel>> getter = () =>
                 {
-                    throw fixture.Create<IntranetGuiRepositoryException>();
+                    throw new IntranetGuiRepositoryException(fixture.Create<string>());
                 };
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.AntalBogføringslinjer)

@@ -126,5 +126,25 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAsync henter en adressekonto.
+        /// </summary>
+        [Test]
+        public async void TestAtAdressekontoGetAsyncHenterAdressekonto()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var adressekonto = await finansstyringRepository.AdressekontoGetAsync(1, 1, DateTime.Now);
+            Assert.That(adressekonto, Is.Not.Null);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
     }
 }

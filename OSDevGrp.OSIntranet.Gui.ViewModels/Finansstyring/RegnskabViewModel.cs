@@ -30,6 +30,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
+        private readonly ObservableCollection<IAdressekontoViewModel> _debitorer = new ObservableCollection<IAdressekontoViewModel>();
+        private readonly ObservableCollection<IAdressekontoViewModel> _kreditorer = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>(); 
 
         #endregion
@@ -144,6 +146,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Debitorer.
+        /// </summary>
+        public virtual IEnumerable<IAdressekontoViewModel> Debitorer
+        {
+            get
+            {
+                var comparer = new AdressekontoViewModelComparer();
+                return _debitorer.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Kreditorer.
+        /// </summary>
+        public virtual IEnumerable<IAdressekontoViewModel> Kreditorer
+        {
+            get
+            {
+                var comparer = new AdressekontoViewModelComparer();
+                return _kreditorer.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
         /// Nyheder.
         /// </summary>
         public virtual IEnumerable<INyhedViewModel> Nyheder
@@ -190,6 +216,32 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 throw new ArgumentNullException("bogføringslinjeViewModel");
             }
             _bogføringslinjeViewModels.Add(bogføringslinjeViewModel);
+        }
+
+        /// <summary>
+        /// Tilføjerer en debitor til regnskabet.
+        /// </summary>
+        /// <param name="adressekontoViewModel">ViewModel for adressekontoen, der skal tilføjes som debitor.</param>
+        public virtual void DebitorAdd(IAdressekontoViewModel adressekontoViewModel)
+        {
+            if (adressekontoViewModel == null)
+            {
+                throw new ArgumentNullException("adressekontoViewModel");
+            }
+            _debitorer.Add(adressekontoViewModel);
+        }
+
+        /// <summary>
+        /// Tilføjerer en kreditor til regnskabet.
+        /// </summary>
+        /// <param name="adressekontoViewModel">ViewModel for adressekontoen, der skal tilføjes som kreditor.</param>
+        public virtual void KreditorAdd(IAdressekontoViewModel adressekontoViewModel)
+        {
+            if (adressekontoViewModel == null)
+            {
+                throw new ArgumentNullException("adressekontoViewModel");
+            }
+            _kreditorer.Add(adressekontoViewModel);
         }
 
         /// <summary>

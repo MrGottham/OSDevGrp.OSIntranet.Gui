@@ -48,5 +48,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <param name="statusDato">Statusdato for listen af kreditorer.</param>
         /// <returns>Kreditorer i regnskabet.</returns>
         Task<IEnumerable<IAdressekontoModel>> KreditorlisteGetAsync(int regnskabsummer, DateTime statusDato);
+
+        /// <summary>
+        /// Henter en given adressekonto til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil adressekontoen skal hentes.</param>
+        /// <param name="nummer">Unik identifikation af adressekontoen.</param>
+        /// <param name="statusDato">Statusdato, hvorpå adressekontoen skal hentes.</param>
+        /// <returns>Adressekonto.</returns>
+        Task<IAdressekontoModel> AdressekontoGetAsync(int regnskabsnummer, int nummer, DateTime statusDato);
     }
 }
