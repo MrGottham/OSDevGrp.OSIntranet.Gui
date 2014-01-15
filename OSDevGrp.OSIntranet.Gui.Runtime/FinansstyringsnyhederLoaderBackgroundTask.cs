@@ -63,10 +63,16 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             try
             {
                 var statusDato = DateTime.Now;
+
                 var konfiguration = finansstyringRepository.Konfiguration;
+                var nyhederFromDate = statusDato.AddDays(konfiguration.DageForNyheder*-1);
+                var nyhederToDate = statusDato;
+                    
                 foreach (var regnskab in await finansstyringRepository.RegnskabslisteGetAsync())
                 {
-                    nyheder.AddRange((await finansstyringRepository.BogføringslinjerGetAsync(regnskab.Nummer, statusDato, konfiguration.AntalBogføringslinjer)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(statusDato.AddDays(konfiguration.DageForNyheder*-1).Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(statusDato.Date) <= 0).ToList());
+                    nyheder.AddRange((await finansstyringRepository.BogføringslinjerGetAsync(regnskab.Nummer, statusDato, konfiguration.AntalBogføringslinjer)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederFromDate.Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederToDate.Date) <= 0).ToList());
+                    nyheder.AddRange((await finansstyringRepository.DebitorlisteGetAsync(regnskab.Nummer, statusDato)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederFromDate.Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederToDate.Date) <= 0).ToList());
+                    nyheder.AddRange((await finansstyringRepository.KreditorlisteGetAsync(regnskab.Nummer, statusDato)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederFromDate.Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederToDate.Date) <= 0).ToList());
                 }
                 return nyheder;
             }
