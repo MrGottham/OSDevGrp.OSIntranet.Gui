@@ -36,7 +36,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <HyperlinkButton Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource TextPrimaryButtonStyle}" Tag="{Binding}" Click="RegnskabButtonClickEventHandler" ClickMode="Press">
+                <HyperlinkButton Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource TextPrimaryButtonStyle}" Click="RegnskabButtonClickEventHandler">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
                         <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
