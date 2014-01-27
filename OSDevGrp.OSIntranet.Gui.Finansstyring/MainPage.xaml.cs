@@ -44,6 +44,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionEventHandler;
 
             SizeChanged += PageSizeChangedEventHandler;
+
+            RegisterBackgroundTasks();
         }
 
         #endregion
@@ -57,7 +59,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// property is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            RegisterBackgroundTasks();
             if (_regnskabslisteViewModel.Regnskaber.Any())
             {
                 return;
@@ -186,6 +187,34 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             VisualStateManager.GoToState(this, "DefaultLayout", true);
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer aktivering/visning af et regnskab.
+        /// </summary>
+        /// <param name="sender">Object, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void RegnskabButtonClickEventHandler(object sender, RoutedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var hyperlinkButton = sender as HyperlinkButton;
+            if (hyperlinkButton == null)
+            {
+                return;
+            }
+            var regnskabViewModel = hyperlinkButton.Tag as IRegnskabViewModel;
+            if (regnskabViewModel == null)
+            {
+                return;
+            }
+            Frame.Navigate(typeof (object), regnskabViewModel);
         }
 
         /// <summary>
