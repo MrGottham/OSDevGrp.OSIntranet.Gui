@@ -5,7 +5,11 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="StandardStyles.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-    
+
+    <!--
+    <SolidColorBrush x:Key="ListViewItemPointerOverBackgroundThemeBrush" Color="Transparent"/>
+    -->
+
     <Style x:Key="HighlightedGridStyle" TargetType="Grid" BasedOn="{StaticResource LayoutRootStyle}">
         <Setter Property="Background" Value="CornflowerBlue"/>
     </Style>
