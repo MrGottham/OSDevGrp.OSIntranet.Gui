@@ -39,13 +39,14 @@
 
         <Grid x:Name="DefaultNavigation" Margin="20,20,20,20" Visibility="Visible" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="96"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
+            <Button Grid.Row="0" Grid.Column="0" Margin="0,0,10,10" Style="{StaticResource BackButtonStyle}"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
         </Grid>
 
         <Grid x:Name="MinimalNavigation" Margin="20,20,20,20" Visibility="Collapsed" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
