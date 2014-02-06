@@ -87,7 +87,7 @@
         </AppBar>
     </Page.TopAppBar>
 
-    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}" Margin="2,0,-2,0">
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -130,7 +130,7 @@
                 </VisualState>
                 <VisualState x:Name="MinimalLayout">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DefaultNavigation"  Storyboard.TargetProperty="Visibility">
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DefaultNavigation" Storyboard.TargetProperty="Visibility">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MinimalNavigation" Storyboard.TargetProperty="Visibility">

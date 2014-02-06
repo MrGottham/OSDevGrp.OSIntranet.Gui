@@ -27,6 +27,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             InitializeComponent();
             Suspending += OnSuspending;
 
+            // TODO: Can go back.
             // TODO: Panes.
             // TODO: Search.
         }

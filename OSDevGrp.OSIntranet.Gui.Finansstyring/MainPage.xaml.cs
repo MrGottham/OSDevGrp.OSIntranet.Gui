@@ -214,7 +214,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            Frame.Navigate(typeof (object), regnskabViewModel);
+            Frame.Navigate(typeof (RegnskabPage), new Tuple<IRegnskabViewModel, IExceptionHandlerViewModel>(regnskabViewModel, _exceptionHandlerViewModel));
         }
 
         /// <summary>
