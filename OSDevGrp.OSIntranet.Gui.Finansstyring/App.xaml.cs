@@ -2,8 +2,6 @@
 using Callisto.Controls;
 using OSDevGrp.OSIntranet.Gui.Finansstyring.Core;
 using OSDevGrp.OSIntranet.Gui.Resources;
-using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
-using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI;

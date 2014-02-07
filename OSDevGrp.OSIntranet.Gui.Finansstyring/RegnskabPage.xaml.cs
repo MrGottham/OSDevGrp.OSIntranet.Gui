@@ -1,4 +1,5 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
@@ -13,8 +14,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     {
         #region Private variables
 
-        private static readonly DependencyProperty ExceptionHandlerProperty = DependencyProperty.Register("ExceptionHandler", typeof (IExceptionHandlerViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
+        private static readonly DependencyProperty ExceptionHandlerProperty = DependencyProperty.Register("ExceptionHandler", typeof (IExceptionHandlerViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
 
         #endregion
 
@@ -27,27 +28,17 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
+            var mainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
+
+            ExceptionHandler = mainViewModel.ExceptionHandler;
+            ExceptionHandlerAppBar.DataContext = ExceptionHandler;
+
             SizeChanged += PageSizeChangedEventHandler;
         }
 
         #endregion
 
         #region Properties
-
-        /// <summary>
-        /// ViewModel for exceptionhandleren.
-        /// </summary>
-        public IExceptionHandlerViewModel ExceptionHandler
-        {
-            get
-            {
-                return GetValue(ExceptionHandlerProperty) as IExceptionHandlerViewModel;
-            }
-            set
-            {
-                SetValue(ExceptionHandlerProperty, value);
-            }
-        }
 
         /// <summary>
         /// ViewModel for regnskabet.
@@ -58,9 +49,24 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return GetValue(RegnskabProperty) as IRegnskabViewModel;
             }
-            set
+            private set
             {
                 SetValue(RegnskabProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for exceptionhandleren.
+        /// </summary>
+        public IExceptionHandlerViewModel ExceptionHandler
+        {
+            get
+            {
+                return GetValue(ExceptionHandlerProperty) as IExceptionHandlerViewModel;
+            }
+            private set
+            {
+                SetValue(ExceptionHandlerProperty, value);
             }
         }
 
@@ -79,18 +85,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 throw new ArgumentNullException("e");
             }
-            
-            var tuple = e.Parameter as Tuple<IRegnskabViewModel, IExceptionHandlerViewModel>;
-            if (tuple == null)
-            {
-                return;
-            }
-            Regnskab = tuple.Item1;
-            ExceptionHandler = tuple.Item2;
 
-            DefaultNavigation.DataContext = Regnskab;
-            MinimalNavigation.DataContext = Regnskab;
-            ExceptionHandlerAppBar.DataContext = ExceptionHandler;
+            // TODO: Make a regnskabgetter...
+
+            //DataContext = Regnskab;
         }
 
         /// <summary>

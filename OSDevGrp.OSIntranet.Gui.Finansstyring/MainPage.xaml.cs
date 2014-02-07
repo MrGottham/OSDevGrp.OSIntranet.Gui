@@ -20,9 +20,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     {
         #region Private variables
 
-        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
-        private readonly IRegnskabslisteViewModel _regnskabslisteViewModel;
-        
+        private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (MainPage), new PropertyMetadata(null));
+        private static readonly DependencyProperty ExceptionHandlerProperty = DependencyProperty.Register("ExceptionHandler", typeof (IExceptionHandlerViewModel), typeof (MainPage), new PropertyMetadata(null));
+
         #endregion
 
         #region Constructor
@@ -34,11 +34,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
-            var mainViewModel = (IMainViewModel) Resources["MainViewModel"];
+            var mainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
             mainViewModel.ApplyConfiguration(ConfigurationProvider.Instance.Settings);
 
-            _exceptionHandlerViewModel = (IExceptionHandlerViewModel) ExceptionHandlerAppBar.DataContext;
-            _regnskabslisteViewModel = (IRegnskabslisteViewModel) ((Grid) Content).DataContext;
+            Regnskabsliste = mainViewModel.Regnskabsliste;
+            ExceptionHandler = mainViewModel.ExceptionHandler;
+
+            DataContext = Regnskabsliste;
+            ExceptionHandlerAppBar.DataContext = ExceptionHandler;
             
             Application.Current.UnhandledException += UnhandledExceptionEventHandler;
             TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionEventHandler;
@@ -50,6 +53,40 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// ViewModel for listen af regnskaber.
+        /// </summary>
+        public IRegnskabslisteViewModel Regnskabsliste
+        {
+            get
+            {
+                return GetValue(RegnskabslisteProperty) as IRegnskabslisteViewModel;
+            }
+            private set
+            {
+                SetValue(RegnskabslisteProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for exceptionhandleren.
+        /// </summary>
+        public IExceptionHandlerViewModel ExceptionHandler
+        {
+            get
+            {
+                return GetValue(ExceptionHandlerProperty) as IExceptionHandlerViewModel;
+            }
+            private set
+            {
+                SetValue(ExceptionHandlerProperty, value);
+            }
+        }
+        
+        #endregion
+
         #region Methods
 
         /// <summary>
@@ -59,14 +96,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// property is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (_regnskabslisteViewModel.Regnskaber.Any())
+            if (Regnskabsliste.Regnskaber.Any())
             {
                 return;
             }
-            var refreshCommand = _regnskabslisteViewModel.RefreshCommand;
-            if (refreshCommand.CanExecute(_regnskabslisteViewModel))
+            var refreshCommand = Regnskabsliste.RefreshCommand;
+            if (refreshCommand.CanExecute(Regnskabsliste))
             {
-                refreshCommand.Execute(_regnskabslisteViewModel);
+                refreshCommand.Execute(Regnskabsliste);
             }
         }
 
@@ -105,7 +142,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            TopAppBar.IsOpen = _exceptionHandlerViewModel.ShowLast;
+            TopAppBar.IsOpen = ExceptionHandler.ShowLast;
         }
 
         /// <summary>
@@ -214,7 +251,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            Frame.Navigate(typeof (RegnskabPage), new Tuple<IRegnskabViewModel, IExceptionHandlerViewModel>(regnskabViewModel, _exceptionHandlerViewModel));
+            Frame.Navigate(typeof (RegnskabPage), regnskabViewModel.Nummer);
         }
 
         /// <summary>
@@ -229,7 +266,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             try
             {
-                _exceptionHandlerViewModel.HandleException(exception);
+                ExceptionHandler.HandleException(exception);
             }
             catch (Exception ex)
             {

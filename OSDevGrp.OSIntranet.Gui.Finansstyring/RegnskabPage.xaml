@@ -30,14 +30,14 @@
         </AppBar>
     </Page.TopAppBar>
 
-    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
             </TransitionCollection>
         </Grid.ChildrenTransitions>
 
-        <Grid x:Name="DefaultNavigation" Margin="20,20,20,20" Visibility="Visible" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
+        <Grid x:Name="DefaultNavigation" Margin="20,20,20,20" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -49,7 +49,7 @@
             <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
         </Grid>
 
-        <Grid x:Name="MinimalNavigation" Margin="20,20,20,20" Visibility="Collapsed" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
+        <Grid x:Name="MinimalNavigation" Margin="20,20,20,20" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
