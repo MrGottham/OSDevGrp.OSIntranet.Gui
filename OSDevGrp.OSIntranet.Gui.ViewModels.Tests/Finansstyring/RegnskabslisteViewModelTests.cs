@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
@@ -201,6 +205,81 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at RegnskabGet henter ViewModel for regnskabet fra listen af regnskaber.
+        /// </summary>
+        [Test]
+        public async void TestAtRegnskabGetHenterRegnskabViewModelFraRegnskaber()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IRegnskabViewModel>();
+                    mock.Expect(m => m.Nummer)
+                        .Return(fixture.Create<int>())
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
+            regnskabslisteViewModel.RegnskabAdd(regnskabViewModelMock);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Empty);
+
+            var result = await regnskabslisteViewModel.RegnskabGetAsync(regnskabViewModelMock.Nummer);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(regnskabViewModelMock));
+
+            finansstyringRepositoryMock.AssertWasNotCalled(m => m.RegnskabslisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet henter ViewModel for regnskabet gennem repositoryet til regnskaber.
+        /// </summary>
+        [Test]
+        public async void TestAtRegnskabGetHenterRegnskabViewModelGennemFinansstyringRepository()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IRegnskabModel>();
+                    mock.Expect(m => m.Nummer)
+                        .Return(fixture.Create<int>())
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            var regnskabModelMockCollection = fixture.CreateMany<IRegnskabModel>(3).ToList();
+            Func<IEnumerable<IRegnskabModel>> regnskabslisteGetter = () => regnskabModelMockCollection;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
+                                       .Return(Task.Run(regnskabslisteGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
+
+            var result = await regnskabslisteViewModel.RegnskabGetAsync(regnskabModelMockCollection.ElementAt(1).Nummer);
+            Assert.That(result, Is.Not.Null);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
         /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler rejser PropertyChanged, når en ViewModel for et regnskab opdateres.
         /// </summary>
         [Test]
@@ -212,7 +291,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Kreditorer")]
         [TestCase("Nyheder")]
         [TestCase("DisplayName")]
-        public void TestAtRPropertyChangedOnRegnskabViewModelEventHandlerRejserPropertyChangedOnRegnskabViewModelUpdate(string propertyName)
+        public void TestAtPropertyChangedOnRegnskabViewModelEventHandlerRejserPropertyChangedOnRegnskabViewModelUpdate(string propertyName)
         {
             var fixture = new Fixture();
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
@@ -247,7 +326,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler kaster en ArgumentNullException, hvis objektet, der rejser eventet, er null.
         /// </summary>
         [Test]
-        public void TestAtRPropertyChangedOnRegnskabViewModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
+        public void TestAtPropertyChangedOnRegnskabViewModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
         {
             var fixture = new Fixture();
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
@@ -272,7 +351,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler kaster en ArgumentNullException, hvis argumenter til eventet er null.
         /// </summary>
         [Test]
-        public void TestAtRPropertyChangedOnRegnskabViewModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
+        public void TestAtPropertyChangedOnRegnskabViewModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
         {
             var fixture = new Fixture();
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));

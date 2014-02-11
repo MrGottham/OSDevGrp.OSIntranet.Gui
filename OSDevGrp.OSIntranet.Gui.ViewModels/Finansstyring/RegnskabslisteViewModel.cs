@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
@@ -123,6 +124,35 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             regnskab.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
             _regnskaber.Add(regnskab);
+        }
+
+        /// <summary>
+        /// Henter og returnerer en ViewModel til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummeret, hvortil ViewModel for regnskabet skal returneres.</param>
+        /// <returns>ViewModel for det givne regnskab.</returns>
+        public async virtual Task<IRegnskabViewModel> RegnskabGetAsync(int regnskabsnummer)
+        {
+            try
+            {
+                var regnskabViewModel = Regnskaber.FirstOrDefault(m => m.Nummer == regnskabsnummer);
+                if (regnskabViewModel != null)
+                {
+                    return regnskabViewModel;
+                }
+                var statusDato = DateTime.Now;
+                var regnskabModelCollection = await _finansstyringRepository.RegnskabslisteGetAsync();
+                var regnskabModel = regnskabModelCollection.FirstOrDefault(m => m.Nummer == regnskabsnummer);
+                if (regnskabModel == null)
+                {
+                    throw new NotImplementedException();
+                }
+                return new RegnskabViewModel(regnskabModel, statusDato, _finansstyringRepository, _exceptionHandlerViewModel);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>
