@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
@@ -277,6 +278,203 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet returnerer null, hvis der ikke findes et regnskab med regnskabsnummeret.
+        /// </summary>
+        [Test]
+        public async void TestAtRegnskabGetReturnererNullHvisRegnskabIkkeFindes()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IRegnskabModel>();
+                    mock.Expect(m => m.Nummer)
+                        .Return(fixture.Create<int>())
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            var regnskabModelMockCollection = fixture.CreateMany<IRegnskabModel>(3).ToList();
+            Func<IEnumerable<IRegnskabModel>> regnskabslisteGetter = () => regnskabModelMockCollection;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
+                                       .Return(Task.Run(regnskabslisteGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
+
+            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            Assert.That(result, Is.Null);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved IntranetGuiRepositoryException.
+        /// </summary>
+        [Test]
+        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IRegnskabModel>();
+                    mock.Expect(m => m.Nummer)
+                        .Return(fixture.Create<int>())
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            Func<IEnumerable<IRegnskabModel>> regnskabslisteGetter = () =>
+                {
+                    var message = fixture.Create<string>();
+                    throw new IntranetGuiRepositoryException(message);
+                };
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
+                                       .Return(Task.Run(regnskabslisteGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
+
+            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            Assert.That(result, Is.Null);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved IntranetGuiSystemException.
+        /// </summary>
+        [Test]
+        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiSystemException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IRegnskabModel>();
+                    mock.Expect(m => m.Nummer)
+                        .Return(fixture.Create<int>())
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            Func<IEnumerable<IRegnskabModel>> regnskabslisteGetter = () =>
+                {
+                    var message = fixture.Create<string>();
+                    throw new IntranetGuiSystemException(message);
+                };
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
+                                       .Return(Task.Run(regnskabslisteGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
+
+            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            Assert.That(result, Is.Null);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved IntranetGuiBusinessException.
+        /// </summary>
+        [Test]
+        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiBusinessException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IRegnskabModel>();
+                    mock.Expect(m => m.Nummer)
+                        .Return(fixture.Create<int>())
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            Func<IEnumerable<IRegnskabModel>> regnskabslisteGetter = () =>
+                {
+                    var message = fixture.Create<string>();
+                    throw new IntranetGuiBusinessException(message);
+                };
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
+                                       .Return(Task.Run(regnskabslisteGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
+
+            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            Assert.That(result, Is.Null);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved Exception.
+        /// </summary>
+        [Test]
+        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IRegnskabModel>();
+                    mock.Expect(m => m.Nummer)
+                        .Return(fixture.Create<int>())
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            Func<IEnumerable<IRegnskabModel>> regnskabslisteGetter = () =>
+                {
+                    var message = fixture.Create<string>();
+                    throw new Exception(message);
+                };
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabslisteGetAsync())
+                                       .Return(Task.Run(regnskabslisteGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var regnskabslisteViewModel = new RegnskabslisteViewModel(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
+            Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
+
+            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            Assert.That(result, Is.Null);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.Anything));
         }
 
         /// <summary>

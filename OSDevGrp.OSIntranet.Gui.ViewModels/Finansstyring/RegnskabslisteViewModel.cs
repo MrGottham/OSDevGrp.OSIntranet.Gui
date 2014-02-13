@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
@@ -143,11 +144,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 var statusDato = DateTime.Now;
                 var regnskabModelCollection = await _finansstyringRepository.RegnskabslisteGetAsync();
                 var regnskabModel = regnskabModelCollection.FirstOrDefault(m => m.Nummer == regnskabsnummer);
-                if (regnskabModel == null)
-                {
-                    throw new NotImplementedException();
-                }
-                return new RegnskabViewModel(regnskabModel, statusDato, _finansstyringRepository, _exceptionHandlerViewModel);
+                return regnskabModel == null ? null : new RegnskabViewModel(regnskabModel, statusDato, _finansstyringRepository, _exceptionHandlerViewModel);
+            }
+            catch (IntranetGuiExceptionBase ex)
+            {
+                _exceptionHandlerViewModel.HandleException(ex);
+                return null;
             }
             catch (Exception)
             {
