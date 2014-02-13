@@ -160,7 +160,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Object, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private void PropertyChangedOnRegnskabViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        private static void PropertyChangedOnRegnskabViewModelEventHandler(object sender, PropertyChangedEventArgs e)
         {
             if (sender == null)
             {
@@ -170,7 +170,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("e");
             }
-            RaisePropertyChanged("Regnskaber");
         }
 
         /// <summary>
