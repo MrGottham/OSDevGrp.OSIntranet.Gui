@@ -151,9 +151,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 _exceptionHandlerViewModel.HandleException(ex);
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.MethodError, "RegnskabGetAsync", ex.Message)));
+                return null;
             }
         }
 

@@ -12,6 +12,7 @@
         MissingConfigurationSetting,
         InvalidConfigurationSettingValue,
         ErrorWhileGettingPropertyValue,
-        ErrorWhileSettingPropertyValue
+        ErrorWhileSettingPropertyValue,
+        MethodError
     }
 }

@@ -137,6 +137,10 @@
     <value>Værdien for konfigurationen med navnet '{0}' er illegal.</value>
     <comment>{0} = Navn på konfigurationsværdi.</comment>
   </data>
+  <data name="MethodError" xml:space="preserve">
+    <value>Fejl i metode '{0}': {1}</value>
+    <comment>{0} = Metodenavn, {1} = Fejlbesked.</comment>
+  </data>
   <data name="MissingConfigurationSetting" xml:space="preserve">
     <value>Konfigurationsværdien med navnet '{0}' er ikke defineret.</value>
     <comment>{0} = Navn på konfigurationsværdi.</comment>

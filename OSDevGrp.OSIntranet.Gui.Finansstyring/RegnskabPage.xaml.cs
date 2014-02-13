@@ -15,6 +15,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Private variables
 
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
+        private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("", typeof (IRegnskabslisteViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty ExceptionHandlerProperty = DependencyProperty.Register("ExceptionHandler", typeof (IExceptionHandlerViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
 
         #endregion
@@ -32,6 +33,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
             ExceptionHandler = mainViewModel.ExceptionHandler;
             ExceptionHandlerAppBar.DataContext = ExceptionHandler;
+
+            Regnskabsliste = mainViewModel.Regnskabsliste;
 
             SizeChanged += PageSizeChangedEventHandler;
         }
@@ -52,6 +55,21 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             private set
             {
                 SetValue(RegnskabProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for regnskabslisten.
+        /// </summary>
+        public IRegnskabslisteViewModel Regnskabsliste
+        {
+            get
+            {
+                return GetValue(RegnskabslisteProperty) as IRegnskabslisteViewModel;
+            }
+            private set
+            {
+                SetValue(RegnskabslisteProperty, value);
             }
         }
 
@@ -79,16 +97,35 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// </summary>
         /// <param name="e">Event data that describes how this page was reached.  The Parameter
         /// property is typically used to configure the page.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             if (e == null)
             {
                 throw new ArgumentNullException("e");
             }
-
-            // TODO: Make a regnskabgetter...
-
-            //DataContext = Regnskab;
+            if (e.Parameter == null)
+            {
+                return;
+            }
+            var regnskabsnummer = (int) e.Parameter;
+            Regnskab = await Regnskabsliste.RegnskabGetAsync(regnskabsnummer);
+            try
+            {
+                if (Regnskab == null)
+                {
+                    return;
+                }
+                var refreshCommand = Regnskab.RefreshCommand;
+                if (refreshCommand == null)
+                {
+                    return;
+                }
+                refreshCommand.Execute(Regnskab);
+            }
+            finally
+            {
+                DataContext = Regnskab;
+            }
         }
 
         /// <summary>

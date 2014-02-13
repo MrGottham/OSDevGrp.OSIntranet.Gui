@@ -137,6 +137,10 @@
     <value>The value for the configuration setting named '{0}' is invalid.</value>
     <comment>{0} = Name of configuration setting.</comment>
   </data>
+  <data name="MethodError" xml:space="preserve">
+    <value>Error in method '{0}': {1}</value>
+    <comment>{0} = Method name, {1} = Error message.</comment>
+  </data>
   <data name="MissingConfigurationSetting" xml:space="preserve">
     <value>The configuration setting named '{0}' is not defined.</value>
     <comment>{0} = Name of configuration setting.</comment>
