@@ -15,12 +15,10 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
-
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 {
     /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
+    /// Finansstyringsapplikation.
     /// </summary>
     sealed partial class App
     {

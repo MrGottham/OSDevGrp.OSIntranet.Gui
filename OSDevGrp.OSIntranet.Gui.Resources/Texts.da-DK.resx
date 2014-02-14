@@ -123,17 +123,26 @@
   <data name="Balance" xml:space="preserve">
     <value>Saldo</value>
   </data>
+  <data name="Bookkeeping" xml:space="preserve">
+    <value>Bogføring</value>
+  </data>
   <data name="Configuration" xml:space="preserve">
     <value>Konfiguration</value>
   </data>
   <data name="Creditor" xml:space="preserve">
     <value>Kreditor</value>
   </data>
+  <data name="Creditors" xml:space="preserve">
+    <value>Kreditorer</value>
+  </data>
   <data name="DaysForNews" xml:space="preserve">
     <value>Antal dage, hvor nyheder er aktuel</value>
   </data>
   <data name="Debtor" xml:space="preserve">
     <value>Debitor</value>
+  </data>
+  <data name="Debtors" xml:space="preserve">
+    <value>Debitorer</value>
   </data>
   <data name="Exception" xml:space="preserve">
     <value>Der er opstået et problem</value>
@@ -150,6 +159,9 @@
   </data>
   <data name="News" xml:space="preserve">
     <value>Nyhed</value>
+  </data>
+  <data name="NewsMultiple" xml:space="preserve">
+    <value>Nyheder</value>
   </data>
   <data name="NumberOfAccountingLinesToGet" xml:space="preserve">
     <value>Antal bogføringslinjer, der skal hentes</value>

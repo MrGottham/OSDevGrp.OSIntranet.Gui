@@ -10,6 +10,7 @@
         ExceptionHandler,
         Hide,
         News,
+        NewsMultiple,
         Configuration,
         SupportingServiceUri,
         NumberOfAccountingLinesToGet,
@@ -18,6 +19,9 @@
         ValueOutsideInterval,
         Balance,
         Debtor,
-        Creditor
+        Debtors,
+        Creditor,
+        Creditors,
+        Bookkeeping
     }
 }

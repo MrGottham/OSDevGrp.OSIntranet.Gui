@@ -44,9 +44,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Overskrift til bogføringslinjer.
+        /// </summary>
+        string BogføringslinjerHeader
+        {
+            get;
+        }
+
+        /// <summary>
         /// Debitorer.
         /// </summary>
         IEnumerable<IAdressekontoViewModel> Debitorer
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til debitorer.
+        /// </summary>
+        string DebitorerHeader
         {
             get;
         }
@@ -58,11 +74,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
+
+        /// <summary>
+        /// Overskrift til kreditorer.
+        /// </summary>
+        string KreditorerHeader
+        {
+            get;
+        }
         
         /// <summary>
         /// Nyheder.
         /// </summary>
         IEnumerable<INyhedViewModel> Nyheder
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til nyheder.
+        /// </summary>
+        string NyhederHeader
         {
             get;
         }

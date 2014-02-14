@@ -7,7 +7,6 @@ using OSDevGrp.OSIntranet.Gui.Runtime;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 {
@@ -19,8 +18,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Private variables
 
         private bool _disposed;
-        private readonly ConfigurationProvider _configurationProvider;
-        private readonly IMainViewModel _mainViewModel;
+        private static readonly DependencyProperty ConfigurationProviderProperty = DependencyProperty.Register("ConfigurationProvider", typeof (ConfigurationProvider), typeof (ConfigurationUserControl), new PropertyMetadata(null));
+        private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (ConfigurationUserControl), new PropertyMetadata(null));
         private static readonly DependencyProperty ValidationErrorProperty = DependencyProperty.RegisterAttached("ValidationError", typeof (string), typeof (ConfigurationUserControl), null);
 
         #endregion
@@ -34,19 +33,50 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
-            _configurationProvider = ConfigurationProvider.Instance;
+            ConfigurationProvider = ConfigurationProvider.Instance;
 
-            _mainViewModel = (IMainViewModel) Resources["MainViewModel"];
-            _mainViewModel.ApplyConfiguration(_configurationProvider.Settings);
-            _mainViewModel.Subscribe(this);
+            MainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
+            MainViewModel.Subscribe(this);
 
-            var finansstyringKonfiguration = (IFinansstyringKonfigurationViewModel) ((Grid) Content).DataContext;
+            var finansstyringKonfiguration = MainViewModel.FinansstyringKonfiguration;
             finansstyringKonfiguration.PropertyChanged += FinansstyringKonfigurationPropertyChangedEventHandler;
+
+            DataContext = MainViewModel;
         }
 
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Leverandør af konfigurationsværdier.
+        /// </summary>
+        public ConfigurationProvider ConfigurationProvider
+        {
+            get
+            {
+                return GetValue(ConfigurationProviderProperty) as ConfigurationProvider;
+            }
+            private set
+            {
+                SetValue(ConfigurationProviderProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// MainViewModel, der skal benyttes til konfiguration.
+        /// </summary>
+        public IMainViewModel MainViewModel
+        {
+            get
+            {
+                return GetValue(MainViewModelProperty) as IMainViewModel;
+            }
+            private set
+            {
+                SetValue(MainViewModelProperty, value);
+            }
+        }
 
         /// <summary>
         /// Seneste valideringsfejl.
@@ -94,7 +124,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            _mainViewModel.Unsubscribe(this);
+            MainViewModel.Unsubscribe(this);
             if (disposing)
             {
             }
@@ -166,15 +196,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             switch (eventArgs.PropertyName)
             {
                 case "FinansstyringServiceUri": 
-                    _configurationProvider.SetValue("FinansstyringServiceUri", finansstyringKonfiguration.FinansstyringServiceUri);
+                    ConfigurationProvider.SetValue("FinansstyringServiceUri", finansstyringKonfiguration.FinansstyringServiceUri);
                     break;
 
                 case "AntalBogføringslinjer":
-                    _configurationProvider.SetValue("AntalBogføringslinjer", finansstyringKonfiguration.AntalBogføringslinjer);
+                    ConfigurationProvider.SetValue("AntalBogføringslinjer", finansstyringKonfiguration.AntalBogføringslinjer);
                     break;
 
                 case "DageForNyheder":
-                    _configurationProvider.SetValue("DageForNyheder", finansstyringKonfiguration.DageForNyheder);
+                    ConfigurationProvider.SetValue("DageForNyheder", finansstyringKonfiguration.DageForNyheder);
                     break;
             }
         }

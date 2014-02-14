@@ -86,6 +86,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
+            DataContext = null;
             var regnskabsnummer = (int) e.Parameter;
             Regnskab = await Regnskabsliste.RegnskabGetAsync(regnskabsnummer);
             try
@@ -128,6 +129,29 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             VisualStateManager.GoToState(this, "DefaultLayout", true);
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer aktivering af tilbageknappen.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void BackButtonClickEventHandler(object sender, RoutedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            if (Frame.CanGoBack)
+            {
+                Frame.GoBack();
+                return;
+            }
+            Frame.Navigate(typeof (RegnskabslistePage), null);
         }
 
         #endregion

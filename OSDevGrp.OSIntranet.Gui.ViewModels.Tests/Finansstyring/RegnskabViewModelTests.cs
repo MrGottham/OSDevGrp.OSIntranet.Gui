@@ -4,12 +4,14 @@ using System.Globalization;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 {
@@ -55,12 +57,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.StatusDato, Is.EqualTo(statusDato));
             Assert.That(regnskabViewModel.Bogføringslinjer, Is.Not.Null);
             Assert.That(regnskabViewModel.Bogføringslinjer, Is.Empty);
+            Assert.That(regnskabViewModel.BogføringslinjerHeader, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogføringslinjerHeader, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogføringslinjerHeader, Is.EqualTo(Resource.GetText(Text.Bookkeeping)));
             Assert.That(regnskabViewModel.Debitorer, Is.Not.Null);
             Assert.That(regnskabViewModel.Debitorer, Is.Empty);
+            Assert.That(regnskabViewModel.DebitorerHeader, Is.Not.Null);
+            Assert.That(regnskabViewModel.DebitorerHeader, Is.Not.Empty);
+            Assert.That(regnskabViewModel.DebitorerHeader, Is.EqualTo(Resource.GetText(Text.Debtors)));
             Assert.That(regnskabViewModel.Kreditorer, Is.Not.Null);
             Assert.That(regnskabViewModel.Kreditorer, Is.Empty);
+            Assert.That(regnskabViewModel.KreditorerHeader, Is.Not.Null);
+            Assert.That(regnskabViewModel.KreditorerHeader, Is.Not.Empty);
+            Assert.That(regnskabViewModel.KreditorerHeader, Is.EqualTo(Resource.GetText(Text.Creditors)));
             Assert.That(regnskabViewModel.Nyheder, Is.Not.Null);
             Assert.That(regnskabViewModel.Nyheder, Is.Empty);
+            Assert.That(regnskabViewModel.NyhederHeader, Is.Not.Null);
+            Assert.That(regnskabViewModel.NyhederHeader, Is.Not.Empty);
+            Assert.That(regnskabViewModel.NyhederHeader, Is.EqualTo(Resource.GetText(Text.NewsMultiple)));
             Assert.That(regnskabViewModel.RefreshCommand, Is.Not.Null);
             Assert.That(regnskabViewModel.RefreshCommand, Is.TypeOf<CommandCollectionExecuterCommand>());
         }

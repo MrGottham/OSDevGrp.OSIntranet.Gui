@@ -123,17 +123,26 @@
   <data name="Balance" xml:space="preserve">
     <value>Balance</value>
   </data>
+  <data name="Bookkeeping" xml:space="preserve">
+    <value>Bookkeeping</value>
+  </data>
   <data name="Configuration" xml:space="preserve">
     <value>Configuration</value>
   </data>
   <data name="Creditor" xml:space="preserve">
     <value>Creditor</value>
   </data>
+  <data name="Creditors" xml:space="preserve">
+    <value>Creditors</value>
+  </data>
   <data name="DaysForNews" xml:space="preserve">
     <value>Number of days when news is current</value>
   </data>
   <data name="Debtor" xml:space="preserve">
     <value>Debtor</value>
+  </data>
+  <data name="Debtors" xml:space="preserve">
+    <value>Debtors</value>
   </data>
   <data name="Exception" xml:space="preserve">
     <value>A problem has occurred</value>
@@ -149,6 +158,9 @@
     <comment>{0} = Value.</comment>
   </data>
   <data name="News" xml:space="preserve">
+    <value>News</value>
+  </data>
+  <data name="NewsMultiple" xml:space="preserve">
     <value>News</value>
   </data>
   <data name="NumberOfAccountingLinesToGet" xml:space="preserve">

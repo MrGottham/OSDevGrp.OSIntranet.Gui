@@ -16,11 +16,11 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
+               <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
                 <TextBlock Grid.Column="1" Margin="10,10,20,10" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="NyhedViewModelDefaultMinimalDataTemplate">
+        <DataTemplate x:Key="NyhedViewModelMinimalDataTemplate">
             <Grid Width="225" MinWidth="225" MaxWidth="225" Height="Auto" MinHeight="75" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -56,7 +56,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" Text="{Binding Path=DisplayName}"/>
-                <ListView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelDefaultMinimalDataTemplate}" SelectionMode="None">
+                <ListView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelMinimalDataTemplate}" SelectionMode="None">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>

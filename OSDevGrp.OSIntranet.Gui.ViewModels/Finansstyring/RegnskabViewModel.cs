@@ -148,6 +148,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Overskrift til bogføringslinjer.
+        /// </summary>
+        public virtual string BogføringslinjerHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.Bookkeeping);
+            }
+        }
+
+        /// <summary>
         /// Debitorer.
         /// </summary>
         public virtual IEnumerable<IAdressekontoViewModel> Debitorer
@@ -156,6 +167,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 var comparer = new AdressekontoViewModelComparer();
                 return _debitorerViewModels.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Overskrift til debitorer.
+        /// </summary>
+        public virtual string DebitorerHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.Debtors);
             }
         }
 
@@ -172,6 +194,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Overskrift til kreditorer.
+        /// </summary>
+        public virtual string KreditorerHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.Creditors);
+            }
+        }
+
+        /// <summary>
         /// Nyheder.
         /// </summary>
         public virtual IEnumerable<INyhedViewModel> Nyheder
@@ -180,6 +213,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 var comparer = new NyhedViewModelComparer();
                 return _nyhedViewModels.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Overskrift til nyheder.
+        /// </summary>
+        public virtual string NyhederHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.NewsMultiple);
             }
         }
 
