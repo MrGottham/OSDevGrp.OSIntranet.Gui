@@ -22,6 +22,7 @@
         Debtors,
         Creditor,
         Creditors,
-        Bookkeeping
+        Bookkeeping,
+        Phone
     }
 }

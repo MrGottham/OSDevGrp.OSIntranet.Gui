@@ -166,6 +166,9 @@
   <data name="NumberOfAccountingLinesToGet" xml:space="preserve">
     <value>Antal bogføringslinjer, der skal hentes</value>
   </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporterede endpoint for service</value>
   </data>

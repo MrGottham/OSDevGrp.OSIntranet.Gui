@@ -166,6 +166,9 @@
   <data name="NumberOfAccountingLinesToGet" xml:space="preserve">
     <value>Number of accounting lines to get</value>
   </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporting endpoint for service</value>
   </data>

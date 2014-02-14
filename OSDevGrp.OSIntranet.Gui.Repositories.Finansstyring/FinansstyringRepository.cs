@@ -325,11 +325,19 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                                     {
                                         try
                                         {
-                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, debitorView.Nummer, debitorView.Navn, statusDato, debitorView.Saldo)
+                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, debitorView.Nummer, debitorView.Navn, statusDato, debitorView.Saldo);
+                                            if (string.IsNullOrEmpty(debitorView.PrimærTelefon) == false)
+                                            {
+                                                adressekontoModel.PrimærTelefon = debitorView.PrimærTelefon.Trim();
+                                                if (string.IsNullOrEmpty(debitorView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, debitorView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
                                                 {
-                                                    PrimærTelefon = debitorView.PrimærTelefon,
-                                                    SekundærTelefon = debitorView.SekundærTelefon
-                                                };
+                                                    adressekontoModel.SekundærTelefon = debitorView.SekundærTelefon.Trim();
+                                                }
+                                            }
+                                            else if (string.IsNullOrEmpty(debitorView.SekundærTelefon) == false)
+                                            {
+                                                adressekontoModel.PrimærTelefon = debitorView.PrimærTelefon.Trim();
+                                            }
                                             adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.Low);
                                             debitorer.Add(adressekontoModel);
                                         }
@@ -414,11 +422,19 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                                     {
                                         try
                                         {
-                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, kreditorView.Nummer, kreditorView.Navn, statusDato, kreditorView.Saldo)
+                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, kreditorView.Nummer, kreditorView.Navn, statusDato, kreditorView.Saldo);
+                                            if (string.IsNullOrEmpty(kreditorView.PrimærTelefon) == false)
+                                            {
+                                                adressekontoModel.PrimærTelefon = kreditorView.PrimærTelefon.Trim();
+                                                if (string.IsNullOrEmpty(kreditorView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, kreditorView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
                                                 {
-                                                    PrimærTelefon = kreditorView.PrimærTelefon,
-                                                    SekundærTelefon = kreditorView.SekundærTelefon
-                                                };
+                                                    adressekontoModel.SekundærTelefon = kreditorView.SekundærTelefon.Trim();
+                                                }
+                                            }
+                                            else if (string.IsNullOrEmpty(kreditorView.SekundærTelefon) == false)
+                                            {
+                                                adressekontoModel.PrimærTelefon = kreditorView.PrimærTelefon.Trim();
+                                            }
                                             adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.High);
                                             kreditorer.Add(adressekontoModel);
                                         }
@@ -501,11 +517,19 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                                         error = e.Error;
                                         return;
                                     }
-                                    adressekontoModel = new AdressekontoModel(regnskabsnummer, e.Result.Nummer, e.Result.Navn, statusDato, e.Result.Saldo)
+                                    adressekontoModel = new AdressekontoModel(regnskabsnummer, e.Result.Nummer, e.Result.Navn, statusDato, e.Result.Saldo);
+                                    if (string.IsNullOrEmpty(e.Result.PrimærTelefon) == false)
+                                    {
+                                        adressekontoModel.PrimærTelefon = e.Result.PrimærTelefon.Trim();
+                                        if (string.IsNullOrEmpty(e.Result.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, e.Result.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
                                         {
-                                            PrimærTelefon = e.Result.PrimærTelefon,
-                                            SekundærTelefon = e.Result.SekundærTelefon
-                                        };
+                                            adressekontoModel.SekundærTelefon = e.Result.SekundærTelefon.Trim();
+                                        }
+                                    }
+                                    else if (string.IsNullOrEmpty(e.Result.SekundærTelefon) == false)
+                                    {
+                                        adressekontoModel.PrimærTelefon = e.Result.PrimærTelefon.Trim();
+                                    }
                                 }
                                 finally
                                 {

@@ -11,7 +11,7 @@
     <Page.Resources>
         <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
         <DataTemplate x:Key="AdressekontoViewModelDefaultDataTemplate">
-            <Grid Width="500" MinWidth="500" MaxWidth="500" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
+            <Grid Width="480" MinWidth="480" MaxWidth="480" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -29,10 +29,10 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=Navn}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Saldo}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="PHONE"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="PHONE 1"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="PHONE 2"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=SaldoAsText}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=PrimærTelefonLabel}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=PrimærTelefon}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=SekundærTelefon}"/>
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -67,29 +67,29 @@
             <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsHorizontalRailEnabled="True" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" MinWidth="1000"/>
+                        <ColumnDefinition Width="Auto" MinWidth="500"/>
+                        <ColumnDefinition Width="Auto" MinWidth="500"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Margin="0,0,10,0" Width="1000" MinWidth="1000">
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="0,0,10,0" Width="500" MinWidth="500">
+                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
                         <ListView ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                                    <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>
                     </StackPanel>
-                    <StackPanel Grid.Column="2" Margin="0,0,10,0" Width="500" MinWidth="500">
+                    <StackPanel Grid.Column="2" Margin="0,0,10,0">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
                         <ListView ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                                    <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>

@@ -10,6 +10,7 @@ using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 {
@@ -70,11 +71,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(adressekontoViewModel.PrimærTelefon, Is.Not.Null);
             Assert.That(adressekontoViewModel.PrimærTelefon, Is.Not.Empty);
             Assert.That(adressekontoViewModel.PrimærTelefon, Is.EqualTo(adressekontoModelMock.PrimærTelefon));
+            Assert.That(adressekontoViewModel.PrimærTelefonLabel, Is.Not.Null);
+            Assert.That(adressekontoViewModel.PrimærTelefonLabel, Is.Not.Empty);
+            Assert.That(adressekontoViewModel.PrimærTelefonLabel, Is.EqualTo(Resource.GetText(Text.Phone)));
             Assert.That(adressekontoViewModel.SekundærTelefon, Is.Not.Null);
             Assert.That(adressekontoViewModel.SekundærTelefon, Is.Not.Empty);
             Assert.That(adressekontoViewModel.SekundærTelefon, Is.EqualTo(adressekontoModelMock.SekundærTelefon));
+            Assert.That(adressekontoViewModel.SekundærTelefonLabel, Is.Not.Null);
+            Assert.That(adressekontoViewModel.SekundærTelefonLabel, Is.Not.Empty);
+            Assert.That(adressekontoViewModel.SekundærTelefonLabel, Is.EqualTo(Resource.GetText(Text.Phone)));
             Assert.That(adressekontoViewModel.StatusDato, Is.EqualTo(adressekontoModelMock.StatusDato));
             Assert.That(adressekontoViewModel.Saldo, Is.EqualTo(adressekontoModelMock.Saldo));
+            Assert.That(adressekontoViewModel.SaldoAsText, Is.Not.Null);
+            Assert.That(adressekontoViewModel.SaldoAsText, Is.Not.Empty);
+            Assert.That(adressekontoViewModel.SaldoAsText, Is.EqualTo(adressekontoModelMock.Saldo.ToString("C")));
+            Assert.That(adressekontoViewModel.SaldoLabel, Is.Not.Null);
+            Assert.That(adressekontoViewModel.SaldoLabel, Is.Not.Empty);
+            Assert.That(adressekontoViewModel.SaldoLabel, Is.EqualTo(Resource.GetText(Text.Balance)));
             Assert.That(adressekontoViewModel.DisplayName, Is.Not.Null);
             Assert.That(adressekontoViewModel.DisplayName, Is.Not.Empty);
             Assert.That(adressekontoViewModel.DisplayName, Is.EqualTo(displayName));
@@ -498,6 +511,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("SekundærTelefon", "SekundærTelefon")]
         [TestCase("StatusDato", "StatusDato")]
         [TestCase("Saldo", "Saldo")]
+        [TestCase("Saldo", "SaldoAsText")]
         [TestCase("Nyhedsaktualitet", "Nyhedsaktualitet")]
         [TestCase("Nyhedsudgivelsestidspunkt", "Nyhedsudgivelsestidspunkt")]
         [TestCase("Nyhedsinformation", "Nyhedsinformation")]

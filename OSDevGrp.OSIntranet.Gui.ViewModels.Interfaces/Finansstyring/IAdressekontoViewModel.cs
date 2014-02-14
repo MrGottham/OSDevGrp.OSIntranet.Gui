@@ -42,12 +42,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Label til primær telefonnummer.
+        /// </summary>
+        string PrimærTelefonLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Sekundær telefonnummer.
         /// </summary>
         string SekundærTelefon
         {
             get; 
             set;
+        }
+
+        /// <summary>
+        /// Label til sekundær telefonummer.
+        /// </summary>
+        string SekundærTelefonLabel
+        {
+            get;
         }
 
         /// <summary>
@@ -66,6 +82,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get; 
             set; 
+        }
+
+        /// <summary>
+        /// Tekstangivelse af saldo pr. statusdato
+        /// </summary>
+        string SaldoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til saldo pr. statusdato.
+        /// </summary>
+        string SaldoLabel
+        {
+            get;
         }
 
         /// <summary>

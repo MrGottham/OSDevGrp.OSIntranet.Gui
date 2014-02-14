@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -143,6 +144,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Label til primær telefonnummer.
+        /// </summary>
+        public virtual string PrimærTelefonLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Phone);
+            }
+        }
+
+        /// <summary>
         /// Sekundær telefonnummer.
         /// </summary>
         public virtual string SekundærTelefon
@@ -161,6 +173,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Label til sekundær telefonummer.
+        /// </summary>
+        public virtual string SekundærTelefonLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Phone);
             }
         }
 
@@ -205,6 +228,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af saldo pr. statusdato
+        /// </summary>
+        public virtual string SaldoAsText
+        {
+            get
+            {
+                return Saldo.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til saldo pr. statusdato.
+        /// </summary>
+        public virtual string SaldoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Balance);
             }
         }
 
@@ -260,7 +305,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("eventArgs");
             }
-            RaisePropertyChanged(eventArgs.PropertyName);
+            switch (eventArgs.PropertyName)
+            {
+                case "Saldo":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("SaldoAsText");
+                    break;
+
+                default:
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    break;
+            }
         }
 
         #endregion
