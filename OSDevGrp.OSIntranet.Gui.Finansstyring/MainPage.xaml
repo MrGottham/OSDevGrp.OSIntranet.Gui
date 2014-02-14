@@ -10,134 +10,27 @@
 
     <Page.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
-        <DataTemplate x:Key="NyhedViewModelDefaultNavigationDataTemplate">
-            <Grid Width="400" MinWidth="400" MaxWidth="400" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
-                <TextBlock Grid.Column="1" Margin="10,10,20,10" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="NyhedViewModelDefaultMinimalDataTemplate">
-            <Grid Width="225" MinWidth="225" MaxWidth="225" Height="Auto" MinHeight="75" Style="{StaticResource HighlightedGridStyle}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Margin="10,5,10,5" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="RegnskabViewModelDefaultNavigationDataTemplate">
-            <Grid Width="Auto" MinWidth="400">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <HyperlinkButton Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource TextPrimaryButtonStyle}" Tag="{Binding}" Click="RegnskabButtonClickEventHandler">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-                        <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
-                    </StackPanel>
-                </HyperlinkButton>
-                <ListView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                </ListView>
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="RegnskabViewModelMinimalNavigationDataTemplate">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" Text="{Binding Path=DisplayName}"/>
-                <ListView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelDefaultMinimalDataTemplate}" SelectionMode="None">
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                </ListView>
-            </Grid>
-        </DataTemplate>
     </Page.Resources>
-
+    
     <Page.TopAppBar>
-        <AppBar Name="ExceptionHandlerAppBar" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:MainPage.ExceptionHandler}" IsOpen="{Binding Path=ShowLast, Mode=TwoWay}" IsSticky="{Binding Path=ShowLast, Mode=TwoWay}" Opened="TopAppBarOpenedEventHandler" Margin="0,1,0,-1">
-            <Grid Style="{StaticResource HighlightedGridStyle}" Height="150" Visibility="{Binding Path=ShowLast, Mode=TwoWay, Converter={Binding Source={StaticResource BooleanToVisibilityConverter}}}">
+        <AppBar d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:MainPage.MainViewModel}" IsOpen="{Binding Path=ExceptionHandler.ShowLast, Mode=TwoWay}" IsSticky="{Binding Path=ExceptionHandler.ShowLast, Mode=TwoWay}" Opened="TopAppBarOpenedEventHandler">
+            <Grid Style="{StaticResource HighlightedGridStyle}" Height="150" Visibility="{Binding Path=ExceptionHandler.ShowLast, Mode=TwoWay, Converter={Binding Source={StaticResource BooleanToVisibilityConverter}}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Margin="40,20,20,20">
-                    <TextBlock Style="{StaticResource SubheaderTextStyle}" Text="{Binding Path=Last.DisplayName}"/>
-                    <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextStyle}" Text="{Binding Path=Last.Message}"/>
+                    <TextBlock Style="{StaticResource SubheaderTextStyle}" Text="{Binding Path=ExceptionHandler.Last.DisplayName}"/>
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextStyle}" Text="{Binding Path=ExceptionHandler.Last.Message}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Margin="20,20,40,20" VerticalAlignment="Center">
-                    <Button Style="{StaticResource TextPrimaryButtonStyle}" Content="{Binding Path=HideCommandText}" Command="{Binding Path=HideCommand}"/>
+                    <Button Style="{StaticResource TextPrimaryButtonStyle}" Content="{Binding Path=ExceptionHandler.HideCommandText}" Command="{Binding Path=ExceptionHandler.HideCommand}"/>
                 </StackPanel>
             </Grid>
         </AppBar>
     </Page.TopAppBar>
 
-    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding Source={StaticResource MainViewModel}, Path=Regnskabsliste}">
-        <Grid.ChildrenTransitions>
-            <TransitionCollection>
-                <EntranceThemeTransition/>
-            </TransitionCollection>
-        </Grid.ChildrenTransitions>
-
-        <Grid x:Name="DefaultNavigation" Margin="20,20,20,20" Visibility="Visible">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-            <ListView Grid.Row="1" ItemsSource="{Binding Path=Regnskaber}" ItemTemplate="{StaticResource RegnskabViewModelDefaultNavigationDataTemplate}" ItemContainerStyle="{StaticResource UnHighlightedListBoxItemStyle}" SelectionMode="None" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" IsDoubleTapEnabled="False" IsHitTestVisible="True" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
-            </ListView>
-        </Grid>
-
-        <Grid x:Name="MinimalNavigation" Margin="20,20,20,20" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-            <ListView Grid.Row="1" ItemsSource="{Binding Path=Regnskaber}" ItemTemplate="{StaticResource RegnskabViewModelMinimalNavigationDataTemplate}" ItemContainerStyle="{StaticResource UnHighlightedListBoxItemStyle}" SelectionMode="None" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="True" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
-            </ListView>
-        </Grid>
-
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="DefaultLayout">
-                </VisualState>
-                <VisualState x:Name="MinimalLayout">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DefaultNavigation" Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MinimalNavigation" Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:MainPage.MainViewModel}">
+        <Frame Name="FinansstyringFrame"/>
     </Grid>
 </Page>

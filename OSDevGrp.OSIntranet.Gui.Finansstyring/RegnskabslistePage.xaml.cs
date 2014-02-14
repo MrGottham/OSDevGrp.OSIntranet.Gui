@@ -1,34 +1,36 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 {
     /// <summary>
-    /// Page til et regnskab.
+    /// Page til en regnskabsliste.
     /// </summary>
-    public sealed partial class RegnskabPage
+    public sealed partial class RegnskabslistePage
     {
         #region Private variables
 
-        private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
-        private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
+        private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabslistePage), new PropertyMetadata(null));
 
         #endregion
 
         #region Constructor
 
         /// <summary>
-        /// Danner en Page til et regnskab.
+        /// Danner Page til en regnskabsliste..
         /// </summary>
-        public RegnskabPage()
+        public RegnskabslistePage()
         {
             InitializeComponent();
 
             var mainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
             Regnskabsliste = mainViewModel.Regnskabsliste;
+            DataContext = Regnskabsliste;
 
             SizeChanged += PageSizeChangedEventHandler;
         }
@@ -38,22 +40,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Properties
 
         /// <summary>
-        /// ViewModel for regnskabet.
-        /// </summary>
-        public IRegnskabViewModel Regnskab
-        {
-            get
-            {
-                return GetValue(RegnskabProperty) as IRegnskabViewModel;
-            }
-            private set
-            {
-                SetValue(RegnskabProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// ViewModel for regnskabslisten.
+        /// ViewModel for listen af regnskaber.
         /// </summary>
         public IRegnskabslisteViewModel Regnskabsliste
         {
@@ -76,34 +63,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// </summary>
         /// <param name="e">Event data that describes how this page was reached.  The Parameter
         /// property is typically used to configure the page.</param>
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e == null)
-            {
-                throw new ArgumentNullException("e");
-            }
-            if (e.Parameter == null)
+            if (Regnskabsliste.Regnskaber.Any())
             {
                 return;
             }
-            var regnskabsnummer = (int) e.Parameter;
-            Regnskab = await Regnskabsliste.RegnskabGetAsync(regnskabsnummer);
-            try
+            var refreshCommand = Regnskabsliste.RefreshCommand;
+            if (refreshCommand.CanExecute(Regnskabsliste))
             {
-                if (Regnskab == null)
-                {
-                    return;
-                }
-                var refreshCommand = Regnskab.RefreshCommand;
-                if (refreshCommand == null)
-                {
-                    return;
-                }
-                refreshCommand.Execute(Regnskab);
-            }
-            finally
-            {
-                DataContext = Regnskab;
+                refreshCommand.Execute(Regnskabsliste);
             }
         }
 
@@ -128,6 +97,34 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             VisualStateManager.GoToState(this, "DefaultLayout", true);
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer aktivering/visning af et regnskab.
+        /// </summary>
+        /// <param name="sender">Object, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void RegnskabButtonClickEventHandler(object sender, RoutedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var hyperlinkButton = sender as HyperlinkButton;
+            if (hyperlinkButton == null)
+            {
+                return;
+            }
+            var regnskabViewModel = hyperlinkButton.Tag as IRegnskabViewModel;
+            if (regnskabViewModel == null)
+            {
+                return;
+            }
+            Frame.Navigate(typeof (RegnskabPage), regnskabViewModel.Nummer);
         }
 
         #endregion

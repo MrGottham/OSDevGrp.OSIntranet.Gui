@@ -162,6 +162,9 @@
     <Compile Include="RegnskabPage.xaml.cs">
       <DependentUpon>RegnskabPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RegnskabslistePage.xaml.cs">
+      <DependentUpon>RegnskabslistePage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -224,6 +227,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="RegnskabPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RegnskabslistePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
