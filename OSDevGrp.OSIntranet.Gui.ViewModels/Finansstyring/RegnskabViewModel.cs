@@ -32,7 +32,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
         private readonly ObservableCollection<IAdressekontoViewModel> _debitorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<IAdressekontoViewModel> _kreditorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
-        private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>(); 
+        private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>();
+
+        private static ObservableCollection<string> _bogføringslinjeColumns;
+        private static readonly object SyncRoot = new object();
 
         #endregion
 
@@ -155,6 +158,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return Resource.GetText(Text.Bookkeeping);
+            }
+        }
+
+        /// <summary>
+        /// Kolonneoverskrifter til bogføringslinjer.
+        /// </summary>
+        public virtual IEnumerable<string> BogføringslinjerColumns
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return _bogføringslinjeColumns ?? (_bogføringslinjeColumns = new ObservableCollection<string>(new Collection<string>(new List<string> {Resource.GetText(Text.Date), Resource.GetText(Text.Annex), Resource.GetText(Text.Account), Resource.GetText(Text.Text), Resource.GetText(Text.BudgetAccount), Resource.GetText(Text.Debit), Resource.GetText(Text.Credit)})));
+                }
             }
         }
 

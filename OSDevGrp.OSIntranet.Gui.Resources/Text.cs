@@ -23,6 +23,13 @@
         Creditor,
         Creditors,
         Bookkeeping,
-        Phone
+        Phone,
+        Date,
+        Annex,
+        Account,
+        Text,
+        BudgetAccount,
+        Debit,
+        Credit
     }
 }

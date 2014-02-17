@@ -52,6 +52,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Kolonneoverskrifter til bogføringslinjer.
+        /// </summary>
+        IEnumerable<string> BogføringslinjerColumns
+        {
+            get;
+        }
+
+        /// <summary>
         /// Debitorer.
         /// </summary>
         IEnumerable<IAdressekontoViewModel> Debitorer

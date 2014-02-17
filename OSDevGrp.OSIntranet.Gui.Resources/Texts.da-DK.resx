@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Account" xml:space="preserve">
+    <value>Konto</value>
+  </data>
   <data name="Accountings" xml:space="preserve">
     <value>Regnskabsliste</value>
+  </data>
+  <data name="Annex" xml:space="preserve">
+    <value>Bilag</value>
   </data>
   <data name="Balance" xml:space="preserve">
     <value>Saldo</value>
@@ -126,8 +132,14 @@
   <data name="Bookkeeping" xml:space="preserve">
     <value>Bogføring</value>
   </data>
+  <data name="BudgetAccount" xml:space="preserve">
+    <value>Budgetkonto</value>
+  </data>
   <data name="Configuration" xml:space="preserve">
     <value>Konfiguration</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Kredit</value>
   </data>
   <data name="Creditor" xml:space="preserve">
     <value>Kreditor</value>
@@ -135,8 +147,14 @@
   <data name="Creditors" xml:space="preserve">
     <value>Kreditorer</value>
   </data>
+  <data name="Date" xml:space="preserve">
+    <value>Dato</value>
+  </data>
   <data name="DaysForNews" xml:space="preserve">
     <value>Antal dage, hvor nyheder er aktuel</value>
+  </data>
+  <data name="Debit" xml:space="preserve">
+    <value>Debit</value>
   </data>
   <data name="Debtor" xml:space="preserve">
     <value>Debitor</value>
@@ -171,6 +189,9 @@
   </data>
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporterede endpoint for service</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Tekst</value>
   </data>
   <data name="ValueOutsideInterval" xml:space="preserve">
     <value>Værdien er ikke i intervallet ({0} - {1}).</value>

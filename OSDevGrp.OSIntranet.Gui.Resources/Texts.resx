@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
   <data name="Accountings" xml:space="preserve">
     <value>Accountings</value>
+  </data>
+  <data name="Annex" xml:space="preserve">
+    <value>Annex</value>
   </data>
   <data name="Balance" xml:space="preserve">
     <value>Balance</value>
@@ -126,8 +132,14 @@
   <data name="Bookkeeping" xml:space="preserve">
     <value>Bookkeeping</value>
   </data>
+  <data name="BudgetAccount" xml:space="preserve">
+    <value>Budget account</value>
+  </data>
   <data name="Configuration" xml:space="preserve">
     <value>Configuration</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Credit</value>
   </data>
   <data name="Creditor" xml:space="preserve">
     <value>Creditor</value>
@@ -135,8 +147,14 @@
   <data name="Creditors" xml:space="preserve">
     <value>Creditors</value>
   </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
   <data name="DaysForNews" xml:space="preserve">
     <value>Number of days when news is current</value>
+  </data>
+  <data name="Debit" xml:space="preserve">
+    <value>Debit</value>
   </data>
   <data name="Debtor" xml:space="preserve">
     <value>Debtor</value>
@@ -171,6 +189,9 @@
   </data>
   <data name="SupportingServiceUri" xml:space="preserve">
     <value>Supporting endpoint for service</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Text</value>
   </data>
   <data name="ValueOutsideInterval" xml:space="preserve">
     <value>The value is outside the interval ({0} - {1}).</value>
