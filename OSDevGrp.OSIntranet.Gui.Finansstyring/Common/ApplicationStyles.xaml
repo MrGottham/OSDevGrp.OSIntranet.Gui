@@ -42,4 +42,6 @@
     <Style x:Key="RedBorderedComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource BorderedComboBoxStyle}">
         <Setter Property="BorderBrush" Value="Red"/>
     </Style>
+    <Style x:Key="BookkeepingListViewStyle" TargetType="ListView">
+    </Style>
 </ResourceDictionary>

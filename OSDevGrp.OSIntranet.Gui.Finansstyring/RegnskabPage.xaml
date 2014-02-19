@@ -9,7 +9,16 @@
     mc:Ignorable="d">
     
     <Page.Resources>
+        <converters:CollectionItemToStringConverter x:Key="CollectionItemToStringConverter"/>
         <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+        <DataTemplate x:Key="BookkeepingHeaderDataTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="AdressekontoViewModelDefaultDataTemplate">
             <Grid Width="480" MinWidth="480" MaxWidth="480" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
@@ -73,6 +82,9 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Margin="0,0,10,0">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
+                        <ListView Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" HeaderTemplate="{StaticResource BookkeepingHeaderDataTemplate}" ItemsSource="{Binding Path=Bogføringslinjer}">
+                            
+                        </ListView>
                         <!--
                         <Grid Margin="0,0,0,0">
                             <Grid.ColumnDefinitions>
