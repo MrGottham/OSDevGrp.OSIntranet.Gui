@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using Windows.UI.Xaml.Data;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
 {
     /// <summary>
-    /// Converter, der kan konvertere et nummereret object i en collection til en streng.
+    /// Converter, der kan konvertere en DateTime til en dato i kort format.
     /// </summary>
-    public class CollectionItemToStringConverter : IValueConverter
+    public class DateTimeToShortDateConverter : IValueConverter
     {
         #region Methods
 
         /// <summary>
-        /// Konverterer et nummereret object i en collection til en streng.
+        /// Konverterer en DateTime til en dato i kort format.
         /// </summary>
         /// <param name="value">Værdi, der skal konverteres.</param>
         /// <param name="targetType">Typen, der skal konverteres til.</param>
@@ -22,16 +21,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// <returns>Konverteret værdi.</returns>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            if (value == null)
+            {
+                return string.Empty;
+            }
             try
             {
-                var collection = value as IEnumerable<object>;
-                if (collection == null)
-                {
-                    return string.Empty;
-                }
-                var collectionAsList = new List<object>(collection);
-                var elementNo = System.Convert.ToInt32(parameter);
-                return collectionAsList.Count < elementNo ? string.Empty : collectionAsList.ElementAt(elementNo).ToString();
+                var cultureInfo = string.IsNullOrEmpty(language) ? new CultureInfo(Windows.Globalization.Language.CurrentInputMethodLanguageTag) : new CultureInfo(language);
+                var dateTime = System.Convert.ToDateTime(value);
+                return dateTime.ToString("d", cultureInfo);
             }
             catch
             {
@@ -40,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         }
 
         /// <summary>
-        /// Konverterer en streng til et nummereret object i en collection.
+        /// Konverterer en dato i kort format til DateTime.
         /// </summary>
         /// <param name="value">Værdi, der skal konverteres.</param>
         /// <param name="targetType">Typen, der skal konverteres til.</param>
