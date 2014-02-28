@@ -43,5 +43,12 @@
         <Setter Property="BorderBrush" Value="Red"/>
     </Style>
     <Style x:Key="BookkeepingListViewStyle" TargetType="ListView">
+        <Setter Property="Background" Value="White"/>
+    </Style>
+    <Style x:Key="BlackTitleTextStyle" TargetType="TextBlock" BasedOn="{StaticResource TitleTextStyle}">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    <Style x:Key="BlackItemTextStyle" TargetType="TextBlock" BasedOn="{StaticResource ItemTextStyle}">
+        <Setter Property="Foreground" Value="Black"/>
     </Style>
 </ResourceDictionary>

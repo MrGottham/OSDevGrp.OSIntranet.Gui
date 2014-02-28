@@ -78,6 +78,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Bilagsnummer.
+        /// </summary>
+        public virtual string Bilag
+        {
+            get
+            {
+                return _bogføringslinjeModel.Bilag;
+            }
+        }
+
+        /// <summary>
         /// Kontonummer, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
         public virtual string Kontonummer

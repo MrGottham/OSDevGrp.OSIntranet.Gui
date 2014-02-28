@@ -11,21 +11,26 @@
     <Page.Resources>
         <converters:CollectionItemToStringConverter x:Key="CollectionItemToStringConverter"/>
         <converters:DateTimeToShortDateConverter x:Key="DateTimeToShortDateConverter"/>
+        <converters:ToUpperCaseConverter x:Key="ToUpperCaseConverter"/>
         <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
         <DataTemplate x:Key="BookkeepingHeaderDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="80" MaxWidth="80"/>
+                    <ColumnDefinition Width="65" MinWidth="65"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
+                <TextBlock Grid.Column="0" Style="{StaticResource BlackTitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
+                <TextBlock Grid.Column="1" Style="{StaticResource BlackTitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BookkeepingLineDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="80" MaxWidth="80"/>
+                    <ColumnDefinition Width="65" MaxWidth="65"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Dato, Converter={StaticResource DateTimeToShortDateConverter}}"/>
+                <TextBlock Grid.Column="0" Style="{StaticResource BlackItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Dato, Converter={StaticResource DateTimeToShortDateConverter}}"/>
+                <TextBlock Grid.Column="1" Style="{StaticResource BlackItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Bilag, Converter={StaticResource ToUpperCaseConverter}}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="AdressekontoViewModelDefaultDataTemplate">
@@ -89,13 +94,21 @@
                         <ColumnDefinition Width="Auto" MinWidth="500"/>
                         <ColumnDefinition Width="Auto" MinWidth="500"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                        <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
-                        <ListView Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" HeaderTemplate="{StaticResource BookkeepingHeaderDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDataTemplate}" ItemsSource="{Binding Path=Bogføringslinjer}">
-                            
+                    <Grid Grid.Column="0" Margin="0,0,10,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
+                        <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" HeaderTemplate="{StaticResource BookkeepingHeaderDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDataTemplate}" ItemsSource="{Binding Path=Bogføringslinjer}" SelectionMode="None">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
                         </ListView>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                    </Grid>
+                    <StackPanel Grid.Column="1" Margin="0,0,10,20">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
                         <ListView ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
@@ -105,7 +118,7 @@
                             </ListView.ItemsPanel>
                         </ListView>
                     </StackPanel>
-                    <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                    <StackPanel Grid.Column="2" Margin="0,0,10,20">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
                         <ListView ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>

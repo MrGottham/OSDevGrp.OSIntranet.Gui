@@ -34,6 +34,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                     mock.Expect(m => m.Dato)
                         .Return(fixture.Create<DateTime>())
                         .Repeat.Any();
+                    mock.Expect(m => m.Bilag)
+                        .Return(fixture.Create<string>())
+                        .Repeat.Any();
                     mock.Expect(m => m.Kontonummer)
                         .Return(fixture.Create<string>())
                         .Repeat.Any();
@@ -69,6 +72,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringslinjeViewModel.Regnskab, Is.EqualTo(regnskabViewModelMock));
             Assert.That(bogføringslinjeViewModel.Løbenummer, Is.EqualTo(bogføringslinjeModelMock.Løbenummer));
             Assert.That(bogføringslinjeViewModel.Dato, Is.EqualTo(bogføringslinjeModelMock.Dato));
+            Assert.That(bogføringslinjeViewModel.Bilag, Is.Not.Null);
+            Assert.That(bogføringslinjeViewModel.Bilag, Is.Not.Empty);
+            Assert.That(bogføringslinjeViewModel.Bilag, Is.EqualTo(bogføringslinjeModelMock.Bilag));
             Assert.That(bogføringslinjeViewModel.Kontonummer, Is.Not.Null);
             Assert.That(bogføringslinjeViewModel.Kontonummer, Is.Not.Empty);
             Assert.That(bogføringslinjeViewModel.Kontonummer, Is.EqualTo(bogføringslinjeModelMock.Kontonummer));
@@ -91,6 +97,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Løbenummer);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Dato);
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Bilag);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kontonummer);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Tekst);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Budgetkontonummer);
@@ -131,6 +138,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         [TestCase("Løbenummer", "Løbenummer")]
         [TestCase("Dato", "Dato")]
+        [TestCase("Bilag", "Bilag")]
         [TestCase("Kontonummer", "Kontonummer")]
         [TestCase("Tekst", "Tekst")]
         [TestCase("Budgetkontonummer", "Budgetkontonummer")]
