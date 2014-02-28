@@ -94,7 +94,7 @@
                         <ColumnDefinition Width="Auto" MinWidth="500"/>
                         <ColumnDefinition Width="Auto" MinWidth="500"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" Margin="0,0,10,20">
+                    <Grid Grid.Column="0" Margin="0,0,40,20">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -108,7 +108,7 @@
                             </ListView.ItemsPanel>
                         </ListView>
                     </Grid>
-                    <StackPanel Grid.Column="1" Margin="0,0,10,20">
+                    <StackPanel Grid.Column="1" Margin="0,0,40,20">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
                         <ListView ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
@@ -118,7 +118,7 @@
                             </ListView.ItemsPanel>
                         </ListView>
                     </StackPanel>
-                    <StackPanel Grid.Column="2" Margin="0,0,10,20">
+                    <StackPanel Grid.Column="2" Margin="0,0,40,20">
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
                         <ListView ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
