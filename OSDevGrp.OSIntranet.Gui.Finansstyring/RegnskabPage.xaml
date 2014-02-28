@@ -19,8 +19,8 @@
                     <ColumnDefinition Width="80" MaxWidth="80"/>
                     <ColumnDefinition Width="65" MinWidth="65"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Style="{StaticResource BlackTitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
-                <TextBlock Grid.Column="1" Style="{StaticResource BlackTitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
+                <TextBlock Grid.Column="0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
+                <TextBlock Grid.Column="1" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BookkeepingLineDataTemplate">
@@ -29,8 +29,8 @@
                     <ColumnDefinition Width="80" MaxWidth="80"/>
                     <ColumnDefinition Width="65" MaxWidth="65"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Style="{StaticResource BlackItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Dato, Converter={StaticResource DateTimeToShortDateConverter}}"/>
-                <TextBlock Grid.Column="1" Style="{StaticResource BlackItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Bilag, Converter={StaticResource ToUpperCaseConverter}}"/>
+                <TextBlock Grid.Column="0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Dato, Converter={StaticResource DateTimeToShortDateConverter}}"/>
+                <TextBlock Grid.Column="1" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Bilag, Converter={StaticResource ToUpperCaseConverter}}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="AdressekontoViewModelDefaultDataTemplate">
