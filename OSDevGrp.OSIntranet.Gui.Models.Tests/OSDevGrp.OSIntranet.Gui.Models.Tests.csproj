@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Finansstyring\AdressekontoModelTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeModelTests.cs" />
+    <Compile Include="Finansstyring\KontoModelBaseTests.cs" />
     <Compile Include="Finansstyring\RegnskabModelTests.cs" />
     <Compile Include="ModelBaseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
