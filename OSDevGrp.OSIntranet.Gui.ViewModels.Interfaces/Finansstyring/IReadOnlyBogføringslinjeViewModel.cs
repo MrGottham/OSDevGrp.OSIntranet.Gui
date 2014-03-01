@@ -56,6 +56,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Tekstangivelse af debitbeløb.
+        /// </summary>
+        string DebitAsText
+        {
+            get;
+        }
+
+        /// <summary>
         /// Kreditbeløb.
         /// </summary>
         decimal Kredit
@@ -64,9 +72,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Tekstangivelse af kreditbeløb.
+        /// </summary>
+        string KreditAsText
+        {
+            get;
+        }
+
+        /// <summary>
         /// Bogføringsbeløb.
         /// </summary>
         decimal Bogført
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogføringsbeløb.
+        /// </summary>
+        string BogførtAsText
         {
             get;
         }

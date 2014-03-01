@@ -133,6 +133,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Tekstangivelse af debitbeløb.
+        /// </summary>
+        public virtual string DebitAsText
+        {
+            get
+            {
+                var result = Debit;
+                return result == 0M ? string.Empty : result.ToString("C");
+            }
+        }
+
+        /// <summary>
         /// Kreditbeløb.
         /// </summary>
         public virtual decimal Kredit
@@ -144,6 +156,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Tekstangivelse af kreditbeløb.
+        /// </summary>
+        public virtual string KreditAsText
+        {
+            get
+            {
+                var result = Kredit;
+                return result == 0M ? string.Empty : result.ToString("C");
+            }
+        }
+
+        /// <summary>
         /// Bogføringsbeløb.
         /// </summary>
         public virtual decimal Bogført
@@ -151,6 +175,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return _bogføringslinjeModel.Bogført;
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogføringsbeløb.
+        /// </summary>
+        public virtual string BogførtAsText
+        {
+            get
+            {
+                var result = Bogført;
+                return result == 0M ? string.Empty : result.ToString("C");
             }
         }
 
@@ -208,6 +244,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             switch (eventArgs.PropertyName)
             {
+                case "Debit":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("DebitAsText");
+                    break;
+
+                case "Kredit":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("KreditAsText");
+                    break;
+
+                case "Bogført":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("BogførtAsText");
+                    break;
+
                 case "Nyhedsinformation":
                     RaisePropertyChanged(eventArgs.PropertyName);
                     RaisePropertyChanged("DisplayName");

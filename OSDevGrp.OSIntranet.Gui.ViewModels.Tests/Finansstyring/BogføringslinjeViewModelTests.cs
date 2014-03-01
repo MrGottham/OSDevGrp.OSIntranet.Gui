@@ -133,6 +133,126 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at getteren til DebitAsText returnerer tekstangivelse af debitbeløb.
+        /// </summary>
+        [Test]
+        [TestCase(-1000)]
+        [TestCase(0)]
+        [TestCase(1000)]
+        public void TestAtDebitAsTextGetterReturnererDebitSomText(decimal debit)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+                    mock.Expect(m => m.Debit)
+                        .Return(debit)
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
+            var bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
+            var bogføringslinjeViewModel = new BogføringslinjeViewModel(regnskabViewModelMock, bogføringslinjeModelMock);
+            Assert.That(bogføringslinjeViewModel, Is.Not.Null);
+
+            if (debit == 0M)
+            {
+                Assert.That(bogføringslinjeViewModel.DebitAsText, Is.Not.Null);
+                Assert.That(bogføringslinjeViewModel.DebitAsText, Is.Empty);
+            }
+            else
+            {
+                Assert.That(bogføringslinjeViewModel.DebitAsText, Is.Not.Null);
+                Assert.That(bogføringslinjeViewModel.DebitAsText, Is.Not.Empty);
+                Assert.That(bogføringslinjeViewModel.DebitAsText, Is.EqualTo(debit.ToString("C")));
+            }
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Debit);
+        }
+
+        /// <summary>
+        /// Tester, at getteren til KreditAsText returnerer tekstangivelse af kreditbeløb.
+        /// </summary>
+        [Test]
+        [TestCase(-1000)]
+        [TestCase(0)]
+        [TestCase(1000)]
+        public void TestAtKreditAsTextGetterReturnererKreditSomText(decimal kredit)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+                    mock.Expect(m => m.Kredit)
+                        .Return(kredit)
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
+            var bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
+            var bogføringslinjeViewModel = new BogføringslinjeViewModel(regnskabViewModelMock, bogføringslinjeModelMock);
+            Assert.That(bogføringslinjeViewModel, Is.Not.Null);
+
+            if (kredit == 0M)
+            {
+                Assert.That(bogføringslinjeViewModel.KreditAsText, Is.Not.Null);
+                Assert.That(bogføringslinjeViewModel.KreditAsText, Is.Empty);
+            }
+            else
+            {
+                Assert.That(bogføringslinjeViewModel.KreditAsText, Is.Not.Null);
+                Assert.That(bogføringslinjeViewModel.KreditAsText, Is.Not.Empty);
+                Assert.That(bogføringslinjeViewModel.KreditAsText, Is.EqualTo(kredit.ToString("C")));
+            }
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit);
+        }
+
+        /// <summary>
+        /// Tester, at getteren til BogførtAsText returnerer tekstangivelse af bogføringsbeløb.
+        /// </summary>
+        [Test]
+        [TestCase(-1000)]
+        [TestCase(0)]
+        [TestCase(1000)]
+        public void TestAtBogførtAsTextGetterReturnererBogførtSomText(decimal bogført)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() =>
+                {
+                    var mock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+                    mock.Expect(m => m.Bogført)
+                        .Return(bogført)
+                        .Repeat.Any();
+                    return mock;
+                }));
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
+            var bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
+            var bogføringslinjeViewModel = new BogføringslinjeViewModel(regnskabViewModelMock, bogføringslinjeModelMock);
+            Assert.That(bogføringslinjeViewModel, Is.Not.Null);
+
+            if (bogført == 0M)
+            {
+                Assert.That(bogføringslinjeViewModel.BogførtAsText, Is.Not.Null);
+                Assert.That(bogføringslinjeViewModel.BogførtAsText, Is.Empty);
+            }
+            else
+            {
+                Assert.That(bogføringslinjeViewModel.BogførtAsText, Is.Not.Null);
+                Assert.That(bogføringslinjeViewModel.BogførtAsText, Is.Not.Empty);
+                Assert.That(bogføringslinjeViewModel.BogførtAsText, Is.EqualTo(bogført.ToString("C")));
+            }
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Bogført);
+        }
+
+        /// <summary>
         /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler rejser PropertyChanged, når modellen for bogføringslinjen opdateres.
         /// </summary>
         [Test]
@@ -143,8 +263,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Tekst", "Tekst")]
         [TestCase("Budgetkontonummer", "Budgetkontonummer")]
         [TestCase("Debit", "Debit")]
+        [TestCase("Debit", "DebitAsText")]
         [TestCase("Kredit", "Kredit")]
+        [TestCase("Kredit", "KreditAsText")]
         [TestCase("Bogført", "Bogført")]
+        [TestCase("Bogført", "BogførtAsText")]
         [TestCase("Adressekonto", "Adressekonto")]
         [TestCase("Nyhedsinformation", "Nyhedsinformation")]
         [TestCase("Nyhedsinformation", "DisplayName")]

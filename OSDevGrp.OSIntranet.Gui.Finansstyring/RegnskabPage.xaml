@@ -16,25 +16,45 @@
         <DataTemplate x:Key="BookkeepingHeaderDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80" MaxWidth="80"/>
-                    <ColumnDefinition Width="65" MinWidth="65"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="80" MinWidth="80" MaxWidth="80"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="280" MinWidth="280" MaxWidth="280"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
-                <TextBlock Grid.Column="1" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
+                <TextBlock Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
+                <TextBlock Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
+                <TextBlock Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=2}"/>
+                <TextBlock Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=3}"/>
+                <TextBlock Grid.Column="4" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=4}"/>
+                <TextBlock Grid.Column="5" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=5}"/>
+                <TextBlock Grid.Column="6" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=6}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BookkeepingLineDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80" MaxWidth="80"/>
-                    <ColumnDefinition Width="65" MaxWidth="65"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="80" MinWidth="80" MaxWidth="80"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="280" MinWidth="280" MaxWidth="280"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Dato, Converter={StaticResource DateTimeToShortDateConverter}}"/>
-                <TextBlock Grid.Column="1" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Bilag, Converter={StaticResource ToUpperCaseConverter}}"/>
+                <TextBlock Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Dato, Converter={StaticResource DateTimeToShortDateConverter}}"/>
+                <TextBlock Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Bilag, Converter={StaticResource ToUpperCaseConverter}}"/>
+                <TextBlock Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Kontonummer, Converter={StaticResource ToUpperCaseConverter}}"/>
+                <TextBlock Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" TextAlignment="Left" Text="{Binding Path=Tekst}"/>
+                <TextBlock Grid.Column="4" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Budgetkontonummer, Converter={StaticResource ToUpperCaseConverter}}"/>
+                <TextBlock Grid.Column="5" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DebitAsText}"/>
+                <TextBlock Grid.Column="6" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KreditAsText}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="AdressekontoViewModelDefaultDataTemplate">
-            <Grid Width="480" MinWidth="480" MaxWidth="480" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
+            <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
