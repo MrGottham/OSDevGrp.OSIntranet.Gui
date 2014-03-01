@@ -9,6 +9,18 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
     /// </summary>
     public abstract class KontoModelBase : ModelBase, IKontoModelBase
     {
+        #region Private variables
+
+        private readonly int _regnskabsnummer;
+        private readonly string _kontonummer;
+        private string _kontonavn;
+        private string _beskrivelse;
+        private string _notat;
+        private int _kontogruppe;
+        private DateTime _statusDato;
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -17,13 +29,31 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         /// <param name="regnskabsnummer">Regnskabsnummer, som kontoen er tilknyttet.</param>
         /// <param name="kontonummer">Kontonummer.</param>
         /// <param name="kontonavn">Kontonavn.</param>
+        /// <param name="kontogruppe">Unik identifikation af kontogruppen.</param>
         /// <param name="statusDato">Statusdato for opgørelse af kontoen.</param>
-        protected KontoModelBase(int regnskabsnummer, string kontonummer, string kontonavn, DateTime statusDato)
+        protected KontoModelBase(int regnskabsnummer, string kontonummer, string kontonavn, int kontogruppe, DateTime statusDato)
         {
             if (regnskabsnummer <= 0)
             {
                 throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", regnskabsnummer), "regnskabsnummer");
             }
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            if (string.IsNullOrEmpty(kontonavn))
+            {
+                throw new ArgumentNullException("kontonavn");
+            }
+            if (kontogruppe <= 0)
+            {
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "kontogruppe", kontogruppe), "kontogruppe");
+            }
+            _regnskabsnummer = regnskabsnummer;
+            _kontonummer = kontonummer;
+            _kontonavn = kontonavn;
+            _kontogruppe = kontogruppe;
+            _statusDato = statusDato;
         }
 
         #endregion
@@ -37,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _regnskabsnummer;
             }
         }
 
@@ -48,7 +78,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _kontonummer;
             }
         }
 
@@ -59,11 +89,20 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _kontonavn;
             }
             set
             {
-                throw new NotImplementedException();
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentNullException("value");
+                }
+                if (_kontonavn == value)
+                {
+                    return;
+                }
+                _kontonavn = value;
+                RaisePropertyChanged("Kontonavn");
             }
         }
 
@@ -74,10 +113,11 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _beskrivelse;
             }
             set
             {
+                _beskrivelse = value;
                 throw new NotImplementedException();
             }
         }
@@ -89,7 +129,23 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
+                return _notat;
+            }
+            set
+            {
+                _notat = value;
                 throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Unik identifikation af kontogruppen.
+        /// </summary>
+        public virtual int Kontogruppe
+        {
+            get
+            {
+                return _kontogruppe;
             }
             set
             {
@@ -104,7 +160,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _statusDato;
             }
             set
             {

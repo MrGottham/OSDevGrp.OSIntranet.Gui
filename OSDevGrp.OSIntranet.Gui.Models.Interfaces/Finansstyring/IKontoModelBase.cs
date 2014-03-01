@@ -51,6 +51,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Unik identifikation af kontogruppen.
+        /// </summary>
+        int Kontogruppe
+        {
+            get; 
+            set; 
+        }
+
+        /// <summary>
         /// Statusdato for opgørelse af kontoen.
         /// </summary>
         DateTime StatusDato
