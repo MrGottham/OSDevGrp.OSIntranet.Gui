@@ -117,8 +117,12 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
+                if (_beskrivelse == value)
+                {
+                    return;
+                }
                 _beskrivelse = value;
-                throw new NotImplementedException();
+                RaisePropertyChanged("Beskrivelse");
             }
         }
 
@@ -133,8 +137,12 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
+                if (_notat == value)
+                {
+                    return;
+                }
                 _notat = value;
-                throw new NotImplementedException();
+                RaisePropertyChanged("Notat");
             }
         }
 
@@ -149,7 +157,16 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                if (value <= 0)
+                {
+                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", value), "value");
+                }
+                if (_kontogruppe == value)
+                {
+                    return;
+                }
+                _kontogruppe = value;
+                RaisePropertyChanged("Kontogruppe");
             }
         }
 
@@ -164,7 +181,12 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                if (_statusDato == value)
+                {
+                    return;
+                }
+                _statusDato = value;
+                RaisePropertyChanged("StatusDato");
             }
         }
 

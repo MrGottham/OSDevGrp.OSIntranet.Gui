@@ -221,5 +221,239 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             kontoModelBase.Kontonavn = fixture.Create<string>();
             Assert.That(eventCalled, Is.True);
         }
+
+        /// <summary>
+        /// Tester, at sætteren til Beskrivelse opdaterer beskrivelsen.
+        /// </summary>
+        [Test]
+        public void TestAtBeskrivelseSetterOpdatererBeskrivelse()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var newValue = fixture.Create<string>();
+            Assert.That(kontoModelBase.Beskrivelse, Is.Not.EqualTo(newValue));
+
+            kontoModelBase.Beskrivelse = newValue;
+            Assert.That(kontoModelBase.Beskrivelse, Is.EqualTo(newValue));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Beskrivelse rejser PropertyChanged ved opdatering af beskrivelsen.
+        /// </summary>
+        [Test]
+        [TestCase("Beskrivelse")]
+        public void TestAtBeskrivelseSetterRejserPropertyChangedVedOpdateringAfBeskrivelse(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var eventCalled = false;
+            kontoModelBase.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, propertyNameToRaise, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.Beskrivelse = kontoModelBase.Beskrivelse;
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.Beskrivelse = fixture.Create<string>();
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Notat opdaterer notatet.
+        /// </summary>
+        [Test]
+        public void TestAtNotatSetterOpdatererNotat()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var newValue = fixture.Create<string>();
+            Assert.That(kontoModelBase.Notat, Is.Not.EqualTo(newValue));
+
+            kontoModelBase.Notat = newValue;
+            Assert.That(kontoModelBase.Notat, Is.EqualTo(newValue));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Notat rejser PropertyChanged ved opdatering af notatet.
+        /// </summary>
+        [Test]
+        [TestCase("Notat")]
+        public void TestAtNotatSetterRejserPropertyChangedVedOpdateringAfNotat(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var eventCalled = false;
+            kontoModelBase.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, propertyNameToRaise, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.Notat = kontoModelBase.Notat;
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.Notat = fixture.Create<string>();
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Kontogruppe kaster en ArgumentException ved illegale kontogrupper.
+        /// </summary>
+        [Test]
+        [TestCase(-1024)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        public void TestAtKontogruppeSetterKasterArgumentExceptionVedIllegalValue(int illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentException>(() => kontoModelBase.Kontogruppe = illegalValue);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Kontogruppe opdaterer kontogruppen.
+        /// </summary>
+        [Test]
+        public void TestAtKontogruppeSetterOpdatererKontogruppe()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var newValue = fixture.Create<int>();
+            Assert.That(kontoModelBase.Kontogruppe, Is.Not.EqualTo(newValue));
+
+            kontoModelBase.Kontogruppe = newValue;
+            Assert.That(kontoModelBase.Kontogruppe, Is.EqualTo(newValue));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Kontogruppe rejser PropertyChanged ved opdatering af kontogruppen.
+        /// </summary>
+        [Test]
+        [TestCase("Kontogruppe")]
+        public void TestAtKontogruppeSetterRejserPropertyChangedVedOpdateringAfKontogruppe(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var eventCalled = false;
+            kontoModelBase.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, propertyNameToRaise, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.Kontogruppe = kontoModelBase.Kontogruppe;
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.Kontogruppe = fixture.Create<int>();
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til StatusDato opdaterer statusdatoen.
+        /// </summary>
+        [Test]
+        public void TestAtStatusDatoSetterOpdatererStatusDato()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var newValue = kontoModelBase.StatusDato.AddDays(7);
+            Assert.That(kontoModelBase.StatusDato, Is.Not.EqualTo(newValue));
+
+            kontoModelBase.StatusDato = newValue;
+            Assert.That(kontoModelBase.StatusDato, Is.EqualTo(newValue));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til StatusDato rejser PropertyChanged ved opdatering af statusdatoen.
+        /// </summary>
+        [Test]
+        [TestCase("StatusDato")]
+        public void TestAtStatusDatoSetterRejserPropertyChangedVedOpdateringAfStatusDato(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var kontoModelBase = new MyKontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>());
+            Assert.That(kontoModelBase, Is.Not.Null);
+
+            var eventCalled = false;
+            kontoModelBase.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, propertyNameToRaise, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.StatusDato = kontoModelBase.StatusDato;
+            Assert.That(eventCalled, Is.False);
+            kontoModelBase.StatusDato = kontoModelBase.StatusDato.AddDays(7);
+            Assert.That(eventCalled, Is.True);
+        }
     }
 }
