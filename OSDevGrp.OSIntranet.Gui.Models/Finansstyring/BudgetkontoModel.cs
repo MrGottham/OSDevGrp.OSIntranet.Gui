@@ -1,5 +1,6 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Resources;
 
 namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
 {
@@ -57,7 +58,18 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                if (value < 0M)
+                {
+                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", value), "value");
+                }
+                if (_indtægter == value)
+                {
+                    return;
+                }
+                _indtægter = value;
+                RaisePropertyChanged("Indtægter");
+                RaisePropertyChanged("Budget");
+                RaisePropertyChanged("Disponibel");
             }
         }
 
@@ -72,7 +84,18 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                if (value < 0M)
+                {
+                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", value), "value");
+                }
+                if (_udgifter == value)
+                {
+                    return;
+                }
+                _udgifter = value;
+                RaisePropertyChanged("Udgifter");
+                RaisePropertyChanged("Budget");
+                RaisePropertyChanged("Disponibel");
             }
         }
 
@@ -98,7 +121,13 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                if (_bogført == value)
+                {
+                    return;
+                }
+                _bogført = value;
+                RaisePropertyChanged("Bogført");
+                RaisePropertyChanged("Disponibel");
             }
         }
 
@@ -109,7 +138,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                if (Budget < 0M)
+                if (Budget <= 0M)
                 {
                     return Math.Abs(Budget) - Math.Abs(Bogført);
                 }
