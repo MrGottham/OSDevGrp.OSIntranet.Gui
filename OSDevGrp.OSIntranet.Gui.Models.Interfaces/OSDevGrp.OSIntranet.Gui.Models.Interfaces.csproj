@@ -44,10 +44,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Core\INyhedModel.cs" />
+    <Compile Include="Core\ITabelModelBase.cs" />
     <Compile Include="Core\Nyhedsaktualitet.cs" />
+    <Compile Include="Finansstyring\Balancetype.cs" />
     <Compile Include="Finansstyring\IAdressekontoModel.cs" />
     <Compile Include="Finansstyring\IBogføringslinjeModel.cs" />
     <Compile Include="Finansstyring\IBudgetkontoModel.cs" />
+    <Compile Include="Finansstyring\IKontogruppeModel.cs" />
+    <Compile Include="Finansstyring\IKontogruppeModelBase.cs" />
     <Compile Include="Finansstyring\IKontoModel.cs" />
     <Compile Include="Finansstyring\IKontoModelBase.cs" />
     <Compile Include="Finansstyring\IRegnskabModel.cs" />

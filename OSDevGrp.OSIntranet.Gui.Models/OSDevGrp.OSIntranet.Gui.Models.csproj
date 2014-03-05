@@ -43,9 +43,12 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Core\TabelModelBase.cs" />
     <Compile Include="Finansstyring\AdressekontoModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeModel.cs" />
     <Compile Include="Finansstyring\BudgetkontoModel.cs" />
+    <Compile Include="Finansstyring\KontogruppeModel.cs" />
+    <Compile Include="Finansstyring\KontogruppeModelBase.cs" />
     <Compile Include="Finansstyring\KontoModel.cs" />
     <Compile Include="Finansstyring\KontoModelBase.cs" />
     <Compile Include="Finansstyring\RegnskabModel.cs" />
