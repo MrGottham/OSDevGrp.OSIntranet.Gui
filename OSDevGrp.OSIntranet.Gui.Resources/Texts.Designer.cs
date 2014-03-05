@@ -61,11 +61,29 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account.
+        /// </summary>
+        internal static string Account {
+            get {
+                return ResourceManager.GetString("Account", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Accountings.
         /// </summary>
         internal static string Accountings {
             get {
                 return ResourceManager.GetString("Accountings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Annex.
+        /// </summary>
+        internal static string Annex {
+            get {
+                return ResourceManager.GetString("Annex", resourceCulture);
             }
         }
         
@@ -88,11 +106,29 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Budget account.
+        /// </summary>
+        internal static string BudgetAccount {
+            get {
+                return ResourceManager.GetString("BudgetAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Configuration.
         /// </summary>
         internal static string Configuration {
             get {
                 return ResourceManager.GetString("Configuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Credit.
+        /// </summary>
+        internal static string Credit {
+            get {
+                return ResourceManager.GetString("Credit", resourceCulture);
             }
         }
         
@@ -115,11 +151,29 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date.
+        /// </summary>
+        internal static string Date {
+            get {
+                return ResourceManager.GetString("Date", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number of days when news is current.
         /// </summary>
         internal static string DaysForNews {
             get {
                 return ResourceManager.GetString("DaysForNews", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debit.
+        /// </summary>
+        internal static string Debit {
+            get {
+                return ResourceManager.GetString("Debit", resourceCulture);
             }
         }
         
@@ -205,11 +259,29 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Phone.
+        /// </summary>
+        internal static string Phone {
+            get {
+                return ResourceManager.GetString("Phone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Supporting endpoint for service.
         /// </summary>
         internal static string SupportingServiceUri {
             get {
                 return ResourceManager.GetString("SupportingServiceUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text.
+        /// </summary>
+        internal static string Text {
+            get {
+                return ResourceManager.GetString("Text", resourceCulture);
             }
         }
         
