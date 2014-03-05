@@ -45,11 +45,17 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _kredit;
             }
             set
             {
-                throw new NotImplementedException();
+                if (_kredit == value)
+                {
+                    return;
+                }
+                _kredit = value;
+                RaisePropertyChanged("Kredit");
+                RaisePropertyChanged("Disponibel");
             }
         }
 
@@ -60,11 +66,17 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _saldo;
             }
             set
             {
-                throw new NotImplementedException();
+                if (_saldo == value)
+                {
+                    return;
+                }
+                _saldo = value;
+                RaisePropertyChanged("Saldo");
+                RaisePropertyChanged("Disponibel");
             }
         }
 
@@ -75,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Kredit + Saldo;
             }
         }
 
