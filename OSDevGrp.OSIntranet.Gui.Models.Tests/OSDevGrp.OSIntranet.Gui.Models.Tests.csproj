@@ -62,6 +62,7 @@
     <Compile Include="Core\TabelModelBaseTests.cs" />
     <Compile Include="Finansstyring\AdressekontoModelTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeModelTests.cs" />
+    <Compile Include="Finansstyring\BudgetkontogruppeModelTests.cs" />
     <Compile Include="Finansstyring\BudgetkontoModelTests.cs" />
     <Compile Include="Finansstyring\KontogruppeModelBaseTests.cs" />
     <Compile Include="Finansstyring\KontogruppeModelTests.cs" />
