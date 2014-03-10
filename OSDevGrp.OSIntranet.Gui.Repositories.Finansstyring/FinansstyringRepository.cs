@@ -71,6 +71,34 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Henter kontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil kontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoplanen.</param>
+        /// <returns>Kontoplan.</returns>
+        public virtual Task<IEnumerable<IKontoModel>> KontoplanGetAsync(int regnskabsnummer, DateTime statusDato)
+        {
+            Func<IEnumerable<IKontoModel>> func = () => KontoplanGet(regnskabsnummer, statusDato);
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Henter en given konto i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra kontoen skal hentes.</param>
+        /// <param name="kontonummer">Kontonummer på kontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoen.</param>
+        /// <returns>Konto.</returns>
+        public virtual Task<IKontoModel> KontoGetAsync(int regnskabsnummer, string kontonummer, DateTime statusDato)
+        {
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Henter et givent antal bogføringslinjer til et regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvortil bogføringslinjer skal hentes.</param>
@@ -182,6 +210,89 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "RegnskabslisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter kontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil kontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoplanen.</param>
+        /// <returns>Kontoplan.</returns>
+        private IEnumerable<IKontoModel> KontoplanGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var result = new List<IKontoModel>();
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new KontoplanGetQuery
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            StatusDato = statusDato
+                        };
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.KontoplanGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    foreach (var kontoView in e.Result)
+                                    {
+                                        var kontoModel = new KontoModel(regnskabsnummer, kontoView.Kontonummer, kontoView.Kontonavn, kontoView.Kontogruppe.Nummer, statusDato, kontoView.Saldo, kontoView.Kredit);
+                                        if (string.IsNullOrEmpty(kontoView.Beskrivelse) == false)
+                                        {
+                                            kontoModel.Beskrivelse = kontoView.Beskrivelse;
+                                        }
+                                        if (string.IsNullOrEmpty(kontoView.Notat) == false)
+                                        {
+                                            kontoModel.Notat = kontoView.Notat;
+                                        }
+                                        result.Add(kontoModel);
+                                    }
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.KontoplanGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch
+                {
+                    client.Abort();
+                    throw;
+                }
+                return result;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
             }
         }
 

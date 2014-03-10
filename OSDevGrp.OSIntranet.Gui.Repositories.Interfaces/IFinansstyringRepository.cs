@@ -25,6 +25,23 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         Task<IEnumerable<IRegnskabModel>> RegnskabslisteGetAsync();
 
         /// <summary>
+        /// Henter kontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil kontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoplanen.</param>
+        /// <returns>Kontoplan.</returns>
+        Task<IEnumerable<IKontoModel>> KontoplanGetAsync(int regnskabsnummer, DateTime statusDato);
+
+        /// <summary>
+        /// Henter en given konto i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra kontoen skal hentes.</param>
+        /// <param name="kontonummer">Kontonummer på kontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoen.</param>
+        /// <returns>Konto.</returns>
+        Task<IKontoModel> KontoGetAsync(int regnskabsnummer, string kontonummer, DateTime statusDato);
+
+        /// <summary>
         /// Henter et givent antal bogføringslinjer til et regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvortil bogføringslinjer skal hentes.</param>
