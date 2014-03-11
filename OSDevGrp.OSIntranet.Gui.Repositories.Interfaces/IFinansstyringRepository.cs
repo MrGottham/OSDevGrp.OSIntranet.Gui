@@ -42,6 +42,23 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         Task<IKontoModel> KontoGetAsync(int regnskabsnummer, string kontonummer, DateTime statusDato);
 
         /// <summary>
+        /// Henter budgetkontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil budgetkontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoplanen.</param>
+        /// <returns>Budgetkontoplan.</returns>
+        Task<IEnumerable<IBudgetkontoModel>> BudgetkontoplanGetAsync(int regnskabsnummer, DateTime statusDato);
+
+        /// <summary>
+        /// Henter en given budgetkonto i et givet regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra budgetkontoen skal hentes.</param>
+        /// <param name="budgetkontonummer">Kontonummer på budgetkontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoen.</param>
+        /// <returns>Budgetkonto.</returns>
+        Task<IBudgetkontoModel> BudgetkontoGetAsync(int regnskabsnummer, string budgetkontonummer, DateTime statusDato);
+
+        /// <summary>
         /// Henter et givent antal bogføringslinjer til et regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvortil bogføringslinjer skal hentes.</param>
@@ -74,5 +91,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <param name="statusDato">Statusdato, hvorpå adressekontoen skal hentes.</param>
         /// <returns>Adressekonto.</returns>
         Task<IAdressekontoModel> AdressekontoGetAsync(int regnskabsnummer, int nummer, DateTime statusDato);
+
+        /// <summary>
+        /// Henter listen af kontogrupper.
+        /// </summary>
+        /// <returns>Kontogrupper.</returns>
+        Task<IEnumerable<IKontogruppeModel>> KontogruppelisteGetAsync();
+
+        /// <summary>
+        /// Henter listen af grupper til budgetkonti.
+        /// </summary>
+        /// <returns>Grupper til budgetkonti.</returns>
+        Task<IEnumerable<IBudgetkontogruppeModel>> BudgetkontogruppelisteGetAsync();
     }
 }

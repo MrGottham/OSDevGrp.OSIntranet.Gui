@@ -95,7 +95,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new ArgumentNullException("kontonummer");
             }
-            throw new NotImplementedException();
+            Func<IKontoModel> func = () => KontoGet(regnskabsnummer, kontonummer, statusDato);
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Henter budgetkontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil budgetkontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoplanen.</param>
+        /// <returns>Budgetkontoplan.</returns>
+        public virtual Task<IEnumerable<IBudgetkontoModel>> BudgetkontoplanGetAsync(int regnskabsnummer, DateTime statusDato)
+        {
+            Func<IEnumerable<IBudgetkontoModel>> func = () => BudgetkontoplanGet(regnskabsnummer, statusDato);
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Henter en given budgetkonto i et givet regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra budgetkontoen skal hentes.</param>
+        /// <param name="budgetkontonummer">Kontonummer på budgetkontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoen.</param>
+        /// <returns>Budgetkonto.</returns>
+        public virtual Task<IBudgetkontoModel> BudgetkontoGetAsync(int regnskabsnummer, string budgetkontonummer, DateTime statusDato)
+        {
+            if (string.IsNullOrEmpty(budgetkontonummer))
+            {
+                throw new ArgumentNullException("budgetkontonummer");
+            }
+            Func<IBudgetkontoModel> func = () => BudgetkontoGet(regnskabsnummer, budgetkontonummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -145,6 +175,26 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         public virtual Task<IAdressekontoModel> AdressekontoGetAsync(int regnskabsnummer, int nummer, DateTime statusDato)
         {
             Func<IAdressekontoModel> func = () => AdressekontoGet(regnskabsnummer, nummer, statusDato);
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Henter listen af kontogrupper.
+        /// </summary>
+        /// <returns>Kontogrupper.</returns>
+        public virtual Task<IEnumerable<IKontogruppeModel>> KontogruppelisteGetAsync()
+        {
+            Func<IEnumerable<IKontogruppeModel>> func = KontogruppelisteGet;
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Henter listen af grupper til budgetkonti.
+        /// </summary>
+        /// <returns>Grupper til budgetkonti.</returns>
+        public virtual Task<IEnumerable<IBudgetkontogruppeModel>> BudgetkontogruppelisteGetAsync()
+        {
+            Func<IEnumerable<IBudgetkontogruppeModel>> func = BudgetkontogruppelisteGet;
             return Task.Run(func);
         }
 
@@ -249,16 +299,25 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                                     }
                                     foreach (var kontoView in e.Result)
                                     {
-                                        var kontoModel = new KontoModel(regnskabsnummer, kontoView.Kontonummer, kontoView.Kontonavn, kontoView.Kontogruppe.Nummer, statusDato, kontoView.Saldo, kontoView.Kredit);
-                                        if (string.IsNullOrEmpty(kontoView.Beskrivelse) == false)
+                                        try
                                         {
-                                            kontoModel.Beskrivelse = kontoView.Beskrivelse;
+                                            var kontoModel = new KontoModel(regnskabsnummer, kontoView.Kontonummer, kontoView.Kontonavn, kontoView.Kontogruppe.Nummer, statusDato, kontoView.Saldo, kontoView.Kredit);
+                                            if (string.IsNullOrEmpty(kontoView.Beskrivelse) == false)
+                                            {
+                                                kontoModel.Beskrivelse = kontoView.Beskrivelse;
+                                            }
+                                            if (string.IsNullOrEmpty(kontoView.Notat) == false)
+                                            {
+                                                kontoModel.Notat = kontoView.Notat;
+                                            }
+                                            result.Add(kontoModel);
                                         }
-                                        if (string.IsNullOrEmpty(kontoView.Notat) == false)
+                                        catch (ArgumentNullException)
                                         {
-                                            kontoModel.Notat = kontoView.Notat;
                                         }
-                                        result.Add(kontoModel);
+                                        catch (ArgumentException)
+                                        {
+                                        }
                                     }
                                 }
                                 finally
@@ -293,6 +352,268 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en given konto i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra kontoen skal hentes.</param>
+        /// <param name="kontonummer">Kontonummer på kontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoen.</param>
+        /// <returns>Konto.</returns>
+        private IKontoModel KontoGet(int regnskabsnummer, string kontonummer, DateTime statusDato)
+        {
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            try
+            {
+                IKontoModel kontoModel = null;
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new KontoGetQuery
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            Kontonummer = kontonummer,
+                            StatusDato = statusDato
+                        };
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.KontoGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    kontoModel = new KontoModel(regnskabsnummer, e.Result.Kontonummer, e.Result.Kontonavn, e.Result.Kontogruppe.Nummer, statusDato, e.Result.Saldo, e.Result.Kredit);
+                                    if (string.IsNullOrEmpty(e.Result.Beskrivelse) == false)
+                                    {
+                                        kontoModel.Beskrivelse = e.Result.Beskrivelse;
+                                    }
+                                    if (string.IsNullOrEmpty(e.Result.Notat) == false)
+                                    {
+                                        kontoModel.Notat = e.Result.Notat;
+                                    }
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.KontoGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch
+                {
+                    client.Abort();
+                    throw;
+                }
+                return kontoModel;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter budgetkontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil budgetkontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoplanen.</param>
+        /// <returns>Budgetkontoplan.</returns>
+        private IEnumerable<IBudgetkontoModel> BudgetkontoplanGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var result = new List<IBudgetkontoModel>();
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new BudgetkontoplanGetQuery
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            StatusDato = statusDato
+                        };
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.BudgetkontoplanGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    foreach (var budgetkontoView in e.Result)
+                                    {
+                                        try
+                                        {
+                                            var budgetkontoModel = new BudgetkontoModel(regnskabsnummer, budgetkontoView.Kontonummer, budgetkontoView.Kontonavn, budgetkontoView.Budgetkontogruppe.Nummer, statusDato, budgetkontoView.Budget, budgetkontoView.Bogført);
+                                            if (string.IsNullOrEmpty(budgetkontoView.Beskrivelse) == false)
+                                            {
+                                                budgetkontoModel.Beskrivelse = budgetkontoView.Beskrivelse;
+                                            }
+                                            if (string.IsNullOrEmpty(budgetkontoView.Notat) == false)
+                                            {
+                                                budgetkontoModel.Notat = budgetkontoView.Notat;
+                                            }
+                                            result.Add(budgetkontoModel);
+                                        }
+                                        catch (ArgumentNullException)
+                                        {
+                                        }
+                                        catch (ArgumentException)
+                                        {
+                                        }
+                                    }
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.BudgetkontoplanGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return result;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en given budgetkonto i et givet regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra budgetkontoen skal hentes.</param>
+        /// <param name="budgetkontonummer">Kontonummer på budgetkontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoen.</param>
+        /// <returns>Budgetkonto.</returns>
+        private IBudgetkontoModel BudgetkontoGet(int regnskabsnummer, string budgetkontonummer, DateTime statusDato)
+        {
+            if (string.IsNullOrEmpty(budgetkontonummer))
+            {
+                throw new ArgumentNullException("budgetkontonummer");
+            }
+            try
+            {
+                IBudgetkontoModel budgetkontoModel = null;
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new BudgetkontoGetQuery
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            Kontonummer = budgetkontonummer,
+                            StatusDato = statusDato
+                        };
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.BudgetkontoGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    budgetkontoModel = new BudgetkontoModel(regnskabsnummer, e.Result.Kontonummer, e.Result.Kontonavn, e.Result.Budgetkontogruppe.Nummer, statusDato, e.Result.Budget, e.Result.Bogført);
+                                    if (string.IsNullOrEmpty(e.Result.Beskrivelse) == false)
+                                    {
+                                        budgetkontoModel.Beskrivelse = e.Result.Beskrivelse;
+                                    }
+                                    if (string.IsNullOrEmpty(e.Result.Notat) == false)
+                                    {
+                                        budgetkontoModel.Notat = e.Result.Notat;
+                                    }
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.BudgetkontoGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return budgetkontoModel;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoGet", ex.Message), ex);
             }
         }
 
@@ -673,6 +994,136 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontoGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af kontogrupper.
+        /// </summary>
+        /// <returns>Kontogrupper.</returns>
+        private IEnumerable<IKontogruppeModel> KontogruppelisteGet()
+        {
+            try
+            {
+                var kontogrupper = new List<IKontogruppeModel>();
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new KontogrupperGetQuery();
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.KontogrupperGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    kontogrupper.AddRange(e.Result.Select(m => new KontogruppeModel(m.Nummer, m.Navn, m.ErAktiver ? Balancetype.Aktiver : Balancetype.Passiver)));
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.KontogrupperGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return kontogrupper;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af grupper til budgetkonti.
+        /// </summary>
+        /// <returns>Grupper til budgetkonti.</returns>
+        private IEnumerable<IBudgetkontogruppeModel> BudgetkontogruppelisteGet()
+        {
+            try
+            {
+                var budgetkontogrupper = new List<IBudgetkontogruppeModel>();
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new BudgetkontogrupperGetQuery();
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        Exception error = null;
+                        client.BudgetkontogrupperGetCompleted += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.Error != null)
+                                    {
+                                        error = e.Error;
+                                        return;
+                                    }
+                                    budgetkontogrupper.AddRange(e.Result.Select(m => new BudgetkontogruppeModel(m.Nummer, m.Navn)));
+                                }
+                                finally
+                                {
+                                    we.Set();
+                                }
+                            };
+                        client.BudgetkontogrupperGetAsync(query);
+                        waitEvent.WaitOne();
+                        if (error != null)
+                        {
+                            throw error;
+                        }
+                    }
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return budgetkontogrupper;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontogruppelisteGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontogruppelisteGet", ex.Message), ex);
             }
         }
 

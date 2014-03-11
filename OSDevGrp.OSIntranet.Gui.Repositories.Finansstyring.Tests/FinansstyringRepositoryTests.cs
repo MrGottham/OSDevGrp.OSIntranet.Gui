@@ -85,12 +85,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
-        /// Tester, at KontoGet kaster en ArgumentNullException ved illegale kontonumre.
+        /// Tester, at KontoGetAsync kaster en ArgumentNullException ved illegale kontonumre.
         /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestAtKontoGetKasterArgumentNullExceptionVedIllegalKontonummer(string illegalKontonummer)
+        public void TestAtKontoGetAsyncKasterArgumentNullExceptionVedIllegalKontonummer(string illegalKontonummer)
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
 
@@ -105,6 +105,102 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.InnerException, Is.Null);
 
             finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at KontoGetAsync henter en given konto.
+        /// </summary>
+        [Test]
+        public async void TestAtKontoGetAsyncHenterKonto()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var statusDato = DateTime.Now;
+            var konto = await finansstyringRepository.KontoGetAsync(1, "DANKORT", statusDato);
+            Assert.That(konto, Is.Not.Null);
+            Assert.That(konto.Regnskabsnummer, Is.EqualTo(1));
+            Assert.That(konto.Kontonummer, Is.Not.Null);
+            Assert.That(konto.Kontonummer, Is.Not.Empty);
+            Assert.That(konto.Kontonummer, Is.EqualTo("DANKORT"));
+            Assert.That(konto.StatusDato, Is.EqualTo(statusDato));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoplanGetAsync henter budgetkontoplanen til et regnskab.
+        /// </summary>
+        [Test]
+        public async void TestAtBudgetkontoplanGetAsyncHenterBudgetkontoplan()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var budgetkontoplan = await finansstyringRepository.BudgetkontoplanGetAsync(1, DateTime.Now);
+            Assert.That(budgetkontoplan, Is.Not.Null);
+            Assert.That(budgetkontoplan, Is.Not.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGetAsync kaster en ArgumentNullException ved illegale kontonumre.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void TestAtBudgetkontoGetAsyncKasterArgumentNullExceptionVedIllegalKontonummer(string illegalKontonummer)
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepository.BudgetkontoGetAsync(1, illegalKontonummer, DateTime.Now));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("budgetkontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGetAsync henter en given budgetkonto.
+        /// </summary>
+        [Test]
+        public async void TestAtBudgetkontoGetAsyncHenterBudgetkonto()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var statusDato = DateTime.Now;
+            var budgetkonto = await finansstyringRepository.BudgetkontoGetAsync(1, "3000", statusDato);
+            Assert.That(budgetkonto, Is.Not.Null);
+            Assert.That(budgetkonto.Regnskabsnummer, Is.EqualTo(1));
+            Assert.That(budgetkonto.Kontonummer, Is.Not.Null);
+            Assert.That(budgetkonto.Kontonummer, Is.Not.Empty);
+            Assert.That(budgetkonto.Kontonummer, Is.EqualTo("3000"));
+            Assert.That(budgetkonto.StatusDato, Is.EqualTo(statusDato));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
 
         /// <summary>
@@ -185,8 +281,54 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var adressekonto = await finansstyringRepository.AdressekontoGetAsync(1, 1, DateTime.Now);
+            var statusDato = DateTime.Now;
+            var adressekonto = await finansstyringRepository.AdressekontoGetAsync(1, 1, statusDato);
             Assert.That(adressekonto, Is.Not.Null);
+            Assert.That(adressekonto.Regnskabsnummer, Is.EqualTo(1));
+            Assert.That(adressekonto.Nummer, Is.EqualTo(1));
+            Assert.That(adressekonto.StatusDato, Is.EqualTo(statusDato));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at KontogruppelisteGetAsync henter listen af kontogrupper.
+        /// </summary>
+        [Test]
+        public async void TestAtKontogruppelisteGetAsyncHenterKontogrupper()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var kontogrupper = await finansstyringRepository.KontogruppelisteGetAsync();
+            Assert.That(kontogrupper, Is.Not.Null);
+            Assert.That(kontogrupper, Is.Not.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontogruppelisteGetAsync henter liste af grupper til budgetkonti.
+        /// </summary>
+        [Test]
+        public async void TestAtBudgetkontogruppelisteGetAsyncHenterBudgetkontogrupper()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var budgetkontogrupper = await finansstyringRepository.BudgetkontogruppelisteGetAsync();
+            Assert.That(budgetkontogrupper, Is.Not.Null);
+            Assert.That(budgetkontogrupper, Is.Not.Empty);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
