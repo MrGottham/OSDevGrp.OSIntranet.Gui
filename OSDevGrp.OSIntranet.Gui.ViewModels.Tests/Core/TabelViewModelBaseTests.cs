@@ -132,5 +132,55 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             Assert.That(exception.ParamName, Is.EqualTo("exceptionHandlerViewModel"));
             Assert.That(exception.InnerException, Is.Null);
         }
+
+        /// <summary>
+        /// Tester, at sætteren til Tekst opdaterer Tekst på modellen, der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m.
+        /// </summary>
+        [Test]
+        public void TestAtTekstSetterOpdatererTekstOnTabelModelBase()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var tabelModelMock = fixture.Create<ITabelModelBase>();
+            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock);
+            Assert.That(tabelViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<string>();
+            tabelViewModel.Tekst = newValue;
+
+            tabelModelMock.AssertWasCalled(m => m.Tekst = Arg<string>.Is.Equal(newValue));
+            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Tekst kalder HandleException på exceptionhandleren ved exceptions.
+        /// </summary>
+        [Test]
+        public void TestAtTekstSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var exception = fixture.Create<Exception>();
+            var tabelModelMock = MockRepository.GenerateMock<ITabelModelBase>();
+            tabelModelMock.Expect(m => m.Tekst = Arg<string>.Is.Anything)
+                          .Throw(exception)
+                          .Repeat.Any();
+
+            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock);
+            Assert.That(tabelViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<string>();
+            tabelViewModel.Tekst = newValue;
+
+            tabelModelMock.AssertWasCalled(m => m.Tekst = Arg<string>.Is.Equal(newValue));
+            exceptionHandleViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
     }
 }

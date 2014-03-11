@@ -64,7 +64,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Tekst = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
