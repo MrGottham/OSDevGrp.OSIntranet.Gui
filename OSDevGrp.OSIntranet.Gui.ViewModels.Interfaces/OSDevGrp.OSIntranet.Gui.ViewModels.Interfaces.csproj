@@ -47,6 +47,7 @@
     <Compile Include="Core\IExceptionHandlerViewModel.cs" />
     <Compile Include="Core\IExceptionViewModel.cs" />
     <Compile Include="Core\INyhedViewModel.cs" />
+    <Compile Include="Core\ITabelViewModelBase.cs" />
     <Compile Include="Finansstyring\IAdressekontoViewModel.cs" />
     <Compile Include="Finansstyring\IBogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\IFinansstyringKonfigurationViewModel.cs" />
