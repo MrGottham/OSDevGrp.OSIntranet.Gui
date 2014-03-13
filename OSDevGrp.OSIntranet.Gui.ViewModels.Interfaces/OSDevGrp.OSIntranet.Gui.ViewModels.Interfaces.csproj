@@ -51,6 +51,8 @@
     <Compile Include="Finansstyring\IAdressekontoViewModel.cs" />
     <Compile Include="Finansstyring\IBogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\IFinansstyringKonfigurationViewModel.cs" />
+    <Compile Include="Finansstyring\IKontogruppeViewModel.cs" />
+    <Compile Include="Finansstyring\IKontogruppeViewModelBase.cs" />
     <Compile Include="Finansstyring\IReadOnlyBogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\IRegnskabViewModel.cs" />

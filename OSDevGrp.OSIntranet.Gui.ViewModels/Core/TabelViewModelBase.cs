@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 
@@ -35,6 +36,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
                 throw new ArgumentNullException("exceptionHandlerViewModel");
             }
             _tabelModel = tabelModel;
+            _tabelModel.PropertyChanged += PropertyChangedOnTabelModelEventHandler;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
         }
 
@@ -108,6 +110,54 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
             }
         }
 
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Metode, der kaldes, når en property på modellen, , der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m., ændres.
+        /// </summary>
+        /// <param name="propertyName">Navn på propertyen, der er blevet ændret.</param>
+        protected virtual void ModelChanged(string propertyName)
+        {
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på modellen, der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnTabelModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Tekst":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("DisplayName");
+                    break;
+
+                default:
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    break;
+            }
+            try
+            {
+                ModelChanged(eventArgs.PropertyName);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
+        }
+        
         #endregion
     }
 }
