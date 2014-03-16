@@ -35,6 +35,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>();
 
         private static ObservableCollection<string> _bogføringslinjeColumns;
+        private static readonly ObservableCollection<IKontogruppeViewModel> KontogruppeViewModels = new ObservableCollection<IKontogruppeViewModel>();
+        private static readonly ObservableCollection<IBudgetkontogruppeViewModel> BudgetkontogruppeViewModels = new ObservableCollection<IBudgetkontogruppeViewModel>(); 
         private static readonly object SyncRoot = new object();
 
         #endregion
@@ -251,7 +253,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                lock (SyncRoot)
+                {
+                    return KontogruppeViewModels.OrderBy(m => m.Nummer);
+                }
             }
         }
 
@@ -262,7 +267,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                lock (SyncRoot)
+                {
+                    return BudgetkontogruppeViewModels.OrderBy(m => m.Nummer);
+                }
             }
         }
 
@@ -337,7 +345,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tilføjer en nyhed til regnskabet.
         /// </summary>
-        /// <param name="nyhedViewModel">ViewModel for nyheden, er skal tilføjes regnskabet.</param>
+        /// <param name="nyhedViewModel">ViewModel for nyheden, der skal tilføjes regnskabet.</param>
         public virtual void NyhedAdd(INyhedViewModel nyhedViewModel)
         {
             if (nyhedViewModel == null)
@@ -346,6 +354,32 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             nyhedViewModel.PropertyChanged += PropertyChangedOnNyhedViewModelEventHandler;
             _nyhedViewModels.Add(nyhedViewModel);
+        }
+
+        /// <summary>
+        /// Tilføjer en kontogruppe til regnskabet.
+        /// </summary>
+        /// <param name="kontogruppeViewModel">ViewModel for kontogruppen, der skal tilføjes.</param>
+        public virtual void KontogruppeAdd(IKontogruppeViewModel kontogruppeViewModel)
+        {
+            if (kontogruppeViewModel == null)
+            {
+                throw new ArgumentNullException("kontogruppeViewModel");
+            }
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Tilføjer en kontogruppe for budgetkonti til regnskabet.
+        /// </summary>
+        /// <param name="budgetkontogruppeViewModel">ViewModel for budgetkontogruppen, der skal tilføjes.</param>
+        public virtual void BudgetkontogruppeAdd(IBudgetkontogruppeViewModel budgetkontogruppeViewModel)
+        {
+            if (budgetkontogruppeViewModel == null)
+            {
+                throw new ArgumentNullException("budgetkontogruppeViewModel");
+            }
+            throw new NotImplementedException();
         }
 
         /// <summary>

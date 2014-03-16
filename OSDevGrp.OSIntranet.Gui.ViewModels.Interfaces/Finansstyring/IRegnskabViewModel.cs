@@ -144,7 +144,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// <summary>
         /// Tilføjer en nyhed til regnskabet.
         /// </summary>
-        /// <param name="nyhedViewModel">ViewModel for nyheden, er skal tilføjes regnskabet.</param>
+        /// <param name="nyhedViewModel">ViewModel for nyheden, der skal tilføjes regnskabet.</param>
         void NyhedAdd(INyhedViewModel nyhedViewModel);
+
+        /// <summary>
+        /// Tilføjer en kontogruppe til regnskabet.
+        /// </summary>
+        /// <param name="kontogruppeViewModel">ViewModel for kontogruppen, der skal tilføjes.</param>
+        void KontogruppeAdd(IKontogruppeViewModel kontogruppeViewModel);
+
+        /// <summary>
+        /// Tilføjer en kontogruppe for budgetkonti til regnskabet.
+        /// </summary>
+        /// <param name="budgetkontogruppeViewModel">ViewModel for budgetkontogruppen, der skal tilføjes.</param>
+        void BudgetkontogruppeAdd(IBudgetkontogruppeViewModel budgetkontogruppeViewModel);
     }
 }
