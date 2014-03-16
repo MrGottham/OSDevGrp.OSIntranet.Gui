@@ -1,13 +1,14 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 {
     /// <summary>
     /// ViewModel til en kontogruppe.
     /// </summary>
-    public class KontogruppeViewModel : KontogruppeViewModelBase<IKontogruppeModel>, IKontogruppeModel
+    public class KontogruppeViewModel : KontogruppeViewModelBase<IKontogruppeModel>, IKontogruppeViewModel
     {
         #region Constructor
 

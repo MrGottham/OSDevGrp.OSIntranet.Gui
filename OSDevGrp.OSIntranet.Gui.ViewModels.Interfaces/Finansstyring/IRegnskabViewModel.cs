@@ -108,6 +108,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Kontogrupper.
+        /// </summary>
+        IEnumerable<IKontogruppeViewModel> Kontogrupper
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kontogrupper til budgetkonti.
+        /// </summary>
+        IEnumerable<IBudgetkontogruppeViewModel> Budgetkontogrupper
+        {
+            get;
+        }
+
+        /// <summary>
         /// Tilføjer en bogføringslinje til regnskabet.
         /// </summary>
         /// <param name="bogføringslinjeViewModel">ViewModel for bogføringslinjen, der skal tilføjes regnskabet.</param>

@@ -245,6 +245,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Kontogrupper.
+        /// </summary>
+        public virtual IEnumerable<IKontogruppeViewModel> Kontogrupper
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Kontogrupper til budgetkonti.
+        /// </summary>
+        public virtual IEnumerable<IBudgetkontogruppeViewModel> Budgetkontogrupper
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Kommando til genindlæsning og opdatering.
         /// </summary>
         public virtual ICommand RefreshCommand

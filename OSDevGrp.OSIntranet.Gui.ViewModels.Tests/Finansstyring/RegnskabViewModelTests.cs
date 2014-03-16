@@ -100,6 +100,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.NyhederHeader, Is.Not.Null);
             Assert.That(regnskabViewModel.NyhederHeader, Is.Not.Empty);
             Assert.That(regnskabViewModel.NyhederHeader, Is.EqualTo(Resource.GetText(Text.NewsMultiple)));
+            Assert.That(regnskabViewModel.Kontogrupper, Is.Not.Null);
+            Assert.That(regnskabViewModel.Kontogrupper, Is.Empty);
+            Assert.That(regnskabViewModel.Budgetkontogrupper, Is.Not.Null);
+            Assert.That(regnskabViewModel.Budgetkontogrupper, Is.Empty);
             Assert.That(regnskabViewModel.RefreshCommand, Is.Not.Null);
             Assert.That(regnskabViewModel.RefreshCommand, Is.TypeOf<CommandCollectionExecuterCommand>());
         }

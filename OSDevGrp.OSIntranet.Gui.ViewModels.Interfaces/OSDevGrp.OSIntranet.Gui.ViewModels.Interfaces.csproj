@@ -50,6 +50,7 @@
     <Compile Include="Core\ITabelViewModelBase.cs" />
     <Compile Include="Finansstyring\IAdressekontoViewModel.cs" />
     <Compile Include="Finansstyring\IBogføringslinjeViewModel.cs" />
+    <Compile Include="Finansstyring\IBudgetkontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\IFinansstyringKonfigurationViewModel.cs" />
     <Compile Include="Finansstyring\IKontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\IKontogruppeViewModelBase.cs" />

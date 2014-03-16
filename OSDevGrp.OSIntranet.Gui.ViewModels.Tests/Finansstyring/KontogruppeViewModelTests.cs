@@ -61,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
-        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis modellen, , der indeholder de grundlæggende oplysninger for en kontogruppe, er null.
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis modellen for kontogruppen, er null.
         /// </summary>
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisKontogruppeModelErNull()
@@ -145,7 +145,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
-        /// Tester, at PropertyChangedOnTabelModelEventHandler rejser PropertyChanged, når modellen, der indeholder de grundlæggende oplysninger for en kontogruppe, opdateres.
+        /// Tester, at PropertyChangedOnTabelModelEventHandler rejser PropertyChanged, når modellen for kontogruppen opdateres.
         /// </summary>
         [Test]
         [TestCase("Id", "Id")]
