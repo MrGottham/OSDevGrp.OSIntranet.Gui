@@ -69,6 +69,7 @@
     <Compile Include="Finansstyring\FinansstyringKonfigurationViewModel.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModelBase.cs" />
+    <Compile Include="Finansstyring\KontoViewModelBase.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\RegnskabViewModel.cs" />
     <Compile Include="MainViewModel.cs" />

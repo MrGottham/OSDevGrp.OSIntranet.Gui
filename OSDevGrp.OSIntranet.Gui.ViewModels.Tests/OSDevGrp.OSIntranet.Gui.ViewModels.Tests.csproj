@@ -80,6 +80,7 @@
     <Compile Include="Finansstyring\FinansstyringKonfigurationViewModelTests.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModelBaseTests.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModelTests.cs" />
+    <Compile Include="Finansstyring\KontoViewModelBaseTests.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabViewModelTests.cs" />
     <Compile Include="MainViewModelTests.cs" />

@@ -73,6 +73,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _debitorerViewModels.CollectionChanged += CollectionChangedOnDebitorViewModelsEventHandler;
             _kreditorerViewModels.CollectionChanged += CollectionChangedOnKreditorerViewModelsEventHandler;
             _nyhedViewModels.CollectionChanged += CollectionChangedOnNyhedViewModelsEventHandler;
+            KontogruppeViewModels.CollectionChanged += CollectionChangedOnKontogruppeViewModelsEventHandler;
+            BudgetkontogruppeViewModels.CollectionChanged += CollectionChangedOnBudgetkontoViewModelsEventHandler;
         }
         
         #endregion
@@ -366,7 +368,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("kontogruppeViewModel");
             }
-            throw new NotImplementedException();
+            lock (SyncRoot)
+            {
+                if (KontogruppeViewModels.Any(m => m.Nummer == kontogruppeViewModel.Nummer))
+                {
+                    return;
+                }
+                kontogruppeViewModel.PropertyChanged += PropertyChangedOnKontogruppeViewModelEventHandler;
+                KontogruppeViewModels.Add(kontogruppeViewModel);
+            }
         }
 
         /// <summary>
@@ -379,7 +389,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("budgetkontogruppeViewModel");
             }
-            throw new NotImplementedException();
+            lock (SyncRoot)
+            {
+                if (BudgetkontogruppeViewModels.Any(m => m.Nummer == budgetkontogruppeViewModel.Nummer))
+                {
+                    return;
+                }
+                budgetkontogruppeViewModel.PropertyChanged += PropertyChangedOnBudgetkontogruppeViewModelEventHandler;
+                BudgetkontogruppeViewModels.Add(budgetkontogruppeViewModel);
+            }
         }
 
         /// <summary>
@@ -479,6 +497,40 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en kontogruppe.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private static void PropertyChangedOnKontogruppeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en kontogruppe til budgetkonti.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private static void PropertyChangedOnBudgetkontogruppeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+        }
+
+        /// <summary>
         /// Eventhandler, der kaldes, når collection af ViewModels for bogføringslinjer ændres.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -566,6 +618,52 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case NotifyCollectionChangedAction.Add:
                     RaisePropertyChanged("Nyheder");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for kontogrupper ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnKontogruppeViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Kontogrupper");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for kontogrupper til budgetkonti ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnBudgetkontoViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Budgetkontogrupper");
                     break;
             }
         }
