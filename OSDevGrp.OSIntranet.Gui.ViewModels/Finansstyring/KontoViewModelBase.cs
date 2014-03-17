@@ -25,11 +25,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="regnskabViewModel">ViewModel for regnskabet, som kontoen er tilknyttet.</param>
         /// <param name="kontoModel">Model indeholdende grundlæggende kontooplysninger.</param>
         /// <param name="kontogruppeViewModel">ViewModel for kontogruppen.</param>
-        /// <param name="finansstyringRepository">Implementering af repositoryet til finansstyring.</param>
-        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel for exceptionhandleren.</param>
         /// <param name="displayName">Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.</param>
         /// <param name="image">Billede, der illustrerer en kontoen.</param>
-        protected KontoViewModelBase(IRegnskabViewModel regnskabViewModel, TKontoModel kontoModel, TKontogruppeViewModel kontogruppeViewModel, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, string displayName, byte[] image)
+        /// <param name="finansstyringRepository">Implementering af repositoryet til finansstyring.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel for exceptionhandleren.</param>
+        protected KontoViewModelBase(IRegnskabViewModel regnskabViewModel, TKontoModel kontoModel, TKontogruppeViewModel kontogruppeViewModel, string displayName, byte[] image, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
         {
         }
 
@@ -157,7 +157,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        ///  Kommando til genindlæsning og opdatering.
+        /// Kommando til genindlæsning og opdatering.
         /// </summary>
         public abstract ICommand RefreshCommand
         {
