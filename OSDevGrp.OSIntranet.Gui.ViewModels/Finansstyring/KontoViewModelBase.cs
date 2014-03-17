@@ -15,6 +15,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     public abstract class KontoViewModelBase<TKontoModel, TKontogruppeViewModel> : ViewModelBase, IKontoViewModelBase<TKontogruppeViewModel> where TKontoModel : IKontoModelBase where TKontogruppeViewModel : IKontogruppeViewModelBase
     {
         #region Private variables
+
+        private readonly IRegnskabViewModel _regnskabViewModel;
+        private readonly TKontoModel _kontoModel;
+        private TKontogruppeViewModel _kontogruppeViewModel;
+        private readonly string _displayName;
+        private readonly byte[] _image;
+        private readonly IFinansstyringRepository _finansstyringRepository;
+        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
+
         #endregion
 
         #region Constructor
@@ -31,6 +40,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="exceptionHandlerViewModel">Implementering af ViewModel for exceptionhandleren.</param>
         protected KontoViewModelBase(IRegnskabViewModel regnskabViewModel, TKontoModel kontoModel, TKontogruppeViewModel kontogruppeViewModel, string displayName, byte[] image, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
         {
+            if (regnskabViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabViewModel");
+            }
+            if (Equals(kontoModel, null))
+            {
+                throw new ArgumentNullException("kontoModel");
+            }
+            if (Equals(kontogruppeViewModel, null))
+            {
+                throw new ArgumentNullException("kontogruppeViewModel");
+            }
+           if (string.IsNullOrEmpty(displayName))
+           {
+               throw new ArgumentNullException("displayName");
+           }
+            if (image == null)
+            {
+                throw new ArgumentNullException("image");
+            }
+            if (finansstyringRepository == null)
+            {
+                throw new ArgumentNullException("finansstyringRepository");
+            }
+            if (exceptionHandlerViewModel == null)
+            {
+                throw new ArgumentNullException("exceptionHandlerViewModel");
+            }
+            _regnskabViewModel = regnskabViewModel;
+            _kontoModel = kontoModel;
+            _kontogruppeViewModel = kontogruppeViewModel;
+            _displayName = displayName;
+            _image = image;
+            _finansstyringRepository = finansstyringRepository;
+            _exceptionHandlerViewModel = exceptionHandlerViewModel;
         }
 
         #endregion
@@ -44,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _regnskabViewModel;
             }
         }
 
@@ -55,7 +99,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Model.Kontonummer;
             }
         }
 
@@ -66,11 +110,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Model.Kontonavn;
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Kontonavn = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -81,11 +132,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Model.Beskrivelse;
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Beskrivelse = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -96,11 +154,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Model.Notat;
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Notat = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -111,11 +176,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _kontogruppeViewModel;
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    if (Equals(value, null))
+                    {
+                        throw new ArgumentNullException("value");
+                    }
+                    if (Equals(_kontogruppeViewModel, value))
+                    {
+                        return;
+                    }
+                    throw new NotImplementedException();
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -126,11 +206,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Model.StatusDato;
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.StatusDato = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -141,7 +228,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _displayName;
             }
         }
 
@@ -152,7 +239,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _image;
             }
         }
 
@@ -171,7 +258,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _kontoModel;
             }
         }
 
@@ -182,7 +269,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _finansstyringRepository;
             }
         }
 
@@ -193,7 +280,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _exceptionHandlerViewModel;
             }
         }
 
