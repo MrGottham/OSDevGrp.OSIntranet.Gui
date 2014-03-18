@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -70,6 +72,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             _regnskabViewModel = regnskabViewModel;
             _kontoModel = kontoModel;
+            _kontoModel.PropertyChanged += PropertyChangedOnKontoModelEventHandler;
             _kontogruppeViewModel = kontogruppeViewModel;
             _displayName = displayName;
             _image = image;
@@ -104,6 +107,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Label til kontonummer.
+        /// </summary>
+        public virtual string KontonummerLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.AccountNumber);
+            }
+        }
+
+        /// <summary>
         /// Kontonavn.
         /// </summary>
         public virtual string Kontonavn
@@ -122,6 +136,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     ExceptionHandler.HandleException(ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Label til kontonavn.
+        /// </summary>
+        public virtual string KontonavnLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.AccountName);
             }
         }
 
@@ -190,7 +215,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     {
                         return;
                     }
-                    throw new NotImplementedException();
+                    Model.Kontogruppe = value.Nummer;
+                    _kontogruppeViewModel = value;
                 }
                 catch (Exception ex)
                 {
@@ -219,6 +245,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     ExceptionHandler.HandleException(ex);
                 }
             }
+        }
+
+        /// <summary>
+        /// Kontoens værdi pr. opgørelsestidspunktet.
+        /// </summary>
+        public abstract decimal Kontoværdi
+        {
+            get;
         }
 
         /// <summary>
@@ -281,6 +315,44 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return _exceptionHandlerViewModel;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Metode, der kaldes, når en property på modellen, der indeholder grundlæggende kontooplysninger, ændres.
+        /// </summary>
+        /// <param name="propertyName">Navn på den ændrede property.</param>
+        protected virtual void ModelChanged(string propertyName)
+        {
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på modellen, der indeholder grundlæggende kontooplysninger.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnKontoModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            RaisePropertyChanged(eventArgs.PropertyName);
+            try
+            {
+                ModelChanged(eventArgs.PropertyName);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
             }
         }
 

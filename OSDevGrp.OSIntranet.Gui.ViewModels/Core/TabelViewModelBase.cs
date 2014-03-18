@@ -115,7 +115,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core
         #region Methods
 
         /// <summary>
-        /// Metode, der kaldes, når en property på modellen, , der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m., ændres.
+        /// Metode, der kaldes, når en property på modellen, der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m., ændres.
         /// </summary>
         /// <param name="propertyName">Navn på propertyen, der er blevet ændret.</param>
         protected virtual void ModelChanged(string propertyName)

@@ -123,6 +123,12 @@
   <data name="Accountings" xml:space="preserve">
     <value>Accountings</value>
   </data>
+  <data name="AccountName" xml:space="preserve">
+    <value>Account name</value>
+  </data>
+  <data name="AccountNumber" xml:space="preserve">
+    <value>Account number</value>
+  </data>
   <data name="Annex" xml:space="preserve">
     <value>Annex</value>
   </data>

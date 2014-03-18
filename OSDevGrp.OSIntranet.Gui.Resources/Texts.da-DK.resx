@@ -123,6 +123,12 @@
   <data name="Accountings" xml:space="preserve">
     <value>Regnskabsliste</value>
   </data>
+  <data name="AccountName" xml:space="preserve">
+    <value>Kontonavn</value>
+  </data>
+  <data name="AccountNumber" xml:space="preserve">
+    <value>Kontonummer</value>
+  </data>
   <data name="Annex" xml:space="preserve">
     <value>Bilag</value>
   </data>

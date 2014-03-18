@@ -25,12 +25,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Label til kontonummer.
+        /// </summary>
+        string KontonummerLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Kontonavn.
         /// </summary>
         string Kontonavn
         {
             get; 
             set;
+        }
+
+        /// <summary>
+        /// Label til kontonavn.
+        /// </summary>
+        string KontonavnLabel
+        {
+            get;
         }
 
         /// <summary>
@@ -67,6 +83,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get; 
             set; 
+        }
+
+        /// <summary>
+        /// Kontoens værdi pr. opgørelsestidspunktet.
+        /// </summary>
+        decimal Kontoværdi
+        {
+            get;
         }
 
         /// <summary>

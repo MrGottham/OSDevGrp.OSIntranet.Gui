@@ -16,7 +16,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Comparers
         /// </summary>
         /// <param name="x">ViewModel for adressekonto.</param>
         /// <param name="y">ViewModel for adressekonto.</param>
-        /// <returns>Sammenligningsresultat</returns>
+        /// <returns>Sammenligningsresultat.</returns>
         public virtual int Compare(IAdressekontoViewModel x, IAdressekontoViewModel y)
         {
             if (x == null)
@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Comparers
             {
                 return result;
             }
-             result = x.Saldo.CompareTo(y.Saldo);
+            result = x.Saldo.CompareTo(y.Saldo);
             return result <= 0 ? Math.Abs(result) : result*-1;
         }
 

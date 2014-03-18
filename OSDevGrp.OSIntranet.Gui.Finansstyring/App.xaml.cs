@@ -40,6 +40,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             InitializeComponent();
             Suspending += OnSuspending;
 
+            // TODO: Refresh.
             // TODO: Search.
         }
 

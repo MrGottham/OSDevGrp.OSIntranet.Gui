@@ -82,7 +82,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             #region Methods
 
             /// <summary>
-            /// Metode, der kaldes, når en property på modellen, , der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m., ændres.
+            /// Metode, der kaldes, når en property på modellen, der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m., ændres.
             /// </summary>
             /// <param name="propertyName">Navn på propertyen, der er blevet ændret.</param>
             protected override void ModelChanged(string propertyName)
@@ -322,7 +322,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             tabelModelMock.Raise(m => m.PropertyChanged += null, tabelModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(tabelViewModel.IsModelChangedCalled, Is.True);
 
-            exceptionHandleViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.Anything));
+            exceptionHandleViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
         }
 
         /// <summary>

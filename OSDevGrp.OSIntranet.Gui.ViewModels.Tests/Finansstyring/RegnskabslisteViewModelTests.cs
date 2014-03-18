@@ -481,8 +481,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler rejser PropertyChanged, når en ViewModel for et regnskab opdateres.
         /// </summary>
         [Test]
-        [Ignore]
-        [TestCase("DisplayName", "Regnskaber")]
+        [TestCase("Nummer", "Regnskaber")]
         public void TestAtPropertyChangedOnRegnskabViewModelEventHandlerRejserPropertyChangedOnRegnskabViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();

@@ -433,7 +433,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private static void PropertyChangedOnBogføringslinjeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        private void PropertyChangedOnBogføringslinjeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
         {
             if (sender == null)
             {
@@ -442,6 +442,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             if (e == null)
             {
                 throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Løbenummer":
+                case "Dato":
+                    RaisePropertyChanged("Bogføringslinjer");
+                    break;
             }
         }
 
@@ -450,7 +457,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private static void PropertyChangedOnAdressekontoViewModelForDebitorEventHandler(object sender, PropertyChangedEventArgs e)
+        private void PropertyChangedOnAdressekontoViewModelForDebitorEventHandler(object sender, PropertyChangedEventArgs e)
         {
             if (sender == null)
             {
@@ -459,6 +466,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             if (e == null)
             {
                 throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Navn":
+                case "StatusDato":
+                case "Saldo":
+                    RaisePropertyChanged("Debitorer");
+                    break;
             }
         }
 
@@ -467,7 +482,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private static void PropertyChangedOnAdressekontoViewModelForKreditorEventHandler(object sender, PropertyChangedEventArgs e)
+        private void PropertyChangedOnAdressekontoViewModelForKreditorEventHandler(object sender, PropertyChangedEventArgs e)
         {
             if (sender == null)
             {
@@ -476,6 +491,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             if (e == null)
             {
                 throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Navn":
+                case "StatusDato":
+                case "Saldo":
+                    RaisePropertyChanged("Kreditorer");
+                    break;
             }
         }
 
@@ -484,7 +507,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private static void PropertyChangedOnNyhedViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        private void PropertyChangedOnNyhedViewModelEventHandler(object sender, PropertyChangedEventArgs e)
         {
             if (sender == null)
             {
@@ -493,6 +516,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             if (e == null)
             {
                 throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Nyhedsudgivelsestidspunkt":
+                case "Nyhedsaktualitet":
+                    RaisePropertyChanged("Nyheder");
+                    break;
             }
         }
 
@@ -501,7 +531,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private static void PropertyChangedOnKontogruppeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        private void PropertyChangedOnKontogruppeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
         {
             if (sender == null)
             {
@@ -510,6 +540,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             if (e == null)
             {
                 throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Nummer":
+                    RaisePropertyChanged("Kontogrupper");
+                    break;
             }
         }
 
@@ -518,7 +554,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private static void PropertyChangedOnBudgetkontogruppeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        private void PropertyChangedOnBudgetkontogruppeViewModelEventHandler(object sender, PropertyChangedEventArgs e)
         {
             if (sender == null)
             {
@@ -527,6 +563,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             if (e == null)
             {
                 throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Nummer":
+                    RaisePropertyChanged("Budgetkontogrupper");
+                    break;
             }
         }
 

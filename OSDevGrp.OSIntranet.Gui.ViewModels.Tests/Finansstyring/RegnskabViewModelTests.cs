@@ -934,8 +934,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnBogføringslinjeViewModelEventHandler rejser PropertyChanged, når ViewModel for en bogføringslinje opdateres.
         /// </summary>
         [Test]
-        [Ignore]
-        [TestCase("DisplayName", "Bogføringslinjer")]
+        [TestCase("Løbenummer", "Bogføringslinjer")]
+        [TestCase("Dato", "Bogføringslinjer")]
         public void TestAtPropertyChangedOnBogføringslinjeViewModelEventHandlerRejserPropertyChangedOnBogføringslinjeViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1027,8 +1027,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnAdressekontoViewModelForDebitorEventHandler rejser PropertyChanged, når ViewModel for adressekontoen til en debitor opdateres.
         /// </summary>
         [Test]
-        [Ignore]
-        [TestCase("DisplayName", "Debitorer")]
+        [TestCase("Navn", "Debitorer")]
+        [TestCase("StatusDato", "Debitorer")]
+        [TestCase("Saldo", "Debitorer")]
         public void TestAtPropertyChangedOnAdressekontoViewModelForDebitorEventHandlerRejserPropertyChangedOnAdressekontoViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1120,8 +1121,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnAdressekontoViewModelForKreditorEventHandler rejser PropertyChanged, når ViewModel for adressekontoen til en kreditor opdateres.
         /// </summary>
         [Test]
-        [Ignore]
-        [TestCase("DisplayName", "Debitorer")]
+        [TestCase("Navn", "Kreditorer")]
+        [TestCase("StatusDato", "Kreditorer")]
+        [TestCase("Saldo", "Kreditorer")]
         public void TestAtPropertyChangedOnAdressekontoViewModelForKreditorEventHandlerRejserPropertyChangedOnAdressekontoViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1213,8 +1215,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnNyhedViewModelEventHandler rejser PropertyChanged, når ViewModel for en nyhed opdateres.
         /// </summary>
         [Test]
-        [Ignore]
-        [TestCase("DisplayName", "Nyheder")]
+        [TestCase("Nyhedsudgivelsestidspunkt", "Nyheder")]
+        [TestCase("Nyhedsaktualitet", "Nyheder")]
         public void TestAtPropertyChangedOnNyhedViewModelEventHandlerRejserPropertyChangedOnNyhedViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1306,8 +1308,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnKontogruppeViewModelEventHandler rejser PropertyChanged, når ViewModel for en kontogruppe opdateres.
         /// </summary>
         [Test]
-        [Ignore]
-        [TestCase(4, "DisplayName", "Kontogrupper")]
+        [TestCase(4, "Nummer", "Kontogrupper")]
         public void TestAtPropertyChangedOnKontogruppeViewModelEventHandlerRejserPropertyChangedOnKontogruppeViewModelUpdate(int nummer, string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1422,8 +1423,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at PropertyChangedOnBudgetkontogruppeViewModelEventHandler rejser PropertyChanged, når ViewModel for en kontogruppe til budgetkonti opdateres.
         /// </summary>
         [Test]
-        [Ignore]
-        [TestCase(4, "DisplayName", "Budgetkontogrupper")]
+        [TestCase(4, "Nummer", "Budgetkontogrupper")]
         public void TestAtPropertyChangedOnBudgetkontogruppeViewModelEventHandlerRejserPropertyChangedOnBudgetkontogruppeViewModelUpdate(int nummer, string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();

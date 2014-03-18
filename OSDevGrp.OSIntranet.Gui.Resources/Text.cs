@@ -30,6 +30,8 @@
         Text,
         BudgetAccount,
         Debit,
-        Credit
+        Credit,
+        AccountNumber,
+        AccountName
     }
 }
