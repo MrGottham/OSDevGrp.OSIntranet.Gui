@@ -43,7 +43,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Kredit = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -80,7 +87,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Saldo = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
