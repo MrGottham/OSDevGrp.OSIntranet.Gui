@@ -203,4 +203,19 @@
     <value>Værdien er ikke i intervallet ({0} - {1}).</value>
     <comment>{0} = Min værdi{1} = Max værdi.</comment>
   </data>
+  <data name="Available" xml:space="preserve">
+    <value>Disponibel</value>
+  </data>
+  <data name="Bookkeeped" xml:space="preserve">
+    <value>Bogført</value>
+  </data>
+  <data name="Budget" xml:space="preserve">
+    <value>Budget</value>
+  </data>
+  <data name="Expenses" xml:space="preserve">
+    <value>Udgifter</value>
+  </data>
+  <data name="Income" xml:space="preserve">
+    <value>Indtægter</value>
+  </data>
 </root>

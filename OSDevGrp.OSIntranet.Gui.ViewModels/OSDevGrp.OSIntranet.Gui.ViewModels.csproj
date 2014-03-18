@@ -59,6 +59,7 @@
     <Compile Include="Finansstyring\AdressekontoViewModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\BudgetkontogruppeViewModel.cs" />
+    <Compile Include="Finansstyring\BudgetkontoViewModel.cs" />
     <Compile Include="Finansstyring\Commands\AdressekontoGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\DebitorlisteGetCommand.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Finansstyring\FinansstyringKonfigurationViewModel.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModelBase.cs" />
+    <Compile Include="Finansstyring\KontoViewModel.cs" />
     <Compile Include="Finansstyring\KontoViewModelBase.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModel.cs" />
     <Compile Include="Finansstyring\RegnskabViewModel.cs" />

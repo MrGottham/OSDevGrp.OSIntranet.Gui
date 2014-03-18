@@ -58,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Comparers
                 result = x.Kontoværdi.CompareTo(y.Kontoværdi);
                 if (result != 0)
                 {
-                    return result;
+                    return result*-1;
                 }
             }
             return string.Compare(x.Kontonummer, y.Kontonummer, StringComparison.CurrentCulture);

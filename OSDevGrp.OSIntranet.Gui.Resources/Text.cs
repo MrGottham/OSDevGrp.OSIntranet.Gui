@@ -32,6 +32,11 @@
         Debit,
         Credit,
         AccountNumber,
-        AccountName
+        AccountName,
+        Available,
+        Income,
+        Expenses,
+        Budget,
+        Bookkeeped
     }
 }

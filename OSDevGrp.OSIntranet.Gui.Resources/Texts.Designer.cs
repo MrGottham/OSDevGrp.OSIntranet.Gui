@@ -106,6 +106,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Available.
+        /// </summary>
+        internal static string Available {
+            get {
+                return ResourceManager.GetString("Available", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Balance.
         /// </summary>
         internal static string Balance {
@@ -115,11 +124,29 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bookkeeped.
+        /// </summary>
+        internal static string Bookkeeped {
+            get {
+                return ResourceManager.GetString("Bookkeeped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bookkeeping.
         /// </summary>
         internal static string Bookkeeping {
             get {
                 return ResourceManager.GetString("Bookkeeping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Budget.
+        /// </summary>
+        internal static string Budget {
+            get {
+                return ResourceManager.GetString("Budget", resourceCulture);
             }
         }
         
@@ -232,11 +259,29 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expenses.
+        /// </summary>
+        internal static string Expenses {
+            get {
+                return ResourceManager.GetString("Expenses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hide.
         /// </summary>
         internal static string Hide {
             get {
                 return ResourceManager.GetString("Hide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Income.
+        /// </summary>
+        internal static string Income {
+            get {
+                return ResourceManager.GetString("Income", resourceCulture);
             }
         }
         
