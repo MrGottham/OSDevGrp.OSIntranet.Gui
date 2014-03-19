@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -94,14 +93,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                             return;
                         }
                         var statusDato = DateTime.Now;
-                        UpdateRegnskabslisteViewModel(regnskabslisteViewModel, statusDato, t.Result, _finansstyringRepository, ExceptionHandler, _synchronizationContext);
-
-                        /*
-                        if (_onFinish != null)
-                        {
-                            InvokeOnFinish(regnskabslisteViewModel, _onFinish, _synchronizationContext);
-                        }
-                        */
+                        UpdateRegnskabslisteViewModel(regnskabslisteViewModel, statusDato, t.Result, _onFinish, _finansstyringRepository, ExceptionHandler, _synchronizationContext);
                     }
                     catch (Exception ex)
                     {
@@ -120,10 +112,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten, der skal opdateres.</param>
         /// <param name="statusDato">Statusdatoen, som ViewModel for regnskabslisten skal opdateres med.</param>
         /// <param name="regnskabModels">Regnskaber, som ViewModel for regnskabslisten skal opdateres med.</param>
+        /// <param name="onFinish">Callbackmetode, der udføres, når ViewModel for regnskabslisten er opdateret.</param>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til en exceptionhandler.</param>
         /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private static void UpdateRegnskabslisteViewModel(IRegnskabslisteViewModel regnskabslisteViewModel, DateTime statusDato, IEnumerable<IRegnskabModel> regnskabModels, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, SynchronizationContext synchronizationContext)
+        private static void UpdateRegnskabslisteViewModel(IRegnskabslisteViewModel regnskabslisteViewModel, DateTime statusDato, IEnumerable<IRegnskabModel> regnskabModels, Action<IRegnskabslisteViewModel> onFinish, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, SynchronizationContext synchronizationContext)
         {
             if (regnskabslisteViewModel == null)
             {
@@ -151,47 +144,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                     {
                         regnskabViewModel.Navn = regnskabModel.Navn;
                         regnskabViewModel.StatusDato = regnskabslisteViewModel.StatusDato;
-                        return;
+                        continue;
                     }
                     regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel, regnskabslisteViewModel.StatusDato, finansstyringRepository, exceptionHandlerViewModel));
                 }
-                return;
-            }
-            var arguments = new Tuple<IRegnskabslisteViewModel, DateTime, IEnumerable<IRegnskabModel>, IFinansstyringRepository, IExceptionHandlerViewModel>(regnskabslisteViewModel, statusDato, regnskabModels, finansstyringRepository, exceptionHandlerViewModel);
-            synchronizationContext.Post(obj =>
+                if (onFinish == null)
                 {
-                    var tuple = (Tuple<IRegnskabslisteViewModel, DateTime, IEnumerable<IRegnskabModel>, IFinansstyringRepository, IExceptionHandlerViewModel>) obj;
-                    UpdateRegnskabslisteViewModel(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, null);
-                }, arguments);
-        }
-
-
-        /// <summary>
-        /// Invoker callbackmetode, der udføres, når kommandoen er udført fejlfrit.
-        /// </summary>
-        /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten, hvormed callbackmetoden skal invokes.</param>
-        /// <param name="onFinish">Callbackmetode, der udføres, når kommandoen er udført fejlfrit.</param>
-        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private static void InvokeOnFinish(IRegnskabslisteViewModel regnskabslisteViewModel, Action<IRegnskabslisteViewModel> onFinish, SynchronizationContext synchronizationContext)
-        {
-            if (regnskabslisteViewModel == null)
-            {
-                throw new ArgumentNullException("regnskabslisteViewModel");
-            }
-            if (onFinish == null)
-            {
-                throw new ArgumentNullException("onFinish");
-            }
-            if (synchronizationContext == null)
-            {
+                    return;
+                }
                 onFinish.Invoke(regnskabslisteViewModel);
                 return;
             }
-            var arguments = new Tuple<IRegnskabslisteViewModel, Action<IRegnskabslisteViewModel>>(regnskabslisteViewModel, onFinish);
+            var arguments = new Tuple<IRegnskabslisteViewModel, DateTime, IEnumerable<IRegnskabModel>, Action<IRegnskabslisteViewModel>, IFinansstyringRepository, IExceptionHandlerViewModel>(regnskabslisteViewModel, statusDato, regnskabModels, onFinish, finansstyringRepository, exceptionHandlerViewModel);
             synchronizationContext.Post(obj =>
                 {
-                    var tuple = (Tuple<IRegnskabslisteViewModel, Action<IRegnskabslisteViewModel>>) obj;
-                    InvokeOnFinish(tuple.Item1, tuple.Item2, null);
+                    var tuple = (Tuple<IRegnskabslisteViewModel, DateTime, IEnumerable<IRegnskabModel>, Action<IRegnskabslisteViewModel>, IFinansstyringRepository, IExceptionHandlerViewModel>) obj;
+                    UpdateRegnskabslisteViewModel(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, tuple.Item6, null);
                 }, arguments);
         }
 
