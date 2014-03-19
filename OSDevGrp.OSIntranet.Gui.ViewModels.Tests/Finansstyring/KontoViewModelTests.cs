@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
@@ -105,7 +107,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(kontoViewModel.Image, Is.Not.Null);
             Assert.That(kontoViewModel.Image, Is.Not.Empty);
             Assert.That(kontoViewModel.Image, Is.EqualTo(Resource.GetEmbeddedResource("Images.Konto.png")));
-            //TODO: Assert.That(kontoViewModel.RefreshCommand, Is.Not.Null);
+            Assert.That(kontoViewModel.RefreshCommand, Is.Not.Null);
+            Assert.That(kontoViewModel.RefreshCommand, Is.TypeOf<KontoGetCommand>());
 
             kontoModelMock.AssertWasNotCalled(m => m.Regnskabsnummer);
             kontoModelMock.AssertWasCalled(m => m.Kontonummer);
@@ -329,6 +332,59 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             kontoModelMock.AssertWasCalled(m => m.Saldo = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnKontoModelEventHandler rejser PropertyChanged, når modellen for kontoen opdateres.
+        /// </summary>
+        [Test]
+        [TestCase("Regnskabsnummer", "Regnskabsnummer")]
+        [TestCase("Kontonummer", "Kontonummer")]
+        [TestCase("Kontonavn", "Kontonavn")]
+        [TestCase("Beskrivelse", "Beskrivelse")]
+        [TestCase("Notat", "Notat")]
+        [TestCase("Kontogruppe", "Kontogruppe")]
+        [TestCase("StatusDato", "StatusDato")]
+        [TestCase("Kredit", "Kredit")]
+        [TestCase("Kredit", "KreditAsText")]
+        [TestCase("Saldo", "Saldo")]
+        [TestCase("Saldo", "SaldoAsText")]
+        [TestCase("Disponibel", "Disponibel")]
+        [TestCase("Disponibel", "DisponibelAsText")]
+        [TestCase("Disponibel", "Kontoværdi")]
+        public void TestAtPropertyChangedOnKontoModelEventHandlerRejserPropertyChangedOnKontoModelUpdate(string propertyNameToRaise, string expectPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IKontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModel>()));
+            fixture.Customize<IKontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontoModelMock = fixture.Create<IKontoModel>();
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var kontoViewModel = new KontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(kontoViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            kontoViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            kontoModelMock.Raise(m => m.PropertyChanged += null, kontoModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+            Assert.That(eventCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
     }
 }

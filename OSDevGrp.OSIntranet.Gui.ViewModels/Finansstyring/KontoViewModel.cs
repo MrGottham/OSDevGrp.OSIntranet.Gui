@@ -3,6 +3,7 @@ using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -13,6 +14,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// </summary>
     public class KontoViewModel : KontoViewModelBase<IKontoModel, IKontogruppeViewModel>, IKontoViewModel
     {
+        #region Private variables
+
+        private ICommand _refreshCommand;
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -171,7 +178,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _refreshCommand ?? (_refreshCommand = new KontoGetCommand(null, FinansstyringRepository, ExceptionHandler));
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Metode, der kaldes, når en property på modellen for kontoen ændres.
+        /// </summary>
+        /// <param name="propertyName">Navn på den ændrede property.</param>
+        protected override void ModelChanged(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "Kredit":
+                    RaisePropertyChanged("KreditAsText");
+                    break;
+
+                case "Saldo":
+                    RaisePropertyChanged("SaldoAsText");
+                    break;
+
+                case "Disponibel":
+                    RaisePropertyChanged("DisponibelAsText");
+                    RaisePropertyChanged("Kontoværdi");
+                    break;
             }
         }
 

@@ -3,6 +3,7 @@ using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -13,6 +14,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// </summary>
     public class BudgetkontoViewModel : KontoViewModelBase<IBudgetkontoModel, IBudgetkontogruppeViewModel>, IBudgetkontoViewModel
     {
+        #region Private variables
+
+        private ICommand _refreshCommand;
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -43,7 +50,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Indtægter = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -80,7 +94,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Udgifter = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -150,7 +171,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.Bogført = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -227,7 +255,42 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _refreshCommand ?? (_refreshCommand = new BudgetkontoGetCommand(null, FinansstyringRepository, ExceptionHandler));
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Metode, der kaldes, når en property på modellen for kontoen ændres.
+        /// </summary>
+        /// <param name="propertyName">Navn på den ændrede property.</param>
+        protected override void ModelChanged(string propertyName)
+        {
+            switch (propertyName)
+            {
+                case "Indtægter":
+                    RaisePropertyChanged("IndtægterAsText");
+                    break;
+
+                case "Udgifter":
+                    RaisePropertyChanged("UdgifterAsText");
+                    break;
+
+                case "Budget":
+                    RaisePropertyChanged("BudgetAsText");
+                    break;
+
+                case "Bogført":
+                    RaisePropertyChanged("BogførtAsText");
+                    RaisePropertyChanged("Kontoværdi");
+                    break;
+
+                case "Disponibel":
+                    RaisePropertyChanged("DisponibelAsText");
+                    break;
             }
         }
 

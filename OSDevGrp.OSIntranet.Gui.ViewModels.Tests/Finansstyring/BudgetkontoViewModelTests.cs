@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
@@ -125,7 +127,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(budgetkontoViewModel.Image, Is.Not.Null);
             Assert.That(budgetkontoViewModel.Image, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.Image, Is.EqualTo(Resource.GetEmbeddedResource("Images.Budgetkonto.png")));
-            //TODO: Assert.That(kontoViewModel.RefreshCommand, Is.Not.Null);
+            Assert.That(budgetkontoViewModel.RefreshCommand, Is.Not.Null);
+            Assert.That(budgetkontoViewModel.RefreshCommand, Is.TypeOf<BudgetkontoGetCommand>());
 
             budgetkontoModelMock.AssertWasNotCalled(m => m.Regnskabsnummer);
             budgetkontoModelMock.AssertWasCalled(m => m.Kontonummer);
@@ -268,7 +271,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
-        /// Tester, at sætteren til Indtægter  kalder HandleException på exceptionhandleren ved exceptions.
+        /// Tester, at sætteren til Indtægter kalder HandleException på exceptionhandleren ved exceptions.
         /// </summary>
         [Test]
         public void TestAtIndtægterSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
@@ -295,6 +298,175 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             budgetkontoModelMock.AssertWasCalled(m => m.Indtægter = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Udgifter opdaterer Udgifter på modellen til budgetkontoen.
+        /// </summary>
+        [Test]
+        public void TestAtUdgifterSetterOpdatererUdgifterOnBudgetkontoModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.Udgifter = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.Udgifter = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Udgifter kalder HandleException på exceptionhandleren ved exceptions.
+        /// </summary>
+        [Test]
+        public void TestAtUdgifterSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var exception = fixture.Create<Exception>();
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Expect(m => m.Udgifter = Arg<decimal>.Is.GreaterThan(0M))
+                                .Throw(exception)
+                                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.Udgifter = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.Udgifter = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Bogført opdaterer Bogført på modellen til budgetkontoen.
+        /// </summary>
+        [Test]
+        public void TestAtBogførtSetterOpdatererBogførtOnBudgetkontoModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.Bogført = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.Bogført = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Bogført kalder HandleException på exceptionhandleren ved exceptions.
+        /// </summary>
+        [Test]
+        public void TestAtBogførtSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var exception = fixture.Create<Exception>();
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Expect(m => m.Bogført = Arg<decimal>.Is.GreaterThan(0M))
+                                .Throw(exception)
+                                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.Bogført = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.Bogført = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnKontoModelEventHandler rejser PropertyChanged, når modellen for budgetkontoen opdateres.
+        /// </summary>
+        [Test]
+        [TestCase("Regnskabsnummer", "Regnskabsnummer")]
+        [TestCase("Kontonummer", "Kontonummer")]
+        [TestCase("Kontonavn", "Kontonavn")]
+        [TestCase("Beskrivelse", "Beskrivelse")]
+        [TestCase("Notat", "Notat")]
+        [TestCase("Kontogruppe", "Kontogruppe")]
+        [TestCase("StatusDato", "StatusDato")]
+        [TestCase("Indtægter", "Indtægter")]
+        [TestCase("Indtægter", "IndtægterAsText")]
+        [TestCase("Udgifter", "Udgifter")]
+        [TestCase("Udgifter", "UdgifterAsText")]
+        [TestCase("Budget", "Budget")]
+        [TestCase("Budget", "BudgetAsText")]
+        [TestCase("Bogført", "Bogført")]
+        [TestCase("Bogført", "BogførtAsText")]
+        [TestCase("Disponibel", "Disponibel")]
+        [TestCase("Disponibel", "DisponibelAsText")]
+        [TestCase("Bogført", "Kontoværdi")]
+        public void TestAtPropertyChangedOnKontoModelEventHandlerRejserPropertyChangedOnBudgetkontoModelUpdate(string propertyNameToRaise, string expectPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            budgetkontoViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            budgetkontoModelMock.Raise(m => m.PropertyChanged += null, budgetkontoModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+            Assert.That(eventCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
     }
 }

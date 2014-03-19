@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <summary>
         /// Henter og opdaterer adressekontoen.
         /// </summary>
-        /// <param name="viewModel">ViewModel for kontoen, der skal hentes og opdateres.</param>
+        /// <param name="viewModel">ViewModel for adressekontoen, der skal hentes og opdateres.</param>
         protected override void Execute(IAdressekontoViewModel viewModel)
         {
             _isBusy = true;
