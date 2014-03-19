@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -91,15 +93,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                             }
                             return;
                         }
-                        UpdateRegnskabslisteViewModel(regnskabslisteViewModel, _synchronizationContext);
-                        foreach (var regnskabModel in t.Result)
-                        {
-                            HandleRegnskabModel(regnskabslisteViewModel, regnskabModel, _finansstyringRepository, ExceptionHandler, _synchronizationContext);
-                        }
+                        var statusDato = DateTime.Now;
+                        UpdateRegnskabslisteViewModel(regnskabslisteViewModel, statusDato, t.Result, _finansstyringRepository, ExceptionHandler, _synchronizationContext);
+
+                        /*
                         if (_onFinish != null)
                         {
                             InvokeOnFinish(regnskabslisteViewModel, _onFinish, _synchronizationContext);
                         }
+                        */
                     }
                     catch (Exception ex)
                     {
@@ -115,54 +117,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <summary>
         /// Opdaterer ViewModel for regnskabslisten.
         /// </summary>
-        /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten.</param>
-        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private static void UpdateRegnskabslisteViewModel(IRegnskabslisteViewModel regnskabslisteViewModel, SynchronizationContext synchronizationContext)
-        {
-            if (regnskabslisteViewModel == null)
-            {
-                throw new ArgumentNullException("regnskabslisteViewModel");
-            }
-            if (synchronizationContext == null)
-            {
-                regnskabslisteViewModel.StatusDato = DateTime.Now;
-                return;
-            }
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                synchronizationContext.Post(obj =>
-                    {
-                        try
-                        {
-                            UpdateRegnskabslisteViewModel(obj as IRegnskabslisteViewModel, null);
-                        }
-                        finally
-                        {
-                            we.Set();
-                        }
-                    }, regnskabslisteViewModel);
-                waitEvent.WaitOne();
-            }
-        }
-
-        /// <summary>
-        /// Håndtering af modeller for hentede regnskaber.
-        /// </summary>
-        /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten, hvorpå hentede modeller skal håndteres.</param>
-        /// <param name="regnskabModel">Model for det hentede regnskab, der skal håndteres.</param>
+        /// <param name="regnskabslisteViewModel">ViewModel for regnskabslisten, der skal opdateres.</param>
+        /// <param name="statusDato">Statusdatoen, som ViewModel for regnskabslisten skal opdateres med.</param>
+        /// <param name="regnskabModels">Regnskaber, som ViewModel for regnskabslisten skal opdateres med.</param>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
-        /// <param name="exceptionHandlerViewModel">Implementering af en ViewModel til en exceptionhandler.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til en exceptionhandler.</param>
         /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private static void HandleRegnskabModel(IRegnskabslisteViewModel regnskabslisteViewModel, IRegnskabModel regnskabModel, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, SynchronizationContext synchronizationContext)
+        private static void UpdateRegnskabslisteViewModel(IRegnskabslisteViewModel regnskabslisteViewModel, DateTime statusDato, IEnumerable<IRegnskabModel> regnskabModels, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, SynchronizationContext synchronizationContext)
         {
             if (regnskabslisteViewModel == null)
             {
                 throw new ArgumentNullException("regnskabslisteViewModel");
             }
-            if (regnskabModel == null)
+            if (regnskabModels == null)
             {
-                throw new ArgumentNullException("regnskabModel");
+                throw new ArgumentNullException("regnskabModels");
             }
             if (finansstyringRepository == null)
             {
@@ -174,35 +143,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             }
             if (synchronizationContext == null)
             {
-                var regnskabViewModel = regnskabslisteViewModel.Regnskaber.SingleOrDefault(m => m.Nummer == regnskabModel.Nummer);
-                if (regnskabViewModel != null)
+                regnskabslisteViewModel.StatusDato = statusDato;
+                foreach (var regnskabModel in regnskabModels)
                 {
-                    regnskabViewModel.Navn = regnskabModel.Navn;
-                    regnskabViewModel.StatusDato = regnskabslisteViewModel.StatusDato;
-                    return;
+                    var regnskabViewModel = regnskabslisteViewModel.Regnskaber.SingleOrDefault(m => m.Nummer == regnskabModel.Nummer);
+                    if (regnskabViewModel != null)
+                    {
+                        regnskabViewModel.Navn = regnskabModel.Navn;
+                        regnskabViewModel.StatusDato = regnskabslisteViewModel.StatusDato;
+                        return;
+                    }
+                    regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel, regnskabslisteViewModel.StatusDato, finansstyringRepository, exceptionHandlerViewModel));
                 }
-                regnskabslisteViewModel.RegnskabAdd(new RegnskabViewModel(regnskabModel, regnskabslisteViewModel.StatusDato, finansstyringRepository, exceptionHandlerViewModel));
                 return;
             }
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                var arguments = new Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>(regnskabslisteViewModel, regnskabModel, finansstyringRepository, exceptionHandlerViewModel);
-                synchronizationContext.Post(obj =>
-                    {
-                        try
-                        {
-                            var tuple = (Tuple<IRegnskabslisteViewModel, IRegnskabModel, IFinansstyringRepository, IExceptionHandlerViewModel>) obj;
-                            HandleRegnskabModel(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, null);
-                        }
-                        finally
-                        {
-                            we.Set();
-                        }
-                    }, arguments);
-                waitEvent.WaitOne();
-            }
+            var arguments = new Tuple<IRegnskabslisteViewModel, DateTime, IEnumerable<IRegnskabModel>, IFinansstyringRepository, IExceptionHandlerViewModel>(regnskabslisteViewModel, statusDato, regnskabModels, finansstyringRepository, exceptionHandlerViewModel);
+            synchronizationContext.Post(obj =>
+                {
+                    var tuple = (Tuple<IRegnskabslisteViewModel, DateTime, IEnumerable<IRegnskabModel>, IFinansstyringRepository, IExceptionHandlerViewModel>) obj;
+                    UpdateRegnskabslisteViewModel(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, null);
+                }, arguments);
         }
+
 
         /// <summary>
         /// Invoker callbackmetode, der udføres, når kommandoen er udført fejlfrit.

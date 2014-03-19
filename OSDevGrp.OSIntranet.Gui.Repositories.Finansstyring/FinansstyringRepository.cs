@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using System.Threading;
 using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
@@ -213,33 +212,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new RegnskabslisteGetQuery();
-                    using (var waitEvent = new AutoResetEvent(false))
-                    {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.RegnskabslisteGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    result.AddRange(e.Result.Select(m => new RegnskabModel(m.Nummer, m.Navn)));
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.RegnskabslisteGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
-                        {
-                            throw error;
-                        }
-                    }
+                    
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginRegnskabslisteGet(query, null, null);
+                    result.AddRange(serviceInterface.EndRegnskabslisteGet(asyncResult).Select(m => new RegnskabModel(m.Nummer, m.Navn)));
+                    
                     client.CloseAsync();
                 }
                 catch
@@ -284,54 +261,32 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             Regnskabsnummer = regnskabsnummer,
                             StatusDato = statusDato
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginKontoplanGet(query, null, null);
+                    foreach (var kontoView in serviceInterface.EndKontoplanGet(asyncResult))
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.KontoplanGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    foreach (var kontoView in e.Result)
-                                    {
-                                        try
-                                        {
-                                            var kontoModel = new KontoModel(regnskabsnummer, kontoView.Kontonummer, kontoView.Kontonavn, kontoView.Kontogruppe.Nummer, statusDato, kontoView.Saldo, kontoView.Kredit);
-                                            if (string.IsNullOrEmpty(kontoView.Beskrivelse) == false)
-                                            {
-                                                kontoModel.Beskrivelse = kontoView.Beskrivelse;
-                                            }
-                                            if (string.IsNullOrEmpty(kontoView.Notat) == false)
-                                            {
-                                                kontoModel.Notat = kontoView.Notat;
-                                            }
-                                            result.Add(kontoModel);
-                                        }
-                                        catch (ArgumentNullException)
-                                        {
-                                        }
-                                        catch (ArgumentException)
-                                        {
-                                        }
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.KontoplanGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
+                        try
                         {
-                            throw error;
+                            var kontoModel = new KontoModel(regnskabsnummer, kontoView.Kontonummer, kontoView.Kontonavn, kontoView.Kontogruppe.Nummer, statusDato, kontoView.Saldo, kontoView.Kredit);
+                            if (string.IsNullOrEmpty(kontoView.Beskrivelse) == false)
+                            {
+                                kontoModel.Beskrivelse = kontoView.Beskrivelse;
+                            }
+                            if (string.IsNullOrEmpty(kontoView.Notat) == false)
+                            {
+                                kontoModel.Notat = kontoView.Notat;
+                            }
+                            result.Add(kontoModel);
+                        }
+                        catch (ArgumentNullException)
+                        {
+                        }
+                        catch (ArgumentException)
+                        {
                         }
                     }
+
                     client.CloseAsync();
                 }
                 catch
@@ -347,11 +302,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (FaultException ex)
             {
-                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+                throw new IntranetGuiRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
             }
             catch (Exception ex)
             {
-                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+                throw new IntranetGuiRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
             }
         }
 
@@ -370,7 +327,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             try
             {
-                IKontoModel kontoModel = null;
+                IKontoModel kontoModel;
                 var binding = GetBasicHttpBinding();
                 var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
                 var client = new FinansstyringServiceClient(binding, endpointAddress);
@@ -382,41 +339,21 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             Kontonummer = kontonummer,
                             StatusDato = statusDato
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginKontoGet(query, null, null);
+                    var kontoView = serviceInterface.EndKontoGet(asyncResult);
+
+                    kontoModel = new KontoModel(regnskabsnummer, kontoView.Kontonummer, kontoView.Kontonavn, kontoView.Kontogruppe.Nummer, statusDato, kontoView.Saldo, kontoView.Kredit);
+                    if (string.IsNullOrEmpty(kontoView.Beskrivelse) == false)
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.KontoGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    kontoModel = new KontoModel(regnskabsnummer, e.Result.Kontonummer, e.Result.Kontonavn, e.Result.Kontogruppe.Nummer, statusDato, e.Result.Saldo, e.Result.Kredit);
-                                    if (string.IsNullOrEmpty(e.Result.Beskrivelse) == false)
-                                    {
-                                        kontoModel.Beskrivelse = e.Result.Beskrivelse;
-                                    }
-                                    if (string.IsNullOrEmpty(e.Result.Notat) == false)
-                                    {
-                                        kontoModel.Notat = e.Result.Notat;
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.KontoGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
-                        {
-                            throw error;
-                        }
+                        kontoModel.Beskrivelse = kontoView.Beskrivelse;
                     }
+                    if (string.IsNullOrEmpty(kontoView.Notat) == false)
+                    {
+                        kontoModel.Notat = kontoView.Notat;
+                    }
+
                     client.CloseAsync();
                 }
                 catch
@@ -461,54 +398,32 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             Regnskabsnummer = regnskabsnummer,
                             StatusDato = statusDato
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginBudgetkontoplanGet(query, null, null);
+                    foreach (var budgetkontoView in serviceInterface.EndBudgetkontoplanGet(asyncResult))
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.BudgetkontoplanGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    foreach (var budgetkontoView in e.Result)
-                                    {
-                                        try
-                                        {
-                                            var budgetkontoModel = new BudgetkontoModel(regnskabsnummer, budgetkontoView.Kontonummer, budgetkontoView.Kontonavn, budgetkontoView.Budgetkontogruppe.Nummer, statusDato, budgetkontoView.Budget, budgetkontoView.Bogført);
-                                            if (string.IsNullOrEmpty(budgetkontoView.Beskrivelse) == false)
-                                            {
-                                                budgetkontoModel.Beskrivelse = budgetkontoView.Beskrivelse;
-                                            }
-                                            if (string.IsNullOrEmpty(budgetkontoView.Notat) == false)
-                                            {
-                                                budgetkontoModel.Notat = budgetkontoView.Notat;
-                                            }
-                                            result.Add(budgetkontoModel);
-                                        }
-                                        catch (ArgumentNullException)
-                                        {
-                                        }
-                                        catch (ArgumentException)
-                                        {
-                                        }
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.BudgetkontoplanGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
+                        try
                         {
-                            throw error;
+                            var budgetkontoModel = new BudgetkontoModel(regnskabsnummer, budgetkontoView.Kontonummer, budgetkontoView.Kontonavn, budgetkontoView.Budgetkontogruppe.Nummer, statusDato, budgetkontoView.Budget, budgetkontoView.Bogført);
+                            if (string.IsNullOrEmpty(budgetkontoView.Beskrivelse) == false)
+                            {
+                                budgetkontoModel.Beskrivelse = budgetkontoView.Beskrivelse;
+                            }
+                            if (string.IsNullOrEmpty(budgetkontoView.Notat) == false)
+                            {
+                                budgetkontoModel.Notat = budgetkontoView.Notat;
+                            }
+                            result.Add(budgetkontoModel);
+                        }
+                        catch (ArgumentNullException)
+                        {
+                        }
+                        catch (ArgumentException)
+                        {
                         }
                     }
+
                     client.CloseAsync();
                 }
                 catch (Exception)
@@ -547,7 +462,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             try
             {
-                IBudgetkontoModel budgetkontoModel = null;
+                IBudgetkontoModel budgetkontoModel;
                 var binding = GetBasicHttpBinding();
                 var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
                 var client = new FinansstyringServiceClient(binding, endpointAddress);
@@ -559,41 +474,21 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             Kontonummer = budgetkontonummer,
                             StatusDato = statusDato
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginBudgetkontoGet(query, null, null);
+                    var budgetkontoView = serviceInterface.EndBudgetkontoGet(asyncResult);
+
+                    budgetkontoModel = new BudgetkontoModel(regnskabsnummer, budgetkontoView.Kontonummer, budgetkontoView.Kontonavn, budgetkontoView.Budgetkontogruppe.Nummer, statusDato, budgetkontoView.Budget, budgetkontoView.Bogført);
+                    if (string.IsNullOrEmpty(budgetkontoView.Beskrivelse) == false)
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.BudgetkontoGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    budgetkontoModel = new BudgetkontoModel(regnskabsnummer, e.Result.Kontonummer, e.Result.Kontonavn, e.Result.Budgetkontogruppe.Nummer, statusDato, e.Result.Budget, e.Result.Bogført);
-                                    if (string.IsNullOrEmpty(e.Result.Beskrivelse) == false)
-                                    {
-                                        budgetkontoModel.Beskrivelse = e.Result.Beskrivelse;
-                                    }
-                                    if (string.IsNullOrEmpty(e.Result.Notat) == false)
-                                    {
-                                        budgetkontoModel.Notat = e.Result.Notat;
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.BudgetkontoGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
-                        {
-                            throw error;
-                        }
+                        budgetkontoModel.Beskrivelse = budgetkontoView.Beskrivelse;
                     }
+                    if (string.IsNullOrEmpty(budgetkontoView.Notat) == false)
+                    {
+                        budgetkontoModel.Notat = budgetkontoView.Notat;
+                    }
+
                     client.CloseAsync();
                 }
                 catch (Exception)
@@ -640,62 +535,40 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             StatusDato = statusDato,
                             Linjer = antalBogføringslinjer
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginBogføringerGet(query, null, null);
+                    foreach (var bogføringslinjeView in serviceInterface.EndBogføringerGet(asyncResult))
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.BogføringerGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    foreach (var bogføringslinjeView in e.Result)
-                                    {
-                                        try
-                                        {
-                                            if (bogføringslinjeView.Konto == null)
-                                            {
-                                                continue;
-                                            }
-                                            var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer, bogføringslinjeView.Løbenr, bogføringslinjeView.Dato, bogføringslinjeView.Konto.Kontonummer, bogføringslinjeView.Tekst, bogføringslinjeView.Debit, bogføringslinjeView.Kredit);
-                                            if (string.IsNullOrEmpty(bogføringslinjeView.Bilag) == false)
-                                            {
-                                                bogføringslinjeModel.Bilag = bogføringslinjeView.Bilag;
-                                            }
-                                            if (bogføringslinjeView.Budgetkonto != null)
-                                            {
-                                                bogføringslinjeModel.Budgetkontonummer = bogføringslinjeView.Budgetkonto.Kontonummer;
-                                            }
-                                            if (bogføringslinjeView.Adressekonto != null)
-                                            {
-                                                bogføringslinjeModel.Adressekonto = bogføringslinjeView.Adressekonto.Nummer;
-                                            }
-                                            result.Add(bogføringslinjeModel);
-                                        }
-                                        catch (ArgumentNullException)
-                                        {
-                                        }
-                                        catch (ArgumentException)
-                                        {
-                                        }
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.BogføringerGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
+                        try
                         {
-                            throw error;
+                            if (bogføringslinjeView.Konto == null)
+                            {
+                                continue;
+                            }
+                            var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer, bogføringslinjeView.Løbenr, bogføringslinjeView.Dato, bogføringslinjeView.Konto.Kontonummer, bogføringslinjeView.Tekst, bogføringslinjeView.Debit, bogføringslinjeView.Kredit);
+                            if (string.IsNullOrEmpty(bogføringslinjeView.Bilag) == false)
+                            {
+                                bogføringslinjeModel.Bilag = bogføringslinjeView.Bilag;
+                            }
+                            if (bogføringslinjeView.Budgetkonto != null)
+                            {
+                                bogføringslinjeModel.Budgetkontonummer = bogføringslinjeView.Budgetkonto.Kontonummer;
+                            }
+                            if (bogføringslinjeView.Adressekonto != null)
+                            {
+                                bogføringslinjeModel.Adressekonto = bogføringslinjeView.Adressekonto.Nummer;
+                            }
+                            result.Add(bogføringslinjeModel);
+                        }
+                        catch (ArgumentNullException)
+                        {
+                        }
+                        catch (ArgumentException)
+                        {
                         }
                     }
+
                     client.CloseAsync();
                 }
                 catch
@@ -740,59 +613,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             Regnskabsnummer = regnskabsnummer,
                             StatusDato = statusDato
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginDebitorlisteGet(query, null, null);
+                    foreach (var debitorView in serviceInterface.EndDebitorlisteGet(asyncResult))
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.DebitorlisteGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    foreach (var debitorView in e.Result)
-                                    {
-                                        try
-                                        {
-                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, debitorView.Nummer, debitorView.Navn, statusDato, debitorView.Saldo);
-                                            if (string.IsNullOrEmpty(debitorView.PrimærTelefon) == false)
-                                            {
-                                                adressekontoModel.PrimærTelefon = debitorView.PrimærTelefon.Trim();
-                                                if (string.IsNullOrEmpty(debitorView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, debitorView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
-                                                {
-                                                    adressekontoModel.SekundærTelefon = debitorView.SekundærTelefon.Trim();
-                                                }
-                                            }
-                                            else if (string.IsNullOrEmpty(debitorView.SekundærTelefon) == false)
-                                            {
-                                                adressekontoModel.PrimærTelefon = debitorView.PrimærTelefon.Trim();
-                                            }
-                                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.Low);
-                                            debitorer.Add(adressekontoModel);
-                                        }
-                                        catch (ArgumentNullException)
-                                        {
-                                        }
-                                        catch (ArgumentException)
-                                        {
-                                        }
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.DebitorlisteGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
+                        try
                         {
-                            throw error;
+                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, debitorView.Nummer, debitorView.Navn, statusDato, debitorView.Saldo);
+                            if (string.IsNullOrEmpty(debitorView.PrimærTelefon) == false)
+                            {
+                                adressekontoModel.PrimærTelefon = debitorView.PrimærTelefon.Trim();
+                                if (string.IsNullOrEmpty(debitorView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, debitorView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
+                                {
+                                    adressekontoModel.SekundærTelefon = debitorView.SekundærTelefon.Trim();
+                                }
+                            }
+                            else if (string.IsNullOrEmpty(debitorView.SekundærTelefon) == false)
+                            {
+                                adressekontoModel.PrimærTelefon = debitorView.PrimærTelefon.Trim();
+                            }
+                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.Low);
+                            debitorer.Add(adressekontoModel);
+                        }
+                        catch (ArgumentNullException)
+                        {
+                        }
+                        catch (ArgumentException)
+                        {
                         }
                     }
+
                     client.CloseAsync();
                 }
                 catch (Exception)
@@ -837,59 +688,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             Regnskabsnummer = regnskabsnummer,
                             StatusDato = statusDato
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginKreditorlisteGet(query, null, null);
+                    foreach (var kreditorView in serviceInterface.EndKreditorlisteGet(asyncResult))
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.KreditorlisteGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    foreach (var kreditorView in e.Result)
-                                    {
-                                        try
-                                        {
-                                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, kreditorView.Nummer, kreditorView.Navn, statusDato, kreditorView.Saldo);
-                                            if (string.IsNullOrEmpty(kreditorView.PrimærTelefon) == false)
-                                            {
-                                                adressekontoModel.PrimærTelefon = kreditorView.PrimærTelefon.Trim();
-                                                if (string.IsNullOrEmpty(kreditorView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, kreditorView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
-                                                {
-                                                    adressekontoModel.SekundærTelefon = kreditorView.SekundærTelefon.Trim();
-                                                }
-                                            }
-                                            else if (string.IsNullOrEmpty(kreditorView.SekundærTelefon) == false)
-                                            {
-                                                adressekontoModel.PrimærTelefon = kreditorView.PrimærTelefon.Trim();
-                                            }
-                                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.High);
-                                            kreditorer.Add(adressekontoModel);
-                                        }
-                                        catch (ArgumentNullException)
-                                        {
-                                        }
-                                        catch (ArgumentException)
-                                        {
-                                        }
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.KreditorlisteGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
+                        try
                         {
-                            throw error;
+                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, kreditorView.Nummer, kreditorView.Navn, statusDato, kreditorView.Saldo);
+                            if (string.IsNullOrEmpty(kreditorView.PrimærTelefon) == false)
+                            {
+                                adressekontoModel.PrimærTelefon = kreditorView.PrimærTelefon.Trim();
+                                if (string.IsNullOrEmpty(kreditorView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, kreditorView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
+                                {
+                                    adressekontoModel.SekundærTelefon = kreditorView.SekundærTelefon.Trim();
+                                }
+                            }
+                            else if (string.IsNullOrEmpty(kreditorView.SekundærTelefon) == false)
+                            {
+                                adressekontoModel.PrimærTelefon = kreditorView.PrimærTelefon.Trim();
+                            }
+                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.High);
+                            kreditorer.Add(adressekontoModel);
+                        }
+                        catch (ArgumentNullException)
+                        {
+                        }
+                        catch (ArgumentException)
+                        {
                         }
                     }
+
                     client.CloseAsync();
                 }
                 catch (Exception)
@@ -924,64 +753,45 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             try
             {
+                IAdressekontoModel adressekontoModel;
                 var binding = GetBasicHttpBinding();
                 var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
                 var client = new FinansstyringServiceClient(binding, endpointAddress);
                 try
                 {
-                    IAdressekontoModel adressekontoModel = null;
                     var query = new AdressekontoGetQuery
                         {
                             Regnskabsnummer = regnskabsnummer,
                             Nummer = nummer,
                             StatusDato = statusDato
                         };
-                    using (var waitEvent = new AutoResetEvent(false))
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginAdressekontoGet(query, null, null);
+                    var adressekontoView = serviceInterface.EndAdressekontoGet(asyncResult);
+
+                    adressekontoModel = new AdressekontoModel(regnskabsnummer, adressekontoView.Nummer, adressekontoView.Navn, statusDato, adressekontoView.Saldo);
+                    if (string.IsNullOrEmpty(adressekontoView.PrimærTelefon) == false)
                     {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.AdressekontoGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    adressekontoModel = new AdressekontoModel(regnskabsnummer, e.Result.Nummer, e.Result.Navn, statusDato, e.Result.Saldo);
-                                    if (string.IsNullOrEmpty(e.Result.PrimærTelefon) == false)
-                                    {
-                                        adressekontoModel.PrimærTelefon = e.Result.PrimærTelefon.Trim();
-                                        if (string.IsNullOrEmpty(e.Result.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, e.Result.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
-                                        {
-                                            adressekontoModel.SekundærTelefon = e.Result.SekundærTelefon.Trim();
-                                        }
-                                    }
-                                    else if (string.IsNullOrEmpty(e.Result.SekundærTelefon) == false)
-                                    {
-                                        adressekontoModel.PrimærTelefon = e.Result.PrimærTelefon.Trim();
-                                    }
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.AdressekontoGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
+                        adressekontoModel.PrimærTelefon = adressekontoView.PrimærTelefon.Trim();
+                        if (string.IsNullOrEmpty(adressekontoView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, adressekontoView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
                         {
-                            throw error;
+                            adressekontoModel.SekundærTelefon = adressekontoView.SekundærTelefon.Trim();
                         }
                     }
-                    return adressekontoModel;
+                    else if (string.IsNullOrEmpty(adressekontoView.SekundærTelefon) == false)
+                    {
+                        adressekontoModel.PrimærTelefon = adressekontoView.PrimærTelefon.Trim();
+                    }
+
+                    client.CloseAsync();
                 }
                 catch (Exception)
                 {
                     client.Abort();
                     throw;
                 }
+                return adressekontoModel;
             }
             catch (IntranetGuiRepositoryException)
             {
@@ -1012,33 +822,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new KontogrupperGetQuery();
-                    using (var waitEvent = new AutoResetEvent(false))
-                    {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.KontogrupperGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    kontogrupper.AddRange(e.Result.Select(m => new KontogruppeModel(m.Nummer, m.Navn, m.ErAktiver ? Balancetype.Aktiver : Balancetype.Passiver)));
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.KontogrupperGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
-                        {
-                            throw error;
-                        }
-                    }
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginKontogrupperGet(query, null, null);
+                    kontogrupper.AddRange(serviceInterface.EndKontogrupperGet(asyncResult).Select(m => new KontogruppeModel(m.Nummer, m.Navn, m.ErAktiver ? Balancetype.Aktiver : Balancetype.Passiver)));
+
                     client.CloseAsync();
                 }
                 catch (Exception)
@@ -1077,33 +865,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new BudgetkontogrupperGetQuery();
-                    using (var waitEvent = new AutoResetEvent(false))
-                    {
-                        var we = waitEvent;
-                        Exception error = null;
-                        client.BudgetkontogrupperGetCompleted += (s, e) =>
-                            {
-                                try
-                                {
-                                    if (e.Error != null)
-                                    {
-                                        error = e.Error;
-                                        return;
-                                    }
-                                    budgetkontogrupper.AddRange(e.Result.Select(m => new BudgetkontogruppeModel(m.Nummer, m.Navn)));
-                                }
-                                finally
-                                {
-                                    we.Set();
-                                }
-                            };
-                        client.BudgetkontogrupperGetAsync(query);
-                        waitEvent.WaitOne();
-                        if (error != null)
-                        {
-                            throw error;
-                        }
-                    }
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginBudgetkontogrupperGet(query, null, null);
+                    budgetkontogrupper.AddRange(serviceInterface.EndBudgetkontogrupperGet(asyncResult).Select(m => new BudgetkontogruppeModel(m.Nummer, m.Navn)));
+
                     client.CloseAsync();
                 }
                 catch (Exception)
