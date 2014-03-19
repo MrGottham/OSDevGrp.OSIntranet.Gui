@@ -12,7 +12,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
     /// <summary>
     /// Kommando til genindlæsning af regnskabslisten.
     /// </summary>
-    public class RegnskabslisteRefreshCommand : ViewModelCommandBase<IRegnskabslisteViewModel>
+    public class RegnskabslisteRefreshCommand : ViewModelCommandBase<IRegnskabslisteViewModel>, ITaskableCommand
     {
         #region Private variables
 
@@ -73,7 +73,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             _isBusy = true;
             var task = _finansstyringRepository.RegnskabslisteGetAsync();
-            task.ContinueWith(t =>
+            ExecuteTask = task.ContinueWith(t =>
                 {
                     try
                     {

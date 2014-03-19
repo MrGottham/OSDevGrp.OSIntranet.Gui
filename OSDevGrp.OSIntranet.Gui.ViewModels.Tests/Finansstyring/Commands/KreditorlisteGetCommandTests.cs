@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using NUnit.Framework;
@@ -36,6 +34,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var command = new KreditorlisteGetCommand(fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
         }
 
         /// <summary>
@@ -128,44 +127,36 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var count = adressekontoModelCollection.Count;
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
-                regnskabViewModelMock.Expect(m => m.Nummer)
-                                     .Return(fixture.Create<int>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.StatusDato)
-                                     .Return(fixture.Create<DateTime>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.Kreditorer)
-                                     .Return(new List<IAdressekontoViewModel>(0))
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.NotNull))
-                                     .WhenCalled(e =>
-                                         {
-                                             count--;
-                                             if (count == 0)
-                                             {
-                                                 we.Set();
-                                             }
-                                         })
-                                     .Repeat.Any();
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.StatusDato)
+                                 .Return(fixture.Create<DateTime>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
 
-                var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
-                Assert.That(command, Is.Not.Null);
+            var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
-                command.Execute(regnskabViewModelMock);
-                waitEvent.WaitOne(3000);
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
 
-                finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
-                finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
-                finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
-                regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
-                regnskabViewModelMock.AssertWasCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.NotNull), opt => opt.Repeat.Times(adressekontoModelCollection.Count));
-            }
-
+            finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
+            // ReSharper disable ImplicitlyCapturedClosure
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
+            // ReSharper restore ImplicitlyCapturedClosure
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
+            regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
+            regnskabViewModelMock.AssertWasCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.NotNull), opt => opt.Repeat.Times(adressekontoModelCollection.Count));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
@@ -207,49 +198,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var count = adressekontoModelCollection.Count;
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
-                regnskabViewModelMock.Expect(m => m.Nummer)
-                                     .Return(fixture.Create<int>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.StatusDato)
-                                     .Return(fixture.Create<DateTime>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.Kreditorer)
-                                     .Return(new List<IAdressekontoViewModel>(0))
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.NotNull))
-                                     .WhenCalled(e =>
-                                     {
-                                         count--;
-                                         if (count == 0)
-                                         {
-                                             we.Set();
-                                         }
-                                     })
-                                     .Repeat.Any();
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.StatusDato)
+                                 .Return(fixture.Create<DateTime>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
 
-                var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
-                Assert.That(command, Is.Not.Null);
+            var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
-                command.Execute(regnskabViewModelMock);
-                waitEvent.WaitOne(3000);
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
 
-                finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
-                finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
-                finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
-                regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
-                regnskabViewModelMock.AssertWasCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.NotNull), opt => opt.Repeat.Times(adressekontoModelCollection.Count));
+            finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
+            // ReSharper disable ImplicitlyCapturedClosure
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
+            // ReSharper restore ImplicitlyCapturedClosure
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
+            regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
+            regnskabViewModelMock.AssertWasCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.NotNull), opt => opt.Repeat.Times(adressekontoModelCollection.Count));
 
-                var dageForNyheder = finansstyringKonfigurationRepositoryMock.DageForNyheder;
-                var adressekontoTilNyhedCollection = adressekontoModelCollection.Where(m => m.StatusDato.Date.CompareTo(regnskabViewModelMock.StatusDato.Date.AddDays(dageForNyheder*-1)) >= 0 && m.StatusDato.Date.CompareTo(regnskabViewModelMock.StatusDato.Date) <= 0).ToList();
-                adressekontoTilNyhedCollection.ForEach(m => m.AssertWasCalled(n => n.SetNyhedsaktualitet(Nyhedsaktualitet.High)));
-                regnskabViewModelMock.AssertWasCalled(m => m.NyhedAdd(Arg<INyhedViewModel>.Is.NotNull), opt => opt.Repeat.Times(adressekontoTilNyhedCollection.Count));
-            }
-
+            var dageForNyheder = finansstyringKonfigurationRepositoryMock.DageForNyheder;
+            var adressekontoTilNyhedCollection = adressekontoModelCollection.Where(m => m.StatusDato.Date.CompareTo(regnskabViewModelMock.StatusDato.Date.AddDays(dageForNyheder * -1)) >= 0 && m.StatusDato.Date.CompareTo(regnskabViewModelMock.StatusDato.Date) <= 0).ToList();
+            adressekontoTilNyhedCollection.ForEach(m => m.AssertWasCalled(n => n.SetNyhedsaktualitet(Nyhedsaktualitet.High)));
+            regnskabViewModelMock.AssertWasCalled(m => m.NyhedAdd(Arg<INyhedViewModel>.Is.NotNull), opt => opt.Repeat.Times(adressekontoTilNyhedCollection.Count));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
@@ -302,46 +285,46 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                var adressekontoViewModelMock = MockRepository.GenerateMock<IAdressekontoViewModel>();
-                adressekontoViewModelMock.Expect(m => m.Nummer)
-                                         .Return(adressekontoModelCollection.ElementAt(0).Nummer)
-                                         .Repeat.Any();
-                adressekontoViewModelMock.Expect(m => m.Saldo = Arg<decimal>.Is.Anything)
-                                         .WhenCalled(e => we.Set())
-                                         .Repeat.Any();
-
-                var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
-                regnskabViewModelMock.Expect(m => m.Nummer)
-                                     .Return(fixture.Create<int>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.StatusDato)
-                                     .Return(fixture.Create<DateTime>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.Kreditorer)
-                                     .Return(new List<IAdressekontoViewModel> {adressekontoViewModelMock})
+            var adressekontoViewModelMock = MockRepository.GenerateMock<IAdressekontoViewModel>();
+            adressekontoViewModelMock.Expect(m => m.Nummer)
+                                     .Return(adressekontoModelCollection.ElementAt(0).Nummer)
                                      .Repeat.Any();
 
-                var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
-                Assert.That(command, Is.Not.Null);
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.StatusDato)
+                                 .Return(fixture.Create<DateTime>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel> { adressekontoViewModelMock })
+                                 .Repeat.Any();
 
-                command.Execute(regnskabViewModelMock);
-                waitEvent.WaitOne(3000);
+            var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
-                finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
-                finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
-                finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
-                regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
-                regnskabViewModelMock.AssertWasNotCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.Anything));
-                adressekontoViewModelMock.AssertWasCalled(m => m.Navn = Arg<string>.Is.Equal(adressekontoModelCollection.ElementAt(0).Navn));
-                adressekontoViewModelMock.AssertWasCalled(m => m.PrimærTelefon = Arg<string>.Is.Equal(adressekontoModelCollection.ElementAt(0).PrimærTelefon));
-                adressekontoViewModelMock.AssertWasCalled(m => m.SekundærTelefon = Arg<string>.Is.Equal(adressekontoModelCollection.ElementAt(0).SekundærTelefon));
-                adressekontoViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.Equal(adressekontoModelCollection.ElementAt(0).StatusDato));
-                adressekontoViewModelMock.AssertWasCalled(m => m.Saldo = Arg<decimal>.Is.Equal(adressekontoModelCollection.ElementAt(0).Saldo));
-            }
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
 
+            finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
+            // ReSharper disable ImplicitlyCapturedClosure
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
+            // ReSharper restore ImplicitlyCapturedClosure
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
+            regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
+            regnskabViewModelMock.AssertWasNotCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.Anything));
+            adressekontoViewModelMock.AssertWasCalled(m => m.Navn = Arg<string>.Is.Equal(adressekontoModelCollection.ElementAt(0).Navn));
+            adressekontoViewModelMock.AssertWasCalled(m => m.PrimærTelefon = Arg<string>.Is.Equal(adressekontoModelCollection.ElementAt(0).PrimærTelefon));
+            adressekontoViewModelMock.AssertWasCalled(m => m.SekundærTelefon = Arg<string>.Is.Equal(adressekontoModelCollection.ElementAt(0).SekundærTelefon));
+            adressekontoViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.Equal(adressekontoModelCollection.ElementAt(0).StatusDato));
+            adressekontoViewModelMock.AssertWasCalled(m => m.Saldo = Arg<decimal>.Is.Equal(adressekontoModelCollection.ElementAt(0).Saldo));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
@@ -394,57 +377,57 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                var refreshCommandMock = MockRepository.GenerateMock<ICommand>();
-                refreshCommandMock.Expect(m => m.CanExecute(Arg<object>.Is.NotNull))
-                                  .Return(true)
-                                  .Repeat.Any();
-                refreshCommandMock.Expect(m => m.Execute(Arg<object>.Is.NotNull))
-                                  .WhenCalled(e => we.Set())
-                                  .Repeat.Any();
+            var refreshCommandMock = MockRepository.GenerateMock<ICommand>();
+            refreshCommandMock.Expect(m => m.CanExecute(Arg<object>.Is.NotNull))
+                              .Return(true)
+                              .Repeat.Any();
 
-                var adressekontoViewModelMock = MockRepository.GenerateMock<IAdressekontoViewModel>();
-                adressekontoViewModelMock.Expect(m => m.Nummer)
-                                         .Return(adressekontoModelCollection.ElementAt(0).Nummer)
-                                         .Repeat.Any();
-
-                var unreadedAdressekontoViewModelMock = MockRepository.GenerateMock<IAdressekontoViewModel>();
-                unreadedAdressekontoViewModelMock.Expect(m => m.Nummer)
-                                                 .Return(fixture.Create<int>())
-                                                 .Repeat.Any();
-                unreadedAdressekontoViewModelMock.Expect(m => m.RefreshCommand)
-                                                 .Return(refreshCommandMock)
-                                                 .Repeat.Any();
-
-                var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
-                regnskabViewModelMock.Expect(m => m.Nummer)
-                                     .Return(fixture.Create<int>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.StatusDato)
-                                     .Return(fixture.Create<DateTime>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.Kreditorer)
-                                     .Return(new List<IAdressekontoViewModel> {adressekontoViewModelMock, unreadedAdressekontoViewModelMock})
+            var adressekontoViewModelMock = MockRepository.GenerateMock<IAdressekontoViewModel>();
+            adressekontoViewModelMock.Expect(m => m.Nummer)
+                                     .Return(adressekontoModelCollection.ElementAt(0).Nummer)
                                      .Repeat.Any();
 
-                var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
-                Assert.That(command, Is.Not.Null);
+            var unreadedAdressekontoViewModelMock = MockRepository.GenerateMock<IAdressekontoViewModel>();
+            unreadedAdressekontoViewModelMock.Expect(m => m.Nummer)
+                                             .Return(fixture.Create<int>())
+                                             .Repeat.Any();
+            unreadedAdressekontoViewModelMock.Expect(m => m.RefreshCommand)
+                                             .Return(refreshCommandMock)
+                                             .Repeat.Any();
 
-                command.Execute(regnskabViewModelMock);
-                waitEvent.WaitOne(3000);
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.StatusDato)
+                                 .Return(fixture.Create<DateTime>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel> { adressekontoViewModelMock, unreadedAdressekontoViewModelMock })
+                                 .Repeat.Any();
 
-                finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
-                finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
-                finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
-                regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
-                regnskabViewModelMock.AssertWasNotCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.Anything));
-                unreadedAdressekontoViewModelMock.AssertWasCalled(m => m.RefreshCommand);
-                refreshCommandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(unreadedAdressekontoViewModelMock)));
-                refreshCommandMock.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(unreadedAdressekontoViewModelMock)));
-            }
+            var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
+            // ReSharper disable ImplicitlyCapturedClosure
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
+            // ReSharper restore ImplicitlyCapturedClosure
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
+            regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
+            regnskabViewModelMock.AssertWasNotCalled(m => m.KreditorAdd(Arg<IAdressekontoViewModel>.Is.Anything));
+            unreadedAdressekontoViewModelMock.AssertWasCalled(m => m.RefreshCommand);
+            refreshCommandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(unreadedAdressekontoViewModelMock)));
+            refreshCommandMock.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(unreadedAdressekontoViewModelMock)));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
@@ -473,35 +456,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<Exception>.Is.NotNull))
-                                             .WhenCalled(e =>
-                                                 {
-                                                     Debug.WriteLine(e.Arguments.ElementAt(0));
-                                                     we.Set();
-                                                 })
-                                             .Repeat.Any();
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.StatusDato)
+                                 .Return(fixture.Create<DateTime>())
+                                 .Repeat.Any();
 
-                var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
-                regnskabViewModelMock.Expect(m => m.Nummer)
-                                     .Return(fixture.Create<int>())
-                                     .Repeat.Any();
-                regnskabViewModelMock.Expect(m => m.StatusDato)
-                                     .Return(fixture.Create<DateTime>())
-                                     .Repeat.Any();
+            var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
-                var command = new KreditorlisteGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
-                Assert.That(command, Is.Not.Null);
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
 
-                command.Execute(regnskabViewModelMock);
-                waitEvent.WaitOne(3000);
-
-                finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
-                finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
-            }
-
+            finansstyringRepositoryMock.AssertWasCalled(m => m.Konfiguration);
+            // ReSharper disable ImplicitlyCapturedClosure
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KreditorlisteGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<DateTime>.Is.Equal(regnskabViewModelMock.StatusDato)));
+            // ReSharper restore ImplicitlyCapturedClosure
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
         }
     }

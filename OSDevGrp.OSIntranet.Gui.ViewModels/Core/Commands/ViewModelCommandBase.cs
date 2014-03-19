@@ -42,6 +42,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         #region Properties
 
         /// <summary>
+        /// Task, som kommandoen gør brug af.
+        /// </summary>
+        public virtual Task ExecuteTask
+        {
+            get; 
+            protected set; 
+        }
+
+        /// <summary>
         /// ViewModel for den exceptionhandler, der skal håndtere exceptions.
         /// </summary>
         protected virtual IExceptionHandlerViewModel ExceptionHandler

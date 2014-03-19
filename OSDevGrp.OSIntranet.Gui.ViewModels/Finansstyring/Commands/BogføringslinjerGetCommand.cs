@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
@@ -13,13 +13,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
     /// <summary>
     /// Kommando, der kan hente bogføringslinjer til et regnskab.
     /// </summary>
-    public class BogføringslinjerGetCommand : ViewModelCommandBase<IRegnskabViewModel>
+    public class BogføringslinjerGetCommand : ViewModelCommandBase<IRegnskabViewModel>, ITaskableCommand
     {
         #region Private variables
 
         private bool _isBusy;
         private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly SynchronizationContext _synchronizationContext;
 
         #endregion
         
@@ -38,7 +37,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 throw new ArgumentNullException("finansstyringRepository");
             }
             _finansstyringRepository = finansstyringRepository;
-            _synchronizationContext = SynchronizationContext.Current;
         }
 
         #endregion
@@ -64,31 +62,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             _isBusy = true;
             var konfiguration = _finansstyringRepository.Konfiguration;
             var task = _finansstyringRepository.BogføringslinjerGetAsync(regnskabViewModel.Nummer, regnskabViewModel.StatusDato, konfiguration.AntalBogføringslinjer);
-            task.ContinueWith(t =>
+            ExecuteTask = task.ContinueWith(t =>
                 {
                     try
                     {
-                        if (t.IsCanceled || t.IsFaulted)
-                        {
-                            if (t.Exception != null)
-                            {
-                                t.Exception.Handle(exception =>
-                                    {
-                                        HandleException(exception);
-                                        return true;
-                                    });
-                            }
-                            return;
-                        }
                         var dageForNyheder = konfiguration.DageForNyheder;
-                        foreach (var bogføringslinjeModel in t.Result.OrderBy(m => m.Dato))
-                        {
-                            HandleBogføringslinjeModel(regnskabViewModel, bogføringslinjeModel, dageForNyheder, _synchronizationContext);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        HandleException(ex);
+                        HandleResultFromTask(t, regnskabViewModel, dageForNyheder, HandleResult);
                     }
                     finally
                     {
@@ -98,23 +77,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         }
 
         /// <summary>
-        /// Håndtering af hentet model for en bogføringslinje.
+        /// Opdaterer ViewModel for regnskabet med bogføringslinjer.
         /// </summary>
-        /// <param name="regnskabViewModel">ViewModel for regnskabet, der skal håndtere den hentede bogføringslinje.</param>
-        /// <param name="bogføringslinjeModel">Model for den hentede bogføringslinje.</param>
-        /// <param name="dageForNyheder">Antal dage, som nyheder er gældende.</param>
-        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private static void HandleBogføringslinjeModel(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, int dageForNyheder, SynchronizationContext synchronizationContext)
+        /// <param name="regnskabViewModel">ViewModel for regnskabet, der skal opdateres.</param>
+        /// <param name="bogføringslinjeModels">Bogføringslinjer, som ViewModel for regnskabet skal opdateres med.</param>
+        /// <param name="dageForNyheder">Antallet af dage, som nyheder er gældende.</param>
+        private static void HandleResult(IRegnskabViewModel regnskabViewModel, IEnumerable<IBogføringslinjeModel> bogføringslinjeModels, int dageForNyheder)
         {
             if (regnskabViewModel == null)
             {
                 throw new ArgumentNullException("regnskabViewModel");
             }
-            if (bogføringslinjeModel == null)
+            if (bogføringslinjeModels == null)
             {
-                throw new ArgumentNullException("bogføringslinjeModel");
+                throw new ArgumentNullException("bogføringslinjeModels");
             }
-            if (synchronizationContext == null)
+            foreach (var bogføringslinjeModel in bogføringslinjeModels)
             {
                 if (regnskabViewModel.Bogføringslinjer.Any(m => m.Løbenummer == bogføringslinjeModel.Løbenummer))
                 {
@@ -126,14 +104,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 {
                     regnskabViewModel.NyhedAdd(new NyhedViewModel(bogføringslinjeModel, bogføringslinjeViewModel.Image));
                 }
-                return;
             }
-            var arguments = new Tuple<IRegnskabViewModel, IBogføringslinjeModel, int>(regnskabViewModel, bogføringslinjeModel, dageForNyheder);
-            synchronizationContext.Post(obj =>
-                {
-                    var tuple = (Tuple<IRegnskabViewModel, IBogføringslinjeModel, int>) obj;
-                    HandleBogføringslinjeModel(tuple.Item1, tuple.Item2, tuple.Item3, null);
-                }, arguments);
         }
 
         #endregion

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
@@ -11,13 +10,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
     /// <summary>
     /// Kommando, der kan hente og opdaterer en adressekonto.
     /// </summary>
-    public class AdressekontoGetCommand : ViewModelCommandBase<IAdressekontoViewModel>
+    public class AdressekontoGetCommand : ViewModelCommandBase<IAdressekontoViewModel>, ITaskableCommand
     {
         #region Private variables
 
         private bool _isBusy;
         private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly SynchronizationContext _synchronizationContext;
 
         #endregion
 
@@ -36,7 +34,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 throw new ArgumentNullException("finansstyringRepository");
             }
             _finansstyringRepository = finansstyringRepository;
-            _synchronizationContext = SynchronizationContext.Current;
         }
 
         #endregion
@@ -61,27 +58,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             _isBusy = true;
             var task = _finansstyringRepository.AdressekontoGetAsync(viewModel.Regnskab.Nummer, viewModel.Nummer, viewModel.StatusDato);
-            task.ContinueWith(t =>
+            ExecuteTask = task.ContinueWith(t =>
                 {
                     try
                     {
-                        if (t.IsCanceled || t.IsFaulted)
-                        {
-                            if (t.Exception != null)
-                            {
-                                t.Exception.Handle(exception =>
-                                    {
-                                        HandleException(exception);
-                                        return true;
-                                    });
-                            }
-                            return;
-                        }
-                        HandleAdressekontoModel(viewModel, t.Result, _synchronizationContext);
-                    }
-                    catch (Exception ex)
-                    {
-                        HandleException(ex);
+                        HandleResultFromTask(t, viewModel, new object(), HandleResult);
                     }
                     finally
                     {
@@ -91,12 +72,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         }
 
         /// <summary>
-        /// Håndterer en hentet model for en adressekonto.
+        /// Opdaterer ViewModel for adressekontoen.
         /// </summary>
-        /// <param name="adressekontoViewModel">ViewModel for adressekontoen, der skal opdateres.</param>
-        /// <param name="adressekontoModel">Model for den hentede adressekonto.</param>
-        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private static void HandleAdressekontoModel(IAdressekontoViewModel adressekontoViewModel, IAdressekontoModel adressekontoModel, SynchronizationContext synchronizationContext)
+        /// <param name="adressekontoViewModel">ViewModel for adressenkontoen, der skal opdateres.</param>
+        /// <param name="adressekontoModel">Model for adressekontoen, som ViewModel for adressekontoen skal opdateres med.</param>
+        /// <param name="argument">Argument, der benyttes til opdatering af ViewModel for adressekontoen.</param>
+        private static void HandleResult(IAdressekontoViewModel adressekontoViewModel, IAdressekontoModel adressekontoModel, object argument)
         {
             if (adressekontoViewModel == null)
             {
@@ -106,21 +87,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             {
                 throw new ArgumentNullException("adressekontoModel");
             }
-            if (synchronizationContext == null)
+            if (argument == null)
             {
-                adressekontoViewModel.Navn = adressekontoModel.Navn;
-                adressekontoViewModel.PrimærTelefon = adressekontoModel.PrimærTelefon;
-                adressekontoViewModel.SekundærTelefon = adressekontoModel.SekundærTelefon;
-                adressekontoViewModel.StatusDato = adressekontoModel.StatusDato;
-                adressekontoViewModel.Saldo = adressekontoModel.Saldo;
-                return;
+                throw new ArgumentNullException("argument");
             }
-            var arguments = new Tuple<IAdressekontoViewModel, IAdressekontoModel>(adressekontoViewModel, adressekontoModel);
-            synchronizationContext.Post(obj =>
-                {
-                    var tuple = (Tuple<IAdressekontoViewModel, IAdressekontoModel>) obj;
-                    HandleAdressekontoModel(tuple.Item1, tuple.Item2, null);
-                }, arguments);
+            adressekontoViewModel.Navn = adressekontoModel.Navn;
+            adressekontoViewModel.PrimærTelefon = adressekontoModel.PrimærTelefon;
+            adressekontoViewModel.SekundærTelefon = adressekontoModel.SekundærTelefon;
+            adressekontoViewModel.StatusDato = adressekontoModel.StatusDato;
+            adressekontoViewModel.Saldo = adressekontoModel.Saldo;
         }
 
         #endregion

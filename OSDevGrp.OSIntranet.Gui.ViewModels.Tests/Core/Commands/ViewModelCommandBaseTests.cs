@@ -131,6 +131,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
 
             var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
             var exceptionHandler = command.GetExceptionHandler();
             Assert.That(exceptionHandler, Is.Not.Null);

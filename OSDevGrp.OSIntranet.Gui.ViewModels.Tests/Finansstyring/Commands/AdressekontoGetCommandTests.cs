@@ -30,6 +30,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var command = new AdressekontoGetCommand(fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
         }
 
         /// <summary>
@@ -137,10 +138,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var command = new AdressekontoGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
-            command.Execute(adressekontoViewModelMock);
+            // ReSharper disable ImplicitlyCapturedClosure
+            Action action = () =>
+                {
+                    command.Execute(adressekontoViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            // ReSharper restore ImplicitlyCapturedClosure
+            Task.Run(action).Wait(3000);
 
+            // ReSharper disable ImplicitlyCapturedClosure
             finansstyringRepositoryMock.AssertWasCalled(m => m.AdressekontoGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<int>.Is.Equal(adressekontoViewModelMock.Nummer), Arg<DateTime>.Is.Equal(adressekontoViewModelMock.StatusDato)));
+            // ReSharper restore ImplicitlyCapturedClosure
             adressekontoViewModelMock.AssertWasCalled(m => m.Navn = Arg<string>.Is.Equal(adressekontoModelMock.Navn));
             adressekontoViewModelMock.AssertWasCalled(m => m.PrimærTelefon = Arg<string>.Is.Equal(adressekontoModelMock.PrimærTelefon));
             adressekontoViewModelMock.AssertWasCalled(m => m.SekundærTelefon = Arg<string>.Is.Equal(adressekontoModelMock.SekundærTelefon));
@@ -152,6 +164,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
         /// <summary>
         /// Tester, at Execute kalder exceptionhandleren med en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
         /// </summary>
+        [Test]
         public void TestAtExecuteKalderExceptionHandlerViewModelMedIntranetGuiRepositoryExceptionVedIntranetGuiRepositoryException()
         {
             var fixture = new Fixture();
@@ -186,11 +199,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             var command = new AdressekontoGetCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
+            Assert.That(command.ExecuteTask, Is.Null);
 
-            command.Execute(adressekontoViewModelMock);
+            // ReSharper disable ImplicitlyCapturedClosure
+            Action action = () =>
+                {
+                    command.Execute(adressekontoViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            // ReSharper restore ImplicitlyCapturedClosure
+            Task.Run(action).Wait(3000);
 
+            // ReSharper disable ImplicitlyCapturedClosure
             finansstyringRepositoryMock.AssertWasCalled(m => m.AdressekontoGetAsync(Arg<int>.Is.Equal(regnskabViewModelMock.Nummer), Arg<int>.Is.Equal(adressekontoViewModelMock.Nummer), Arg<DateTime>.Is.Equal(adressekontoViewModelMock.StatusDato)));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
+            // ReSharper restore ImplicitlyCapturedClosure
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
         }
     }
 }

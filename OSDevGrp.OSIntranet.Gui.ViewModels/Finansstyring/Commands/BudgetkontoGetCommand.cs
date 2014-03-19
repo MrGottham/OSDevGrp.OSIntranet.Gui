@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
@@ -11,14 +10,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
     /// <summary>
     /// Kommando, der kan hente og opdatere en budgetkontoen.
     /// </summary>
-    public class BudgetkontoGetCommand : ViewModelCommandBase<IBudgetkontoViewModel>
+    public class BudgetkontoGetCommand : ViewModelCommandBase<IBudgetkontoViewModel>, ITaskableCommand
     {
         #region Private variables
 
         private bool _isBusy = false;
         private readonly ICommand _dependencyCommand;
         private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly SynchronizationContext _synchronizationContext;
 
         #endregion
 
@@ -30,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="dependencyCommand">Implementering af kommando, som denne kommando er afhængig af.</param>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til en exceptionhandler.</param>
-        public BudgetkontoGetCommand(ICommand dependencyCommand, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
+        public BudgetkontoGetCommand(ITaskableCommand dependencyCommand, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
             : base(exceptionHandlerViewModel)
         {
             // TODO: Null check on dependencyCommand.
@@ -40,7 +38,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             }
             _dependencyCommand = dependencyCommand;
             _finansstyringRepository = finansstyringRepository;
-            _synchronizationContext = SynchronizationContext.Current;
         }
 
         #endregion

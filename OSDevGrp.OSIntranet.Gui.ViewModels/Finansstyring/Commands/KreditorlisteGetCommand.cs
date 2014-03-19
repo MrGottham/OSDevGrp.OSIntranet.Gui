@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
@@ -16,13 +15,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
     /// <summary>
     /// Kommando, der kan hente og opdatere kreditorlisten til et regnskab.
     /// </summary>
-    public class KreditorlisteGetCommand : ViewModelCommandBase<IRegnskabViewModel>
+    public class KreditorlisteGetCommand : ViewModelCommandBase<IRegnskabViewModel>, ITaskableCommand
     {
         #region Private variables
 
         private bool _isBusy;
         private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly SynchronizationContext _synchronizationContext;
 
         #endregion
 
@@ -41,7 +39,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 throw new ArgumentNullException("finansstyringRepository");
             }
             _finansstyringRepository = finansstyringRepository;
-            _synchronizationContext = SynchronizationContext.Current;
         }
 
         #endregion
@@ -67,46 +64,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             _isBusy = true;
             var konfiguration = _finansstyringRepository.Konfiguration;
             var task = _finansstyringRepository.KreditorlisteGetAsync(viewModel.Nummer, viewModel.StatusDato);
-            task.ContinueWith(t =>
+            ExecuteTask = task.ContinueWith(t =>
                 {
                     try
                     {
-                        if (t.IsCanceled || t.IsFaulted)
-                        {
-                            if (t.Exception != null)
-                            {
-                                t.Exception.Handle(exception =>
-                                    {
-                                        HandleException(exception);
-                                        return true;
-                                    });
-                            }
-                            return;
-                        }
                         var dageForNyheder = konfiguration.DageForNyheder;
-                        var adressekontoViewModelCollection = new List<IAdressekontoViewModel>(viewModel.Kreditorer);
-                        foreach (var adressekontoModel in t.Result.OrderBy(m => m.Nummer))
-                        {
-                            HandleAdressekontoModel(viewModel, adressekontoModel, dageForNyheder, _synchronizationContext);
-                            var adressekontoViewModel = adressekontoViewModelCollection.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
-                            while (adressekontoViewModel != null)
-                            {
-                                adressekontoViewModelCollection.Remove(adressekontoViewModel);
-                                adressekontoViewModel = adressekontoViewModelCollection.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
-                            }
-                        }
-                        foreach (var adressekontoViewModel in adressekontoViewModelCollection)
-                        {
-                            var refreshCommand = adressekontoViewModel.RefreshCommand;
-                            if (refreshCommand.CanExecute(adressekontoViewModel))
-                            {
-                                refreshCommand.Execute(adressekontoViewModel);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        HandleException(ex);
+                        HandleResultFromTask(t, viewModel, dageForNyheder, HandleResult);
                     }
                     finally
                     {
@@ -116,49 +79,62 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         }
 
         /// <summary>
-        /// Håndtering af hentet adressekonto for en kreditor.
+        /// Opdaterer ViewModel for regnskabet med kreditorer.
         /// </summary>
-        /// <param name="regnskabViewModel">ViewModel for regnskabet, hvorpå den hentede adressekonto skal håndteres.</param>
-        /// <param name="adressekontoModel">Model for den hentede adressekonto.</param>
-        /// <param name="dageForNyheder">Antal dage, som nyheder er gældende.</param>
-        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
-        private void HandleAdressekontoModel(IRegnskabViewModel regnskabViewModel, IAdressekontoModel adressekontoModel, int dageForNyheder, SynchronizationContext synchronizationContext)
+        /// <param name="regnskabViewModel">ViewModel for regnskabet, der skal opdateres.</param>
+        /// <param name="adressekontoModels">Kreditorer, som regnskabet skal opdateres med.</param>
+        /// <param name="dageForNyheder">Antallet af dage, som nyheder er gældende.</param>
+        private void HandleResult(IRegnskabViewModel regnskabViewModel, IEnumerable<IAdressekontoModel> adressekontoModels, int dageForNyheder)
         {
             if (regnskabViewModel == null)
             {
                 throw new ArgumentNullException("regnskabViewModel");
             }
-            if (adressekontoModel == null)
+            if (adressekontoModels == null)
             {
-                throw new ArgumentNullException("adressekontoModel");
+                throw new ArgumentNullException("adressekontoModels");
             }
-            if (synchronizationContext == null)
+            var adressekontoViewModelCollection = new List<IAdressekontoViewModel>(regnskabViewModel.Kreditorer);
+            foreach (var adressekontoModel in adressekontoModels.OrderBy(m => m.Nummer))
             {
-                var adressekontoViewModel = regnskabViewModel.Kreditorer.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
-                if (adressekontoViewModel == null)
+                try
                 {
-                    adressekontoViewModel = new AdressekontoViewModel(regnskabViewModel, adressekontoModel, Resource.GetText(Text.Creditor), Resource.GetEmbeddedResource("Images.Adressekonto.png"), _finansstyringRepository, ExceptionHandler);
-                    regnskabViewModel.KreditorAdd(adressekontoViewModel);
-                    if (adressekontoModel.StatusDato.Date.CompareTo(regnskabViewModel.StatusDato.Date.AddDays(dageForNyheder * -1)) >= 0 && adressekontoModel.StatusDato.Date.CompareTo(regnskabViewModel.StatusDato.Date) <= 0)
+                    var adressekontoViewModel = regnskabViewModel.Kreditorer.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
+                    if (adressekontoViewModel == null)
                     {
-                        adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.High);
-                        regnskabViewModel.NyhedAdd(new NyhedViewModel(adressekontoModel, adressekontoViewModel.Image));
+                        adressekontoViewModel = new AdressekontoViewModel(regnskabViewModel, adressekontoModel, Resource.GetText(Text.Creditor), Resource.GetEmbeddedResource("Images.Adressekonto.png"), _finansstyringRepository, ExceptionHandler);
+                        regnskabViewModel.KreditorAdd(adressekontoViewModel);
+                        if (adressekontoModel.StatusDato.Date.CompareTo(regnskabViewModel.StatusDato.Date.AddDays(dageForNyheder*-1)) >= 0 && adressekontoModel.StatusDato.Date.CompareTo(regnskabViewModel.StatusDato.Date) <= 0)
+                        {
+                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.High);
+                            regnskabViewModel.NyhedAdd(new NyhedViewModel(adressekontoModel, adressekontoViewModel.Image));
+                        }
+                        continue;
                     }
-                    return;
+                    adressekontoViewModel.Navn = adressekontoModel.Navn;
+                    adressekontoViewModel.PrimærTelefon = adressekontoModel.PrimærTelefon;
+                    adressekontoViewModel.SekundærTelefon = adressekontoModel.SekundærTelefon;
+                    adressekontoViewModel.StatusDato = adressekontoModel.StatusDato;
+                    adressekontoViewModel.Saldo = adressekontoModel.Saldo;
                 }
-                adressekontoViewModel.Navn = adressekontoModel.Navn;
-                adressekontoViewModel.PrimærTelefon = adressekontoModel.PrimærTelefon;
-                adressekontoViewModel.SekundærTelefon = adressekontoModel.SekundærTelefon;
-                adressekontoViewModel.StatusDato = adressekontoModel.StatusDato;
-                adressekontoViewModel.Saldo = adressekontoModel.Saldo;
-                return;
-            }
-            var arguments = new Tuple<IRegnskabViewModel, IAdressekontoModel, int>(regnskabViewModel, adressekontoModel, dageForNyheder);
-            synchronizationContext.Post(obj =>
+                finally
                 {
-                    var tuple = (Tuple<IRegnskabViewModel, IAdressekontoModel, int>) obj;
-                    HandleAdressekontoModel(tuple.Item1, tuple.Item2, tuple.Item3, null);
-                }, arguments);
+                    var adressekontoViewModel = adressekontoViewModelCollection.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
+                    while (adressekontoViewModel != null)
+                    {
+                        adressekontoViewModelCollection.Remove(adressekontoViewModel);
+                        adressekontoViewModel = adressekontoViewModelCollection.FirstOrDefault(m => m.Nummer == adressekontoModel.Nummer);
+                    }
+                }
+            }
+            foreach (var adressekontoViewModel in adressekontoViewModelCollection)
+            {
+                var refreshCommand = adressekontoViewModel.RefreshCommand;
+                if (refreshCommand.CanExecute(adressekontoViewModel))
+                {
+                    refreshCommand.Execute(adressekontoViewModel);
+                }
+            }
         }
 
         #endregion
