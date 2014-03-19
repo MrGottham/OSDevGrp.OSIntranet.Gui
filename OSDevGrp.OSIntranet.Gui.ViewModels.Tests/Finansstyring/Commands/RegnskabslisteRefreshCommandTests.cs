@@ -165,7 +165,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                                        .Return(new ObservableCollection<IRegnskabViewModel>(new List<IRegnskabViewModel> { regnskabViewModelMock }))
                                        .Repeat.Any();
 
-
             var command = new RegnskabslisteRefreshCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
@@ -196,41 +195,31 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                                        .Return(Task.Run(regnskabCollectionGetter))
                                        .Repeat.Any();
 
-            using (var waitEvent = new AutoResetEvent(false))
-            {
-                var we = waitEvent;
-                var regnskabslisteViewModelMock = MockRepository.GenerateMock<IRegnskabslisteViewModel>();
-                var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-                var actionCalled = false;
-                Action<IRegnskabslisteViewModel> onFinish = obj =>
-                    {
-                        try
-                        {
-                            Assert.That(obj, Is.Not.Null);
-                            Assert.That(obj, Is.EqualTo(regnskabslisteViewModelMock));
-                            actionCalled = true;
-                        }
-                        finally
-                        {
-                            we.Set();
-                        }
-                    };
+            var regnskabslisteViewModelMock = MockRepository.GenerateMock<IRegnskabslisteViewModel>();
 
-                var command = new RegnskabslisteRefreshCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock, onFinish);
-                Assert.That(command, Is.Not.Null);
+            var actionCalled = false;
+            Action<IRegnskabslisteViewModel> onFinish = obj =>
+                {
+                    Assert.That(obj, Is.Not.Null);
+                    Assert.That(obj, Is.EqualTo(regnskabslisteViewModelMock));
+                    actionCalled = true;
+                };
 
-                Assert.That(actionCalled, Is.False);
-                command.Execute(regnskabslisteViewModelMock);
-                waitEvent.WaitOne(3000);
-                Assert.That(actionCalled, Is.True);
+            var command = new RegnskabslisteRefreshCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock, onFinish);
+            Assert.That(command, Is.Not.Null);
 
-                finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
-                regnskabslisteViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.LessThanOrEqual(DateTime.Now));
-                regnskabslisteViewModelMock.AssertWasNotCalled(m => m.Regnskaber);
-                regnskabslisteViewModelMock.AssertWasNotCalled(m => m.RegnskabAdd(Arg<IRegnskabViewModel>.Is.Anything));
-                exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
-            }
+            Assert.That(actionCalled, Is.False);
+            Action action = () => command.Execute(regnskabslisteViewModelMock);
+            Task.Run(action).Wait(3000);
+            Assert.That(actionCalled, Is.True);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
+            regnskabslisteViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.LessThanOrEqual(DateTime.Now));
+            regnskabslisteViewModelMock.AssertWasNotCalled(m => m.Regnskaber);
+            regnskabslisteViewModelMock.AssertWasNotCalled(m => m.RegnskabAdd(Arg<IRegnskabViewModel>.Is.Anything));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
         /// <summary>

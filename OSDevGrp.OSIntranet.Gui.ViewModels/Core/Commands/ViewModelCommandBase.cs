@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
@@ -15,6 +17,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         #region Private variables
 
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
+        private readonly SynchronizationContext _synchronizationContext;
 
         #endregion
 
@@ -31,6 +34,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
                 throw new ArgumentNullException("exceptionHandlerViewModel");
             }
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
+            _synchronizationContext = SynchronizationContext.Current;
         }
 
         #endregion
@@ -45,6 +49,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
             get
             {
                 return _exceptionHandlerViewModel;
+            }
+        }
+
+        /// <summary>
+        /// Synkroniseringskontekst.
+        /// </summary>
+        protected virtual SynchronizationContext SynchronizationContext
+        {
+            get
+            {
+                return _synchronizationContext;
             }
         }
 
@@ -120,6 +135,91 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
                 return;
             }
             ExceptionHandler.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.CommandError, GetType().Name, exception.Message), exception));
+        }
+
+        /// <summary>
+        /// Håndterer resultatet fra udførelsen af en given task.
+        /// </summary>
+        /// <typeparam name="TTaskResult">Typen af resultatet, som task'en medfører.</typeparam>
+        /// <typeparam name="TArgument">Typen på argumentet, som skal benyttes ved håndtering af resultatet.</typeparam>
+        /// <param name="task">Task, hvorfra resultatet skal håndteres.</param>
+        /// <param name="viewModel">Implementering af den ViewModel, hvorpå resultatet skal benyttes.</param>
+        /// <param name="argument">Argument, som skal benyttes ved håndtering af resultatet.</param>
+        /// <param name="onHandleTaskResult">Callback metode, der udføres, når resultatet skal håndteres.</param>
+        protected virtual void HandleResultFromTask<TTaskResult, TArgument>(Task<TTaskResult> task, TViewModel viewModel, TArgument argument, Action<TViewModel, TTaskResult, TArgument> onHandleTaskResult)
+        {
+            if (task == null)
+            {
+                throw new ArgumentNullException("task");
+            }
+            if (Equals(viewModel, null))
+            {
+                throw new ArgumentNullException("viewModel");
+            }
+            if (onHandleTaskResult == null)
+            {
+                throw new ArgumentNullException("onHandleTaskResult");
+            }
+            try
+            {
+                if (task.IsCanceled || task.IsFaulted)
+                {
+                    if (task.Exception != null)
+                    {
+                        task.Exception.Handle(exception =>
+                            {
+                                HandleException(exception);
+                                return true;
+                            });
+                    }
+                    return;
+                }
+                HandleResultFromTask(task.Result, viewModel, argument, onHandleTaskResult, SynchronizationContext);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Håndterer resultatet fra udførelsen af en given task.
+        /// </summary>
+        /// <typeparam name="TTaskResult">Typen af resultatet, som task'en medfører.</typeparam>
+        /// <typeparam name="TArgument">Typen på argumentet, som skal benyttes ved håndtering af resultatet.</typeparam>
+        /// <param name="taskResult">Resultat fra udførelsen af det givne task.</param>
+        /// <param name="viewModel">Implementering af den ViewModel, hvorpå resultatet skal benyttes.</param>
+        /// <param name="argument">Argument, som skal benyttes ved håndtering af resultatet.</param>
+        /// <param name="onHandleTaskResult">Callback metode, der udføres, når resultatet skal håndteres.</param>
+        /// <param name="synchronizationContext">Synkroniseringskontekst.</param>
+        private void HandleResultFromTask<TTaskResult, TArgument>(TTaskResult taskResult, TViewModel viewModel, TArgument argument, Action<TViewModel, TTaskResult, TArgument> onHandleTaskResult, SynchronizationContext synchronizationContext)
+        {
+            if (Equals(viewModel, null))
+            {
+                throw new ArgumentNullException("viewModel");
+            }
+            if (onHandleTaskResult == null)
+            {
+                throw new ArgumentNullException("onHandleTaskResult");
+            }
+            if (synchronizationContext == null)
+            {
+                try
+                {
+                    onHandleTaskResult(viewModel, taskResult, argument);
+                }
+                catch (Exception ex)
+                {
+                    HandleException(ex);
+                }
+                return;
+            }
+            var arguments = new Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>>(taskResult, viewModel, argument, onHandleTaskResult);
+            synchronizationContext.Post(obj =>
+                {
+                    var tuple = (Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>>) obj;
+                    HandleResultFromTask(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, null);
+                }, arguments);
         }
 
         #endregion

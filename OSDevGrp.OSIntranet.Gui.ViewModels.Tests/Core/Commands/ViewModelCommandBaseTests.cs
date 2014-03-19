@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
@@ -67,6 +70,29 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             }
 
             /// <summary>
+            /// Returnerer synkroniseringskontekst.
+            /// </summary>
+            /// <returns>Synkroniseringskontekst.</returns>
+            public SynchronizationContext GetSynchronizationContext()
+            {
+                return SynchronizationContext;
+            }
+
+            /// <summary>
+            /// Håndterer resultatet fra udførelsen af en given task.
+            /// </summary>
+            /// <typeparam name="TTaskResult">Typen af resultatet, som task'en medfører.</typeparam>
+            /// <typeparam name="TArgument">Typen på argumentet, som skal benyttes ved håndtering af resultatet.</typeparam>
+            /// <param name="task">Task, hvorfra resultatet skal håndteres.</param>
+            /// <param name="viewModel">Implementering af den ViewModel, hvorpå resultatet skal benyttes.</param>
+            /// <param name="argument">Argument, som skal benyttes ved håndtering af resultatet.</param>
+            /// <param name="onHandleTaskResult">Callback metode, der udføres, når resultatet skal håndteres.</param>
+            public new void HandleResultFromTask<TTaskResult, TArgument>(Task<TTaskResult> task, IViewModel viewModel, TArgument argument, Action<IViewModel, TTaskResult, TArgument> onHandleTaskResult)
+            {
+                base.HandleResultFromTask(task, viewModel, argument, onHandleTaskResult);
+            }
+
+            /// <summary>
             /// Returnerer angivelse af, om kommandoen kan udføres på den givne ViewModel.
             /// </summary>
             /// <param name="viewModel">ViewModel, hvorpå kommandoen skal udføres.</param>
@@ -109,6 +135,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             var exceptionHandler = command.GetExceptionHandler();
             Assert.That(exceptionHandler, Is.Not.Null);
             Assert.That(exceptionHandler, Is.EqualTo(exceptionHandlerViewModelMock));
+
+            var synchronizationContext = command.GetSynchronizationContext();
+            Assert.That(synchronizationContext, Is.Null);
         }
 
         /// <summary>
@@ -351,6 +380,203 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             command.Execute(fixture.Create<IViewModel>());
 
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at HandleResultFromTask kaster en ArgumentNullException, hvis task'en, hvorfra resultatet skal håndteres, er null.
+        /// </summary>
+        [Test]
+        public void TestAtHandleResultFromTaskKasterArgumentNullExceptionHvisTaskErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+            fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            Action<IViewModel, IModel, object> onHandleResult = (viewMode, model, argument) => { };
+            onHandleResult.Invoke(fixture.Create<IViewModel>(), fixture.Create<IModel>(), null);
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => command.HandleResultFromTask(null, fixture.Create<IViewModel>(), null, onHandleResult));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("task"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at HandleResultFromTask kaster en ArgumentNullException, hvis den ViewModel, der skal håndtere resultatet, er null.
+        /// </summary>
+        [Test]
+        public void TestAtHandleResultFromTaskKasterArgumentNullExceptionHvisViewModelErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+            fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            Action<IViewModel, IModel, object> onHandleResult = (viewMode, model, argument) => { };
+            onHandleResult.Invoke(fixture.Create<IViewModel>(), fixture.Create<IModel>(), null);
+
+            var modelMock = fixture.Create<IModel>();
+            Func<IModel> modelGetter = () => modelMock;
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () =>
+                {
+                    var task = Task.Run(modelGetter);
+                    await task.ContinueWith(t => command.HandleResultFromTask(t, null, null, onHandleResult));
+                });
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("viewModel"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at HandleResultFromTask kaster en ArgumentNullException, hvis callback metoden, der udføres, når resultatet skal håndteres, er null.
+        /// </summary>
+        [Test]
+        public void TestAtHandleResultFromTaskKasterArgumentNullExceptionHvisOnHandleTaskResultErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+            fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var modelMock = fixture.Create<IModel>();
+            Func<IModel> modelGetter = () => modelMock;
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () =>
+                {
+                    var task = Task.Run(modelGetter);
+                    await task.ContinueWith(t => command.HandleResultFromTask<IModel, object>(t, fixture.Create<IViewModel>(), null, null));
+                });
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("onHandleTaskResult"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at HandleResultFromTask kalder HandleException på exceptionhandleren, hvis task'en har fejlet.
+        /// </summary>
+        [Test]
+        public void TestAtHandleResultFromTaskKalderHandleExceptionOnExceptionHandlerViewModelHvisTaskHarKastetException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+            fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            Action<IViewModel, IModel, object> onHandleResult = (viewMode, model, argument) => { };
+            onHandleResult.Invoke(fixture.Create<IViewModel>(), fixture.Create<IModel>(), null);
+
+            var exception = fixture.Create<IntranetGuiRepositoryException>();
+            Func<IModel> modelGetter = () =>
+                {
+                    throw exception;
+                };
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            Task.Run(async () =>
+                {
+                    var task = Task.Run(modelGetter);
+                    await task.ContinueWith(t => command.HandleResultFromTask(t, fixture.Create<IViewModel>(), null, onHandleResult));
+                }).Wait(3000);
+
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at HandleResultFromTask kalder callback metode, der udføres, når resultatet skal håndteres.
+        /// </summary>
+        [Test]
+        public void TestAtHandleResultFromTaskKalderOnHandleTaskResult()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+            fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var actionCalled = false;
+            Action<IViewModel, IModel, object> onHandleResult = (viewMode, model, argument) => { actionCalled = true; };
+
+            var modelMock = fixture.Create<IModel>();
+            Func<IModel> modelGetter = () => modelMock;
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            Assert.That(actionCalled, Is.False);
+            Task.Run(async () =>
+                {
+                    var task = Task.Run(modelGetter);
+                    await task.ContinueWith(t => command.HandleResultFromTask(t, fixture.Create<IViewModel>(), null, onHandleResult));
+                }).Wait(3000);
+            Assert.That(actionCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at HandleResultFromTask kalder HandleException på exceptionhandleren, callback metode, der udføres, når resultatet skal håndteres, kaster en exception.
+        /// </summary>
+        [Test]
+        public void TestAtHandleResultFromTaskKalderHandleExceptionOnExceptionHandlerViewModelHvisOnHandleTaskResultKasterException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+            fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var actionCalled = false;
+            var exception = fixture.Create<IntranetGuiBusinessException>();
+            Action<IViewModel, IModel, object> onHandleResult = (viewMode, model, argument) =>
+                {
+                    actionCalled = true;
+                    throw exception;
+                };
+
+            var modelMock = fixture.Create<IModel>();
+            Func<IModel> modelGetter = () => modelMock;
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            Assert.That(actionCalled, Is.False);
+            Task.Run(async () =>
+                {
+                    var task = Task.Run(modelGetter);
+                    await task.ContinueWith(t => command.HandleResultFromTask(t, fixture.Create<IViewModel>(), null, onHandleResult));
+                }).Wait(3000);
+            Assert.That(actionCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf));
         }
     }
 }
