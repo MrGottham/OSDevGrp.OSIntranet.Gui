@@ -63,8 +63,10 @@
     <Compile Include="Finansstyring\Commands\AdressekontoGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\BudgetkontoGetCommand.cs" />
+    <Compile Include="Finansstyring\Commands\BudgetkontogrupperGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\DebitorlisteGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\KontoGetCommand.cs" />
+    <Compile Include="Finansstyring\Commands\KontogrupperGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\KreditorlisteGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\RegnskabslisteRefreshCommand.cs" />
     <Compile Include="Finansstyring\Comparers\AdressekontoViewModelComparer.cs" />

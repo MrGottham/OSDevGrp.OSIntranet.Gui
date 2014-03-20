@@ -183,6 +183,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
                     }
                     return;
                 }
+                if (Equals(task.Result, null))
+                {
+                    return;
+                }
                 HandleResultFromTask(task.Result, viewModel, argument, onHandleTaskResult, SynchronizationContext);
             }
             catch (Exception ex)

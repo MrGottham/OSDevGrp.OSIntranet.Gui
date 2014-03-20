@@ -512,6 +512,37 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         }
 
         /// <summary>
+        /// Tester, at HandleResultFromTask ikke kalder callback metode, der udføres, når resultatet skal håndteres, hvis resultatet er null.
+        /// </summary>
+        [Test]
+        public void TestAtHandleResultFromTaskIkkeKalderOnHandleTaskResultHvisResultErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+            fixture.Customize<IViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IViewModel>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var actionCalled = false;
+            Action<IViewModel, IModel, object> onHandleResult = (viewMode, model, argument) => { actionCalled = true; };
+
+            Func<IModel> modelGetter = () => null;
+
+            var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            Assert.That(actionCalled, Is.False);
+            Task.Run(async () =>
+                {
+                    var task = Task.Run(modelGetter);
+                    await task.ContinueWith(t => command.HandleResultFromTask(t, fixture.Create<IViewModel>(), null, onHandleResult));
+                }).Wait(3000);
+            Assert.That(actionCalled, Is.False);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
         /// Tester, at HandleResultFromTask kalder callback metode, der udføres, når resultatet skal håndteres.
         /// </summary>
         [Test]

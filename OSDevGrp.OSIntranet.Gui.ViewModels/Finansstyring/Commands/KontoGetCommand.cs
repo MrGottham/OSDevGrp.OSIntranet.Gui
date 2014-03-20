@@ -1,5 +1,8 @@
 ﻿using System;
-using System.Windows.Input;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
@@ -14,8 +17,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
     {
         #region Private variables
 
-        private bool _isBusy = false;
-        private readonly ICommand _dependencyCommand;
+        private bool _isBusy;
+        private readonly ITaskableCommand _dependencyCommand;
         private readonly IFinansstyringRepository _finansstyringRepository;
 
         #endregion
@@ -31,7 +34,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         public KontoGetCommand(ITaskableCommand dependencyCommand, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
             : base(exceptionHandlerViewModel)
         {
-            // TODO: Null check on dependencyCommand.
+            if (dependencyCommand == null)
+            {
+                throw new ArgumentNullException("dependencyCommand");
+            }
             if (finansstyringRepository == null)
             {
                 throw new ArgumentNullException("finansstyringRepository");
@@ -60,7 +66,57 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="kontoViewModel">ViewModel for kontoen, der skal hentes og opdateres.</param>
         protected override void Execute(IKontoViewModel kontoViewModel)
         {
-            throw new NotImplementedException();
+            var regnskabViewModel = kontoViewModel.Regnskab;
+            Task dependencyCommandTask = null;
+            if (_dependencyCommand.CanExecute(regnskabViewModel))
+            {
+                _dependencyCommand.Execute(regnskabViewModel);
+                dependencyCommandTask = _dependencyCommand.ExecuteTask;
+            }
+            _isBusy = true;
+            var task = _finansstyringRepository.KontoGetAsync(regnskabViewModel.Nummer, kontoViewModel.Kontonummer, kontoViewModel.StatusDato);
+            ExecuteTask = task.ContinueWith(t =>
+                {
+                    try
+                    {
+                        if (dependencyCommandTask != null)
+                        {
+                            dependencyCommandTask.Wait();
+                        }
+                        HandleResultFromTask(t, kontoViewModel, new List<IKontogruppeViewModel>(regnskabViewModel.Kontogrupper), HandleResult);
+                    }
+                    finally
+                    {
+                        _isBusy = false;
+                    }
+                });
+        }
+
+        /// <summary>
+        /// Opdaterer ViewModel for kontoen.
+        /// </summary>
+        /// <param name="kontoViewModel">ViewModel for kontoen, som skal opdateres.</param>
+        /// <param name="kontoModel">Model for kontoen, som ViewModel for kontoen skal opdateres med.</param>
+        /// <param name="kontogruppeViewModels">ViewModels for kontogrupper.</param>
+        private static void HandleResult(IKontoViewModel kontoViewModel, IKontoModel kontoModel, IEnumerable<IKontogruppeViewModel> kontogruppeViewModels)
+        {
+            if (kontoViewModel == null)
+            {
+                throw new ArgumentNullException("kontoViewModel");
+            }
+            if (kontoModel == null)
+            {
+                throw new ArgumentNullException("kontoModel");
+            }
+            if (kontogruppeViewModels == null)
+            {
+                throw new ArgumentNullException("kontogruppeViewModels");
+            }
+            var kontogruppeViewModel = kontogruppeViewModels.SingleOrDefault(m => m.Nummer == kontoModel.Kontogruppe);
+            if (kontogruppeViewModel == null)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         #endregion
