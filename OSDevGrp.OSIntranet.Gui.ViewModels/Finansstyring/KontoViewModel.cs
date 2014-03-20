@@ -178,7 +178,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return _refreshCommand ?? (_refreshCommand = new KontoGetCommand(null, FinansstyringRepository, ExceptionHandler));
+                return _refreshCommand ?? (_refreshCommand = new KontoGetCommand(new KontogrupperGetCommand(FinansstyringRepository, ExceptionHandler), FinansstyringRepository, ExceptionHandler));
             }
         }
 

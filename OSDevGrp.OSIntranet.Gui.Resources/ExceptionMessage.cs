@@ -13,6 +13,8 @@
         InvalidConfigurationSettingValue,
         ErrorWhileGettingPropertyValue,
         ErrorWhileSettingPropertyValue,
-        MethodError
+        MethodError,
+        AccountGroupNotFound,
+        BudgetAccountGroupNotFound
     }
 }

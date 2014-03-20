@@ -61,6 +61,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The account group with the unique number &apos;{0}&apos; could not be found..
+        /// </summary>
+        internal static string AccountGroupNotFound {
+            get {
+                return ResourceManager.GetString("AccountGroupNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The budget account group with the unique number &apos;{0}&apos; could not be found..
+        /// </summary>
+        internal static string BudgetAccountGroupNotFound {
+            get {
+                return ResourceManager.GetString("BudgetAccountGroupNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error while executing the command &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string CommandError {

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -115,8 +117,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             var kontogruppeViewModel = kontogruppeViewModels.SingleOrDefault(m => m.Nummer == kontoModel.Kontogruppe);
             if (kontogruppeViewModel == null)
             {
-                throw new NotImplementedException();
+                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.AccountGroupNotFound, kontoModel.Kontogruppe));
             }
+            kontoViewModel.Kontonavn = kontoModel.Kontonavn;
+            kontoViewModel.Beskrivelse = kontoModel.Beskrivelse;
+            kontoViewModel.Notat = kontoModel.Notat;
+            kontoViewModel.Kontogruppe = kontogruppeViewModel;
+            kontoViewModel.StatusDato = kontoModel.StatusDato;
+            kontoViewModel.Kredit = kontoModel.Kredit;
+            kontoViewModel.Saldo = kontoModel.Saldo;
         }
 
         #endregion

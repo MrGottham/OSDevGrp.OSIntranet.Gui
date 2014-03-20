@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -115,8 +117,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             var budgetkontogruppeViewModel = budgetkontogruppeViewModels.SingleOrDefault(m => m.Nummer == budgetkontoModel.Kontogruppe);
             if (budgetkontogruppeViewModel == null)
             {
-                throw new NotImplementedException();
+                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountGroupNotFound, budgetkontoModel.Kontogruppe));
             }
+            budgetkontoViewModel.Kontonavn = budgetkontoModel.Kontonavn;
+            budgetkontoViewModel.Beskrivelse = budgetkontoModel.Beskrivelse;
+            budgetkontoViewModel.Notat = budgetkontoModel.Notat;
+            budgetkontoViewModel.Kontogruppe = budgetkontogruppeViewModel;
+            budgetkontoViewModel.StatusDato = budgetkontoModel.StatusDato;
+            budgetkontoViewModel.Indtægter = budgetkontoModel.Indtægter;
+            budgetkontoViewModel.Udgifter = budgetkontoModel.Udgifter;
+            budgetkontoViewModel.Bogført = budgetkontoModel.Bogført;
         }
 
         #endregion
