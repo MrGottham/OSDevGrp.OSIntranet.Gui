@@ -53,6 +53,62 @@
                 <TextBlock Grid.Column="6" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KreditAsText}"/>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="KontoViewModelDefaultDateTemplate">
+            <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
+                <Grid Grid.Column="1" Margin="10,10,20,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=Kontonavn}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=KreditLabel}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KreditAsText}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=SaldoLabel}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=SaldoAsText}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=DisponibelLabel}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DisponibelAsText}"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="BudgetkontoViewModelDefaultDateTemplate">
+            <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
+                <Grid Grid.Column="1" Margin="10,10,20,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=Kontonavn}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=BudgetLabel}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetAsText}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=BogførtLabel}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtAsText}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=DisponibelLabel}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DisponibelAsText}"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="AdressekontoViewModelDefaultDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
@@ -90,6 +146,13 @@
     </Page.Resources>
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
+        <Grid.Resources>
+            <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTop}" IsSourceGrouped="True">
+            </CollectionViewSource>
+            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiTop}" IsSourceGrouped="True">
+            </CollectionViewSource>
+        </Grid.Resources>
+        
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -113,6 +176,8 @@
                         <ColumnDefinition Width="Auto" MinWidth="1000"/>
                         <ColumnDefinition Width="Auto" MinWidth="500"/>
                         <ColumnDefinition Width="Auto" MinWidth="500"/>
+                        <ColumnDefinition Width="Auto" MinWidth="500"/>
+                        <ColumnDefinition Width="Auto" MinWidth="500"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" Margin="0,0,40,20">
                         <Grid.RowDefinitions>
@@ -128,26 +193,78 @@
                             </ListView.ItemsPanel>
                         </ListView>
                     </Grid>
-                    <StackPanel Grid.Column="1" Margin="0,0,40,20">
-                        <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
-                        <ListView ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                    <Grid Grid.Column="1" Margin="0,0,40,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
+                        <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Margin="0,0,40,20">
-                        <TextBlock Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
-                        <ListView ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                    </Grid>
+                    <Grid Grid.Column="2" Margin="0,0,40,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
+                        <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDateTemplate}" SelectionMode="None">
+                            <ListView.GroupStyle>
+                                <GroupStyle HidesIfEmpty="True">
+                                    <GroupStyle.HeaderTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <TextBlock>XYZ</TextBlock>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                    <GroupStyle.Panel>
+                                        <ItemsPanelTemplate>
+                                            <VariableSizedWrapGrid/>
+                                        </ItemsPanelTemplate>
+                                    </GroupStyle.Panel>
+                                </GroupStyle>
+                            </ListView.GroupStyle>
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>
-                    </StackPanel>
+                    </Grid>
+                    <Grid Grid.Column="3" Margin="0,0,40,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
+                        <ListView Grid.Row="1" ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                    </Grid>
+                    <Grid Grid.Column="4" Margin="0,0,40,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
+                        <ListView Grid.Row="1" ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                    </Grid>
                 </Grid>
             </ScrollViewer>
         </Grid>
