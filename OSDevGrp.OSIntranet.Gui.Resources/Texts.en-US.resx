@@ -218,4 +218,10 @@
   <data name="Income" xml:space="preserve">
     <value>Income</value>
   </data>
+  <data name="Accounts" xml:space="preserve">
+    <value>Accounts</value>
+  </data>
+  <data name="BudgetAccounts" xml:space="preserve">
+    <value>Budget accounts</value>
+  </data>
 </root>

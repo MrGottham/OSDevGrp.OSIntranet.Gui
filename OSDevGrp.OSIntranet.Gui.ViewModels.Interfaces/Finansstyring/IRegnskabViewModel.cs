@@ -36,6 +36,54 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Konti.
+        /// </summary>
+        IEnumerable<IKontoViewModel> Konti
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Topbenyttede konti.
+        /// </summary>
+        IEnumerable<IKontoViewModel> KontiTop
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til konti.
+        /// </summary>
+        string KontiHeader
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Budgetkonti.
+        /// </summary>
+        IEnumerable<IBudgetkontoViewModel> Budgetkonti
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Topbenyttede budgetkonti.
+        /// </summary>
+        IEnumerable<IBudgetkontoViewModel> BudgetkontiTop
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til budgetkonti.
+        /// </summary>
+        string BudgetkontiHeader
+        {
+            get;
+        }
+        
+        /// <summary>
         /// Bogføringslinjer.
         /// </summary>
         IEnumerable<IReadOnlyBogføringslinjeViewModel> Bogføringslinjer
@@ -122,6 +170,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
+
+        /// <summary>
+        /// Tilføjer en konto til regnskabet.
+        /// </summary>
+        /// <param name="kontoViewModel">ViewModel for kontoen, der skal tilføjes regnskabet.</param>
+        void KontoAdd(IKontoViewModel kontoViewModel);
+
+        /// <summary>
+        /// Tilføjer en budgetkonto til regnskabet.
+        /// </summary>
+        /// <param name="budgetkontoViewModel">ViewModel for budgetkontoen, der skal tilføjes regnskabet.</param>
+        void BudgetkontoAdd(IBudgetkontoViewModel budgetkontoViewModel);
 
         /// <summary>
         /// Tilføjer en bogføringslinje til regnskabet.

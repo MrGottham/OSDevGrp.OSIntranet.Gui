@@ -29,6 +29,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly IRegnskabModel _regnskabModel;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
+        private readonly ObservableCollection<IKontoViewModel> _kontoViewModels = new ObservableCollection<IKontoViewModel>();
+        private readonly ObservableCollection<IBudgetkontoViewModel> _budgetkontoViewModels = new ObservableCollection<IBudgetkontoViewModel>();
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
         private readonly ObservableCollection<IAdressekontoViewModel> _debitorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<IAdressekontoViewModel> _kreditorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
@@ -69,12 +71,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _statusDato = statusDato;
             _finansstyringRepository = finansstyringRepository;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
+            _kontoViewModels.CollectionChanged += CollectionChangedOnKontoViewModelsEventHandler;
+            _budgetkontoViewModels.CollectionChanged += CollectionChangedOnBudgetkontoViewModelsEventHandler;
             _bogføringslinjeViewModels.CollectionChanged += CollectionChangedOnBogføringslinjeViewModelsEventHandler;
             _debitorerViewModels.CollectionChanged += CollectionChangedOnDebitorViewModelsEventHandler;
             _kreditorerViewModels.CollectionChanged += CollectionChangedOnKreditorerViewModelsEventHandler;
             _nyhedViewModels.CollectionChanged += CollectionChangedOnNyhedViewModelsEventHandler;
             KontogruppeViewModels.CollectionChanged += CollectionChangedOnKontogruppeViewModelsEventHandler;
-            BudgetkontogruppeViewModels.CollectionChanged += CollectionChangedOnBudgetkontoViewModelsEventHandler;
+            BudgetkontogruppeViewModels.CollectionChanged += CollectionChangedOnBudgetkontogruppeViewModelsEventHandler;
         }
         
         #endregion
@@ -139,6 +143,76 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 _statusDato = value;
                 RaisePropertyChanged("StatusDato");
+            }
+        }
+
+        /// <summary>
+        /// Konti.
+        /// </summary>
+        public virtual IEnumerable<IKontoViewModel> Konti
+        {
+            get
+            {
+                var comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(false);
+                return _kontoViewModels.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Topbenyttede konti.
+        /// </summary>
+        public virtual IEnumerable<IKontoViewModel> KontiTop
+        {
+            get
+            {
+                var comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(true);
+                return _kontoViewModels.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+            }
+        }
+
+        /// <summary>
+        /// Overskrift til konti.
+        /// </summary>
+        public virtual string KontiHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.Accounts);
+            }
+        }
+
+        /// <summary>
+        /// Budgetkonti.
+        /// </summary>
+        public virtual IEnumerable<IBudgetkontoViewModel> Budgetkonti
+        {
+            get
+            {
+                var comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(false);
+                return _budgetkontoViewModels.OrderBy(m => m, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Topbenyttede budgetkonti.
+        /// </summary>
+        public virtual IEnumerable<IBudgetkontoViewModel> BudgetkontiTop
+        {
+            get
+            {
+                var comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(true);
+                return _budgetkontoViewModels.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+            }
+        }
+
+        /// <summary>
+        /// Overskrift til budgetkonti.
+        /// </summary>
+        public virtual string BudgetkontiHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetAccounts);
             }
         }
 
@@ -289,6 +363,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 var executeCommands = new Collection<ICommand>
                     {
+                        new RelayCommand(obj => StatusDato = DateTime.Now),
+                        new KontoplanGetCommand(new KontogrupperGetCommand(_finansstyringRepository, _exceptionHandlerViewModel), _finansstyringRepository, _exceptionHandlerViewModel),
+                        new BudgetkontoplanGetCommand(new BudgetkontogrupperGetCommand(_finansstyringRepository, _exceptionHandlerViewModel), _finansstyringRepository, _exceptionHandlerViewModel),
                         new BogføringslinjerGetCommand(_finansstyringRepository, _exceptionHandlerViewModel),
                         new DebitorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel),
                         new KreditorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel)
@@ -301,6 +378,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #endregion
         
         #region Methods
+
+        /// <summary>
+        /// Tilføjer en konto til regnskabet.
+        /// </summary>
+        /// <param name="kontoViewModel">ViewModel for kontoen, der skal tilføjes regnskabet.</param>
+        public virtual void KontoAdd(IKontoViewModel kontoViewModel)
+        {
+            if (kontoViewModel == null)
+            {
+                throw new ArgumentNullException("kontoViewModel");
+            }
+            kontoViewModel.PropertyChanged += PropertyChangedOnKontoViewModelEventHandler;
+            _kontoViewModels.Add(kontoViewModel);
+        }
+
+        /// <summary>
+        /// Tilføjer en budgetkonto til regnskabet.
+        /// </summary>
+        /// <param name="budgetkontoViewModel">ViewModel for budgetkontoen, der skal tilføjes regnskabet.</param>
+        public virtual void BudgetkontoAdd(IBudgetkontoViewModel budgetkontoViewModel)
+        {
+            if (budgetkontoViewModel == null)
+            {
+                throw new ArgumentNullException("budgetkontoViewModel");
+            }
+            budgetkontoViewModel.PropertyChanged += PropertyChangedOnBudgetkontoViewModelEventHandler;
+            _budgetkontoViewModels.Add(budgetkontoViewModel);
+        }
 
         /// <summary>
         /// Tilføjer en bogføringslinje til regnskabet.
@@ -424,6 +529,72 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 default:
                     RaisePropertyChanged(e.PropertyName);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en konto.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnKontoViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Kontonummer":
+                    RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("KontiTop");
+                    break;
+
+                case "Kontogruppe":
+                    RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("KontiTop");
+                    break;
+
+                case "Kontoværdi":
+                    RaisePropertyChanged("KontiTop");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en  budgetkonto.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnBudgetkontoViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Kontonummer":
+                    RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("BudgetkontiTop");
+                    break;
+
+                case "Kontogruppe":
+                    RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("BudgetkontiTop");
+                    break;
+
+                case "Kontoværdi":
+                    RaisePropertyChanged("BudgetkontiTop");
                     break;
             }
         }
@@ -573,6 +744,54 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for konti ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnKontoViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("KontiTop");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for budgetkonti ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnBudgetkontoViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("BudgetkontiTop");
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Eventhandler, der kaldes, når collection af ViewModels for bogføringslinjer ændres.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -692,7 +911,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="e">Argumenter til eventet.</param>
-        private void CollectionChangedOnBudgetkontoViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        private void CollectionChangedOnBudgetkontogruppeViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (sender == null)
             {

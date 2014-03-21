@@ -218,4 +218,10 @@
   <data name="Income" xml:space="preserve">
     <value>Indtægter</value>
   </data>
+  <data name="Accounts" xml:space="preserve">
+    <value>Konti</value>
+  </data>
+  <data name="BudgetAccounts" xml:space="preserve">
+    <value>Budgetkonti</value>
+  </data>
 </root>

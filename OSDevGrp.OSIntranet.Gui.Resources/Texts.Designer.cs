@@ -97,6 +97,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accounts.
+        /// </summary>
+        internal static string Accounts {
+            get {
+                return ResourceManager.GetString("Accounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Annex.
         /// </summary>
         internal static string Annex {
@@ -156,6 +165,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string BudgetAccount {
             get {
                 return ResourceManager.GetString("BudgetAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Budget accounts.
+        /// </summary>
+        internal static string BudgetAccounts {
+            get {
+                return ResourceManager.GetString("BudgetAccounts", resourceCulture);
             }
         }
         
