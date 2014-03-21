@@ -159,6 +159,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Konti fordelt på kontogrupper.
+        /// </summary>
+        public virtual IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiGrouped
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Topbenyttede konti.
         /// </summary>
         public virtual IEnumerable<IKontoViewModel> KontiTop
@@ -166,7 +177,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 var comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(true);
-                return _kontoViewModels.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+                return Konti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+            }
+        }
+
+        /// <summary>
+        /// Topbenyttede konti fordelt på kontogrupper.
+        /// </summary>
+        public virtual IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiTopGrouped
+        {
+            get
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -194,6 +216,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Budgetkonti fordelt på kontogrupper til budetkonti.
+        /// </summary>
+        public virtual IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiGrouped
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Topbenyttede budgetkonti.
         /// </summary>
         public virtual IEnumerable<IBudgetkontoViewModel> BudgetkontiTop
@@ -201,7 +234,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 var comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(true);
-                return _budgetkontoViewModels.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+                return Budgetkonti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+            }
+        }
+
+        /// <summary>
+        /// Topbenyttede budgetkonti fordelt på kontogrupper til budetkonti.
+        /// </summary>
+        public virtual IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiTopGrouped
+        {
+            get
+            {
+                throw new NotImplementedException();
             }
         }
 

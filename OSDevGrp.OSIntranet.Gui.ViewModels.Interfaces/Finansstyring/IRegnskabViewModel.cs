@@ -44,9 +44,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Konti fordelt på kontogrupper.
+        /// </summary>
+        IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiGrouped
+        {
+            get;
+        }
+
+        /// <summary>
         /// Topbenyttede konti.
         /// </summary>
         IEnumerable<IKontoViewModel> KontiTop
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Topbenyttede konti fordelt på kontogrupper.
+        /// </summary>
+        IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiTopGrouped
         {
             get;
         }
@@ -68,9 +84,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Budgetkonti fordelt på kontogrupper til budetkonti.
+        /// </summary>
+        IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiGrouped
+        {
+            get;
+        }
+
+        /// <summary>
         /// Topbenyttede budgetkonti.
         /// </summary>
         IEnumerable<IBudgetkontoViewModel> BudgetkontiTop
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Topbenyttede budgetkonti fordelt på kontogrupper til budetkonti.
+        /// </summary>
+        IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiTopGrouped
         {
             get;
         }
