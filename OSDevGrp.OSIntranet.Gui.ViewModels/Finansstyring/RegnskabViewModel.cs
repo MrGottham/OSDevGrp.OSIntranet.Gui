@@ -165,7 +165,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return GenerateKontoViewModelBaseGroups(Konti, new List<IKontogruppeViewModel>(Kontogrupper));
             }
         }
 
@@ -188,7 +188,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return GenerateKontoViewModelBaseGroups(KontiTop, new List<IKontogruppeViewModel>(Kontogrupper));
             }
         }
 
@@ -222,7 +222,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return GenerateKontoViewModelBaseGroups(Budgetkonti, new List<IBudgetkontogruppeViewModel>(Budgetkontogrupper));
             }
         }
 
@@ -245,7 +245,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return GenerateKontoViewModelBaseGroups(BudgetkontiTop, new List<IBudgetkontogruppeViewModel>(Budgetkontogrupper));
             }
         }
 
@@ -596,16 +596,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case "Kontonummer":
                     RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("KontiGrouped");
                     RaisePropertyChanged("KontiTop");
+                    RaisePropertyChanged("KontiTopGrouped");
                     break;
 
                 case "Kontogruppe":
                     RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("KontiGrouped");
                     RaisePropertyChanged("KontiTop");
+                    RaisePropertyChanged("KontiTopGrouped");
                     break;
 
                 case "Kontoværdi":
                     RaisePropertyChanged("KontiTop");
+                    RaisePropertyChanged("KontiTopGrouped");
                     break;
             }
         }
@@ -629,16 +634,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case "Kontonummer":
                     RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("BudgetkontiGrouped");
                     RaisePropertyChanged("BudgetkontiTop");
+                    RaisePropertyChanged("BudgetkontiTopGrouped");
                     break;
 
                 case "Kontogruppe":
                     RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("BudgetkontiGrouped");
                     RaisePropertyChanged("BudgetkontiTop");
+                    RaisePropertyChanged("BudgetkontiTopGrouped");
                     break;
 
                 case "Kontoværdi":
                     RaisePropertyChanged("BudgetkontiTop");
+                    RaisePropertyChanged("BudgetkontiTopGrouped");
                     break;
             }
         }
@@ -806,7 +816,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case NotifyCollectionChangedAction.Add:
                     RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("KontiGrouped");
                     RaisePropertyChanged("KontiTop");
+                    RaisePropertyChanged("KontiTopGrouped");
                     break;
             }
         }
@@ -830,7 +842,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case NotifyCollectionChangedAction.Add:
                     RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("BudgetkontiGrouped");
                     RaisePropertyChanged("BudgetkontiTop");
+                    RaisePropertyChanged("BudgetkontiTopGrouped");
                     break;
             }
         }
@@ -972,6 +986,45 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     break;
             }
         }
+
+        /// <summary>
+        /// Grupperer en liste af konti på kontogrupper.
+        /// </summary>
+        /// <typeparam name="TKontogruppeViewModel">Typen på kontogrupper, der skal grupperes efter.</typeparam>
+        /// <typeparam name="TKontoViewModel">Typen på konti, der skal grupperes.</typeparam>
+        /// <param name="kontoViewModels">Konti, der skal grupperes.</param>
+        /// <param name="kontogruppeViewModels">Kontogrupper, der kan grupperes på.</param>
+        /// <returns>Konti grupperet efter kontogrupper.</returns>
+        private static IEnumerable<KeyValuePair<TKontogruppeViewModel, IEnumerable<TKontoViewModel>>> GenerateKontoViewModelBaseGroups<TKontogruppeViewModel, TKontoViewModel>(IEnumerable<TKontoViewModel> kontoViewModels, IEnumerable<TKontogruppeViewModel> kontogruppeViewModels) where TKontogruppeViewModel : IKontogruppeViewModelBase where TKontoViewModel : IKontoViewModelBase<TKontogruppeViewModel>
+        {
+            if (kontoViewModels == null)
+            {
+                throw new ArgumentNullException("kontoViewModels");
+            }
+            if (kontogruppeViewModels == null)
+            {
+                throw new ArgumentNullException("kontogruppeViewModels");
+            }
+            var kontogrupper = kontogruppeViewModels.ToArray();
+
+            var dictionary = new Dictionary<TKontogruppeViewModel, IEnumerable<TKontoViewModel>>();
+            foreach (var kontoViewModel in kontoViewModels)
+            {
+                var kontogruppeViewModel = kontogrupper.SingleOrDefault(m => m.Nummer == kontoViewModel.Kontogruppe.Nummer);
+                if (Equals(kontogruppeViewModel, null))
+                {
+                    continue;
+                }
+                var key = dictionary.Keys.SingleOrDefault(m => m.Nummer == kontogruppeViewModel.Nummer);
+                while (Equals(key, null))
+                {
+                    dictionary.Add(kontogruppeViewModel, new List<TKontoViewModel>());
+                    key = dictionary.Keys.SingleOrDefault(m => m.Nummer == kontogruppeViewModel.Nummer);
+                }
+            }
+            return dictionary;
+        }
+
 
         #endregion
     }

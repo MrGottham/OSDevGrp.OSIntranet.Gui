@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -11,6 +12,7 @@ using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
+using Ploeh.AutoFixture.Kernel;
 using Rhino.Mocks;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
@@ -277,6 +279,49 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at getteren til KontiGroup returnerer grupperede konti.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtKontiGroupedGetterReturnererDictionary(int[] kontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeViewModelMockCollection = new List<IKontogruppeViewModel>(kontogrupper.Length);
+            foreach (var id in kontogrupper)
+            {
+                var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+                kontogruppeViewModelMock.Expect(m => m.Nummer)
+                                        .Return(id)
+                                        .Repeat.Any();
+                kontogruppeViewModelMockCollection.Add(kontogruppeViewModelMock);
+            }
+
+            var kontoViewModelMockCollection = CreateKontoViewModels(fixture, kontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.Konti, Is.Not.Null);
+            Assert.That(regnskabViewModel.Konti, Is.Empty);
+            Assert.That(regnskabViewModel.KontiGrouped, Is.Not.Null);
+            Assert.That(regnskabViewModel.KontiGrouped, Is.Empty);
+
+            kontogruppeViewModelMockCollection.ForEach(regnskabViewModel.KontogruppeAdd);
+            kontoViewModelMockCollection.ForEach(regnskabViewModel.KontoAdd);
+            Assert.That(regnskabViewModel.Konti, Is.Not.Null);
+            Assert.That(regnskabViewModel.Konti, Is.Not.Empty);
+
+            var kontiGrouped = regnskabViewModel.KontiGrouped;
+            Assert.That(kontiGrouped, Is.Not.Null);
+            Assert.That(kontiGrouped, Is.Not.Empty);
+            Assert.That(kontiGrouped.Sum(m => m.Value.Count()), Is.EqualTo(regnskabViewModel.Konti.Count()));
+        }
+
+        /// <summary>
         /// Tester, at getteren til KontiTop udelader konti, hvor kontoværdien er 0.
         /// </summary>
         [Test]
@@ -377,6 +422,92 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.KontiTop, Is.Not.Null);
             Assert.That(regnskabViewModel.KontiTop, Is.Not.Empty);
             Assert.That(regnskabViewModel.KontiTop.Count(), Is.EqualTo(25));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til KontiTopGroup returnerer grupperede topbenyttede konti.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtKontiTopGroupedGetterReturnererDictionary(int[] kontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeViewModelMockCollection = new List<IKontogruppeViewModel>(kontogrupper.Length);
+            foreach (var id in kontogrupper)
+            {
+                var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+                kontogruppeViewModelMock.Expect(m => m.Nummer)
+                                        .Return(id)
+                                        .Repeat.Any();
+                kontogruppeViewModelMockCollection.Add(kontogruppeViewModelMock);
+            }
+
+            var kontoViewModelMockCollection = CreateKontoViewModels(fixture, kontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.KontiTop, Is.Not.Null);
+            Assert.That(regnskabViewModel.KontiTop, Is.Empty);
+            Assert.That(regnskabViewModel.KontiTopGrouped, Is.Not.Null);
+            Assert.That(regnskabViewModel.KontiTopGrouped, Is.Empty);
+
+            kontogruppeViewModelMockCollection.ForEach(regnskabViewModel.KontogruppeAdd);
+            kontoViewModelMockCollection.ForEach(regnskabViewModel.KontoAdd);
+            Assert.That(regnskabViewModel.KontiTop, Is.Not.Null);
+            Assert.That(regnskabViewModel.KontiTop, Is.Not.Empty);
+
+            var kontiTopGrouped = regnskabViewModel.KontiTopGrouped;
+            Assert.That(kontiTopGrouped, Is.Not.Null);
+            Assert.That(kontiTopGrouped, Is.Not.Empty);
+            Assert.That(kontiTopGrouped.Sum(m => m.Value.Count()), Is.EqualTo(regnskabViewModel.KontiTop.Count()));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til BudgetkontiGroup returnerer grupperede budgetkonti.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtBudgetkontiGroupedGetterReturnererDictionary(int[] budgetkontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
+            foreach (var id in budgetkontogrupper)
+            {
+                var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                                              .Return(id)
+                                              .Repeat.Any();
+                budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
+            }
+
+            var budgetkontoViewModelMockCollection = CreateBudgetkontoViewModels(fixture, budgetkontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.Budgetkonti, Is.Not.Null);
+            Assert.That(regnskabViewModel.Budgetkonti, Is.Empty);
+            Assert.That(regnskabViewModel.BudgetkontiGrouped, Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiGrouped, Is.Empty);
+
+            budgetkontogruppeViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontogruppeAdd);
+            budgetkontoViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontoAdd);
+            Assert.That(regnskabViewModel.Budgetkonti, Is.Not.Null);
+            Assert.That(regnskabViewModel.Budgetkonti, Is.Not.Empty);
+
+            var budgetkontiGrouped = regnskabViewModel.BudgetkontiGrouped;
+            Assert.That(budgetkontiGrouped, Is.Not.Null);
+            Assert.That(budgetkontiGrouped, Is.Not.Empty);
+            Assert.That(budgetkontiGrouped.Sum(m => m.Value.Count()), Is.EqualTo(regnskabViewModel.Budgetkonti.Count()));
         }
 
         /// <summary>
@@ -483,6 +614,49 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at getteren til BudgetkontiTopGroup returnerer grupperede topbenyttede budgetkonti.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtBudgetkontiTopGroupedGetterReturnererDictionary(int[] budgetkontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
+            foreach (var id in budgetkontogrupper)
+            {
+                var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                                              .Return(id)
+                                              .Repeat.Any();
+                budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
+            }
+
+            var budgetkontoViewModelMockCollection = CreateBudgetkontoViewModels(fixture, budgetkontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiTop, Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiTop, Is.Empty);
+            Assert.That(regnskabViewModel.BudgetkontiTopGrouped, Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiTopGrouped, Is.Empty);
+
+            budgetkontogruppeViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontogruppeAdd);
+            budgetkontoViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontoAdd);
+            Assert.That(regnskabViewModel.BudgetkontiTop, Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiTop, Is.Not.Empty);
+
+            var budgetkontiTopGrouped = regnskabViewModel.BudgetkontiTopGrouped;
+            Assert.That(budgetkontiTopGrouped, Is.Not.Null);
+            Assert.That(budgetkontiTopGrouped, Is.Not.Empty);
+            Assert.That(budgetkontiTopGrouped.Sum(m => m.Value.Count()), Is.EqualTo(regnskabViewModel.BudgetkontiTop.Count()));
+        }
+
+        /// <summary>
         /// Tester, at KontoAdd kaster en ArgumentNullException, hvis ViewModel for kontoen er null.
         /// </summary>
         [Test]
@@ -558,7 +732,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Konti")]
+        [TestCase("KontiGrouped")]
         [TestCase("KontiTop")]
+        [TestCase("KontiTopGrouped")]
         public void TestAtKontoAddRejserPropertyChangedVedAddAfKontoViewModel(string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -666,7 +842,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Budgetkonti")]
+        [TestCase("BudgetkontiGrouped")]
         [TestCase("BudgetkontiTop")]
+        [TestCase("BudgetkontiTopGrouped")]
         public void TestAtBudgetkontoAddRejserPropertyChangedVedAddAfBudgetkontoViewModel(string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1379,10 +1557,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Kontonummer", "Konti")]
+        [TestCase("Kontonummer", "KontiGrouped")]
         [TestCase("Kontonummer", "KontiTop")]
+        [TestCase("Kontonummer", "KontiTopGrouped")]
         [TestCase("Kontogruppe", "Konti")]
+        [TestCase("Kontogruppe", "KontiGrouped")]
         [TestCase("Kontogruppe", "KontiTop")]
+        [TestCase("Kontogruppe", "KontiTopGrouped")]
         [TestCase("Kontoværdi", "KontiTop")]
+        [TestCase("Kontoværdi", "KontiTopGrouped")]
         public void TestAtPropertyChangedOnKontoViewModelEventHandlerRejserPropertyChangedOnKontoViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1478,10 +1661,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Kontonummer", "Budgetkonti")]
+        [TestCase("Kontonummer", "BudgetkontiGrouped")]
         [TestCase("Kontonummer", "BudgetkontiTop")]
+        [TestCase("Kontonummer", "BudgetkontiTopGrouped")]
         [TestCase("Kontogruppe", "Budgetkonti")]
+        [TestCase("Kontogruppe", "BudgetkontiGrouped")]
         [TestCase("Kontogruppe", "BudgetkontiTop")]
+        [TestCase("Kontogruppe", "BudgetkontiTopGrouped")]
         [TestCase("Kontoværdi", "BudgetkontiTop")]
+        [TestCase("Kontoværdi", "BudgetkontiTopGrouped")]
         public void TestAtPropertyChangedOnBudgetkontoViewModelEventHandlerRejserPropertyChangedOnBudgetkontoViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -2174,6 +2362,80 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("e"));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Danner og returnerer en liste af konti.
+        /// </summary>
+        /// <returns>Liste af konti.</returns>
+        private static IEnumerable<IKontoViewModel> CreateKontoViewModels(ISpecimenBuilder fixture, IEnumerable<IKontogruppeViewModel> kontogrupper, Random random, int count)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            if (kontogrupper == null)
+            {
+                throw new ArgumentNullException("kontogrupper");
+            }
+            if (random == null)
+            {
+                throw new ArgumentNullException("random");
+            }
+            var kontogruppeArray = kontogrupper.ToArray();
+            var result = new List<IKontoViewModel>(count);
+            while (result.Count < count)
+            {
+                var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+                kontoViewModelMock.Expect(m => m.Kontonummer)
+                                  .Return(fixture.Create<string>())
+                                  .Repeat.Any();
+                kontoViewModelMock.Expect(m => m.Kontogruppe)
+                                  .Return(kontogruppeArray.ElementAt(random.Next(kontogruppeArray.Length - 1)))
+                                  .Repeat.Any();
+                kontoViewModelMock.Expect(m => m.Kontoværdi)
+                                  .Return(fixture.Create<decimal>())
+                                  .Repeat.Any();
+                result.Add(kontoViewModelMock);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Danner og returnerer en liste af budgetkonti.
+        /// </summary>
+        /// <returns>Liste af budgetkonti.</returns>
+        private static IEnumerable<IBudgetkontoViewModel> CreateBudgetkontoViewModels(ISpecimenBuilder fixture, IEnumerable<IBudgetkontogruppeViewModel> budgetkontogrupper, Random random, int count)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            if (budgetkontogrupper == null)
+            {
+                throw new ArgumentNullException("budgetkontogrupper");
+            }
+            if (random == null)
+            {
+                throw new ArgumentNullException("random");
+            }
+            var budgetkontogrupperArray = budgetkontogrupper.ToArray();
+            var result = new List<IBudgetkontoViewModel>(count);
+            while (result.Count < count)
+            {
+                var budgetkontoViewModelMock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                budgetkontoViewModelMock.Expect(m => m.Kontonummer)
+                                        .Return(fixture.Create<string>())
+                                        .Repeat.Any();
+                budgetkontoViewModelMock.Expect(m => m.Kontogruppe)
+                                        .Return(budgetkontogrupperArray.ElementAt(random.Next(budgetkontogrupperArray.Length - 1)))
+                                        .Repeat.Any();
+                budgetkontoViewModelMock.Expect(m => m.Kontoværdi)
+                                        .Return(fixture.Create<decimal>())
+                                        .Repeat.Any();
+                result.Add(budgetkontoViewModelMock);
+            }
+            return result;
         }
     }
 }
