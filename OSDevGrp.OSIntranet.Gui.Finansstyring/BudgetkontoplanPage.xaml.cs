@@ -88,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             DataContext = null;
-            var regnskabsnummer = (int)e.Parameter;
+            var regnskabsnummer = (int) e.Parameter;
             Regnskab = await Regnskabsliste.RegnskabGetAsync(regnskabsnummer);
             try
             {
