@@ -156,7 +156,7 @@
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
         <Grid.Resources>
             <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
-            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
+            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
         </Grid.Resources>
         
         <Grid.ChildrenTransitions>
@@ -211,6 +211,7 @@
                             </StackPanel>
                         </HyperlinkButton>
                         <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
+                            <!--
                             <GridView.GroupStyle>
                                 <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}">
                                     <GroupStyle.Panel>
@@ -225,6 +226,7 @@
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
                             </GridView.ItemsPanel>
+                            -->
                         </GridView>
                     </Grid>
                     <Grid Grid.Column="2" Margin="0,0,40,20">
@@ -243,6 +245,21 @@
                                 <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}">
                                     <GroupStyle.Panel>
                                         <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </GroupStyle.Panel>
+                                </GroupStyle>
+                            </GridView.GroupStyle>
+                            <GridView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid Orientation="Vertical" MaximumRowsOrColumns="999"/>
+                                </ItemsPanelTemplate>
+                            </GridView.ItemsPanel>
+                            <!--
+                            <GridView.GroupStyle>
+                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}">
+                                    <GroupStyle.Panel>
+                                        <ItemsPanelTemplate>
                                             <VariableSizedWrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                         </ItemsPanelTemplate>
                                     </GroupStyle.Panel>
@@ -253,6 +270,7 @@
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
                             </GridView.ItemsPanel>
+                            -->
                         </GridView>
                     </Grid>
                     <Grid Grid.Column="3" Margin="0,0,40,20">
