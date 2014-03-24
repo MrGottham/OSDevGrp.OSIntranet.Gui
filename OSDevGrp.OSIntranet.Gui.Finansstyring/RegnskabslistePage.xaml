@@ -40,13 +40,13 @@
                         <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
                     </StackPanel>
                 </HyperlinkButton>
-                <ListView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
-                    <ListView.ItemsPanel>
+                <GridView Grid.Row="1" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
+                    <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                         </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                </ListView>
+                    </GridView.ItemsPanel>
+                </GridView>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="RegnskabViewModelMinimalNavigationDataTemplate">

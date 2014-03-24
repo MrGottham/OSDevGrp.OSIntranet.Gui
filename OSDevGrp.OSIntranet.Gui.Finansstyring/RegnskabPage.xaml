@@ -58,7 +58,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=Key.Tekst}"/>
+                <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=Key.Tekst}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="KontoViewModelDefaultDateTemplate">
@@ -156,7 +156,7 @@
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
         <Grid.Resources>
             <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
-            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
+            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
         </Grid.Resources>
         
         <Grid.ChildrenTransitions>
@@ -210,16 +210,22 @@
                                 <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
                             </StackPanel>
                         </HyperlinkButton>
-                        <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
-                            <ListView.GroupStyle>
-                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>
-                            </ListView.GroupStyle>
-                            <ListView.ItemsPanel>
+                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
+                            <GridView.GroupStyle>
+                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}">
+                                    <GroupStyle.Panel>
+                                        <ItemsPanelTemplate>
+                                            <VariableSizedWrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                                        </ItemsPanelTemplate>
+                                    </GroupStyle.Panel>
+                                </GroupStyle>
+                            </GridView.GroupStyle>
+                            <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
+                            </GridView.ItemsPanel>
+                        </GridView>
                     </Grid>
                     <Grid Grid.Column="2" Margin="0,0,40,20">
                         <Grid.RowDefinitions>
@@ -232,16 +238,22 @@
                                 <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
                             </StackPanel>
                         </HyperlinkButton>
-                        <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDateTemplate}" SelectionMode="None">
-                            <ListView.GroupStyle>
-                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>
-                            </ListView.GroupStyle>
-                            <ListView.ItemsPanel>
+                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDateTemplate}" SelectionMode="None">
+                            <GridView.GroupStyle>
+                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}">
+                                    <GroupStyle.Panel>
+                                        <ItemsPanelTemplate>
+                                            <VariableSizedWrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                                        </ItemsPanelTemplate>
+                                    </GroupStyle.Panel>
+                                </GroupStyle>
+                            </GridView.GroupStyle>
+                            <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
+                            </GridView.ItemsPanel>
+                        </GridView>
                     </Grid>
                     <Grid Grid.Column="3" Margin="0,0,40,20">
                         <Grid.RowDefinitions>
@@ -249,13 +261,13 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
-                        <ListView Grid.Row="1" ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
-                            <ListView.ItemsPanel>
+                        <GridView Grid.Row="1" ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                            <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
+                            </GridView.ItemsPanel>
+                        </GridView>
                     </Grid>
                     <Grid Grid.Column="4" Margin="0,0,40,20">
                         <Grid.RowDefinitions>
@@ -263,13 +275,13 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
-                        <ListView Grid.Row="1" ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
-                            <ListView.ItemsPanel>
+                        <GridView Grid.Row="1" ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                            <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                                 </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
+                            </GridView.ItemsPanel>
+                        </GridView>
                     </Grid>
                 </Grid>
             </ScrollViewer>
