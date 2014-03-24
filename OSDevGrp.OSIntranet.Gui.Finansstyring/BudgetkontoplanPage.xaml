@@ -15,9 +15,28 @@
         </Grid.ChildrenTransitions>
 
         <Grid x:Name="DefaultNavigation" Margin="20,20,20,20" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,10" Style="{StaticResource BackButtonStyle}" Click="BackButtonClickEventHandler"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
         </Grid>
 
         <Grid x:Name="MinimalNavigation" Margin="20,20,20,20" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
+            <TextBlock Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource ItemTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

@@ -155,10 +155,8 @@
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
         <Grid.Resources>
-            <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value">
-            </CollectionViewSource>
-            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value">
-            </CollectionViewSource>
+            <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
+            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
         </Grid.Resources>
         
         <Grid.ChildrenTransitions>
@@ -206,7 +204,12 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
+                        <HyperlinkButton Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource TextPrimaryButtonStyle}" Tag="{Binding}" Click="KontoplanButtonClickEventHandler">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
+                                <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
+                            </StackPanel>
+                        </HyperlinkButton>
                         <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
                             <ListView.GroupStyle>
                                 <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>
@@ -223,7 +226,12 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
+                        <HyperlinkButton Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource TextPrimaryButtonStyle}" Tag="{Binding}" Click="BudgetkontoplanButtonClickEventHandler">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
+                                <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
+                            </StackPanel>
+                        </HyperlinkButton>
                         <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDateTemplate}" SelectionMode="None">
                             <ListView.GroupStyle>
                                 <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>

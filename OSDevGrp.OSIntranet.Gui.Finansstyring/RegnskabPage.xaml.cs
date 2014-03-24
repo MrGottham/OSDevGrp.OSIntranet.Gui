@@ -3,6 +3,7 @@ using System.Linq;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
@@ -157,6 +158,62 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             Frame.Navigate(typeof (RegnskabslistePage), null);
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer aktivering/visning af en kontoplan til regnskabet.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void KontoplanButtonClickEventHandler(object sender, RoutedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var hyperlinkButton = sender as HyperlinkButton;
+            if (hyperlinkButton == null)
+            {
+                return;
+            }
+            var regnskabViewModel = hyperlinkButton.Tag as IRegnskabViewModel;
+            if (regnskabViewModel == null)
+            {
+                return;
+            }
+            Frame.Navigate(typeof (KontoplanPage), regnskabViewModel.Nummer);
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer aktivering/visning af en budgetkontoplan til regnskabet.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void BudgetkontoplanButtonClickEventHandler(object sender, RoutedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var hyperlinkButton = sender as HyperlinkButton;
+            if (hyperlinkButton == null)
+            {
+                return;
+            }
+            var regnskabViewModel = hyperlinkButton.Tag as IRegnskabViewModel;
+            if (regnskabViewModel == null)
+            {
+                return;
+            }
+            Frame.Navigate(typeof (BudgetkontoplanPage), regnskabViewModel.Nummer);
         }
 
         #endregion
