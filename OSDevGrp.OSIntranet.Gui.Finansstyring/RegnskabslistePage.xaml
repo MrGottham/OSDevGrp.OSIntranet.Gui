@@ -17,7 +17,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
-                <TextBlock Grid.Column="1" Margin="10,10,20,10" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
+               <TextBlock Grid.Column="1" Margin="10,10,20,10" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="NyhedViewModelMinimalDataTemplate">

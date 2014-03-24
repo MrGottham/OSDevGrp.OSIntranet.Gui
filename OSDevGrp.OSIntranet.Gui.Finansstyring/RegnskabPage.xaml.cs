@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
@@ -31,9 +32,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             Regnskabsliste = mainViewModel.Regnskabsliste;
 
             SizeChanged += PageSizeChangedEventHandler;
-
-            // TODO: http://www.c-sharpcorner.com/UploadFile/c25b6d/perform-grouping-in-gridview-using-windows-store-apps/
-            // TODO: http://msdn.microsoft.com/en-us/library/windows/apps/hh780627.aspx
         }
 
         #endregion
@@ -97,6 +95,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 if (Regnskab == null)
                 {
                     return;
+                }
+                if (Regnskabsliste.Regnskaber.Any(m => m.Nummer == Regnskab.Nummer) == false)
+                {
+                    Regnskabsliste.RegnskabAdd(Regnskab);
                 }
                 var refreshCommand = Regnskab.RefreshCommand;
                 if (refreshCommand == null)

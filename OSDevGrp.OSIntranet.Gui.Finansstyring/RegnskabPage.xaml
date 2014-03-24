@@ -58,7 +58,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Margin="0,0,0,5" Text="XYZ"/>
+                <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=Key.Tekst}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="KontoViewModelDefaultDateTemplate">
@@ -148,7 +148,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Margin="10,5,10,5" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}" Style="{StaticResource ItemTextStyle}"/>
+                <TextBlock Grid.Column="0" Margin="10,5,10,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=Nyhedsinformation}"/>
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -167,7 +167,7 @@
             </TransitionCollection>
         </Grid.ChildrenTransitions>
 
-        <Grid x:Name="DefaultNavigation" Margin="20,20,20,20" Visibility="Visible">
+        <Grid x:Name="DefaultNavigation" Margin="20,21,20,19" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -192,7 +192,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
                         <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" HeaderTemplate="{StaticResource BookkeepingHeaderDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDataTemplate}" ItemsSource="{Binding Path=Bogføringslinjer}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -206,7 +206,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
                         <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
                             <ListView.GroupStyle>
                                 <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>
@@ -223,7 +223,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
                         <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDateTemplate}" SelectionMode="None">
                             <ListView.GroupStyle>
                                 <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>
@@ -240,7 +240,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
                         <ListView Grid.Row="1" ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -254,7 +254,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
+                        <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
                         <ListView Grid.Row="1" ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
