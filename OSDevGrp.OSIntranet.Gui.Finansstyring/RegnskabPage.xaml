@@ -53,6 +53,14 @@
                 <TextBlock Grid.Column="6" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KreditAsText}"/>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="KontogruppeViewModelBaseDefaultDateTemplate">
+            <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Margin="0,0,0,5" Text="XYZ"/>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="KontoViewModelDefaultDateTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
@@ -147,9 +155,9 @@
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
         <Grid.Resources>
-            <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTop}" IsSourceGrouped="True">
+            <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value">
             </CollectionViewSource>
-            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiTop}" IsSourceGrouped="True">
+            <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value">
             </CollectionViewSource>
         </Grid.Resources>
         
@@ -200,6 +208,9 @@
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
                         <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
+                            <ListView.GroupStyle>
+                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>
+                            </ListView.GroupStyle>
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -215,20 +226,7 @@
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=BudgetkontiHeader}"/>
                         <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDateTemplate}" SelectionMode="None">
                             <ListView.GroupStyle>
-                                <GroupStyle HidesIfEmpty="True">
-                                    <GroupStyle.HeaderTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <TextBlock>XYZ</TextBlock>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </GroupStyle.HeaderTemplate>
-                                    <GroupStyle.Panel>
-                                        <ItemsPanelTemplate>
-                                            <VariableSizedWrapGrid/>
-                                        </ItemsPanelTemplate>
-                                    </GroupStyle.Panel>
-                                </GroupStyle>
+                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource KontogruppeViewModelBaseDefaultDateTemplate}"/>
                             </ListView.GroupStyle>
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>

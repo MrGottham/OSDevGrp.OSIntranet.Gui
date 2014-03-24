@@ -1021,10 +1021,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     dictionary.Add(kontogruppeViewModel, new List<TKontoViewModel>());
                     key = dictionary.Keys.SingleOrDefault(m => m.Nummer == kontogruppeViewModel.Nummer);
                 }
+                ((IList<TKontoViewModel>) dictionary[key]).Add(kontoViewModel);
             }
             return dictionary;
         }
-
 
         #endregion
     }
