@@ -145,6 +145,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BudgetkontoplanPage.xaml.cs">
+      <DependentUpon>BudgetkontoplanPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConfigurationUserControl.xaml.cs">
       <DependentUpon>ConfigurationUserControl.xaml</DependentUpon>
     </Compile>
@@ -158,6 +161,9 @@
     <Compile Include="Core\SuspensionManager.cs" />
     <Compile Include="Core\SuspensionManagerException.cs" />
     <Compile Include="Core\ViewModelValidator.cs" />
+    <Compile Include="KontoplanPage.xaml.cs">
+      <DependentUpon>KontoplanPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -209,6 +215,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="BudgetkontoplanPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Common\ApplicationStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -222,6 +232,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="ConfigurationUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="KontoplanPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
