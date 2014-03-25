@@ -77,6 +77,35 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             _kredit = kredit;
         }
 
+        /// <summary>
+        /// Danner model til en ny bogføringslinje, som efterfølgende kan bogføres.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, som den nye bogføringslinje skal være tilknyttet.</param>
+        /// <param name="dato">Bogføringsdato, som den nye bogføringslinje skal initieres med.</param>
+        /// <param name="kontonummer">kontonummer</param>
+        private BogføringslinjeModel(int regnskabsnummer, DateTime dato, string kontonummer)
+        {
+            if (regnskabsnummer <= 0)
+            {
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", regnskabsnummer), "regnskabsnummer");
+            }
+            if (dato > DateTime.Now)
+            {
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato), "dato");
+            }
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            _regnskabsnummer = regnskabsnummer;
+            _løbenummer = int.MinValue;
+            _dato = dato;
+            _kontonummer = kontonummer;
+            _tekst = string.Empty;
+            _debit = 0M;
+            _kredit = 0M;
+        }
+
         #endregion
 
         #region Properties
@@ -337,6 +366,22 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 nyhedsinformationBuilder.AppendFormat("{0} {1}", Tekst, Bogført.ToString("C"));
                 return nyhedsinformationBuilder.ToString();
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Danner en ny bogføringslinje, som efterfølgende kan bogføres.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, som den nye bogføringslinje skal være tilknyttet.</param>
+        /// <param name="dato">Bogføringsdato, som den nye bogføringslinje skal initieres med.</param>
+        /// <param name="kontonummer">Kontonummer, som den nye bogføringslinje skal initieres med.</param>
+        /// <returns>Model til ny bogføringslinje, som efterfølgende kan bogføres.</returns>
+        public static IBogføringslinjeModel CreateNew(int regnskabsnummer, DateTime dato, string kontonummer)
+        {
+            return new BogføringslinjeModel(regnskabsnummer, dato, kontonummer);
         }
 
         #endregion

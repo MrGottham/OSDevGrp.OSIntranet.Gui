@@ -45,7 +45,9 @@
   <ItemGroup>
     <Compile Include="Core\TabelModelBase.cs" />
     <Compile Include="Finansstyring\AdressekontoModel.cs" />
+    <Compile Include="Finansstyring\BogføringsadvarselModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeModel.cs" />
+    <Compile Include="Finansstyring\BogføringsresultatModel.cs" />
     <Compile Include="Finansstyring\BudgetkontogruppeModel.cs" />
     <Compile Include="Finansstyring\BudgetkontoModel.cs" />
     <Compile Include="Finansstyring\KontogruppeModel.cs" />

@@ -48,7 +48,9 @@
     <Compile Include="Core\Nyhedsaktualitet.cs" />
     <Compile Include="Finansstyring\Balancetype.cs" />
     <Compile Include="Finansstyring\IAdressekontoModel.cs" />
+    <Compile Include="Finansstyring\IBogføringsadvarselModel.cs" />
     <Compile Include="Finansstyring\IBogføringslinjeModel.cs" />
+    <Compile Include="Finansstyring\IBogføringsresultatModel.cs" />
     <Compile Include="Finansstyring\IBudgetkontogruppeModel.cs" />
     <Compile Include="Finansstyring\IBudgetkontoModel.cs" />
     <Compile Include="Finansstyring\IKontogruppeModel.cs" />

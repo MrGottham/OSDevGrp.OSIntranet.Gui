@@ -3,6 +3,7 @@ using System.Globalization;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
@@ -78,7 +79,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
-            Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(illegalValue, fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            var exception = Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(illegalValue, fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("regnskabsnummer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -93,7 +102,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
-            Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), illegalValue, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            var exception = Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), illegalValue, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "løbenummer", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("løbenummer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -108,7 +125,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var fixture = new Fixture();
 
             var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
-            Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), dato, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            var exception = Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), dato, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dato"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -122,7 +147,12 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), illegalValue, fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), illegalValue, fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -136,7 +166,12 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), illegalValue, fixture.Create<decimal>(), fixture.Create<decimal>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), illegalValue, fixture.Create<decimal>(), fixture.Create<decimal>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("tekst"));
+            Assert.That(exception.InnerException, Is.Null);
         }
  
         /// <summary>
@@ -150,7 +185,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
-            Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<decimal>()));
+            var exception = Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<decimal>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "debit", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("debit"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -164,7 +207,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
-            Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), illegalValue));
+            var exception = Assert.Throws<ArgumentException>(() => new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), illegalValue));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "kredit", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kredit"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -182,7 +233,16 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var bogføringslinjeModel = new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
             Assert.That(bogføringslinjeModel, Is.Not.Null);
 
-            Assert.Throws<ArgumentException>(() => bogføringslinjeModel.Dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US")));
+            var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
+            var exception = Assert.Throws<ArgumentException>(() => bogføringslinjeModel.Dato = dato);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", dato)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -305,7 +365,12 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var bogføringslinjeModel = new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
             Assert.That(bogføringslinjeModel, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => bogføringslinjeModel.Kontonummer = illegalValue);
+            var exception = Assert.Throws<ArgumentNullException>(() => bogføringslinjeModel.Kontonummer = illegalValue);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -375,7 +440,12 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var bogføringslinjeModel = new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
             Assert.That(bogføringslinjeModel, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => bogføringslinjeModel.Tekst = illegalValue);
+            var exception = Assert.Throws<ArgumentNullException>(() => bogføringslinjeModel.Tekst = illegalValue);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -497,7 +567,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var bogføringslinjeModel = new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
             Assert.That(bogføringslinjeModel, Is.Not.Null);
 
-            Assert.Throws<ArgumentException>(() => bogføringslinjeModel.Debit = illegalValue);
+            var exception = Assert.Throws<ArgumentException>(() => bogføringslinjeModel.Debit = illegalValue);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -569,7 +647,15 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var bogføringslinjeModel = new BogføringslinjeModel(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
             Assert.That(bogføringslinjeModel, Is.Not.Null);
 
-            Assert.Throws<ArgumentException>(() => bogføringslinjeModel.Kredit = illegalValue);
+            var exception = Assert.Throws<ArgumentException>(() => bogføringslinjeModel.Kredit = illegalValue);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -677,6 +763,99 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(eventCalled, Is.False);
             bogføringslinjeModel.Adressekonto = fixture.Create<int>();
             Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at CreateNew danner en ny bogføringslinje, som efterfølgende kan bogføres.
+        /// </summary>
+        [Test]
+        public void TestAtCreateNewDannerBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var regnskabsnummer = fixture.Create<int>();
+            var dato = fixture.Create<DateTime>();
+            var kontonummer = fixture.Create<string>();
+            var bogføringslinjeModel = BogføringslinjeModel.CreateNew(regnskabsnummer, dato, kontonummer);
+            Assert.That(bogføringslinjeModel, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
+            Assert.That(bogføringslinjeModel.Løbenummer, Is.EqualTo(int.MinValue));
+            Assert.That(bogføringslinjeModel.Dato, Is.EqualTo(dato));
+            Assert.That(bogføringslinjeModel.Bilag, Is.Null);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.Not.Empty);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.EqualTo(kontonummer));
+            Assert.That(bogføringslinjeModel.Tekst, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Tekst, Is.Empty);
+            Assert.That(bogføringslinjeModel.Budgetkontonummer, Is.Null);
+            Assert.That(bogføringslinjeModel.Debit, Is.EqualTo(0M));
+            Assert.That(bogføringslinjeModel.Kredit, Is.EqualTo(0M));
+        }
+
+        /// <summary>
+        /// Tester, at CreateNew kaster en ArgumentException ved illegale regnskabsnumre.
+        /// </summary>
+        [Test]
+        [TestCase(-1024)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        public void TestAtCreateNewKasterArgumentExceptionVedIllegalRegnskabsnummer(int illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var exception = Assert.Throws<ArgumentException>(() => BogføringslinjeModel.CreateNew(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("regnskabsnummer"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at CreateNew kaster en ArgumentException ved illegale bogføringsdatoer.
+        /// </summary>
+        [Test]
+        [TestCase("2050-01-01")]
+        [TestCase("2055-09-01")]
+        [TestCase("2055-12-31")]
+        public void TestAtCreateNewKasterArgumentExceptionVedIllegalDato(string illegalValue)
+        {
+            var fixture = new Fixture();
+
+            var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
+            var exception = Assert.Throws<ArgumentException>(() => BogføringslinjeModel.CreateNew(fixture.Create<int>(), dato, fixture.Create<string>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dato"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at CreateNew kaster en ArgumentNullException ved illegale kontonumre.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void TestAtCreateNewKasterArgumentNullExceptionVedIllegalKontonummer(string illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var exception = Assert.Throws<ArgumentNullException>(() => BogføringslinjeModel.CreateNew(fixture.Create<int>(), fixture.Create<DateTime>(), illegalValue));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
     }
 }
