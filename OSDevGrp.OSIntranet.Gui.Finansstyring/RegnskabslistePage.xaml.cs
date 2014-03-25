@@ -105,14 +105,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             try
             {
                 DefaultNavigationContent.Visibility = Visibility.Visible;
-                DefaultNavigationProgressBar.Visibility = Visibility.Collapsed;
                 MinimalNavigationContent.Visibility = Visibility.Visible;
-                MinimalNavigationProgressBar.Visibility = Visibility.Collapsed;
                 CommandAppBar.Visibility = Visibility.Visible;
             }
             finally
             {
-                MinimalNavigationProgressBar.IsEnabled = false;
+                DefaultNavigationProgressBar.IsIndeterminate = false;
+                DefaultNavigationProgressBar.Visibility = Visibility.Collapsed;
+                MinimalNavigationProgressBar.IsIndeterminate = false;
+                MinimalNavigationProgressBar.Visibility = Visibility.Collapsed;
             }
         }
 

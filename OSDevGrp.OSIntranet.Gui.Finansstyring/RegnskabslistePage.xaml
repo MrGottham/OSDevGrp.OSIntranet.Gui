@@ -101,7 +101,7 @@
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
-            <ProgressBar Name="DefaultNavigationProgressBar" Grid.Row="1" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center" IsEnabled="True"/>
+            <ProgressBar Name="DefaultNavigationProgressBar" Grid.Row="1" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center"/>
         </Grid>
 
         <Grid x:Name="MinimalNavigation" Margin="20,20,20,20" Visibility="Collapsed">
@@ -117,7 +117,7 @@
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
-            <ProgressBar Name="MinimalNavigationProgressBar" Grid.Row="1" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center" IsEnabled="True"/>
+            <ProgressBar Name="MinimalNavigationProgressBar" Grid.Row="1" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

@@ -146,7 +146,7 @@
     </Page.Resources>
 
     <Page.BottomAppBar>
-        <AppBar x:Name="CommandAppBar" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
+        <AppBar x:Name="CommandAppBar" Visibility="Collapsed" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -182,7 +182,7 @@
             </Grid.RowDefinitions>
             <Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,10" Style="{StaticResource BackButtonStyle}" Click="BackButtonClickEventHandler"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
-            <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsHorizontalRailEnabled="True" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled">
+            <ScrollViewer Name="DefaultNavigationContent" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed" IsHorizontalRailEnabled="True" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" MinWidth="1000"/>
@@ -273,6 +273,7 @@
                     </Grid>
                 </Grid>
             </ScrollViewer>
+            <ProgressBar Name="DefaultNavigationProgressBar" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center"/>
         </Grid>
 
         <Grid x:Name="MinimalNavigation" Margin="20,20,20,20" Visibility="Collapsed">
@@ -283,13 +284,14 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
             <TextBlock Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource ItemTextStyle}" Text="{Binding Path=NyhederHeader}"/>
-            <ListView Grid.Row="2" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelMinimalNavigationDataTemplate}" SelectionMode="None" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView Name="MinimalNavigationContent" Grid.Row="2" Visibility="Collapsed" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelMinimalNavigationDataTemplate}" SelectionMode="None" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
+            <ProgressBar Name="MinimalNavigationProgressBar" Grid.Row="2" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

@@ -88,8 +88,18 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
+
             DataContext = null;
+            DefaultNavigationContent.Visibility = Visibility.Collapsed;
+            DefaultNavigationProgressBar.IsIndeterminate = true;
+            DefaultNavigationProgressBar.Visibility = Visibility.Visible;
+            MinimalNavigationContent.Visibility = Visibility.Collapsed;
+            MinimalNavigationProgressBar.IsIndeterminate = true;
+            MinimalNavigationProgressBar.Visibility = Visibility.Visible;
+
             CommandAppBar.DataContext = null;
+            CommandAppBar.Visibility = Visibility.Collapsed;
+
             var regnskabsnummer = (int) e.Parameter;
             Regnskab = await Regnskabsliste.RegnskabGetAsync(regnskabsnummer);
             try
@@ -102,6 +112,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     Regnskabsliste.RegnskabAdd(Regnskab);
                 }
+
+                DefaultNavigationContent.Visibility = Visibility.Visible;
+                MinimalNavigationContent.Visibility = Visibility.Visible;
+                CommandAppBar.Visibility = Visibility.Collapsed;
+                
                 var refreshCommand = Regnskab.RefreshCommand;
                 if (refreshCommand == null)
                 {
@@ -113,6 +128,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 DataContext = Regnskab;
                 CommandAppBar.DataContext = Regnskab;
+
+                DefaultNavigationProgressBar.IsIndeterminate = false;
+                DefaultNavigationProgressBar.Visibility = Visibility.Collapsed;
+                MinimalNavigationProgressBar.IsIndeterminate = false;
+                MinimalNavigationProgressBar.Visibility = Visibility.Collapsed;
             }
         }
 
