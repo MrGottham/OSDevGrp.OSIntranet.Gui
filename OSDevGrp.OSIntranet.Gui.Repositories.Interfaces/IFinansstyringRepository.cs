@@ -50,7 +50,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         Task<IEnumerable<IBudgetkontoModel>> BudgetkontoplanGetAsync(int regnskabsnummer, DateTime statusDato);
 
         /// <summary>
-        /// Henter en given budgetkonto i et givet regnskab.
+        /// Henter en given budgetkonto i et givent regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra budgetkontoen skal hentes.</param>
         /// <param name="budgetkontonummer">Kontonummer på budgetkontoen, der skal hentes.</param>
@@ -67,6 +67,21 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <returns>Bogføringslinjer til regnskabet.</returns>
         Task<IEnumerable<IBogføringslinjeModel>> BogføringslinjerGetAsync(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer);
 
+        /// <summary>
+        /// Bogfører værdier i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvor værdier skal bogføres.</param>
+        /// <param name="dato">Bogføringsdato.</param>
+        /// <param name="bilag">Bilagsnummer.</param>
+        /// <param name="kontonummer">Kontonummer, hvorpå værdier skal bogføres.</param>
+        /// <param name="tekst">Tekst.</param>
+        /// <param name="budgetkontonummer">Budgetkontonummer, hvorpå værdier skal bogføres.</param>
+        /// <param name="debit">Debitbeløb.</param>
+        /// <param name="kredit">Kreditbeløb.</param>
+        /// <param name="adressekonto">Unik identifikation af adressekontoen, hvorpå værdier skal bogføres.</param>
+        /// <returns>Bogføringsresultat.</returns>
+        Task<IBogføringsresultatModel> BogførAsync(int regnskabsnummer, DateTime dato, string bilag, string kontonummer, string tekst, string budgetkontonummer, decimal debit, decimal kredit, int adressekonto);
+            
         /// <summary>
         /// Henter listen af debitorer til et regnskab.
         /// </summary>

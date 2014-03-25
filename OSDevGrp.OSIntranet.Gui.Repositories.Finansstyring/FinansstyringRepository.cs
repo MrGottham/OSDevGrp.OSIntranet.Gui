@@ -111,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
-        /// Henter en given budgetkonto i et givet regnskab.
+        /// Henter en given budgetkonto i et givent regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra budgetkontoen skal hentes.</param>
         /// <param name="budgetkontonummer">Kontonummer på budgetkontoen, der skal hentes.</param>
@@ -137,6 +137,49 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         public virtual Task<IEnumerable<IBogføringslinjeModel>> BogføringslinjerGetAsync(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer)
         {
             Func<IEnumerable<IBogføringslinjeModel>> func = () => BogføringslinjerGet(regnskabsnummer, statusDato, antalBogføringslinjer);
+            return Task.Run(func);
+        }
+
+        /// <summary>
+        /// Bogfører værdier i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvor værdier skal bogføres.</param>
+        /// <param name="dato">Bogføringsdato.</param>
+        /// <param name="bilag">Bilagsnummer.</param>
+        /// <param name="kontonummer">Kontonummer, hvorpå værdier skal bogføres.</param>
+        /// <param name="tekst">Tekst.</param>
+        /// <param name="budgetkontonummer">Budgetkontonummer, hvorpå værdier skal bogføres.</param>
+        /// <param name="debit">Debitbeløb.</param>
+        /// <param name="kredit">Kreditbeløb.</param>
+        /// <param name="adressekonto">Unik identifikation af adressekontoen, hvorpå værdier skal bogføres.</param>
+        /// <returns>Bogføringsresultat.</returns>
+        public virtual Task<IBogføringsresultatModel> BogførAsync(int regnskabsnummer, DateTime dato, string bilag, string kontonummer, string tekst, string budgetkontonummer, decimal debit, decimal kredit, int adressekonto)
+        {
+            if (regnskabsnummer <= 0)
+            {
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", regnskabsnummer), "regnskabsnummer");
+            }
+            if (dato > DateTime.Now)
+            {
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato), "dato");
+            }
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            if (string.IsNullOrEmpty(tekst))
+            {
+                throw new ArgumentNullException("tekst");
+            }
+            if (debit < 0M)
+            {
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "debit", debit), "debit");
+            }
+            if (kredit < 0M)
+            {
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "kredit", kredit), "kredit");
+            }
+            Func<IBogføringsresultatModel> func = () => Bogfør(regnskabsnummer, dato, bilag, kontonummer, tekst, budgetkontonummer, debit, kredit, adressekonto);
             return Task.Run(func);
         }
 
@@ -589,6 +632,82 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BogføringslinjerGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Bogfører værdier i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvor værdier skal bogføres.</param>
+        /// <param name="dato">Bogføringsdato.</param>
+        /// <param name="bilag">Bilagsnummer.</param>
+        /// <param name="kontonummer">Kontonummer, hvorpå værdier skal bogføres.</param>
+        /// <param name="tekst">Tekst.</param>
+        /// <param name="budgetkontonummer">Budgetkontonummer, hvorpå værdier skal bogføres.</param>
+        /// <param name="debit">Debitbeløb.</param>
+        /// <param name="kredit">Kreditbeløb.</param>
+        /// <param name="adressekonto">Unik identifikation af adressekontoen, hvorpå værdier skal bogføres.</param>
+        /// <returns>Bogføringsresultat.</returns>
+        private IBogføringsresultatModel Bogfør(int regnskabsnummer, DateTime dato, string bilag, string kontonummer, string tekst, string budgetkontonummer, decimal debit, decimal kredit, int adressekonto)
+        {
+            try
+            {
+                IBogføringsresultatModel bogføringsresultatModel;
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var command = new BogføringslinjeOpretCommand
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            Dato = dato,
+                            Bilag = string.IsNullOrEmpty(bilag) ? null : bilag,
+                            Kontonummer = kontonummer,
+                            Tekst = tekst,
+                            Budgetkontonummer = string.IsNullOrEmpty(budgetkontonummer) ? null : budgetkontonummer,
+                            Debit = debit,
+                            Kredit = kredit,
+                            Adressekonto = adressekonto
+                        };
+
+                    var serviceInterface = (FinansstyringService)client;
+                    var asyncResult = serviceInterface.BeginBogføringslinjeOpret(command, null, null);
+                    var response = serviceInterface.EndBogføringslinjeOpret(asyncResult);
+
+                    var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer, response.Løbenr, response.Dato, response.Konto.Kontonummer, response.Tekst, response.Debit, response.Kredit)
+                        {
+                            Bilag = string.IsNullOrEmpty(response.Bilag) ? null : response.Bilag,
+                            Budgetkontonummer = response.Budgetkonto == null ? null : string.IsNullOrEmpty(response.Budgetkonto.Kontonummer) ? null : response.Budgetkonto.Kontonummer,
+                            Adressekonto = response.Adressekonto == null ? 0 : response.Adressekonto.Nummer
+                        };
+                    var bogføringsadvarselModelCollection = new List<IBogføringsadvarselModel>();
+                    if (response.Advarsler != null)
+                    {
+                        bogføringsadvarselModelCollection.AddRange(response.Advarsler.Where(m => string.IsNullOrEmpty(m.Advarsel) == false && m.Konto != null && string.IsNullOrEmpty(m.Konto.Kontonummer) == false && string.IsNullOrEmpty(m.Konto.Kontonavn) == false).Select(m => new BogføringsadvarselModel(m.Advarsel, m.Konto.Kontonummer, m.Konto.Kontonavn, m.Beløb)));
+                    }
+                    bogføringsresultatModel = new BogføringsresultatModel(bogføringslinjeModel, bogføringsadvarselModelCollection);
+
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return bogføringsresultatModel;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Bogfør", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Bogfør", ex.Message), ex);
             }
         }
 
