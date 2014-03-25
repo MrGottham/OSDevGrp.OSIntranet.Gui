@@ -177,7 +177,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 var comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(true);
-                return Konti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+                return Konti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m.Kontoværdi).Take(25).OrderBy(m => m, comparer);
             }
         }
 
@@ -234,7 +234,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 var comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(true);
-                return Budgetkonti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m, comparer).Take(25);
+                return Budgetkonti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m.Kontoværdi).Take(25).OrderBy(m => m, comparer);
             }
         }
 
