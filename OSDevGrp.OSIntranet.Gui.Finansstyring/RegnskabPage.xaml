@@ -53,7 +53,7 @@
                 <TextBlock Grid.Column="6" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KreditAsText}"/>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="KontoViewModelDefaultDateTemplate">
+        <DataTemplate x:Key="KontoViewModelDefaultDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -81,7 +81,7 @@
                 </Grid>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="BudgetkontoViewModelDefaultDateTemplate">
+        <DataTemplate x:Key="BudgetkontoViewModelDefaultDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -202,7 +202,7 @@
                                 <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
                             </StackPanel>
                         </HyperlinkButton>
-                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDateTemplate}" SelectionMode="None">
+                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -221,7 +221,7 @@
                                 <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
                             </StackPanel>
                         </HyperlinkButton>
-                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDateTemplate}" SelectionMode="None">
+                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDataTemplate}" SelectionMode="None">
                             <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
