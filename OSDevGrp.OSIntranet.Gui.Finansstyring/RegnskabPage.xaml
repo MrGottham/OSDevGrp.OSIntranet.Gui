@@ -13,7 +13,7 @@
         <converters:DateTimeToShortDateConverter x:Key="DateTimeToShortDateConverter"/>
         <converters:ToUpperCaseConverter x:Key="ToUpperCaseConverter"/>
         <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
-        <DataTemplate x:Key="BookkeepingHeaderDataTemplate">
+        <DataTemplate x:Key="BookkeepingHeaderDefaultNavigationDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
@@ -33,7 +33,7 @@
                 <TextBlock Grid.Column="6" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogføringslinjerColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=6}"/>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="BookkeepingLineDataTemplate">
+        <DataTemplate x:Key="BookkeepingLineDefaultNavigationDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
@@ -53,7 +53,7 @@
                 <TextBlock Grid.Column="6" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KreditAsText}"/>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="KontoViewModelDefaultDataTemplate">
+        <DataTemplate x:Key="KontoViewModelDefaultNavigationDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -81,7 +81,7 @@
                 </Grid>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="BudgetkontoViewModelDefaultDataTemplate">
+        <DataTemplate x:Key="BudgetkontoViewModelDefaultNavigationDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -109,7 +109,7 @@
                 </Grid>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="AdressekontoViewModelDefaultDataTemplate">
+        <DataTemplate x:Key="AdressekontoViewModelDefaultNavigationDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -135,7 +135,7 @@
                 </Grid>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="NyhedViewModelMinimalDataTemplate">
+        <DataTemplate x:Key="NyhedViewModelMinimalNavigationDataTemplate">
             <Grid Width="225" MinWidth="225" MaxWidth="225" Height="Auto" MinHeight="75" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -197,7 +197,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
-                        <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" HeaderTemplate="{StaticResource BookkeepingHeaderDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDataTemplate}" ItemsSource="{Binding Path=Bogføringslinjer}" SelectionMode="None">
+                        <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" HeaderTemplate="{StaticResource BookkeepingHeaderDefaultNavigationDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDefaultNavigationDataTemplate}" ItemsSource="{Binding Path=Bogføringslinjer}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -216,7 +216,7 @@
                                 <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
                             </StackPanel>
                         </HyperlinkButton>
-                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource KontiTopCollectionViewSource}}" ItemTemplate="{StaticResource KontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                             <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -235,7 +235,7 @@
                                 <TextBlock Margin="0,0,5,0" Style="{StaticResource GroupHeaderTextStyle}" Text="&gt;"/>
                             </StackPanel>
                         </HyperlinkButton>
-                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                        <GridView Grid.Row="1" ItemsSource="{Binding Source={StaticResource BudgetkontiTopCollectionViewSource}}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                             <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -249,7 +249,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=DebitorerHeader}"/>
-                        <GridView Grid.Row="1" ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                        <GridView Grid.Row="1" ItemsSource="{Binding Path=Debitorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                             <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -263,7 +263,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KreditorerHeader}"/>
-                        <GridView Grid.Row="1" ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultDataTemplate}" SelectionMode="None">
+                        <GridView Grid.Row="1" ItemsSource="{Binding Path=Kreditorer}" ItemTemplate="{StaticResource AdressekontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                             <GridView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
@@ -283,7 +283,7 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
             <TextBlock Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource ItemTextStyle}" Text="{Binding Path=NyhederHeader}"/>
-            <ListView Grid.Row="2" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelMinimalDataTemplate}" SelectionMode="None" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView Grid.Row="2" ItemsSource="{Binding Path=Nyheder}" ItemTemplate="{StaticResource NyhedViewModelMinimalNavigationDataTemplate}" SelectionMode="None" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>

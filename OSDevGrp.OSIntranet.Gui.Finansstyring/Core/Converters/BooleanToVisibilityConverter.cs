@@ -19,7 +19,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// <param name="parameter">Parameter til konverteringen.</param>
         /// <param name="language">Sprog.</param>
         /// <returns>Konverteret værdi.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public virtual object Convert(object value, Type targetType, object parameter, string language)
         {
             var valueAsBoolean = System.Convert.ToBoolean(value);
             return valueAsBoolean ? Visibility.Visible : Visibility.Collapsed;
@@ -33,7 +33,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// <param name="parameter">Parameter til konverteringen.</param>
         /// <param name="language">Sprog.</param>
         /// <returns>Konverteret værdi.</returns>
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public virtual object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             var visibility = (Visibility) Enum.Parse(typeof (Visibility), value.ToString());
             switch (visibility)

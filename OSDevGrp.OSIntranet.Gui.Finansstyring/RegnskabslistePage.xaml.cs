@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -15,6 +17,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     {
         #region Private variables
 
+        private readonly SynchronizationContext _synchronizationContext;
         private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabslistePage), new PropertyMetadata(null));
 
         #endregion
@@ -27,6 +30,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         public RegnskabslistePage()
         {
             InitializeComponent();
+            _synchronizationContext = SynchronizationContext.Current;
 
             var mainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
             Regnskabsliste = mainViewModel.Regnskabsliste;
@@ -68,12 +72,47 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             if (Regnskabsliste.Regnskaber.Any())
             {
+                ShowContent();
                 return;
             }
-            var refreshCommand = Regnskabsliste.RefreshCommand;
-            if (refreshCommand.CanExecute(Regnskabsliste))
+            var refreshCommand = Regnskabsliste.RefreshCommand as ITaskableCommand;
+            if (refreshCommand == null || refreshCommand.CanExecute(Regnskabsliste) == false)
             {
-                refreshCommand.Execute(Regnskabsliste);
+                return;
+            }
+            refreshCommand.Execute(Regnskabsliste);
+            var executeTask = refreshCommand.ExecuteTask;
+            if (executeTask == null)
+            {
+                return;
+            }
+            executeTask.ContinueWith(t =>
+                {
+                    if (_synchronizationContext == null)
+                    {
+                        ShowContent();
+                        return;
+                    }
+                    _synchronizationContext.Post(obj => ShowContent(), null);
+                });
+        }
+
+        /// <summary>
+        /// Viser indhold på siden.
+        /// </summary>
+        private void ShowContent()
+        {
+            try
+            {
+                DefaultNavigationContent.Visibility = Visibility.Visible;
+                DefaultNavigationProgressBar.Visibility = Visibility.Collapsed;
+                MinimalNavigationContent.Visibility = Visibility.Visible;
+                MinimalNavigationProgressBar.Visibility = Visibility.Collapsed;
+                CommandAppBar.Visibility = Visibility.Visible;
+            }
+            finally
+            {
+                MinimalNavigationProgressBar.IsEnabled = false;
             }
         }
 
