@@ -88,6 +88,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             DataContext = null;
+            CommandAppBar.DataContext = null;
             var regnskabsnummer = (int) e.Parameter;
             Regnskab = await Regnskabsliste.RegnskabGetAsync(regnskabsnummer);
             try
@@ -110,6 +111,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             finally
             {
                 DataContext = Regnskab;
+                CommandAppBar.DataContext = Regnskab;
             }
         }
 

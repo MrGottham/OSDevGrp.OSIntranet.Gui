@@ -31,6 +31,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             var mainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
             Regnskabsliste = mainViewModel.Regnskabsliste;
             DataContext = Regnskabsliste;
+            CommandAppBar.DataContext = Regnskabsliste;
 
             SizeChanged += PageSizeChangedEventHandler;
         }

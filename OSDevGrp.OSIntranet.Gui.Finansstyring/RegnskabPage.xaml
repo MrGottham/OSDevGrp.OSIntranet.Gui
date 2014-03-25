@@ -145,6 +145,20 @@
         </DataTemplate>
     </Page.Resources>
 
+    <Page.BottomAppBar>
+        <AppBar x:Name="CommandAppBar" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Style="{StaticResource RefreshAppBarButtonStyle}" Command="{Binding Path=RefreshCommand}" CommandParameter="{Binding}"/>
+                </StackPanel>
+            </Grid>
+        </AppBar>
+    </Page.BottomAppBar>
+
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:RegnskabPage.Regnskab}">
         <Grid.Resources>
             <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
