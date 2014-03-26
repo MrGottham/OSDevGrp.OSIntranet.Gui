@@ -57,6 +57,7 @@
     <Compile Include="Core\TabelViewModelBase.cs" />
     <Compile Include="Core\Validators\Validation.cs" />
     <Compile Include="Finansstyring\AdressekontoViewModel.cs" />
+    <Compile Include="Finansstyring\BogføringsadvarselViewModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModel.cs" />
     <Compile Include="Finansstyring\BudgetkontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\BudgetkontoViewModel.cs" />

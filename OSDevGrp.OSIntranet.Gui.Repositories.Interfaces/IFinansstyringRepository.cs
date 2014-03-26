@@ -68,6 +68,15 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         Task<IEnumerable<IBogføringslinjeModel>> BogføringslinjerGetAsync(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer);
 
         /// <summary>
+        /// Danner og returnerer en ny bogføringslinje, der efterfølgende kan bogføres.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, som den nye bogføringslinje skal være tilknyttet.</param>
+        /// <param name="dato">Bogføringsdato, som den nye bogføringslinje skal initieres med.</param>
+        /// <param name="kontonummer">Kontonummer, som den nye bogføringslinje skal initieres med.</param>
+        /// <returns>Ny bogføringslinje, der efterfølgende kan bogføres.</returns>
+        Task<IBogføringslinjeModel> BogføringslinjeCreateNewAsync(int regnskabsnummer, DateTime dato, string kontonummer);
+            
+        /// <summary>
         /// Bogfører værdier i et givent regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvor værdier skal bogføres.</param>

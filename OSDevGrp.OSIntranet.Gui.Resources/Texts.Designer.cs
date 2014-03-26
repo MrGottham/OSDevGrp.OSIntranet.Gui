@@ -97,6 +97,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is overdrawn..
+        /// </summary>
+        internal static string AccountOverdrawned {
+            get {
+                return ResourceManager.GetString("AccountOverdrawned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Accounts.
         /// </summary>
         internal static string Accounts {
@@ -345,6 +354,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string Phone {
             get {
                 return ResourceManager.GetString("Phone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Posting warning.
+        /// </summary>
+        internal static string PostingWarning {
+            get {
+                return ResourceManager.GetString("PostingWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Posting warnings.
+        /// </summary>
+        internal static string PostingWarnings {
+            get {
+                return ResourceManager.GetString("PostingWarnings", resourceCulture);
             }
         }
         

@@ -141,6 +141,41 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Danner og returnerer en ny bogføringslinje, der efterfølgende kan bogføres.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, som den nye bogføringslinje skal være tilknyttet.</param>
+        /// <param name="dato">Bogføringsdato, som den nye bogføringslinje skal initieres med.</param>
+        /// <param name="kontonummer">Kontonummer, som den nye bogføringslinje skal initieres med.</param>
+        /// <returns>Ny bogføringslinje, der efterfølgende kan bogføres.</returns>
+        public virtual Task<IBogføringslinjeModel> BogføringslinjeCreateNewAsync(int regnskabsnummer, DateTime dato, string kontonummer)
+        {
+            Func<IBogføringslinjeModel> func = () =>
+                {
+                    try
+                    {
+                        return BogføringslinjeModel.CreateNew(regnskabsnummer, dato, kontonummer);
+                    }
+                    catch (ArgumentNullException)
+                    {
+                        throw;
+                    }
+                    catch (ArgumentException)
+                    {
+                        throw;
+                    }
+                    catch (IntranetGuiRepositoryException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BogføringslinjeCreateNewAsync", ex.Message), ex);
+                    }
+                };
+            return Task.Run(func);
+        }
+
+        /// <summary>
         /// Bogfører værdier i et givent regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvor værdier skal bogføres.</param>
@@ -671,7 +706,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             Adressekonto = adressekonto
                         };
 
-                    var serviceInterface = (FinansstyringService)client;
+                    var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginBogføringslinjeOpret(command, null, null);
                     var response = serviceInterface.EndBogføringslinjeOpret(asyncResult);
 
@@ -1020,6 +1055,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             return new BasicHttpBinding(BasicHttpSecurityMode.None)
                 {
+                    SendTimeout = new TimeSpan(0, 0, 3, 0),
+                    ReceiveTimeout = new TimeSpan(0, 0, 3, 0),
                     MaxReceivedMessageSize = 4194304
                 };
         }

@@ -39,6 +39,9 @@
         Income,
         Expenses,
         Budget,
-        Bookkeeped
+        Bookkeeped,
+        PostingWarning,
+        PostingWarnings,
+        AccountOverdrawned
     }
 }

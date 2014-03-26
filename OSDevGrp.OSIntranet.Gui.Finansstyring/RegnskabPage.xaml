@@ -197,7 +197,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
-                        <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" HeaderTemplate="{StaticResource BookkeepingHeaderDefaultNavigationDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDefaultNavigationDataTemplate}" ItemsSource="{Binding Path=Bogføringslinjer}" SelectionMode="None">
+                        <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" ItemsSource="{Binding Path=Bogføringslinjer}" HeaderTemplate="{StaticResource BookkeepingHeaderDefaultNavigationDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDefaultNavigationDataTemplate}" SelectionMode="None">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>

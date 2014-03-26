@@ -224,4 +224,14 @@
   <data name="BudgetAccounts" xml:space="preserve">
     <value>Budget accounts</value>
   </data>
+  <data name="PostingWarning" xml:space="preserve">
+    <value>Posting warning</value>
+  </data>
+  <data name="PostingWarnings" xml:space="preserve">
+    <value>Posting warnings</value>
+  </data>
+  <data name="AccountOverdrawned" xml:space="preserve">
+    <value>{0} is overdrawn.</value>
+    <comment>{0} = Account name.</comment>
+  </data>
 </root>

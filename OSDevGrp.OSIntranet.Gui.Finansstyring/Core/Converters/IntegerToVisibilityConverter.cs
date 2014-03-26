@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
 {
     /// <summary>
-    /// Konverterer et objekt til Visibility. 
+    /// Konverterer en integer til Visibility. 
     /// </summary>
-    public class ObjectToVisibilityConverter : BooleanToVisibilityConverter
+    public class IntegerToVisibilityConverter : BooleanToVisibilityConverter
     {
         #region Methods
 
         /// <summary>
-        /// Konverterer et objekt til Visibility.
+        /// Konverterer en integer til Visibility.
         /// </summary>
         /// <param name="value">Værdi, der skal konverteres.</param>
         /// <param name="targetType">Typen, der skal konverteres til.</param>
@@ -20,21 +19,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
         /// <returns>Konverteret værdi.</returns>
         public override object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (value == null)
-            {
-                return base.Convert(false, targetType, parameter, language);
-            }
-            var enumerable = value as IEnumerable;
-            if (enumerable != null)
-            {
-                var enumerator = enumerable.GetEnumerator();
-                return base.Convert(enumerator.Current != null || enumerator.MoveNext(), targetType, parameter, language);
-            }
-            return base.Convert(true, targetType, parameter, language);
+            var valueAsInteger = System.Convert.ToInt32(value);
+            return base.Convert(valueAsInteger > 0, targetType, parameter, language);
         }
 
         /// <summary>
-        /// Konverterer Visibility til et objekt.
+        /// Konverterer Visibility til en integer.
         /// </summary>
         /// <param name="value">Værdi, der skal konverteres.</param>
         /// <param name="targetType">Typen, der skal konverteres til.</param>

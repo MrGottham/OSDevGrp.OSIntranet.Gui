@@ -229,6 +229,127 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync kaster en ArgumentException ved illegale regnskabsnumre.
+        /// </summary>
+        [Test]
+        [TestCase(-1024)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        public void TestAtBogføringslinjeCreateNewAsyncArgumentExceptionVedIllegalRegnskabsnummer(int illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogføringslinjeCreateNewAsync(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("regnskabsnummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync kaster en ArgumentException ved illegale datoer.
+        /// </summary>
+        [Test]
+        [TestCase("2050-01-01")]
+        [TestCase("2055-09-01")]
+        [TestCase("2055-12-31")]
+        public void TestAtBogføringslinjeCreateNewAsyncArgumentExceptionVedIllegalDato(string illegalValue)
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogføringslinjeCreateNewAsync(fixture.Create<int>(), dato, fixture.Create<string>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dato"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync kaster en ArgumentNullException ved illegale kontonumre.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void TestAtBogføringslinjeCreateNewAsyncArgumentNullExceptionVedIllegalKontonummer(string illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepository.BogføringslinjeCreateNewAsync(fixture.Create<int>(), fixture.Create<DateTime>(), illegalValue));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync danner og returnerer en ny bogføringslinje, der efterfølgende kan bogføres.
+        /// </summary>
+        [Test]
+        public async void TestAtBogføringslinjeCreateNewAsyncDannerBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var regnskabsnummer = fixture.Create<int>();
+            var dato = fixture.Create<DateTime>();
+            var kontonummer = fixture.Create<string>();
+            var bogføringslinjeModel = await finansstyringRepository.BogføringslinjeCreateNewAsync(regnskabsnummer, dato, kontonummer);
+            Assert.That(bogføringslinjeModel, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
+            Assert.That(bogføringslinjeModel.Løbenummer, Is.EqualTo(int.MinValue));
+            Assert.That(bogføringslinjeModel.Dato, Is.EqualTo(dato));
+            Assert.That(bogføringslinjeModel.Bilag, Is.Null);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.Not.Empty);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.EqualTo(kontonummer));
+            Assert.That(bogføringslinjeModel.Tekst, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Tekst, Is.Empty);
+            Assert.That(bogføringslinjeModel.Budgetkontonummer, Is.Null);
+            Assert.That(bogføringslinjeModel.Debit, Is.EqualTo(0M));
+            Assert.That(bogføringslinjeModel.Kredit, Is.EqualTo(0M));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
         /// Tester, at BogførAsync kaster en ArgumentException ved illegale regnskabsnumre.
         /// </summary>
         [Test]

@@ -68,6 +68,7 @@
     <Compile Include="Core\TabelViewModelBaseTests.cs" />
     <Compile Include="Core\Validators\ValidationTests.cs" />
     <Compile Include="Finansstyring\AdressekontoViewModelTests.cs" />
+    <Compile Include="Finansstyring\BogføringsadvarselViewModelTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModelTests.cs" />
     <Compile Include="Finansstyring\BudgetkontogruppeViewModelTests.cs" />
     <Compile Include="Finansstyring\BudgetkontoViewModelTests.cs" />
