@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
@@ -55,7 +56,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         protected override void Execute(IRegnskabViewModel regnskabViewModel)
         {
             _isBusy = true;
-            throw new NotImplementedException();
+            var kontonummer = regnskabViewModel.Bogføringslinjer.Any() ? regnskabViewModel.Bogføringslinjer.ElementAt(0).Kontonummer : regnskabViewModel.Konti.ElementAt(0).Kontonummer;
+            var task = _finansstyringRepository.BogføringslinjeCreateNewAsync(regnskabViewModel.Nummer, DateTime.Now, kontonummer);
+            ExecuteTask = task.ContinueWith(t =>
+                {
+                    try
+                    {
+                        HandleResultFromTask(t, regnskabViewModel, new object(), HandleResult);
+                    }
+                    finally
+                    {
+                        _isBusy = false;
+                    }
+                });
+        }
+
+        /// <summary>
+        /// Initierer en ny ViewModel til bogføring på et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabViewModel">ViewModel for regnskabet, hvor en ny ViewModel til bogføring skal initieres.</param>
+        /// <param name="bogføringslinjeModel">Model for en ny bogføringslinje, der efterfølgende kan bogføres.</param>
+        /// <param name="argument">Argument til initiering af en ny ViewModel til bogføring.</param>
+        private static void HandleResult(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, object argument)
+        {
+            if (regnskabViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabViewModel");
+            }
+            if (bogføringslinjeModel == null)
+            {
+                throw new ArgumentNullException("bogføringslinjeModel");
+            }
+            if (argument == null)
+            {
+                throw new ArgumentNullException("argument");
+            }
         }
     }
 }
