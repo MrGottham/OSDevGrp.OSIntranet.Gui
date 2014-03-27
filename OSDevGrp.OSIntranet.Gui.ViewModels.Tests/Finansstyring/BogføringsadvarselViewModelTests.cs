@@ -309,16 +309,37 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
             fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
 
-            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(MockRepository.GenerateMock<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
+
+            var removeCommand = bogføringsadvarselViewModel.RemoveCommand;
+            Assert.That(removeCommand, Is.Not.Null);
+
+            removeCommand.Execute(parameter);
+        }
+
+        /// <summary>
+        /// Tester, at Execute på RemoveCommand fjeren bogføringsadvarslen fra regnskabet.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteOnRemoveCommandFjernerBogføringsadvarselViewModelFraRegnskab()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
+            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+
+            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
             var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(regnskabViewModelMock, fixture.Create<IReadOnlyBogføringslinjeViewModel>(), fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
             var removeCommand = bogføringsadvarselViewModel.RemoveCommand;
             Assert.That(removeCommand, Is.Not.Null);
 
-            removeCommand.CanExecute(parameter);
+            removeCommand.Execute(null);
 
-            // TODO: regnskabViewModelMock.AssertWasCalled(m => m.);
+            regnskabViewModelMock.AssertWasCalled(m => m.BogføringsadvarselRemove(Arg<IBogføringsadvarselViewModel>.Is.Equal(bogføringsadvarselViewModel)));
         }
 
         /// <summary>

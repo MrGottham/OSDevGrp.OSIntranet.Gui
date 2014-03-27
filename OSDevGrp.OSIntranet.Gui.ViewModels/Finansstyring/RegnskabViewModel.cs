@@ -25,6 +25,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Private variables
 
         private DateTime _statusDato;
+        private IBogføringViewModel _bogføringViewModel;
+        private ITaskableCommand _bogføringSetCommand;
         private ICommand _refreshCommand;
         private readonly IRegnskabModel _regnskabModel;
         private readonly IFinansstyringRepository _finansstyringRepository;
@@ -32,6 +34,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly ObservableCollection<IKontoViewModel> _kontoViewModels = new ObservableCollection<IKontoViewModel>();
         private readonly ObservableCollection<IBudgetkontoViewModel> _budgetkontoViewModels = new ObservableCollection<IBudgetkontoViewModel>();
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
+        private readonly ObservableCollection<IBogføringsadvarselViewModel> _bogføringsadvarselViewModels = new ObservableCollection<IBogføringsadvarselViewModel>(); 
         private readonly ObservableCollection<IAdressekontoViewModel> _debitorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<IAdressekontoViewModel> _kreditorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>();
@@ -74,6 +77,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _kontoViewModels.CollectionChanged += CollectionChangedOnKontoViewModelsEventHandler;
             _budgetkontoViewModels.CollectionChanged += CollectionChangedOnBudgetkontoViewModelsEventHandler;
             _bogføringslinjeViewModels.CollectionChanged += CollectionChangedOnBogføringslinjeViewModelsEventHandler;
+            _bogføringsadvarselViewModels.CollectionChanged += CollectionChangedOnBogføringsadvarselViewModelsEventHandler;
             _debitorerViewModels.CollectionChanged += CollectionChangedOnDebitorViewModelsEventHandler;
             _kreditorerViewModels.CollectionChanged += CollectionChangedOnKreditorerViewModelsEventHandler;
             _nyhedViewModels.CollectionChanged += CollectionChangedOnNyhedViewModelsEventHandler;
@@ -298,6 +302,76 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        public virtual IBogføringViewModel Bogføring
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return _bogføringViewModel;
+                }
+            }
+            private set
+            {
+                lock (SyncRoot)
+                {
+                    if (_bogføringViewModel == value)
+                    {
+                        return;
+                    }
+                    _bogføringViewModel = value;
+                    RaisePropertyChanged("Bogføring");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Overskrift til en ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        public virtual string BogføringHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.Bookkeeping);
+            }
+        }
+
+        /// <summary>
+        /// Kommando, der kan sætte en ny ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        public virtual ITaskableCommand BogføringSetCommand
+        {
+            get
+            {
+                return _bogføringSetCommand ??  (_bogføringSetCommand = new BogføringSetCommand(_finansstyringRepository, _exceptionHandlerViewModel));
+            }
+        }
+
+        /// <summary>
+        /// Bogføringsadvarsler.
+        /// </summary>
+        public virtual IEnumerable<IBogføringsadvarselViewModel> Bogføringsadvarsler
+        {
+            get
+            {
+                return _bogføringsadvarselViewModels.OrderByDescending(m => m.Tidspunkt);
+            }
+        }
+
+        /// <summary>
+        /// Overskrift til bogføringsadvarsler.
+        /// </summary>
+        public virtual string BogføringsadvarslerHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.PostingWarnings);
+            }
+        }
+        
+        /// <summary>
         /// Debitorer.
         /// </summary>
         public virtual IEnumerable<IAdressekontoViewModel> Debitorer
@@ -463,6 +537,50 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             bogføringslinjeViewModel.PropertyChanged += PropertyChangedOnBogføringslinjeViewModelEventHandler;
             _bogføringslinjeViewModels.Add(bogføringslinjeViewModel);
+        }
+
+        /// <summary>
+        /// Sætter en ny ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        /// <param name="bogføringViewModel">Ny ViewModel, hvorfra der kan bogføres.</param>
+        public virtual void BogføringSet(IBogføringViewModel bogføringViewModel)
+        {
+            if (bogføringViewModel == null)
+            {
+                throw new ArgumentNullException("bogføringViewModel");
+            }
+            Bogføring = bogføringViewModel;
+        }
+
+        /// <summary>
+        /// Tilføjer en bogføringsadvarsel til regnskabet.
+        /// </summary>
+        /// <param name="bogføringsadvarselViewModel">ViewModel for bogføringsadvarslen, der skal tilføjes regnskabet.</param>
+        public virtual void BogføringsadvarselAdd(IBogføringsadvarselViewModel bogføringsadvarselViewModel)
+        {
+            if (bogføringsadvarselViewModel == null)
+            {
+                throw new ArgumentNullException("bogføringsadvarselViewModel");
+            }
+            bogføringsadvarselViewModel.PropertyChanged += PropertyChangedOnBogføringsadvarselViewModelEventHandler;
+            _bogføringsadvarselViewModels.Add(bogføringsadvarselViewModel);
+        }
+
+        /// <summary>
+        /// Fjerner en bogføringsadvarsel fra regnskabet.
+        /// </summary>
+        /// <param name="bogføringsadvarselViewModel">ViewModel for bogføringsadvarslen, der skal fjernes fra regnskabet.</param>
+        public virtual void BogføringsadvarselRemove(IBogføringsadvarselViewModel bogføringsadvarselViewModel)
+        {
+            if (bogføringsadvarselViewModel == null)
+            {
+                throw new ArgumentNullException("bogføringsadvarselViewModel");
+            }
+            while (_bogføringsadvarselViewModels.Contains(bogføringsadvarselViewModel))
+            {
+                _bogføringsadvarselViewModels.Remove(bogføringsadvarselViewModel);
+                bogføringsadvarselViewModel.PropertyChanged -= PropertyChangedOnBogføringsadvarselViewModelEventHandler;
+            }
         }
 
         /// <summary>
@@ -678,6 +796,29 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en bogføringsadvarsel.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void PropertyChangedOnBogføringsadvarselViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Tidspunkt":
+                    RaisePropertyChanged("Bogføringsadvarsler");
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Eventhandler, der kaldes, når en property ændres på en ViewModel for adressekontoen til en debitor.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -868,6 +1009,33 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case NotifyCollectionChangedAction.Add:
                     RaisePropertyChanged("Bogføringslinjer");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels for bogføringsadvarsler ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnBogføringsadvarselViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Bogføringsadvarsler");
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    RaisePropertyChanged("Bogføringsadvarsler");
                     break;
             }
         }

@@ -59,9 +59,11 @@
     <Compile Include="Finansstyring\AdressekontoViewModel.cs" />
     <Compile Include="Finansstyring\BogføringsadvarselViewModel.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModel.cs" />
+    <Compile Include="Finansstyring\BogføringViewModel.cs" />
     <Compile Include="Finansstyring\BudgetkontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\BudgetkontoViewModel.cs" />
     <Compile Include="Finansstyring\Commands\AdressekontoGetCommand.cs" />
+    <Compile Include="Finansstyring\Commands\BogføringSetCommand.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\BudgetkontoGetCommand.cs" />
     <Compile Include="Finansstyring\Commands\BudgetkontogrupperGetCommand.cs" />

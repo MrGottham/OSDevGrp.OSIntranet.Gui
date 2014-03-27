@@ -140,6 +140,46 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        IBogføringViewModel Bogføring
+        {
+            get; 
+        }
+
+        /// <summary>
+        /// Overskrift til en ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        string BogføringHeader
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kommando, der kan sætte en ny ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        ITaskableCommand BogføringSetCommand
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Bogføringsadvarsler.
+        /// </summary>
+        IEnumerable<IBogføringsadvarselViewModel> Bogføringsadvarsler
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til bogføringsadvarsler.
+        /// </summary>
+        string BogføringsadvarslerHeader
+        {
+            get;
+        }
+        
+        /// <summary>
         /// Debitorer.
         /// </summary>
         IEnumerable<IAdressekontoViewModel> Debitorer
@@ -220,6 +260,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// </summary>
         /// <param name="bogføringslinjeViewModel">ViewModel for bogføringslinjen, der skal tilføjes regnskabet.</param>
         void BogføringslinjeAdd(IReadOnlyBogføringslinjeViewModel bogføringslinjeViewModel);
+
+        /// <summary>
+        /// Sætter en ny ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        /// <param name="bogføringViewModel">Ny ViewModel, hvorfra der kan bogføres.</param>
+        void BogføringSet(IBogføringViewModel bogføringViewModel);
+
+        /// <summary>
+        /// Tilføjer en bogføringsadvarsel til regnskabet.
+        /// </summary>
+        /// <param name="bogføringsadvarselViewModel">ViewModel for bogføringsadvarslen, der skal tilføjes regnskabet.</param>
+        void BogføringsadvarselAdd(IBogføringsadvarselViewModel bogføringsadvarselViewModel);
+
+        /// <summary>
+        /// Fjerner en bogføringsadvarsel fra regnskabet.
+        /// </summary>
+        /// <param name="bogføringsadvarselViewModel">ViewModel for bogføringsadvarslen, der skal fjernes fra regnskabet.</param>
+        void BogføringsadvarselRemove(IBogføringsadvarselViewModel bogføringsadvarselViewModel);
 
         /// <summary>
         /// Tilføjerer en debitor til regnskabet.

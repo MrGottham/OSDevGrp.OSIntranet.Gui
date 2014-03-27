@@ -52,6 +52,7 @@
     <Compile Include="Finansstyring\IAdressekontoViewModel.cs" />
     <Compile Include="Finansstyring\IBogføringsadvarselViewModel.cs" />
     <Compile Include="Finansstyring\IBogføringslinjeViewModel.cs" />
+    <Compile Include="Finansstyring\IBogføringViewModel.cs" />
     <Compile Include="Finansstyring\IBudgetkontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\IBudgetkontoViewModel.cs" />
     <Compile Include="Finansstyring\IFinansstyringKonfigurationViewModel.cs" />

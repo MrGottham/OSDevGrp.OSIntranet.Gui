@@ -187,6 +187,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         {
                             _bogføringslinjeViewModel.PropertyChanged -= PropertyChangedOnBogføringslinjeViewModelEventHandler;
                             _bogføringsadvarselModel.PropertyChanged -= PropertyChangedOnBogføringsadvarselModelEventHandler;
+                            Regnskab.BogføringsadvarselRemove(this);
                         };
                     _removeCommand = new RelayCommand(action);
                 }
