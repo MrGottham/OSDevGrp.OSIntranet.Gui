@@ -99,9 +99,18 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to {0} is overdrawn..
         /// </summary>
-        internal static string AccountOverdrawned {
+        internal static string AccountOverdrawnedWithoutValue {
             get {
-                return ResourceManager.GetString("AccountOverdrawned", resourceCulture);
+                return ResourceManager.GetString("AccountOverdrawnedWithoutValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is overdrawn by {1}..
+        /// </summary>
+        internal static string AccountOverdrawnedWithValue {
+            get {
+                return ResourceManager.GetString("AccountOverdrawnedWithValue", resourceCulture);
             }
         }
         
@@ -183,6 +192,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string BudgetAccounts {
             get {
                 return ResourceManager.GetString("BudgetAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cause.
+        /// </summary>
+        internal static string Cause {
+            get {
+                return ResourceManager.GetString("Cause", resourceCulture);
             }
         }
         

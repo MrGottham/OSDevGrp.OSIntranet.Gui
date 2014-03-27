@@ -230,8 +230,15 @@
   <data name="PostingWarnings" xml:space="preserve">
     <value>Bogføringsadvarsler</value>
   </data>
-  <data name="AccountOverdrawned" xml:space="preserve">
+  <data name="AccountOverdrawnedWithoutValue" xml:space="preserve">
     <value>{0} er i overtræk.</value>
     <comment>{0} = Kontonavn.</comment>
+  </data>
+  <data name="AccountOverdrawnedWithValue" xml:space="preserve">
+    <value>{0} er i overtræk med {1}.</value>
+    <comment>{0} = Kontonavn, {1} = Overtræksbeløb.</comment>
+  </data>
+  <data name="Cause" xml:space="preserve">
+    <value>Årsag</value>
   </data>
 </root>

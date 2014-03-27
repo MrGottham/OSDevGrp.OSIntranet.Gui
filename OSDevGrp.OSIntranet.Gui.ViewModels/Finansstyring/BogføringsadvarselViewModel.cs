@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text;
 using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
@@ -14,6 +16,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
+        private ICommand _removeCommand;
         private readonly IRegnskabViewModel _regnskabViewModel;
         private readonly IReadOnlyBogføringslinjeViewModel _bogføringslinjeViewModel;
         private readonly IBogføringsadvarselModel _bogføringsadvarselModel;
@@ -46,7 +49,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             _regnskabViewModel = regnskabViewModel;
             _bogføringslinjeViewModel = bogføringslinjeViewModel;
+            _bogføringslinjeViewModel.PropertyChanged += PropertyChangedOnBogføringslinjeViewModelEventHandler;
             _bogføringsadvarselModel = bogføringsadvarselModel;
+            _bogføringsadvarselModel.PropertyChanged += PropertyChangedOnBogføringsadvarselModelEventHandler;
             _tidspunkt = tidspunkt;
         }
 
@@ -161,6 +166,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 var informationBuilder = new StringBuilder(TidspunktAsText);
+                informationBuilder.AppendFormat(" {0}", Beløb == 0M ? Resource.GetText(Text.AccountOverdrawnedWithoutValue, Kontonavn) : Resource.GetText(Text.AccountOverdrawnedWithValue, Kontonavn, BeløbAsText));
+                informationBuilder.AppendLine();
+                informationBuilder.AppendLine();
+                informationBuilder.AppendFormat("{0}: {1} {2}", Resource.GetText(Text.Cause), _bogføringslinjeViewModel.Tekst, _bogføringslinjeViewModel.BogførtAsText);
                 return informationBuilder.ToString();
             }
         }
@@ -172,7 +181,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                if (_removeCommand == null)
+                {
+                    Action<object> action = obj =>
+                        {
+                            _bogføringslinjeViewModel.PropertyChanged -= PropertyChangedOnBogføringslinjeViewModelEventHandler;
+                            _bogføringsadvarselModel.PropertyChanged -= PropertyChangedOnBogføringsadvarselModelEventHandler;
+                        };
+                    _removeCommand = new RelayCommand(action);
+                }
+                return _removeCommand;
             }
         }
 
@@ -195,6 +213,77 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return Resource.GetEmbeddedResource("Images.Bogføringslinje.png");
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på ViewModel for bogføringslinjen, der har medført advarslen.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnBogføringslinjeViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Tekst":
+                    RaisePropertyChanged("Bogføringslinje");
+                    RaisePropertyChanged("Information");
+                    break;
+
+                case "BogførtAsText":
+                    RaisePropertyChanged("Bogføringslinje");
+                    RaisePropertyChanged("Information");
+                    break;
+
+                default:
+                    RaisePropertyChanged("Bogføringslinje");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på modellen for advarslen, som er opstået ved bogføring.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnBogføringsadvarselModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Kontonavn":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("Information");
+                    break;
+
+                case "Beløb":
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    RaisePropertyChanged("BeløbAsText");
+                    RaisePropertyChanged("Information");
+                    break;
+
+                default:
+                    RaisePropertyChanged(eventArgs.PropertyName);
+                    break;
             }
         }
 

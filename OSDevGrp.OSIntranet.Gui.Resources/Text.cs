@@ -42,6 +42,8 @@
         Bookkeeped,
         PostingWarning,
         PostingWarnings,
-        AccountOverdrawned
+        AccountOverdrawnedWithoutValue,
+        AccountOverdrawnedWithValue,
+        Cause
     }
 }
