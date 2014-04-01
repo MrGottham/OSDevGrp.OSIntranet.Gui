@@ -241,4 +241,7 @@
   <data name="Cause" xml:space="preserve">
     <value>Årsag</value>
   </data>
+  <data name="ValueIsRequiered" xml:space="preserve">
+    <value>Værdi er påkrævet og må ikke være tom.</value>
+  </data>
 </root>

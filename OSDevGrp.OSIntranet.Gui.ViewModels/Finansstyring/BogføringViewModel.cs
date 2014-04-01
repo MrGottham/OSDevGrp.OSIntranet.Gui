@@ -1,6 +1,9 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -9,7 +12,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// <summary>
     /// ViewModel, hvorfra der kan bogføres.
     /// </summary>
-    public class BogføringViewModel : BogføringslinjeViewModel
+    public class BogføringViewModel : BogføringslinjeViewModel, IBogføringViewModel
     {
         #region Private variables
 
@@ -40,6 +43,52 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             _finansstyringRepository = finansstyringRepository;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Tekstangivelse af bogføringstidspunkt.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateDatoAsText")]
+        public virtual string DatoAsText
+        {
+            get
+            {
+                return Dato.ToString("d");
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Label til bogføringstidspunkt.
+        /// </summary>
+        public virtual string DatoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Date);
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Validerer værdien for bogføringstidspunkt.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateDatoAsText(string value)
+        {
+            var result = Validation.ValidateRequiredValue(value);
+            return result;
         }
 
         #endregion

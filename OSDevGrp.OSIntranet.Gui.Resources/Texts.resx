@@ -241,4 +241,7 @@
   <data name="Cause" xml:space="preserve">
     <value>Cause</value>
   </data>
+  <data name="ValueIsRequiered" xml:space="preserve">
+    <value>Value is required and can't be empty.</value>
+  </data>
 </root>

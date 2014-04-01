@@ -960,6 +960,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("KontiGrouped");
                     RaisePropertyChanged("KontiTop");
                     RaisePropertyChanged("KontiTopGrouped");
+                    if (Bogføring != null)
+                    {
+                        break;
+                    }
+                    lock (SyncRoot)
+                    {
+                        if (BogføringSetCommand.CanExecute(this) == false)
+                        {
+                            break;
+                        }
+                        BogføringSetCommand.Execute(this);
+                    }
                     break;
             }
         }
@@ -1009,6 +1021,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case NotifyCollectionChangedAction.Add:
                     RaisePropertyChanged("Bogføringslinjer");
+                    if (Bogføring != null)
+                    {
+                        break;
+                    }
+                    lock (SyncRoot)
+                    {
+                        if (BogføringSetCommand.CanExecute(this) == false)
+                        {
+                            break;
+                        }
+                        BogføringSetCommand.Execute(this);
+                    }
                     break;
             }
         }

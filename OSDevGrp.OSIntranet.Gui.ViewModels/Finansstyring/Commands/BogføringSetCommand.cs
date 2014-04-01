@@ -77,7 +77,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="regnskabViewModel">ViewModel for regnskabet, hvor en ny ViewModel til bogføring skal initieres.</param>
         /// <param name="bogføringslinjeModel">Model for en ny bogføringslinje, der efterfølgende kan bogføres.</param>
         /// <param name="argument">Argument til initiering af en ny ViewModel til bogføring.</param>
-        private static void HandleResult(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, object argument)
+        private void HandleResult(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, object argument)
         {
             if (regnskabViewModel == null)
             {
@@ -91,6 +91,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             {
                 throw new ArgumentNullException("argument");
             }
+            regnskabViewModel.BogføringSet(new BogføringViewModel(regnskabViewModel, bogføringslinjeModel, _finansstyringRepository, ExceptionHandler));
         }
     }
 }

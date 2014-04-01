@@ -412,6 +412,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value is required and can&apos;t be empty..
+        /// </summary>
+        internal static string ValueIsRequiered {
+            get {
+                return ResourceManager.GetString("ValueIsRequiered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value is outside the interval ({0} - {1})..
         /// </summary>
         internal static string ValueOutsideInterval {

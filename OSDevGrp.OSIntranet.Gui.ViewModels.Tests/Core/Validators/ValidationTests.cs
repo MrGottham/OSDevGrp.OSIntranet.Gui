@@ -13,6 +13,37 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
     public class ValidationTests
     {
         /// <summary>
+        /// Tester, at ValidateRequiredValue returnerer Success ved lovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase("XYZ")]
+        [TestCase("ZYX")]
+        public void TestAtValidateRequiredValueReturnererSuccessVedLovligeValues(string value)
+        {
+            var result = Validation.ValidateRequiredValue(value);
+            Assert.That(result, Is.EqualTo(ValidationResult.Success));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateRequiredValue returnerer ValidationResult ved ulovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        public void TestAtValidateRequiredValueReturnererValidationResultVedUlovligeValues(string value)
+        {
+            var result = Validation.ValidateRequiredValue(value);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
+            Assert.That(result.ErrorMessage, Is.Not.Null);
+            Assert.That(result.ErrorMessage, Is.Not.Empty);
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueIsRequiered)));
+            Assert.That(result.MemberNames, Is.Not.Null);
+            Assert.That(result.MemberNames, Is.Empty);
+        }
+
+        /// <summary>
         /// Tester, at ValidateUri returnerer Success ved lovlige værdier.
         /// </summary>
         [Test]
@@ -39,6 +70,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.InvalidValueForUri, value)));
+            Assert.That(result.MemberNames, Is.Not.Null);
+            Assert.That(result.MemberNames, Is.Empty);
         }
 
         /// <summary>
@@ -71,6 +104,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, min, max)));
+            Assert.That(result.MemberNames, Is.Not.Null);
+            Assert.That(result.MemberNames, Is.Empty);
         }
     }
 }

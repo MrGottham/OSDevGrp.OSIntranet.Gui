@@ -44,6 +44,7 @@
         PostingWarnings,
         AccountOverdrawnedWithoutValue,
         AccountOverdrawnedWithValue,
-        Cause
+        Cause,
+        ValueIsRequiered
     }
 }

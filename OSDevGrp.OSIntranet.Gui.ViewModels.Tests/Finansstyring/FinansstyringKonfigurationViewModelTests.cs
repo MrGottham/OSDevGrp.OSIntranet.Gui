@@ -1261,6 +1261,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.InvalidValueForUri, value)));
+            Assert.That(result.MemberNames, Is.Not.Null);
+            Assert.That(result.MemberNames, Is.Empty);
         }
 
         /// <summary>
@@ -1292,6 +1294,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 10, 250)));
+            Assert.That(result.MemberNames, Is.Not.Null);
+            Assert.That(result.MemberNames, Is.Empty);
         }
 
         /// <summary>
@@ -1323,6 +1327,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 0, 30)));
+            Assert.That(result.MemberNames, Is.Not.Null);
+            Assert.That(result.MemberNames, Is.Empty);
         }
     }
 }

@@ -10,6 +10,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
     public static class Validation
     {
         /// <summary>
+        /// Validerer, om der er angivet en værdi.
+        /// </summary>
+        /// <param name="value">Værdi, der skal være angivet.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateRequiredValue(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) == false
+                       ? ValidationResult.Success
+                       : new ValidationResult(Resource.GetText(Text.ValueIsRequiered));
+        }
+
+        /// <summary>
         /// Validerer, om værdien er en URI adresse.
         /// </summary>
         /// <param name="value">Værdi, der skal valideres.</param>

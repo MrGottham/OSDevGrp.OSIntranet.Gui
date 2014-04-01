@@ -144,9 +144,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                                  .Return(new List<IReadOnlyBogføringslinjeViewModel>(0))
                                  .Repeat.Any();
 
-            command.Execute(regnskabViewModelMock);
-            Assert.That(command.ExecuteTask, Is.Not.Null);
-            command.ExecuteTask.Wait(3000);
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.BogføringslinjeCreateNewAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Equal(kontoViewModelMockCollection.ElementAt(0).Kontonummer)));
             regnskabViewModelMock.AssertWasCalled(m => m.BogføringSet(Arg<IBogføringViewModel>.Is.NotNull));
@@ -196,9 +200,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                                  .Return(bogføringslinjeViewModelMockCollection)
                                  .Repeat.Any();
 
-            command.Execute(regnskabViewModelMock);
-            Assert.That(command.ExecuteTask, Is.Not.Null);
-            command.ExecuteTask.Wait(3000);
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.BogføringslinjeCreateNewAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Equal(bogføringslinjeViewModelMockCollection.ElementAt(0).Kontonummer)));
             regnskabViewModelMock.AssertWasCalled(m => m.BogføringSet(Arg<IBogføringViewModel>.Is.NotNull));
@@ -251,9 +259,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                                  .Return(bogføringslinjeViewModelMockCollection)
                                  .Repeat.Any();
 
-            command.Execute(regnskabViewModelMock);
-            Assert.That(command.ExecuteTask, Is.Not.Null);
-            command.ExecuteTask.Wait(3000);
+            Action action = () =>
+                {
+                    command.Execute(regnskabViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.BogføringslinjeCreateNewAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Equal(bogføringslinjeViewModelMockCollection.ElementAt(0).Kontonummer)));
             regnskabViewModelMock.AssertWasNotCalled(m => m.BogføringSet(Arg<IBogføringViewModel>.Is.Anything));
