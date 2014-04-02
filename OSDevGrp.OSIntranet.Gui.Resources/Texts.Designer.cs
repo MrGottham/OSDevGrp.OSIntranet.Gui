@@ -250,6 +250,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The date must be before or eqaul to {0}..
+        /// </summary>
+        internal static string DateGreaterThan {
+            get {
+                return ResourceManager.GetString("DateGreaterThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number of days when news is current.
         /// </summary>
         internal static string DaysForNews {
@@ -408,6 +417,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string Text {
             get {
                 return ResourceManager.GetString("Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value is not a valid date or in incorrect format..
+        /// </summary>
+        internal static string ValueIsNotDate {
+            get {
+                return ResourceManager.GetString("ValueIsNotDate", resourceCulture);
             }
         }
         

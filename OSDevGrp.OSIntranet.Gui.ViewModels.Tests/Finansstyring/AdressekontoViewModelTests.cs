@@ -546,7 +546,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
-        /// Teser, at PropertyChangedOnAdressekontoModelEventHandler kaster en ArgumentNullException, hvis objektet, der rejser eventet, er null.
+        /// Tester, at PropertyChangedOnAdressekontoModelEventHandler kaster en ArgumentNullException, hvis objektet, der rejser eventet, er null.
         /// </summary>
         [Test]
         public void TestAtPropertyChangedOnAdressekontoModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
@@ -570,7 +570,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
-        /// Teser, at PropertyChangedOnAdressekontoModelEventHandler kaster en ArgumentNullException, hvis argumenter til eventet er null.
+        /// Tester, at PropertyChangedOnAdressekontoModelEventHandler kaster en ArgumentNullException, hvis argumenter til eventet er null.
         /// </summary>
         [Test]
         public void TestAtPropertyChangedOnAdressekontoModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()

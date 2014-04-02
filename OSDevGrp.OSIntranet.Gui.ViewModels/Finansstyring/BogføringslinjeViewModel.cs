@@ -223,6 +223,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
         }
 
+        /// <summary>
+        /// Model for bogføringslinjen.
+        /// </summary>
+        protected virtual IBogføringslinjeModel Model
+        {
+            get
+            {
+                return _bogføringslinjeModel;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -232,7 +243,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>
-        private void PropertyChangedOnBogføringslinjeModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        protected virtual void PropertyChangedOnBogføringslinjeModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
         {
             if (sender == null)
             {

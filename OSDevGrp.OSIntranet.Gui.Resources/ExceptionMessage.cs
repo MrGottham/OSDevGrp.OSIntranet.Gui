@@ -15,6 +15,7 @@
         ErrorWhileSettingPropertyValue,
         MethodError,
         AccountGroupNotFound,
-        BudgetAccountGroupNotFound
+        BudgetAccountGroupNotFound,
+        ErrorWhileSettingBookeepingDate
     }
 }

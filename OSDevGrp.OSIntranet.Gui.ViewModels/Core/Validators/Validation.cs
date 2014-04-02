@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using OSDevGrp.OSIntranet.Gui.Resources;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
@@ -37,8 +38,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
         /// <summary>
         /// Validerer, om værdien er i et givent interval.
         /// </summary>
-        /// <param name="value">Værdien, der skal valideres.</param>
-        /// <param name="min">Minimun for intervallet, hvori værdien skal være.</param>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <param name="min">Minimum for intervallet, hvori værdien skal være.</param>
         /// <param name="max">Maksimum for intervallet, hvori værdien skal være.</param>
         /// <returns>Valideringsresultat.</returns>
         public static ValidationResult ValidateInterval(int value, int min, int max)
@@ -48,6 +49,36 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
                 return ValidationResult.Success;
             }
             return new ValidationResult(Resource.GetText(Text.ValueOutsideInterval, min, max));
+        }
+
+        /// <summary>
+        /// Validerer, om værdien er en dato.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateDate(string value)
+        {
+            return ValidateDateLowerOrEqualTo(value, DateTime.MaxValue);
+        }
+
+        /// <summary>
+        /// Validerer, om værdien er en dato, der er mindre end eller lig en anden dato.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <param name="maxDateTime">Datoen, som værdien skal være mindre end eller lig med.</param>
+        /// <returns>Valideringsresutlat.</returns>
+        public static ValidationResult ValidateDateLowerOrEqualTo(string value, DateTime maxDateTime)
+        {
+            DateTime dateTime;
+            if (DateTime.TryParse(value, CultureInfo.CurrentUICulture, DateTimeStyles.AssumeLocal, out dateTime) == false)
+            {
+                return new ValidationResult(Resource.GetText(Text.ValueIsNotDate));
+            }
+            if (dateTime.Date.CompareTo(maxDateTime.Date) > 0)
+            {
+                return new ValidationResult(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToString("D", CultureInfo.CurrentUICulture)));
+            }
+            return ValidationResult.Success;
         }
     }
 }

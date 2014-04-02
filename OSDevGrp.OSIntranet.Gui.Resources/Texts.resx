@@ -244,4 +244,11 @@
   <data name="ValueIsRequiered" xml:space="preserve">
     <value>Value is required and can't be empty.</value>
   </data>
+  <data name="ValueIsNotDate" xml:space="preserve">
+    <value>Value is not a valid date or in incorrect format.</value>
+  </data>
+  <data name="DateGreaterThan" xml:space="preserve">
+    <value>The date must be before or eqaul to {0}.</value>
+    <comment>{0} = Max date.</comment>
+  </data>
 </root>

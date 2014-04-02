@@ -244,4 +244,11 @@
   <data name="ValueIsRequiered" xml:space="preserve">
     <value>Værdi er påkrævet og må ikke være tom.</value>
   </data>
+  <data name="ValueIsNotDate" xml:space="preserve">
+    <value>Værdien er ikke en valid dato eller er ikke korrekt formateret.</value>
+  </data>
+  <data name="DateGreaterThan" xml:space="preserve">
+    <value>Datoen skal ligge før eller være lig med {0}.</value>
+    <comment>{0} = Maks. dato.</comment>
+  </data>
 </root>

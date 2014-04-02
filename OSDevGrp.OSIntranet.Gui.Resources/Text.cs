@@ -45,6 +45,8 @@
         AccountOverdrawnedWithoutValue,
         AccountOverdrawnedWithValue,
         Cause,
-        ValueIsRequiered
+        ValueIsRequiered,
+        ValueIsNotDate,
+        DateGreaterThan
     }
 }

@@ -97,6 +97,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error while setting date for the accounting line..
+        /// </summary>
+        internal static string ErrorWhileSettingBookeepingDate {
+            get {
+                return ResourceManager.GetString("ErrorWhileSettingBookeepingDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error while setting value of the property named &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string ErrorWhileSettingPropertyValue {
