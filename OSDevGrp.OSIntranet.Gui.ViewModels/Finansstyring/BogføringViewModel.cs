@@ -19,6 +19,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
+        private readonly IKontoViewModel _kontoViewModel = null;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
 
@@ -106,6 +107,186 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
         }
 
+        /// <summary>
+        /// Bilagsnummer.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateBilag")]
+        public new virtual string Bilag
+        {
+            get
+            {
+                return base.Bilag;
+            }
+            set
+            {
+                try
+                {
+                    var validationResult = ValidateBilag(value);
+                    if (validationResult != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "Bilag", value);
+                    }
+                    try
+                    {
+                        Model.Bilag = value;
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAnnex), this, "Bilag", value, ex);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAnnex), this, "Bilag", value, ex);
+                    }
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Bilag", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Label til bilagsnummer.
+        /// </summary>
+        public virtual string BilagLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Annex);
+            }
+        }
+
+        /// <summary>
+        /// Kontonummer, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateKontonummer")]
+        public new virtual string Kontonummer
+        {
+            get
+            {
+                return base.Kontonummer;
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Label til kontonummeret, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string KontonummerLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Account);
+            }
+        }
+
+        /// <summary>
+        /// Navn på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string Kontonavn
+        {
+            get
+            {
+                return KontoViewModel == null ? string.Empty : KontoViewModel.Kontonavn;
+            }
+        }
+
+        /// <summary>
+        /// Label til navnet på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string KontonavnLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Account);
+            }
+        }
+
+        /// <summary>
+        /// Saldo på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual decimal KontoSaldo
+        {
+            get
+            {
+                return KontoViewModel == null ? 0M : KontoViewModel.Saldo;
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af saldo på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string KontoSaldoAsText
+        {
+            get
+            {
+                return KontoViewModel == null ? string.Empty : KontoViewModel.SaldoAsText;
+            }
+        }
+
+        /// <summary>
+        /// Label til saldoen på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string KontoSaldoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Balance);
+            }
+        }
+
+        /// <summary>
+        /// Disponibel beløb på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual decimal KontoDisponibel
+        {
+            get
+            {
+                return KontoViewModel == null ? 0M : KontoViewModel.Disponibel;
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af disponibel beløb på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string KontoDisponibelAsText
+        {
+            get
+            {
+                return KontoViewModel == null ? string.Empty : KontoViewModel.DisponibelAsText;
+            }
+        }
+
+        /// <summary>
+        /// Label til disponibel beløb på kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string KontoDisponibelLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Available);
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        protected virtual IKontoViewModel KontoViewModel
+        {
+            get
+            {
+                return _kontoViewModel;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -144,6 +325,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 return result;
             }
             return Validation.ValidateDateLowerOrEqualTo(value, DateTime.Now);
+        }
+
+        /// <summary>
+        /// Validerer værdien for bilagsnummer.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateBilag(string value)
+        {
+            return ValidationResult.Success;
+        }
+
+        /// <summary>
+        /// Validerer værdien for kontonummer.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateKontonummer(string value)
+        {
+            return Validation.ValidateRequiredValue(value);
         }
 
         #endregion
