@@ -471,9 +471,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    throw;
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Budgetkontonummer", ex.Message), ex));
                 }
             }
         }
