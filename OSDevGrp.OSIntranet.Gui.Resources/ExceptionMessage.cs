@@ -16,7 +16,10 @@
         MethodError,
         AccountGroupNotFound,
         BudgetAccountGroupNotFound,
-        ErrorWhileSettingBookeepingDate,
-        ErrorWhileSettingAnnex
+        ErrorWhileSettingBookkeepingDate,
+        ErrorWhileSettingAnnex,
+        ErrorWhileSettingAccountNumber,
+        ErrorWhileSettingBookkeepingText,
+        ErrorWhileSettingBudgetAccountNumber
     }
 }

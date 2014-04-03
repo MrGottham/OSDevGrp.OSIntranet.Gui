@@ -77,6 +77,7 @@
     <Compile Include="Finansstyring\Comparers\AdressekontoViewModelComparer.cs" />
     <Compile Include="Finansstyring\Comparers\BogføringslinjeViewModelComparer.cs" />
     <Compile Include="Finansstyring\Comparers\KontoViewModelBaseComparer.cs" />
+    <Compile Include="Finansstyring\FieldInformations.cs" />
     <Compile Include="Finansstyring\FinansstyringKonfigurationViewModel.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModel.cs" />
     <Compile Include="Finansstyring\KontogruppeViewModelBase.cs" />

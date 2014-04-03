@@ -97,6 +97,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error while setting account number for the accounting line..
+        /// </summary>
+        internal static string ErrorWhileSettingAccountNumber {
+            get {
+                return ResourceManager.GetString("ErrorWhileSettingAccountNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error while setting annex for the accounting line..
         /// </summary>
         internal static string ErrorWhileSettingAnnex {
@@ -108,9 +117,27 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error while setting date for the accounting line..
         /// </summary>
-        internal static string ErrorWhileSettingBookeepingDate {
+        internal static string ErrorWhileSettingBookkeepingDate {
             get {
-                return ResourceManager.GetString("ErrorWhileSettingBookeepingDate", resourceCulture);
+                return ResourceManager.GetString("ErrorWhileSettingBookkeepingDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while setting text for the accounting line..
+        /// </summary>
+        internal static string ErrorWhileSettingBookkeepingText {
+            get {
+                return ResourceManager.GetString("ErrorWhileSettingBookkeepingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while setting budget account number for the accounting line..
+        /// </summary>
+        internal static string ErrorWhileSettingBudgetAccountNumber {
+            get {
+                return ResourceManager.GetString("ErrorWhileSettingBudgetAccountNumber", resourceCulture);
             }
         }
         

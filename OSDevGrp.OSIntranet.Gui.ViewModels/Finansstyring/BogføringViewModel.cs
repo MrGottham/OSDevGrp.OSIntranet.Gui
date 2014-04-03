@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
@@ -19,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
-        private readonly IKontoViewModel _kontoViewModel = null;
+        private IKontoViewModel _kontoViewModel;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
 
@@ -78,11 +79,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     }
                     catch (ArgumentNullException ex)
                     {
-                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookeepingDate), this, "DatoAsText", value, ex);
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookkeepingDate), this, "DatoAsText", value, ex);
                     }
                     catch (ArgumentException ex)
                     {
-                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookeepingDate), this, "DatoAsText", value, ex);
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookkeepingDate), this, "DatoAsText", value, ex);
                     }
                 }
                 catch (IntranetGuiExceptionBase ex)
@@ -93,6 +94,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DatoAsText", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om tekstangivelsen for bogføringstidspunktet kan redigeres.
+        /// </summary>
+        public virtual bool DatoAsTextIsReadOnly
+        {
+            get
+            {
+                return KontoReaderTaskIsActive || BudgetkontoReaderTaskIsActive || ErBogført;
             }
         }
 
@@ -128,7 +140,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     }
                     try
                     {
-                        Model.Bilag = value;
+                        Model.Bilag = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
                     }
                     catch (ArgumentNullException ex)
                     {
@@ -147,6 +159,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Bilag", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for bilagsnummeret.
+        /// </summary>
+        public virtual int BilagMaxLength
+        {
+            get
+            {
+                return FieldInformations.BilagFieldLength;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om bilagsnummeret kan redigeres.
+        /// </summary>
+        public virtual bool BilagIsReadOnly
+        {
+            get
+            {
+                return ErBogført;
             }
         }
 
@@ -173,7 +207,56 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    var validationResult = ValidateKontonummer(value);
+                    if (validationResult != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "Kontonummer", value);
+                    }
+                    try
+                    {
+                        Model.Kontonummer = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAccountNumber), this, "Kontonummer", value, ex);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAccountNumber), this, "Kontonummer", value, ex);
+                    }
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Kontonummer", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for kontonummeret.
+        /// </summary>
+        public virtual int KontonummerMaxLength
+        {
+            get
+            {
+                return FieldInformations.KontonummerFieldLength;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om kontonummeret kan redigeres.
+        /// </summary>
+        public virtual bool KontonummerIsReadOnly
+        {
+            get
+            {
+                return KontoReaderTaskIsActive || ErBogført;
             }
         }
 
@@ -277,6 +360,246 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Tekst.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateTekst")]
+        public new virtual string Tekst
+        {
+            get
+            {
+                return base.Tekst;
+            }
+            set
+            {
+                try
+                {
+                    var validationResult = ValidateTekst(value);
+                    if (validationResult != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "Tekst", value);
+                    }
+                    try
+                    {
+                        Model.Tekst = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookkeepingText), this, "Tekst", value, ex);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookkeepingText), this, "Tekst", value, ex);
+                    }
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Tekst", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for teksten til bogføringslinjen.
+        /// </summary>
+        public virtual int TekstMaxLength
+        {
+            get
+            {
+                return FieldInformations.BogføringstekstFieldLength;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om teksten til bogføringslinjen kan redigeres.
+        /// </summary>
+        public virtual bool TekstIsReadOnly
+        {
+            get
+            {
+                return ErBogført;
+            }
+        }
+
+        /// <summary>
+        /// Label til teksten på bogføringslinjen.
+        /// </summary>
+        public virtual string TekstLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Text);
+            }
+        }
+
+        /// <summary>
+        /// Kontonummer på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateBudgetkontonummer")]
+        public new virtual string Budgetkontonummer
+        {
+            get
+            {
+                return base.Budgetkontonummer;
+            }
+            set
+            {
+                try
+                {
+                    var validationResult = ValidateBudgetkontonummer(value);
+                    if (validationResult != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "Budgetkontonummer", value);
+                    }
+                    try
+                    {
+                        Model.Budgetkontonummer = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBudgetAccountNumber), this, "Budgetkontonummer", value, ex);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBudgetAccountNumber), this, "Budgetkontonummer", value, ex);
+                    }
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for kontonummeret på budgetkontoen.
+        /// </summary>
+        public virtual int BudgetkontonummerMaxLength
+        {
+            get
+            {
+                return FieldInformations.KontonummerFieldLength;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om kontonummeret på budgetkontoen kan redigeres.
+        /// </summary>
+        public virtual bool BudgetkontonummerIsReadOnly
+        {
+            get
+            {
+                return BudgetkontoReaderTaskIsActive || ErBogført;
+            }
+        }
+
+        /// <summary>
+        /// Label til kontonummeret på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string BudgetkontonummerLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetAccount);
+            }
+        }
+
+        /// <summary>
+        /// Navn på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string Budgetkontonavn
+        {
+            get
+            {
+                return BudgetkontoViewModel == null ? string.Empty : BudgetkontoViewModel.Kontonavn;
+            }
+        }
+
+        /// <summary>
+        /// Label til navnet på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string BudgetkontonavnLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetAccount);
+            }
+        }
+
+        /// <summary>
+        /// Bogført beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual decimal BudgetkontoBogført
+        {
+            get
+            {
+                return BudgetkontoViewModel == null ? 0M : BudgetkontoViewModel.Bogført;
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string BudgetkontoBogførtAsText
+        {
+            get
+            {
+                return BudgetkontoViewModel == null ? string.Empty : BudgetkontoViewModel.BogførtAsText;
+            }
+        }
+
+        /// <summary>
+        /// Label til bogført beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string BudgetkontoBogførtLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Bookkeeped);
+            }
+        }
+
+        /// <summary>
+        /// Disponibel beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual decimal BudgetkontoDisponibel
+        {
+            get
+            {
+                return BudgetkontoViewModel == null ? 0M : BudgetkontoViewModel.Disponibel;
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af disponibel beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string BudgetkontoDisponibelAsText
+        {
+            get
+            {
+                return BudgetkontoViewModel == null ? string.Empty : BudgetkontoViewModel.DisponibelAsText;
+            }
+        }
+
+        /// <summary>
+        /// Label til disponibel beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string BudgetkontoDisponibelLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Available);
+            }
+        }
+
+        /// <summary>
         /// ViewModel for kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
         protected virtual IKontoViewModel KontoViewModel
@@ -284,6 +607,101 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return _kontoViewModel;
+            }
+            private set
+            {
+                _kontoViewModel = value;
+                RaisePropertyChanged("Kontonavn");
+                RaisePropertyChanged("KontoSaldo");
+                RaisePropertyChanged("KontoSaldoAsText");
+                RaisePropertyChanged("KontoDisponibel");
+                RaisePropertyChanged("KontoDisponibelAsText");
+            }
+        }
+
+        /// <summary>
+        /// Task, der indlæser og opdaterer kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        protected virtual Task KontoReaderTask
+        {
+            get
+            {
+                return null;
+            }
+            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
+            // TODO: RaisePropertyChanged("KontonummerIsReadOnly");
+        }
+
+        /// <summary>
+        /// Angivelse af, om den Task, der indlæser og opdaterer kontoen, hvortil bogføringslinjen er tilknyttet, er igangværende.
+        /// </summary>
+        protected virtual bool KontoReaderTaskIsActive
+        {
+            get
+            {
+                return KontoReaderTask != null && KontoReaderTask.IsCompleted == false && KontoReaderTask.IsCanceled == false && KontoReaderTask.IsFaulted == false;
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        protected virtual IBudgetkontoViewModel BudgetkontoViewModel
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Task, der indlæser og opdaterer budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        protected virtual Task BudgetkontoReaderTask
+        {
+            get
+            {
+                return null;
+            }
+            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
+            // TODO: RaisePropertyChanged("BudgetkontonummerIsReadOnly");
+        }
+
+        /// <summary>
+        /// Angivelse af, om den Task, der indlæser og opdaterer budgetkontoen, hvortil bogføringslinjen er tilknyttet, er igangværende.
+        /// </summary>
+        protected virtual bool BudgetkontoReaderTaskIsActive
+        {
+            get
+            {
+                return BudgetkontoReaderTask != null && BudgetkontoReaderTask.IsCompleted == false && BudgetkontoReaderTask.IsCanceled == false && BudgetkontoReaderTask.IsFaulted == false;
+            }
+        }
+
+        /// <summary>
+        /// Task, der udfører den asynkrone bogføring.
+        /// </summary>
+        protected virtual Task BogføringTask
+        {
+            get
+            {
+                return null;
+            }
+            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
+            // TODO: RaisePropertyChanged("BilagIsReadOnly");
+            // TODO: RaisePropertyChanged("KontonummerIsReadOnly");
+            // TODO: RaisePropertyChanged("TekstIsReadOnly");
+            // TODO: RaisePropertyChanged("BudgetkontonummerIsReadOnly");
+        }
+
+        /// <summary>
+        /// Angivelse af, om bogføringslinjen er ved eller er blevet bogført.
+        /// </summary>
+        protected virtual bool ErBogført
+        {
+            get
+            {
+                return BogføringTask != null;
             }
         }
 
@@ -304,7 +722,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 case "Dato":
                     RaisePropertyChanged("DatoAsText");
                     break;
+
+                case "Kontonummer":
+                    KontoViewModelRefresh();
+                    break;
             }
+        }
+
+        /// <summary>
+        /// Genindlæser ViewModel for kontoen, som bogføringslinjen er tilknyttet.
+        /// </summary>
+        private async void KontoViewModelRefresh()
+        {
+            if (KontoReaderTask != null)
+            {
+                await KontoReaderTask;
+            }
+            KontoViewModel = null;
+            if (string.IsNullOrEmpty(Model.Kontonummer))
+            {
+                return;
+            }
+            // TODO: Reload konto.
         }
 
         /// <summary>
@@ -345,6 +784,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         public static ValidationResult ValidateKontonummer(string value)
         {
             return Validation.ValidateRequiredValue(value);
+        }
+
+        /// <summary>
+        /// Validerer værdien for teksten til bogføringslinjen.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateTekst(string value)
+        {
+            return Validation.ValidateRequiredValue(value);
+        }
+
+        /// <summary>
+        /// Validerer værdien for kontonummer til budgetkontoen.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateBudgetkontonummer(string value)
+        {
+            return ValidationResult.Success;
         }
 
         #endregion

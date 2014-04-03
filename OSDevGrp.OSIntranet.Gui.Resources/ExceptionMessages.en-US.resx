@@ -133,11 +133,20 @@
     <value>Error while getting value of the property named '{0}': {1}</value>
     <comment>{0} = Name of property, {1} = Error message.</comment>
   </data>
+  <data name="ErrorWhileSettingAccountNumber" xml:space="preserve">
+    <value>Error while setting account number for the accounting line.</value>
+  </data>
   <data name="ErrorWhileSettingAnnex" xml:space="preserve">
     <value>Error while setting annex for the accounting line.</value>
   </data>
-  <data name="ErrorWhileSettingBookeepingDate" xml:space="preserve">
+  <data name="ErrorWhileSettingBookkeepingDate" xml:space="preserve">
     <value>Error while setting date for the accounting line.</value>
+  </data>
+  <data name="ErrorWhileSettingBookkeepingText" xml:space="preserve">
+    <value>Error while setting text for the accounting line.</value>
+  </data>
+  <data name="ErrorWhileSettingBudgetAccountNumber" xml:space="preserve">
+    <value>Error while setting budget account number for the accounting line.</value>
   </data>
   <data name="ErrorWhileSettingPropertyValue" xml:space="preserve">
     <value>Error while setting value of the property named '{0}': {1}</value>
