@@ -80,5 +80,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
             }
             return ValidationResult.Success;
         }
+
+        /// <summary>
+        /// Validerer, om værdien er et decimaltal, der er større end eller lig et andet decimaltal.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <param name="minValue">Minimumsværdi, som værdien skal være større end eller lig med.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateDecimalGreaterOrEqualTo(string value, decimal minValue)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

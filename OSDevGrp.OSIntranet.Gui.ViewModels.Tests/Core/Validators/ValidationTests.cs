@@ -155,7 +155,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         }
 
         /// <summary>
-        /// Tester, at validateDate returnerer Success ved lovlige værdier.
+        /// Tester, at ValidateDateLowerOrEqualTo returnerer Success ved lovlige værdier.
         /// </summary>
         [Test]
         [TestCase("1901-01-01", "1901-12-31")]
@@ -179,7 +179,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         }
 
         /// <summary>
-        /// Tester, at validateDate returnerer ValidationResult ved ulovlige værdier.
+        /// Tester, at ValidateDateLowerOrEqualTo returnerer ValidationResult ved ulovlige værdier.
         /// </summary>
         [Test]
         [TestCase("2014-01-01", "2013-12-31")]
@@ -200,6 +200,42 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
             Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToLongDateString())));
+            Assert.That(result.MemberNames, Is.Not.Null);
+            Assert.That(result.MemberNames, Is.Empty);
+        }
+
+        /// <summary>
+        /// Tester, at ValidateDecimalGreaterOrEqualTo returnerer Success ved lovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase("$ 1,000.00", 4000)]
+        [TestCase("$ 2,000.00", 4000)]
+        [TestCase("$ 3,000.00", 4000)]
+        [TestCase("$ 4,000.00", 4000)]
+        public void TestAtValidateDecimalGreaterOrEqualToReturnererSuccessVedLovligeValues(string value, decimal minValue)
+        {
+            var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
+            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C"), minValue);
+            Assert.That(result, Is.EqualTo(ValidationResult.Success));
+        }
+
+        /// <summary>
+        /// Tester, at ValidateDecimalGreaterOrEqualTo returnerer ValidationResult ved ulovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase("$ 1,000.01", 1000)]
+        [TestCase("$ 2,000.01", 2000)]
+        [TestCase("$ 3,000.01", 3000)]
+        [TestCase("$ 4,000.01", 4000)]
+        public void TestAtValidateDecimalGreaterOrEqualToReturnererValidationResultVedUlovligeValues(string value, decimal minValue)
+        {
+            var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
+            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C"), minValue);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
+            Assert.That(result.ErrorMessage, Is.Not.Null);
+            Assert.That(result.ErrorMessage, Is.Not.Empty);
+            //Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToLongDateString())));
             Assert.That(result.MemberNames, Is.Not.Null);
             Assert.That(result.MemberNames, Is.Empty);
         }

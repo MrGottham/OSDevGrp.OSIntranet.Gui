@@ -21,6 +21,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Private variables
 
         private IKontoViewModel _kontoViewModel;
+        private IBudgetkontoViewModel _budgetkontoViewModel;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
 
@@ -622,7 +623,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Task, der indlæser og opdaterer kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        protected virtual Task KontoReaderTask
+        protected virtual Task<IKontoViewModel> KontoReaderTask
         {
             get
             {
@@ -650,14 +651,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return null;
+                return _budgetkontoViewModel;
+            }
+            private set
+            {
+                _budgetkontoViewModel = value;
+                RaisePropertyChanged("Budgetkontonavn");
+                RaisePropertyChanged("BudgetkontoBogført");
+                RaisePropertyChanged("BudgetkontoBogførtAsText");
+                RaisePropertyChanged("BudgetkontoDisponibel");
+                RaisePropertyChanged("BudgetkontoDisponibelAsText");
             }
         }
 
         /// <summary>
         /// Task, der indlæser og opdaterer budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        protected virtual Task BudgetkontoReaderTask
+        protected virtual Task<IBudgetkontoViewModel> BudgetkontoReaderTask
         {
             get
             {
@@ -721,10 +731,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case "Dato":
                     RaisePropertyChanged("DatoAsText");
+                    KontoViewModelRefresh();
+                    BudgetkontoViewModelRefresh();
                     break;
 
                 case "Kontonummer":
                     KontoViewModelRefresh();
+                    break;
+
+                case "Budgetkontonummer":
+                    BudgetkontoViewModelRefresh();
                     break;
             }
         }
@@ -732,18 +748,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Genindlæser ViewModel for kontoen, som bogføringslinjen er tilknyttet.
         /// </summary>
-        private async void KontoViewModelRefresh()
+        private void KontoViewModelRefresh()
         {
-            if (KontoReaderTask != null)
-            {
-                await KontoReaderTask;
-            }
             KontoViewModel = null;
             if (string.IsNullOrEmpty(Model.Kontonummer))
             {
                 return;
             }
             // TODO: Reload konto.
+        }
+
+        /// <summary>
+        /// Genindlæser ViewModel for budgetkontoen, som bogføringslinjen er tilknyttet.
+        /// </summary>
+        private void BudgetkontoViewModelRefresh()
+        {
+            BudgetkontoViewModel = null;
+            if (string.IsNullOrEmpty(Model.Budgetkontonummer))
+            {
+                return;
+            }
+            // TODO: Reload budgetkonto.
         }
 
         /// <summary>
