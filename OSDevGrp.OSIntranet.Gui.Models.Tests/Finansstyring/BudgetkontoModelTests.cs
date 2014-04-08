@@ -148,14 +148,26 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Budget, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(bogført));
-            Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(0M - Math.Abs(bogført)));
+            Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(0M));
         }
 
         /// <summary>
         /// Tester, at konstruktøren initierer en model til en budgetkonto med budgetterede beløb og med bogført beløb.
         /// </summary>
         [Test]
-        public void TestAtConstructorInitiererBudgetkontoModelMedBudgetOgBogført()
+        [TestCase(-1000, -500, 500)]
+        [TestCase(-1000, -500, 500)]
+        [TestCase(-1000, -750, 250)]
+        [TestCase(-1000, -1000, 0)]
+        [TestCase(-1000, -1500, 0)]
+        [TestCase(-1000, -1750, 0)]
+        [TestCase(1000, -1000, 0)]
+        [TestCase(1000, -750, 0)]
+        [TestCase(1000, -500, 0)]
+        [TestCase(1000, 500, 0)]
+        [TestCase(1000, 750, 0)]
+        [TestCase(1000, 1000, 0)]
+        public void TestAtConstructorInitiererBudgetkontoModelMedBudgetOgBogført(decimal budget, decimal bogført, decimal expectedDisponibel)
         {
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
@@ -165,8 +177,6 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             var kontonavn = fixture.Create<string>();
             var kontogruppe = fixture.Create<int>();
             var statusDato = fixture.Create<DateTime>();
-            var budget = Math.Abs(fixture.Create<decimal>())*-1;
-            var bogført = Math.Abs(fixture.Create<decimal>())*-1;
             var budgetkontoModel = new BudgetkontoModel(regnskabsnummer, kontonummer, kontonavn, kontogruppe, statusDato, budget, bogført);
             Assert.That(budgetkontoModel, Is.Not.Null);
             Assert.That(budgetkontoModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
@@ -180,11 +190,11 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Notat, Is.Null);
             Assert.That(budgetkontoModel.Kontogruppe, Is.EqualTo(kontogruppe));
             Assert.That(budgetkontoModel.StatusDato, Is.EqualTo(statusDato));
-            Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(0M));
-            Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(Math.Abs(budget)));
+            Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(budget > 0M ? Math.Abs(budget) : 0M));
+            Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(budget > 0M ? 0M : Math.Abs(budget)));
             Assert.That(budgetkontoModel.Budget, Is.EqualTo(budget));
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(bogført));
-            Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(Math.Abs(budget) - Math.Abs(bogført)));
+            Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(expectedDisponibel));
         }
 
         /// <summary>
@@ -394,7 +404,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
             var budget = Math.Abs(fixture.Create<decimal>())*-1;
-            var bogført = Math.Abs(fixture.Create<decimal>())*-1;
+            var bogført = (budget/4)*2;
             var budgetkontoModel = new BudgetkontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>(), budget, bogført);
             Assert.That(budgetkontoModel, Is.Not.Null);
             Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(0M));
@@ -403,7 +413,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(bogført));
             Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(Math.Abs(budget) - Math.Abs(bogført)));
 
-            var newValue = Math.Abs(fixture.Create<decimal>());
+            var newValue = Math.Abs((budget/4)*3);
             Assert.That(budgetkontoModel.Udgifter, Is.Not.EqualTo(newValue));
 
             budgetkontoModel.Udgifter = newValue;
@@ -458,7 +468,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
 
             var budget = Math.Abs(fixture.Create<decimal>())*-1;
-            var bogført = Math.Abs(fixture.Create<decimal>())*-1;
+            var bogført = (budget/4)*2;
             var budgetkontoModel = new BudgetkontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>(), budget, bogført);
             Assert.That(budgetkontoModel, Is.Not.Null);
             Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(0M));
@@ -467,7 +477,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(bogført));
             Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(Math.Abs(budget) - Math.Abs(bogført)));
 
-            var newValue = Math.Abs(fixture.Create<decimal>())*-1;
+            var newValue = (budget/4)*3;
             Assert.That(budgetkontoModel.Bogført, Is.Not.EqualTo(newValue));
 
             budgetkontoModel.Bogført = newValue;

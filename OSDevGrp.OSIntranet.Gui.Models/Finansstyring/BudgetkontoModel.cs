@@ -140,7 +140,8 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             {
                 if (Budget <= 0M)
                 {
-                    return Math.Abs(Budget) - Math.Abs(Bogført);
+                    var disponibel = Math.Abs(Budget) - Math.Abs(Bogført);
+                    return disponibel < 0M ? 0M : disponibel;
                 }
                 return 0M;
             }
