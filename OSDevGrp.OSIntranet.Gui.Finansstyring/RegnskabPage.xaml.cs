@@ -115,7 +115,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
                 DefaultNavigationContent.Visibility = Visibility.Visible;
                 MinimalNavigationContent.Visibility = Visibility.Visible;
-                CommandAppBar.Visibility = Visibility.Collapsed;
+                CommandAppBar.Visibility = Visibility.Visible;
                 
                 var refreshCommand = Regnskab.RefreshCommand;
                 if (refreshCommand == null)
