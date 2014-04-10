@@ -47,6 +47,8 @@
         Cause,
         ValueIsRequiered,
         ValueIsNotDate,
-        DateGreaterThan
+        DateGreaterThan,
+        ValueIsNotDecimal,
+        DecimalLowerThan
     }
 }

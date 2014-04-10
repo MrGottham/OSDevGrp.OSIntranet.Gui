@@ -10,6 +10,8 @@
         public const int BilagFieldLength = 10;
         public const int KontonummerFieldLength = 15;
         public const int BogføringstekstFieldLength = 30;
+        public const int DebitFieldLength = 15;
+        public const int KreditFieldLength = 15;
 
         #endregion
     }

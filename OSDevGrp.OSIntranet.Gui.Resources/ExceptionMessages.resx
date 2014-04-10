@@ -148,6 +148,12 @@
   <data name="ErrorWhileSettingBudgetAccountNumber" xml:space="preserve">
     <value>Error while setting budget account number for the accounting line.</value>
   </data>
+  <data name="ErrorWhileSettingCredit" xml:space="preserve">
+    <value>Error while setting credit for the accounting line.</value>
+  </data>
+  <data name="ErrorWhileSettingDebit" xml:space="preserve">
+    <value>Error while setting debit for the accounting line.</value>
+  </data>
   <data name="ErrorWhileSettingPropertyValue" xml:space="preserve">
     <value>Error while setting value of the property named '{0}': {1}</value>
     <comment>{0} = Name of property, {1} = Error message.</comment>

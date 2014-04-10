@@ -27,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Danner en ViewModel, hvorfra der kan bogføres.
@@ -37,6 +37,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til en exceptionhandler.</param>
         public BogføringViewModel(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
+            : this(regnskabViewModel, bogføringslinjeModel, finansstyringRepository, exceptionHandlerViewModel, false)
+        {
+        }
+
+        /// <summary>
+        /// Danner en ViewModel, hvorfra der kan bogføres.
+        /// </summary>
+        /// <param name="regnskabViewModel">ViewModel for regnskabet, hvorpå der skal bogføres.</param>
+        /// <param name="bogføringslinjeModel">Model til en ny bogføringslinje, der kan tilrettes og bogføres.</param>
+        /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til en exceptionhandler.</param>
+        /// <param name="runRefreshTasks">Angivelse af, om de Tasks, der udfører refresh, skal køres ved initiering af ViewModel, hvorfra der kan bogføres.</param>
+        public BogføringViewModel(IRegnskabViewModel regnskabViewModel, IBogføringslinjeModel bogføringslinjeModel, IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, bool runRefreshTasks)
             : base(regnskabViewModel, bogføringslinjeModel)
         {
             if (finansstyringRepository == null)
@@ -49,6 +62,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             _finansstyringRepository = finansstyringRepository;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
+            if (!runRefreshTasks)
+            {
+                return;
+            }
+            KontoViewModelRefresh();
+            BudgetkontoViewModelRefresh();
         }
 
         #endregion
@@ -601,6 +620,168 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Tekstangivelse af debitbeløb.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateCurrency")]
+        public new virtual string DebitAsText
+        {
+            get
+            {
+                return base.DebitAsText;
+            }
+            set
+            {
+                try
+                {
+                    var result = ValidateCurrency(value);
+                    if (result != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(result.ErrorMessage, this, "DebitAsText", value);
+                    }
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(value))
+                        {
+                            Model.Debit = 0M;
+                            return;
+                        }
+                        Model.Debit = decimal.Parse(value.Trim(), NumberStyles.Any, CultureInfo.CurrentUICulture);
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingDebit), this, "DebitAsText", value, ex);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingDebit), this, "DebitAsText", value, ex);
+                    }
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DebitAsText", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for debitbeløbet.
+        /// </summary>
+        public virtual int DebitMaxLength
+        {
+            get
+            {
+                return FieldInformations.DebitFieldLength;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om debitbeløbet kan redigeres.
+        /// </summary>
+        public virtual bool DebitIsReadOnly
+        {
+            get
+            {
+                return ErBogført;
+            }
+        }
+
+        /// <summary>
+        /// Label til debitbeløbet.
+        /// </summary>
+        public virtual string DebitLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Debit);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af kreditbeløb.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateCurrency")]
+        public new virtual string KreditAsText
+        {
+            get
+            {
+                return base.KreditAsText;
+            }
+            set
+            {
+                try
+                {
+                    var result = ValidateCurrency(value);
+                    if (result != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(result.ErrorMessage, this, "KreditAsText", value);
+                    }
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(value))
+                        {
+                            Model.Kredit = 0M;
+                            return;
+                        }
+                        Model.Kredit = decimal.Parse(value.Trim(), NumberStyles.Any, CultureInfo.CurrentUICulture);
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingCredit), this, "KreditAsText", value, ex);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingCredit), this, "KreditAsText", value, ex);
+                    }
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "KreditAsText", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for kreditbeløbet.
+        /// </summary>
+        public virtual int KreditMaxLength
+        {
+            get
+            {
+                return FieldInformations.KreditFieldLength;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om kreditbeløbet kan redigeres.
+        /// </summary>
+        public virtual bool KreditIsReadOnly
+        {
+            get
+            {
+                return ErBogført;
+            }
+        }
+
+        /// <summary>
+        /// Label til kreditbeløbet.
+        /// </summary>
+        public virtual string KreditLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Credit);
+            }
+        }
+
+        /// <summary>
         /// ViewModel for kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
         protected virtual IKontoViewModel KontoViewModel
@@ -702,6 +883,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             // TODO: RaisePropertyChanged("KontonummerIsReadOnly");
             // TODO: RaisePropertyChanged("TekstIsReadOnly");
             // TODO: RaisePropertyChanged("BudgetkontonummerIsReadOnly");
+            // TODO: RaisePropertyChanged("DebitIsReadOnly");
+            // TODO: RaisePropertyChanged("KreditIsReadOnly");
+            // TODO: RaisePropertyChanged("ErBogført");
         }
 
         /// <summary>
@@ -784,11 +968,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 return result;
             }
             result = Validation.ValidateDate(value);
-            if (result != ValidationResult.Success)
-            {
-                return result;
-            }
-            return Validation.ValidateDateLowerOrEqualTo(value, DateTime.Now);
+            return result != ValidationResult.Success
+                       ? result
+                       : Validation.ValidateDateLowerOrEqualTo(value, DateTime.Now);
         }
 
         /// <summary>
@@ -829,6 +1011,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         public static ValidationResult ValidateBudgetkontonummer(string value)
         {
             return ValidationResult.Success;
+        }
+
+        /// <summary>
+        /// Validerer værdien for et bogføringsbeløb.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateCurrency(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return ValidationResult.Success;
+            }
+            var result = Validation.ValidateDecimal(value);
+            return result != ValidationResult.Success ? result : Validation.ValidateDecimalGreaterOrEqualTo(value, 0M);
         }
 
         #endregion

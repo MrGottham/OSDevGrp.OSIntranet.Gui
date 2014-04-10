@@ -201,7 +201,7 @@
   </data>
   <data name="ValueOutsideInterval" xml:space="preserve">
     <value>Værdien er ikke i intervallet ({0} - {1}).</value>
-    <comment>{0} = Min værdi{1} = Max værdi.</comment>
+    <comment>{0} = Min værdi, {1} = Max værdi.</comment>
   </data>
   <data name="Available" xml:space="preserve">
     <value>Disponibel</value>
@@ -250,5 +250,12 @@
   <data name="DateGreaterThan" xml:space="preserve">
     <value>Datoen skal ligge før eller være lig med {0}.</value>
     <comment>{0} = Maks. dato.</comment>
+  </data>
+  <data name="DecimalLowerThan" xml:space="preserve">
+    <value>Værdien skal være større end eller lig med {0}.</value>
+    <comment>{0} = Min værdi.</comment>
+  </data>
+  <data name="ValueIsNotDecimal" xml:space="preserve">
+    <value>Værdien er ikke et valid decimaltal eller er ikke korrekt formateret.</value>
   </data>
 </root>

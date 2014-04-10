@@ -20,6 +20,8 @@
         ErrorWhileSettingAnnex,
         ErrorWhileSettingAccountNumber,
         ErrorWhileSettingBookkeepingText,
-        ErrorWhileSettingBudgetAccountNumber
+        ErrorWhileSettingBudgetAccountNumber,
+        ErrorWhileSettingDebit,
+        ErrorWhileSettingCredit
     }
 }

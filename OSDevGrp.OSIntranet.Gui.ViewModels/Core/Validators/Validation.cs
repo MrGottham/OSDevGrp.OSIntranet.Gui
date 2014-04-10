@@ -74,11 +74,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
             {
                 return new ValidationResult(Resource.GetText(Text.ValueIsNotDate));
             }
-            if (dateTime.Date.CompareTo(maxDateTime.Date) > 0)
-            {
-                return new ValidationResult(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToString("D", CultureInfo.CurrentUICulture)));
-            }
-            return ValidationResult.Success;
+            return dateTime.Date.CompareTo(maxDateTime.Date) > 0
+                       ? new ValidationResult(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToString("D", CultureInfo.CurrentUICulture)))
+                       : ValidationResult.Success;
+        }
+
+        /// <summary>
+        /// Validaterer, om værdien er et decimaltal.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateDecimal(string value)
+        {
+            return ValidateDecimalGreaterOrEqualTo(value, decimal.MinValue);
         }
 
         /// <summary>
@@ -89,7 +97,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
         /// <returns>Valideringsresultat.</returns>
         public static ValidationResult ValidateDecimalGreaterOrEqualTo(string value, decimal minValue)
         {
-            throw new NotImplementedException();
+            decimal valueAsDecimal;
+            if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.CurrentUICulture, out valueAsDecimal) == false)
+            {
+                return new ValidationResult(Resource.GetText(Text.ValueIsNotDecimal));
+            }
+            return valueAsDecimal < minValue
+                       ? new ValidationResult(Resource.GetText(Text.DecimalLowerThan, minValue.ToString("G", CultureInfo.CurrentUICulture)))
+                       : ValidationResult.Success;
         }
     }
 }

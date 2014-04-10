@@ -251,4 +251,11 @@
     <value>The date must be before or eqaul to {0}.</value>
     <comment>{0} = Max date.</comment>
   </data>
+  <data name="DecimalLowerThan" xml:space="preserve">
+    <value>The value must be greater or equal to {0}.</value>
+    <comment>{0} = Min value.</comment>
+  </data>
+  <data name="ValueIsNotDecimal" xml:space="preserve">
+    <value>Value is not a valid decimal or in incorrect format.</value>
+  </data>
 </root>

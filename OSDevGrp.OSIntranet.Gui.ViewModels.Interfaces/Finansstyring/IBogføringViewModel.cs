@@ -307,5 +307,87 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
+
+        /// <summary>
+        /// Debitbeløb.
+        /// </summary>
+        decimal Debit
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af debitbeløb.
+        /// </summary>
+        string DebitAsText
+        {
+            get; 
+            set; 
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for debitbeløbet.
+        /// </summary>
+        int DebitMaxLength
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Angivelse af, om debitbeløbet kan redigeres.
+        /// </summary>
+        bool DebitIsReadOnly
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til debitbeløbet.
+        /// </summary>
+        string DebitLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kreditbeløb.
+        /// </summary>
+        decimal Kredit
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af kreditbeløb.
+        /// </summary>
+        string KreditAsText
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Angivelse af den maksimale tekstlængde for kreditbeløbet.
+        /// </summary>
+        int KreditMaxLength
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Angivelse af, om kreditbeløbet kan redigeres.
+        /// </summary>
+        bool KreditIsReadOnly
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til kreditbeløbet.
+        /// </summary>
+        string KreditLabel
+        {
+            get;
+        }
     }
 }

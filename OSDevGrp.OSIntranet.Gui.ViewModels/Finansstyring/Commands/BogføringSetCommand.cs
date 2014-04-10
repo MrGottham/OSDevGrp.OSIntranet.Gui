@@ -17,10 +17,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
 
         private bool _isBusy;
         private readonly IFinansstyringRepository _finansstyringRepository;
+        private readonly bool _runRefreshTasks;
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Danner en kommando, der på et regnskab kan initerer en ny ViewModel til bogføring.
@@ -28,6 +29,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til exceptionhandleren.</param>
         public BogføringSetCommand(IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel)
+            : this(finansstyringRepository, exceptionHandlerViewModel, false)
+        {
+        }
+
+        /// <summary>
+        /// Danner en kommando, der på et regnskab kan initerer en ny ViewModel til bogføring.
+        /// </summary>
+        /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
+        /// <param name="exceptionHandlerViewModel">Implementering af ViewModel til exceptionhandleren.</param>
+        /// <param name="runRefreshTasks">Angivelse af, om de Tasks, der udfører refresh, skal køres ved initiering af ViewModel, hvorfra der kan bogføres.</param>
+        public BogføringSetCommand(IFinansstyringRepository finansstyringRepository, IExceptionHandlerViewModel exceptionHandlerViewModel, bool runRefreshTasks)
             : base(exceptionHandlerViewModel)
         {
             if (finansstyringRepository == null)
@@ -35,6 +47,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 throw new ArgumentNullException("finansstyringRepository");
             }
             _finansstyringRepository = finansstyringRepository;
+            _runRefreshTasks = runRefreshTasks;
         }
 
         #endregion
@@ -91,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             {
                 throw new ArgumentNullException("argument");
             }
-            regnskabViewModel.BogføringSet(new BogføringViewModel(regnskabViewModel, bogføringslinjeModel, _finansstyringRepository, ExceptionHandler));
+            regnskabViewModel.BogføringSet(new BogføringViewModel(regnskabViewModel, bogføringslinjeModel, _finansstyringRepository, ExceptionHandler, _runRefreshTasks));
         }
     }
 }

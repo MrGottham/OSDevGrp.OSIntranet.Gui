@@ -345,7 +345,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return _bogføringSetCommand ??  (_bogføringSetCommand = new BogføringSetCommand(_finansstyringRepository, _exceptionHandlerViewModel));
+                return _bogføringSetCommand ??  (_bogføringSetCommand = new BogføringSetCommand(_finansstyringRepository, _exceptionHandlerViewModel, true));
             }
         }
 
