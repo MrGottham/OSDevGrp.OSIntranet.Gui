@@ -3565,8 +3565,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         {
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() =>
+                {
+                    var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+                    regnskabViewModelMock.Expect(m => m.Nummer)
+                                         .Return(fixture.Create<int>())
+                                         .Repeat.Any();
+                    return regnskabViewModelMock;
+                }));
 
             var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
             bogføringslinjeModelMock.Expect(m => m.Dato)
@@ -3582,10 +3588,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
+            Func<IEnumerable<IAdressekontoModel>> adressekontoModelCollectionGetter = () => new List<IAdressekontoModel>(0);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.AdressekontolisteGetAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue)))
+                                       .Return(Task.Run(adressekontoModelCollectionGetter))
+                                       .Repeat.Any();
+
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, finansstyringRepositoryMock, exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.Tasks, Is.Not.Null);
+            Assert.That(bogføringViewModel.Tasks, Is.Empty);
 
             var eventCalled = false;
             bogføringViewModel.PropertyChanged += (s, e) =>
@@ -3601,7 +3615,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 };
 
             Assert.That(eventCalled, Is.False);
-            bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+            Action action = () =>
+                {
+                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+                    var tasks = bogføringViewModel.Tasks.ToArray();
+                    Task.WaitAll(tasks);
+                };
+            Task.Run(action).Wait(3000);
             Assert.That(eventCalled, Is.True);
 
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
@@ -3768,6 +3788,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                 .Repeat.Any();
 
             var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            adressekontoModelMock.Expect(m => m.Navn)
+                                 .Return(fixture.Create<string>())
+                                 .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.Saldo)
+                                 .Return(fixture.Create<decimal>())
+                                 .Repeat.Any();
 
             Func<IKontoModel> kontoModelGetter = () => kontoModelMock;
             Func<IBudgetkontoModel> budgetkontoModelGetter = () => budgetkontoModelMock;
@@ -3797,8 +3823,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 {
                     "DatoAsTextIsReadOnly",
                     "KontonummerIsReadOnly",
+                    "Kontonavn",
+                    "KontoSaldo",
+                    "KontoSaldoAsText",
+                    "KontoDisponibel",
+                    "KontoDisponibelAsText",
                     "BudgetkontonummerIsReadOnly",
+                    "Budgetkontonavn",
+                    "BudgetkontoBogført",
+                    "BudgetkontoBogførtAsText",
+                    "BudgetkontoDisponibel",
+                    "BudgetkontoDisponibelAsText",
                     "AdressekontoIsReadOnly",
+                    "AdressekontoNavn",
+                    "AdressekontoSaldo",
+                    "AdressekontoSaldoAsText",
+                    "Adressekonti",
                     "Tasks",
                     "IsWorking"
                 };
@@ -3813,18 +3853,70 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             bogføringViewModel.PropertyChanged += (s, e) =>
                 {
                     Assert.That(s, Is.Not.Null);
+                    Assert.That(s, Is.TypeOf<BogføringViewModel>());
                     Assert.That(e, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Empty);
-                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    var viewModel = (BogføringViewModel) s;
+                    switch (e.PropertyName)
                     {
-                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                        case "Kontonavn":
+                        case "KontoSaldo":
+                        case "KontoSaldoAsText":
+                        case "KontoDisponibel":
+                        case "KontoDisponibelAsText":
+                            if (string.IsNullOrEmpty(viewModel.Kontonavn))
+                            {
+                                return;
+                            }
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
+
+                        case "Budgetkontonavn":
+                        case "BudgetkontoBogført":
+                        case "BudgetkontoBogførtAsText":
+                        case "BudgetkontoDisponibel":
+                        case "BudgetkontoDisponibelAsText":
+                            if (string.IsNullOrEmpty(viewModel.Budgetkontonavn))
+                            {
+                                return;
+                            }
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
+
+
+                        case "AdressekontoNavn":
+                        case "AdressekontoSaldo":
+                        case "AdressekontoSaldoAsText":
+                            if (string.IsNullOrEmpty(viewModel.AdressekontoNavn))
+                            {
+                                return;
+                            }
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
+
+                        default:
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
                     }
                 };
 
             Action action = () =>
                 {
                     bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Dato"));
+
                     var tasks = bogføringViewModel.Tasks.ToArray();
                     Assert.That(tasks, Is.Not.Null);
                     Assert.That(tasks, Is.Not.Empty);
@@ -3855,6 +3947,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.Not.Null);
             Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.Not.Empty);
             Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.EqualTo(budgetkontoModelMock.Disponibel.ToString("C")));
+
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.EqualTo(adressekontoModelMock.Navn));
+            Assert.That(bogføringViewModel.AdressekontoSaldo, Is.EqualTo(adressekontoModelMock.Saldo));
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.EqualTo(adressekontoModelMock.Saldo.ToString("C")));
 
             Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
             Assert.That(expectedNotifyPropertyChanged, Is.Empty);
@@ -3940,6 +4040,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 {
                     "DatoAsTextIsReadOnly",
                     "KontonummerIsReadOnly",
+                    "Kontonavn",
+                    "KontoSaldo",
+                    "KontoSaldoAsText",
+                    "KontoDisponibel",
+                    "KontoDisponibelAsText",
                     "Tasks",
                     "IsWorking"
                 };
@@ -3954,18 +4059,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             bogføringViewModel.PropertyChanged += (s, e) =>
                 {
                     Assert.That(s, Is.Not.Null);
+                    Assert.That(s, Is.TypeOf<BogføringViewModel>());
                     Assert.That(e, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Empty);
-                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    var viewModel = (BogføringViewModel) s;
+                    switch (e.PropertyName)
                     {
-                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                        case "Kontonavn":
+                        case "KontoSaldo":
+                        case "KontoSaldoAsText":
+                        case "KontoDisponibel":
+                        case "KontoDisponibelAsText":
+                            if (string.IsNullOrEmpty(viewModel.Kontonavn))
+                            {
+                                return;
+                            }
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
+
+                        default:
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
                     }
                 };
 
             Action action = () =>
                 {
                     bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Kontonummer"));
+                    
                     var tasks = bogføringViewModel.Tasks.ToArray();
                     Assert.That(tasks, Is.Not.Null);
                     Assert.That(tasks, Is.Not.Empty);
@@ -4064,6 +4192,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 {
                     "DatoAsTextIsReadOnly",
                     "BudgetkontonummerIsReadOnly",
+                    "Budgetkontonavn",
+                    "BudgetkontoBogført",
+                    "BudgetkontoBogførtAsText",
+                    "BudgetkontoDisponibel",
+                    "BudgetkontoDisponibelAsText",
                     "Tasks",
                     "IsWorking"
                 };
@@ -4078,18 +4211,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             bogføringViewModel.PropertyChanged += (s, e) =>
                 {
                     Assert.That(s, Is.Not.Null);
+                    Assert.That(s, Is.TypeOf<BogføringViewModel>());
                     Assert.That(e, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Empty);
-                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    var viewModel = (BogføringViewModel) s;
+                    switch (e.PropertyName)
                     {
-                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                        case "Budgetkontonavn":
+                        case "BudgetkontoBogført":
+                        case "BudgetkontoBogførtAsText":
+                        case "BudgetkontoDisponibel":
+                        case "BudgetkontoDisponibelAsText":
+                            if (string.IsNullOrEmpty(viewModel.Budgetkontonavn))
+                            {
+                                return;
+                            }
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
+
+                        default:
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
                     }
                 };
 
             Action action = () =>
                 {
                     bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Budgetkontonummer"));
+
                     var tasks = bogføringViewModel.Tasks.ToArray();
                     Assert.That(tasks, Is.Not.Null);
                     Assert.That(tasks, Is.Not.Empty);
@@ -4149,6 +4305,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Repeat.Any();
 
             var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            adressekontoModelMock.Expect(m => m.Navn)
+                                 .Return(fixture.Create<string>())
+                                 .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.Saldo)
+                                 .Return(fixture.Create<decimal>())
+                                 .Repeat.Any();
 
             Func<IEnumerable<IAdressekontoModel>> adressekontoModelCollectionGetter = () => new Collection<IAdressekontoModel> {adressekontoModelMock};
             var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
@@ -4160,8 +4322,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var expectedNotifyPropertyChanged = new List<string>
                 {
-                    "DatoAsTextIsReadOnly",
+                   "DatoAsTextIsReadOnly",
                     "AdressekontoIsReadOnly",
+                    "AdressekontoNavn",
+                    "AdressekontoSaldo",
+                    "AdressekontoSaldoAsText",
+                    "Adressekonti",
                     "Tasks",
                     "IsWorking"
                 };
@@ -4176,24 +4342,53 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             bogføringViewModel.PropertyChanged += (s, e) =>
                 {
                     Assert.That(s, Is.Not.Null);
+                    Assert.That(s, Is.TypeOf<BogføringViewModel>());
                     Assert.That(e, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Null);
                     Assert.That(e.PropertyName, Is.Not.Empty);
-                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    var viewModel = (BogføringViewModel) s;
+                    switch (e.PropertyName)
                     {
-                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                        case "AdressekontoNavn":
+                        case "AdressekontoSaldo":
+                        case "AdressekontoSaldoAsText":
+                            if (string.IsNullOrEmpty(viewModel.AdressekontoNavn))
+                            {
+                                return;
+                            }
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
+
+                        default:
+                            while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                            {
+                                expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                            }
+                            break;
                     }
                 };
 
             Action action = () =>
                 {
                     bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Adressekonto"));
+                    
                     var tasks = bogføringViewModel.Tasks.ToArray();
                     Assert.That(tasks, Is.Not.Null);
                     Assert.That(tasks, Is.Not.Empty);
                     Task.WaitAll(tasks);
                 };
             Task.Run(action).Wait(3000);
+
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.EqualTo(adressekontoModelMock.Navn));
+            Assert.That(bogføringViewModel.AdressekontoSaldo, Is.EqualTo(adressekontoModelMock.Saldo));
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.EqualTo(adressekontoModelMock.Saldo.ToString("C")));
 
             Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
             Assert.That(expectedNotifyPropertyChanged, Is.Empty);

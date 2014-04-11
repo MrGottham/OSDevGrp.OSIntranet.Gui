@@ -29,6 +29,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private IBudgetkontoViewModel _budgetkontoViewModel;
         private Task<IBudgetkontoViewModel> _budgetkontoReaderTask;
         private IAdressekontoViewModel _adressekontoViewModel;
+        private Task<IEnumerable<IAdressekontoViewModel>> _adressekontoReaderTask;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
         private readonly ObservableCollection<IAdressekontoViewModel> _adressekontoViewModelCollection = new ObservableCollection<IAdressekontoViewModel>();
@@ -1097,7 +1098,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return null;
+                return _adressekontoReaderTask;
+            }
+            private set
+            {
+                _adressekontoReaderTask = value;
             }
             // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
             // TODO: RaisePropertyChanged("AdressekontoIsReadOnly");
@@ -1301,14 +1306,66 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Genindlæser ViewModels for adressekonti og dermed ViewModel for adressekontoen, som bogføringslinjen er tilknyttet.
         /// </summary>
-        private void AdressekontoViewModelCollectionRefresh()
+        private async void AdressekontoViewModelCollectionRefresh()
         {
             AdressekontoViewModel = null;
-            if (Adressekonto == 0)
+            try
             {
-                return;
+                foreach (var adressekontoViewModel in await CreateAdressekontoReaderTask())
+                {
+                    var viewModel = _adressekontoViewModelCollection.FirstOrDefault(m => m.Nummer == adressekontoViewModel.Nummer);
+                    if (viewModel == null)
+                    {
+                        adressekontoViewModel.PropertyChanged += PropertyChangedOnAdressekontoViewModelEventHander;
+                        _adressekontoViewModelCollection.Add(adressekontoViewModel);
+                        continue;
+                    }
+                    viewModel.Navn = adressekontoViewModel.Navn;
+                    viewModel.PrimærTelefon = adressekontoViewModel.PrimærTelefon;
+                    viewModel.SekundærTelefon = adressekontoViewModel.SekundærTelefon;
+                    viewModel.StatusDato = adressekontoViewModel.StatusDato;
+                    viewModel.Saldo = adressekontoViewModel.Saldo;
+                }
+                if (Adressekonto == 0)
+                {
+                    return;
+                }
+                AdressekontoViewModel = _adressekontoViewModelCollection.FirstOrDefault(m => m.Nummer == Adressekonto);
             }
-            // TODO: Realod adressekonti.
+            catch (IntranetGuiExceptionBase ex)
+            {
+                _exceptionHandlerViewModel.HandleException(ex);
+            }
+            catch (Exception ex)
+            {
+                _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.MethodError, "BudgetkontoViewModelRefresh", ex.Message), ex));
+            }
+            finally
+            {
+                AdressekontoReaderTask = null;
+            }
+        }
+
+        /// <summary>
+        /// Danner Task, der indlæser og opdaterer adressekontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        /// <returns>Task, der indlæser og opdaterer adressekontoen, hvortil bogføringslinjen er tilknyttet.</returns>
+        private Task<IEnumerable<IAdressekontoViewModel>> CreateAdressekontoReaderTask()
+        {
+            Func<Task<IEnumerable<IAdressekontoViewModel>>> adressekontoViewModelCollectionGetter = async () =>
+                {
+                    try
+                    {
+                        var adressekontoModelCollection = await _finansstyringRepository.AdressekontolisteGetAsync(Regnskab.Nummer, Dato);
+                        return adressekontoModelCollection.Select(m => new AdressekontoViewModel(Regnskab, m, Resource.GetText(Text.AddressAccount), Resource.GetEmbeddedResource("Images.Adressekonto.png"), _finansstyringRepository, _exceptionHandlerViewModel));
+                    }
+                    catch
+                    {
+                        return new List<IAdressekontoViewModel>(0);
+                    }
+                };
+            AdressekontoReaderTask = Task.Run(adressekontoViewModelCollectionGetter);
+            return AdressekontoReaderTask;
         }
 
         /// <summary>
@@ -1316,7 +1373,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>
-        private void PropertyChangedOnAdressekontoViewModel(object sender, PropertyChangedEventArgs eventArgs)
+        private void PropertyChangedOnAdressekontoViewModelEventHander(object sender, PropertyChangedEventArgs eventArgs)
         {
             throw new NotImplementedException();
         }
@@ -1328,7 +1385,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="eventArgs">Argumenter til eventet.</param>
         private void CollectionChangedOnAdressekontoViewModelCollectionEventHandler(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
-            throw new NotImplementedException();
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            switch (eventArgs.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Adressekonti");
+                    break;
+            }
         }
 
         /// <summary>
