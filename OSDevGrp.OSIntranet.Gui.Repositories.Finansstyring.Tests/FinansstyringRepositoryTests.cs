@@ -593,6 +593,27 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at AdressekontolisteGetAsync henter listen af adressekonti til et givent regnskab.
+        /// </summary>
+        [Test]
+        public async void TestAtAdressekontolisteGetAsyncHenterAdressekontoliste()
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
+                                                    .Return(new Uri(FinansstyringServiceTestUri))
+                                                    .Repeat.Any();
+
+            var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
+            Assert.That(finansstyringRepository, Is.Not.Null);
+
+            var adressekonti = await finansstyringRepository.AdressekontolisteGetAsync(1, DateTime.Now);
+            Assert.That(adressekonti, Is.Not.Null);
+            Assert.That(adressekonti.Count(), Is.GreaterThanOrEqualTo(0));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
+        }
+
+        /// <summary>
         /// Tester, at AdressekontoGetAsync henter en adressekonto.
         /// </summary>
         [Test]

@@ -25,7 +25,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Private variables
 
         private IKontoViewModel _kontoViewModel;
+        private Task<IKontoViewModel> _kontoReaderTask;
         private IBudgetkontoViewModel _budgetkontoViewModel;
+        private Task<IBudgetkontoViewModel> _budgetkontoReaderTask;
         private IAdressekontoViewModel _adressekontoViewModel;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
@@ -997,12 +999,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return null;
+                return _kontoReaderTask;
             }
-            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
-            // TODO: RaisePropertyChanged("KontonummerIsReadOnly");
-            // TODO: RaisePropertyChanged("Tasks");
-            // TODO: RaisePropertyChanged("IsWorking");
+            private set
+            {
+                _kontoReaderTask = value;
+                RaisePropertyChanged("DatoAsTextIsReadOnly");
+                RaisePropertyChanged("KontonummerIsReadOnly");
+                RaisePropertyChanged("Tasks");
+                RaisePropertyChanged("IsWorking");
+            }
         }
 
         /// <summary>
@@ -1043,12 +1049,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return null;
+                return _budgetkontoReaderTask;
             }
-            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
-            // TODO: RaisePropertyChanged("BudgetkontonummerIsReadOnly");
-            // TODO: RaisePropertyChanged("Tasks");
-            // TODO: RaisePropertyChanged("IsWorking");
+            private set
+            {
+                _budgetkontoReaderTask = value;
+                RaisePropertyChanged("DatoAsTextIsReadOnly");
+                RaisePropertyChanged("BudgetkontonummerIsReadOnly");
+                RaisePropertyChanged("Tasks");
+                RaisePropertyChanged("IsWorking");
+            }
         }
 
         /// <summary>
@@ -1071,7 +1081,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 return _adressekontoViewModel;
             }
-            set 
+            private set 
             { 
                 _adressekontoViewModel = value;
                 RaisePropertyChanged("AdressekontoNavn");
@@ -1187,27 +1197,105 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Genindlæser ViewModel for kontoen, som bogføringslinjen er tilknyttet.
         /// </summary>
-        private void KontoViewModelRefresh()
+        private async void KontoViewModelRefresh()
         {
             KontoViewModel = null;
             if (string.IsNullOrEmpty(Kontonummer))
             {
                 return;
             }
-            // TODO: Reload konto.
+            try
+            {
+                KontoViewModel = await CreateKontoReaderTask();
+            }
+            catch (IntranetGuiExceptionBase ex)
+            {
+                _exceptionHandlerViewModel.HandleException(ex);
+            }
+            catch (Exception ex)
+            {
+                _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.MethodError, "KontoViewModelRefresh", ex.Message), ex));
+            }
+            finally
+            {
+                KontoReaderTask = null;
+            }
+        }
+
+        /// <summary>
+        /// Danner Task, der indlæser og opdaterer kontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        /// <returns>Task, der indlæser og opdaterer kontoen, hvortil bogføringslinjen er tilknyttet.</returns>
+        private Task<IKontoViewModel> CreateKontoReaderTask()
+        {
+            Func<Task<IKontoViewModel>> kontoViewModelGetter = async () =>
+                {
+                    try
+                    {
+                        var kontogruppeModelCollection = await _finansstyringRepository.KontogruppelisteGetAsync();
+                        var kontoModel = await _finansstyringRepository.KontoGetAsync(Regnskab.Nummer, Kontonummer, Dato);
+                        var kontogruppeViewModel = new KontogruppeViewModel(kontogruppeModelCollection.FirstOrDefault(m => m.Nummer == kontoModel.Kontogruppe), _exceptionHandlerViewModel);
+                        return new KontoViewModel(Regnskab, kontoModel, kontogruppeViewModel, _finansstyringRepository, _exceptionHandlerViewModel);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                };
+            KontoReaderTask = Task.Run(kontoViewModelGetter);
+            return KontoReaderTask;
         }
 
         /// <summary>
         /// Genindlæser ViewModel for budgetkontoen, som bogføringslinjen er tilknyttet.
         /// </summary>
-        private void BudgetkontoViewModelRefresh()
+        private async void BudgetkontoViewModelRefresh()
         {
             BudgetkontoViewModel = null;
             if (string.IsNullOrEmpty(Budgetkontonummer))
             {
                 return;
             }
-            // TODO: Reload budgetkonto.
+            try
+            {
+                BudgetkontoViewModel = await CreateBudgetkontoReaderTask();
+            }
+            catch (IntranetGuiExceptionBase ex)
+            {
+                _exceptionHandlerViewModel.HandleException(ex);
+            }
+            catch (Exception ex)
+            {
+                _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.MethodError, "BudgetkontoViewModelRefresh", ex.Message), ex));
+            }
+            finally
+            {
+                BudgetkontoReaderTask = null;
+            }
+        }
+
+        /// <summary>
+        /// Danner Task, der indlæser og opdaterer budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        /// <returns>Task, der indlæser og opdaterer budgetkontoen, hvortil bogføringslinjen er tilknyttet.</returns>
+        private Task<IBudgetkontoViewModel> CreateBudgetkontoReaderTask()
+        {
+            Func<Task<IBudgetkontoViewModel>> budgetkontoViewModelGetter = async () =>
+                {
+                    try
+                    {
+                        var budgetkontogruppeModelCollection = await _finansstyringRepository.BudgetkontogruppelisteGetAsync();
+                        var budgetkontoModel = await _finansstyringRepository.BudgetkontoGetAsync(Regnskab.Nummer, Budgetkontonummer, Dato);
+                        var budgetkontogruppeViewModel = new BudgetkontogruppeViewModel(budgetkontogruppeModelCollection.FirstOrDefault(m => m.Nummer == budgetkontoModel.Kontogruppe), _exceptionHandlerViewModel);
+                        return new BudgetkontoViewModel(Regnskab, budgetkontoModel, budgetkontogruppeViewModel, _finansstyringRepository, _exceptionHandlerViewModel);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                };
+            BudgetkontoReaderTask = Task.Run(budgetkontoViewModelGetter);
+            return BudgetkontoReaderTask;
         }
 
         /// <summary>

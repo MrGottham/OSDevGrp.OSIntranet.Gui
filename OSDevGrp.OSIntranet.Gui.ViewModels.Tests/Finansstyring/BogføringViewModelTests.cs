@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -3681,6 +3684,521 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(exception.ParamName, Is.EqualTo("eventArgs"));
             Assert.That(exception.InnerException, Is.Null);
 
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler reloader information, hvis Dato opdateres på modellen for bogføringslinjen.
+        /// </summary>
+        [Test]
+        public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerReloaderInformationHvisDatoOpdateresOnBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IKontogruppeModel>(e => e.FromFactory(() =>
+                {
+                    var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+                    kontogruppeModelMock.Expect(m => m.Nummer)
+                                        .Return(fixture.Create<int>())
+                                        .Repeat.Any();
+                    return kontogruppeModelMock;
+                }));
+            fixture.Customize<IBudgetkontogruppeModel>(e => e.FromFactory(() =>
+                {
+                    var budgetkontogruppeModel = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+                    budgetkontogruppeModel.Expect(m => m.Nummer)
+                                          .Return(fixture.Create<int>())
+                                          .Repeat.Any();
+                    return budgetkontogruppeModel;
+                }));
+
+            var regnskabsnummer = fixture.Create<int>();
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(regnskabsnummer)
+                                 .Repeat.Any();
+
+            var dato = fixture.Create<DateTime>();
+            var kontonummer = fixture.Create<string>();
+            var budgetkontonummer = fixture.Create<string>();
+            var adressekonto = fixture.Create<int>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(dato)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(kontonummer)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(budgetkontonummer)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(adressekonto)
+                                    .Repeat.Any();
+
+            var random = new Random(DateTime.Now.Millisecond);
+            var kontogruppeModelMockCollection = fixture.CreateMany<IKontogruppeModel>(7).ToList();
+            var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            kontoModelMock.Expect(m => m.Kontonavn)
+                          .Return(fixture.Create<string>())
+                          .Repeat.Any();
+            kontoModelMock.Expect(m => m.Kontogruppe)
+                          .Return(kontogruppeModelMockCollection.ElementAt(random.Next(0, kontogruppeModelMockCollection.Count - 1)).Nummer)
+                          .Repeat.Any();
+            kontoModelMock.Expect(m => m.Saldo)
+                          .Return(fixture.Create<decimal>())
+                          .Repeat.Any();
+            kontoModelMock.Expect(m => m.Disponibel)
+                          .Return(fixture.Create<decimal>())
+                          .Repeat.Any();
+
+            var budgetkontogruppeModelMockCollection = fixture.CreateMany<IBudgetkontogruppeModel>(7).ToList();
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Expect(m => m.Kontonavn)
+                                .Return(fixture.Create<string>())
+                                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Kontogruppe)
+                                .Return(budgetkontogruppeModelMockCollection.ElementAt(random.Next(0, budgetkontogruppeModelMockCollection.Count - 1)).Nummer)
+                                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Bogført)
+                                .Return(fixture.Create<decimal>())
+                                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Disponibel)
+                                .Return(fixture.Create<decimal>())
+                                .Repeat.Any();
+
+            var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+
+            Func<IKontoModel> kontoModelGetter = () => kontoModelMock;
+            Func<IBudgetkontoModel> budgetkontoModelGetter = () => budgetkontoModelMock;
+            Func<IEnumerable<IAdressekontoModel>> adressekontoModelCollectionGetter = () => new Collection<IAdressekontoModel> {adressekontoModelMock};
+            Func<IEnumerable<IKontogruppeModel>> kontogruppeModelCollectionGetter = () => kontogruppeModelMockCollection;
+            Func<IEnumerable<IBudgetkontogruppeModel>> budgetkontogruppeModelCollectionGetter = () => budgetkontogruppeModelMockCollection;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.KontoGetAsync(Arg<int>.Is.GreaterThan(0), Arg<string>.Is.NotNull, Arg<DateTime>.Is.GreaterThan(DateTime.MinValue)))
+                                       .Return(Task.Run(kontoModelGetter))
+                                       .Repeat.Any();
+            finansstyringRepositoryMock.Expect(m => m.BudgetkontoGetAsync(Arg<int>.Is.GreaterThan(0), Arg<string>.Is.NotNull, Arg<DateTime>.Is.GreaterThan(DateTime.MinValue)))
+                                       .Return(Task.Run(budgetkontoModelGetter))
+                                       .Repeat.Any();
+            finansstyringRepositoryMock.Expect(m => m.AdressekontolisteGetAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue)))
+                                       .Return(Task.Run(adressekontoModelCollectionGetter))
+                                       .Repeat.Any();
+            finansstyringRepositoryMock.Expect(m => m.KontogruppelisteGetAsync())
+                                       .Return(Task.Run(kontogruppeModelCollectionGetter))
+                                       .Repeat.Any();
+            finansstyringRepositoryMock.Expect(m => m.BudgetkontogruppelisteGetAsync())
+                                       .Return(Task.Run(budgetkontogruppeModelCollectionGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var expectedNotifyPropertyChanged = new List<string>
+                {
+                    "DatoAsTextIsReadOnly",
+                    "KontonummerIsReadOnly",
+                    "BudgetkontonummerIsReadOnly",
+                    "AdressekontoIsReadOnly",
+                    "Tasks",
+                    "IsWorking"
+                };
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Empty);
+
+            var bogføringViewModel = new BogføringViewModel(regnskabViewModelMock, bogføringslinjeModelMock, finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel.Tasks, Is.Not.Null);
+            Assert.That(bogføringViewModel.Tasks, Is.Empty);
+            Assert.That(bogføringViewModel.IsWorking, Is.False);
+
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    {
+                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                    }
+                };
+
+            Action action = () =>
+                {
+                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Dato"));
+                    var tasks = bogføringViewModel.Tasks.ToArray();
+                    Assert.That(tasks, Is.Not.Null);
+                    Assert.That(tasks, Is.Not.Empty);
+                    Task.WaitAll(tasks);
+                };
+            Task.Run(action).Wait(3000);
+
+            Assert.That(bogføringViewModel.Kontonavn, Is.Not.Null);
+            Assert.That(bogføringViewModel.Kontonavn, Is.Not.Empty);
+            Assert.That(bogføringViewModel.Kontonavn, Is.EqualTo(kontoModelMock.Kontonavn));
+            Assert.That(bogføringViewModel.KontoSaldo, Is.EqualTo(kontoModelMock.Saldo));
+            Assert.That(bogføringViewModel.KontoSaldoAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontoSaldoAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.KontoSaldoAsText, Is.EqualTo(kontoModelMock.Saldo.ToString("C")));
+            Assert.That(bogføringViewModel.KontoDisponibel, Is.EqualTo(kontoModelMock.Disponibel));
+            Assert.That(bogføringViewModel.KontoDisponibelAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontoDisponibelAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.KontoDisponibelAsText, Is.EqualTo(kontoModelMock.Disponibel.ToString("C")));
+
+            Assert.That(bogføringViewModel.Budgetkontonavn, Is.Not.Null);
+            Assert.That(bogføringViewModel.Budgetkontonavn, Is.Not.Empty);
+            Assert.That(bogføringViewModel.Budgetkontonavn, Is.EqualTo(budgetkontoModelMock.Kontonavn));
+            Assert.That(bogføringViewModel.BudgetkontoBogført, Is.EqualTo(budgetkontoModelMock.Bogført));
+            Assert.That(bogføringViewModel.BudgetkontoBogførtAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontoBogførtAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.BudgetkontoBogførtAsText, Is.EqualTo(budgetkontoModelMock.Bogført.ToString("C")));
+            Assert.That(bogføringViewModel.BudgetkontoDisponibel, Is.EqualTo(budgetkontoModelMock.Disponibel));
+            Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.EqualTo(budgetkontoModelMock.Disponibel.ToString("C")));
+
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Empty);
+
+            // ReSharper disable ImplicitlyCapturedClosure
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KontoGetAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<string>.Is.Equal(kontonummer), Arg<DateTime>.Is.Equal(dato)));
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BudgetkontoGetAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<string>.Is.Equal(budgetkontonummer), Arg<DateTime>.Is.Equal(dato)));
+            finansstyringRepositoryMock.AssertWasCalled(m => m.AdressekontolisteGetAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<DateTime>.Is.Equal(dato)));
+            // ReSharper restore ImplicitlyCapturedClosure
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KontogruppelisteGetAsync());
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BudgetkontogruppelisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler reloader information, hvis Kontonummer opdateres på modellen for bogføringslinjen.
+        /// </summary>
+        [Test]
+        public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerReloaderInformationHvisKontonummerOpdateresOnBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IKontogruppeModel>(e => e.FromFactory(() =>
+                {
+                    var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+                    kontogruppeModelMock.Expect(m => m.Nummer)
+                                        .Return(fixture.Create<int>())
+                                        .Repeat.Any();
+                    return kontogruppeModelMock;
+                }));
+
+            var regnskabsnummer = fixture.Create<int>();
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(regnskabsnummer)
+                                 .Repeat.Any();
+
+            var dato = fixture.Create<DateTime>();
+            var kontonummer = fixture.Create<string>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(dato)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(kontonummer)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var random = new Random(DateTime.Now.Millisecond);
+            var kontogruppeModelMockCollection = fixture.CreateMany<IKontogruppeModel>(7).ToList();
+            var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            kontoModelMock.Expect(m => m.Kontonavn)
+                          .Return(fixture.Create<string>())
+                          .Repeat.Any();
+            kontoModelMock.Expect(m => m.Kontogruppe)
+                          .Return(kontogruppeModelMockCollection.ElementAt(random.Next(0, kontogruppeModelMockCollection.Count - 1)).Nummer)
+                          .Repeat.Any();
+            kontoModelMock.Expect(m => m.Saldo)
+                          .Return(fixture.Create<decimal>())
+                          .Repeat.Any();
+            kontoModelMock.Expect(m => m.Disponibel)
+                          .Return(fixture.Create<decimal>())
+                          .Repeat.Any();
+
+            Func<IKontoModel> kontoModelGetter = () => kontoModelMock;
+            Func<IEnumerable<IKontogruppeModel>> kontogruppeModelCollectionGetter = () => kontogruppeModelMockCollection;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.KontoGetAsync(Arg<int>.Is.GreaterThan(0), Arg<string>.Is.NotNull, Arg<DateTime>.Is.GreaterThan(DateTime.MinValue)))
+                                       .Return(Task.Run(kontoModelGetter))
+                                       .Repeat.Any();
+            finansstyringRepositoryMock.Expect(m => m.KontogruppelisteGetAsync())
+                                       .Return(Task.Run(kontogruppeModelCollectionGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var expectedNotifyPropertyChanged = new List<string>
+                {
+                    "DatoAsTextIsReadOnly",
+                    "KontonummerIsReadOnly",
+                    "Tasks",
+                    "IsWorking"
+                };
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Empty);
+
+            var bogføringViewModel = new BogføringViewModel(regnskabViewModelMock, bogføringslinjeModelMock, finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel.Tasks, Is.Not.Null);
+            Assert.That(bogføringViewModel.Tasks, Is.Empty);
+            Assert.That(bogføringViewModel.IsWorking, Is.False);
+
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    {
+                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                    }
+                };
+
+            Action action = () =>
+                {
+                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Kontonummer"));
+                    var tasks = bogføringViewModel.Tasks.ToArray();
+                    Assert.That(tasks, Is.Not.Null);
+                    Assert.That(tasks, Is.Not.Empty);
+                    Task.WaitAll(tasks);
+                };
+            Task.Run(action).Wait(3000);
+
+            Assert.That(bogføringViewModel.Kontonavn, Is.Not.Null);
+            Assert.That(bogføringViewModel.Kontonavn, Is.Not.Empty);
+            Assert.That(bogføringViewModel.Kontonavn, Is.EqualTo(kontoModelMock.Kontonavn));
+            Assert.That(bogføringViewModel.KontoSaldo, Is.EqualTo(kontoModelMock.Saldo));
+            Assert.That(bogføringViewModel.KontoSaldoAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontoSaldoAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.KontoSaldoAsText, Is.EqualTo(kontoModelMock.Saldo.ToString("C")));
+            Assert.That(bogføringViewModel.KontoDisponibel, Is.EqualTo(kontoModelMock.Disponibel));
+            Assert.That(bogføringViewModel.KontoDisponibelAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontoDisponibelAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.KontoDisponibelAsText, Is.EqualTo(kontoModelMock.Disponibel.ToString("C")));
+
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Empty);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KontoGetAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<string>.Is.Equal(kontonummer), Arg<DateTime>.Is.Equal(dato)));
+            finansstyringRepositoryMock.AssertWasCalled(m => m.KontogruppelisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler reloader information, hvis Budgetkontonummer opdateres på modellen for bogføringslinjen.
+        /// </summary>
+        [Test]
+        public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerReloaderInformationHvisBudgetkontonummerOpdateresOnBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IBudgetkontogruppeModel>(e => e.FromFactory(() =>
+                {
+                    var budgetkontogruppeModel = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+                    budgetkontogruppeModel.Expect(m => m.Nummer)
+                                          .Return(fixture.Create<int>())
+                                          .Repeat.Any();
+                    return budgetkontogruppeModel;
+                }));
+
+            var regnskabsnummer = fixture.Create<int>();
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(regnskabsnummer)
+                                 .Repeat.Any();
+
+            var dato = fixture.Create<DateTime>();
+            var budgetkontonummer = fixture.Create<string>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(dato)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(budgetkontonummer)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var random = new Random(DateTime.Now.Millisecond);
+            var budgetkontogruppeModelMockCollection = fixture.CreateMany<IBudgetkontogruppeModel>(7).ToList();
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Expect(m => m.Kontonavn)
+                                .Return(fixture.Create<string>())
+                                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Kontogruppe)
+                                .Return(budgetkontogruppeModelMockCollection.ElementAt(random.Next(0, budgetkontogruppeModelMockCollection.Count - 1)).Nummer)
+                                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Bogført)
+                                .Return(fixture.Create<decimal>())
+                                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Disponibel)
+                                .Return(fixture.Create<decimal>())
+                                .Repeat.Any();
+
+            Func<IBudgetkontoModel> budgetkontoModelGetter = () => budgetkontoModelMock;
+            Func<IEnumerable<IBudgetkontogruppeModel>> budgetkontogruppeModelCollectionGetter = () => budgetkontogruppeModelMockCollection;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.BudgetkontoGetAsync(Arg<int>.Is.GreaterThan(0), Arg<string>.Is.NotNull, Arg<DateTime>.Is.GreaterThan(DateTime.MinValue)))
+                                       .Return(Task.Run(budgetkontoModelGetter))
+                                       .Repeat.Any();
+            finansstyringRepositoryMock.Expect(m => m.BudgetkontogruppelisteGetAsync())
+                                       .Return(Task.Run(budgetkontogruppeModelCollectionGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var expectedNotifyPropertyChanged = new List<string>
+                {
+                    "DatoAsTextIsReadOnly",
+                    "BudgetkontonummerIsReadOnly",
+                    "Tasks",
+                    "IsWorking"
+                };
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Empty);
+
+            var bogføringViewModel = new BogføringViewModel(regnskabViewModelMock, bogføringslinjeModelMock, finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel.Tasks, Is.Not.Null);
+            Assert.That(bogføringViewModel.Tasks, Is.Empty);
+            Assert.That(bogføringViewModel.IsWorking, Is.False);
+
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    {
+                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                    }
+                };
+
+            Action action = () =>
+                {
+                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Budgetkontonummer"));
+                    var tasks = bogføringViewModel.Tasks.ToArray();
+                    Assert.That(tasks, Is.Not.Null);
+                    Assert.That(tasks, Is.Not.Empty);
+                    Task.WaitAll(tasks);
+                };
+            Task.Run(action).Wait(3000);
+
+            Assert.That(bogføringViewModel.Budgetkontonavn, Is.Not.Null);
+            Assert.That(bogføringViewModel.Budgetkontonavn, Is.Not.Empty);
+            Assert.That(bogføringViewModel.Budgetkontonavn, Is.EqualTo(budgetkontoModelMock.Kontonavn));
+            Assert.That(bogføringViewModel.BudgetkontoBogført, Is.EqualTo(budgetkontoModelMock.Bogført));
+            Assert.That(bogføringViewModel.BudgetkontoBogførtAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontoBogførtAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.BudgetkontoBogførtAsText, Is.EqualTo(budgetkontoModelMock.Bogført.ToString("C")));
+            Assert.That(bogføringViewModel.BudgetkontoDisponibel, Is.EqualTo(budgetkontoModelMock.Disponibel));
+            Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.Not.Empty);
+            Assert.That(bogføringViewModel.BudgetkontoDisponibelAsText, Is.EqualTo(budgetkontoModelMock.Disponibel.ToString("C")));
+
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Empty);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BudgetkontoGetAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<string>.Is.Equal(budgetkontonummer), Arg<DateTime>.Is.Equal(dato)));
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BudgetkontogruppelisteGetAsync());
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler reloader information, hvis Adressekonto opdateres på modellen for bogføringslinjen.
+        /// </summary>
+        [Test]
+        public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerReloaderInformationHvisAdressekontoOpdateresOnBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var regnskabsnummer = fixture.Create<int>();
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(regnskabsnummer)
+                                 .Repeat.Any();
+
+            var dato = fixture.Create<DateTime>();
+            var adressekonto = fixture.Create<int>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(dato)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(adressekonto)
+                                    .Repeat.Any();
+
+            var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+
+            Func<IEnumerable<IAdressekontoModel>> adressekontoModelCollectionGetter = () => new Collection<IAdressekontoModel> {adressekontoModelMock};
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.AdressekontolisteGetAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue)))
+                                       .Return(Task.Run(adressekontoModelCollectionGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var expectedNotifyPropertyChanged = new List<string>
+                {
+                    "DatoAsTextIsReadOnly",
+                    "AdressekontoIsReadOnly",
+                    "Tasks",
+                    "IsWorking"
+                };
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Empty);
+
+            var bogføringViewModel = new BogføringViewModel(regnskabViewModelMock, bogføringslinjeModelMock, finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel.Tasks, Is.Not.Null);
+            Assert.That(bogføringViewModel.Tasks, Is.Empty);
+            Assert.That(bogføringViewModel.IsWorking, Is.False);
+
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    while (expectedNotifyPropertyChanged.Contains(e.PropertyName))
+                    {
+                        expectedNotifyPropertyChanged.Remove(e.PropertyName);
+                    }
+                };
+
+            Action action = () =>
+                {
+                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Adressekonto"));
+                    var tasks = bogføringViewModel.Tasks.ToArray();
+                    Assert.That(tasks, Is.Not.Null);
+                    Assert.That(tasks, Is.Not.Empty);
+                    Task.WaitAll(tasks);
+                };
+            Task.Run(action).Wait(3000);
+
+            Assert.That(expectedNotifyPropertyChanged, Is.Not.Null);
+            Assert.That(expectedNotifyPropertyChanged, Is.Empty);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.AdressekontolisteGetAsync(Arg<int>.Is.Equal(regnskabsnummer), Arg<DateTime>.Is.Equal(dato)));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 

@@ -243,6 +243,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Henter listen af adressekonti til en regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil listen af adressekonti skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af adressekonti.</param>
+        /// <returns>Adressekonti til regnskabet.</returns>
+        public virtual Task<IEnumerable<IAdressekontoModel>> AdressekontolisteGetAsync(int regnskabsnummer, DateTime statusDato)
+        {
+            Func<IEnumerable<IAdressekontoModel>> func = () => AdressekontolisteGet(regnskabsnummer, statusDato);
+            return Task.Run(func);
+        }
+
+        /// <summary>
         /// Henter en given adressekonto til et regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvortil adressekontoen skal hentes.</param>
@@ -893,6 +905,81 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KreditorlisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af adressekonti til en regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil listen af adressekonti skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af adressekonti.</param>
+        /// <returns>Adressekonti til regnskabet.</returns>
+        private IEnumerable<IAdressekontoModel> AdressekontolisteGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var adressekonti = new List<IAdressekontoModel>();
+                var binding = GetBasicHttpBinding();
+                var endpointAddress = new EndpointAddress(Konfiguration.FinansstyringServiceUri);
+                var client = new FinansstyringServiceClient(binding, endpointAddress);
+                try
+                {
+                    var query = new AdressekontolisteGetQuery
+                        {
+                            Regnskabsnummer = regnskabsnummer,
+                            StatusDato = statusDato
+                        };
+
+                    var serviceInterface = (FinansstyringService) client;
+                    var asyncResult = serviceInterface.BeginAdressekontolisteGet(query, null, null);
+                    foreach (var adressekontoView in serviceInterface.EndAdressekontolisteGet(asyncResult))
+                    {
+                        try
+                        {
+                            var adressekontoModel = new AdressekontoModel(regnskabsnummer, adressekontoView.Nummer, adressekontoView.Navn, statusDato, adressekontoView.Saldo);
+                            if (string.IsNullOrEmpty(adressekontoView.PrimærTelefon) == false)
+                            {
+                                adressekontoModel.PrimærTelefon = adressekontoView.PrimærTelefon.Trim();
+                                if (string.IsNullOrEmpty(adressekontoView.SekundærTelefon) == false && string.Compare(adressekontoModel.PrimærTelefon, adressekontoView.SekundærTelefon.Trim(), StringComparison.OrdinalIgnoreCase) != 0)
+                                {
+                                    adressekontoModel.SekundærTelefon = adressekontoView.SekundærTelefon.Trim();
+                                }
+                            }
+                            else if (string.IsNullOrEmpty(adressekontoView.SekundærTelefon) == false)
+                            {
+                                adressekontoModel.PrimærTelefon = adressekontoView.PrimærTelefon.Trim();
+                            }
+                            adressekontoModel.SetNyhedsaktualitet(Nyhedsaktualitet.Medium);
+                            adressekonti.Add(adressekontoModel);
+                        }
+                        catch (ArgumentNullException)
+                        {
+                        }
+                        catch (ArgumentException)
+                        {
+                        }
+                    }
+
+                    client.CloseAsync();
+                }
+                catch (Exception)
+                {
+                    client.Abort();
+                    throw;
+                }
+                return adressekonti;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontolisteGet", ex.Message), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontolisteGet", ex.Message), ex);
             }
         }
 
