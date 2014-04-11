@@ -22,6 +22,7 @@
         ErrorWhileSettingBookkeepingText,
         ErrorWhileSettingBudgetAccountNumber,
         ErrorWhileSettingDebit,
-        ErrorWhileSettingCredit
+        ErrorWhileSettingCredit,
+        ErrorWhileSettingAddressAccount
     }
 }

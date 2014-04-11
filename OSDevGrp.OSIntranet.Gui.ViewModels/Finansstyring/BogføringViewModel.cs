@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -22,8 +26,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
         private IKontoViewModel _kontoViewModel;
         private IBudgetkontoViewModel _budgetkontoViewModel;
+        private IAdressekontoViewModel _adressekontoViewModel;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
+        private readonly ObservableCollection<IAdressekontoViewModel> _adressekontoViewModelCollection = new ObservableCollection<IAdressekontoViewModel>();
 
         #endregion
 
@@ -62,12 +68,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             _finansstyringRepository = finansstyringRepository;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
+            _adressekontoViewModelCollection.CollectionChanged += CollectionChangedOnAdressekontoViewModelCollectionEventHandler;
             if (!runRefreshTasks)
             {
                 return;
             }
             KontoViewModelRefresh();
             BudgetkontoViewModelRefresh();
+            AdressekontoViewModelCollectionRefresh();
         }
 
         #endregion
@@ -124,7 +132,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return KontoReaderTaskIsActive || BudgetkontoReaderTaskIsActive || ErBogført;
+                return KontoReaderTaskIsActive || BudgetkontoReaderTaskIsActive || AdressekontoReaderTaskIsActive || ErBogført;
             }
         }
 
@@ -782,6 +790,187 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Unik identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        [CustomValidation(typeof (BogføringViewModel), "ValidateAdressekonto")]
+        public new virtual int Adressekonto
+        {
+            get
+            {
+                return base.Adressekonto;
+            }
+            set
+            {
+                try
+                {
+                    var result = ValidateAdressekonto(value);
+                    if (result != ValidationResult.Success)
+                    {
+                        throw new IntranetGuiValidationException(result.ErrorMessage, this, "Adressekonto", value);
+                    }
+                    try
+                    {
+                        Model.Adressekonto = value;
+                    }
+                    catch (ArgumentNullException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAddressAccount), this, "Adressekonto", value, ex);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAddressAccount), this, "Adressekonto", value, ex);
+                    }
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Adressekonto", ex.Message), ex));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet, kan redigeres.
+        /// </summary>
+        public virtual bool AdressekontoIsReadOnly
+        {
+            get
+            {
+                return AdressekontoReaderTaskIsActive || ErBogført;
+            }
+        }
+
+        /// <summary>
+        /// Label til den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string AdressekontoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.AddressAccount);
+            }
+        }
+
+        /// <summary>
+        /// Navn på adressekontoen.
+        /// </summary>
+        public virtual string AdressekontoNavn
+        {
+            get
+            {
+                return AdressekontoViewModel == null ? string.Empty : AdressekontoViewModel.Navn;
+            }
+        }
+
+        /// <summary>
+        /// Label til navnet på adressekontoen.
+        /// </summary>
+        public virtual string AdressekontoNavnLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Name);
+            }
+        }
+
+        /// <summary>
+        /// Saldo på adressekontoen.
+        /// </summary>
+        public virtual decimal AdressekontoSaldo
+        {
+            get
+            {
+                return AdressekontoViewModel == null ? 0M : AdressekontoViewModel.Saldo;
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af saldo på adressekontoen.
+        /// </summary>
+        public virtual string AdressekontoSaldoAsText
+        {
+            get
+            {
+                return AdressekontoViewModel == null ? string.Empty : AdressekontoViewModel.SaldoAsText;
+            }
+        }
+
+        /// <summary>
+        /// Label til saldoen på adressekontoen.
+        /// </summary>
+        public virtual string AdressekontoSaldoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Balance);
+            }
+        }
+
+        /// <summary>
+        /// Adressekonti, der kan tilknyttes bogføringslinjen.
+        /// </summary>
+        public virtual IEnumerable<IAdressekontoViewModel> Adressekonti
+        {
+            get
+            {
+                return _adressekontoViewModelCollection.OrderBy(m => m.Navn);
+            }
+        }
+
+        /// <summary>
+        /// Label til adressekonti, der kan tilknyttes bogføringslinjen.
+        /// </summary>
+        public virtual string AdressekontiLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.AddressAccounts);
+            }
+        }
+
+        /// <summary>
+        /// Tasks, der udføres asynkront.
+        /// </summary>
+        public virtual IEnumerable<Task> Tasks
+        {
+            get
+            {
+                var tasks = new ObservableCollection<Task>();
+                if (KontoReaderTask != null)
+                {
+                    tasks.Add(KontoReaderTask);
+                }
+                if (BudgetkontoReaderTask != null)
+                {
+                    tasks.Add(BudgetkontoReaderTask);
+                }
+                if (AdressekontoReaderTask != null)
+                {
+                    tasks.Add(AdressekontoReaderTask);
+                }
+                if (BogføringTask != null)
+                {
+                    tasks.Add(BogføringTask);
+                }
+                return tasks;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om asynkront arbejde er igangværende for bogføringslinjen.
+        /// </summary>
+        public virtual bool IsWorking
+        {
+            get
+            {
+                return KontoReaderTaskIsActive || BudgetkontoReaderTaskIsActive || AdressekontoReaderTaskIsActive || BogføringTaskIsActive;
+            }
+        }
+
+        /// <summary>
         /// ViewModel for kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
         protected virtual IKontoViewModel KontoViewModel
@@ -812,6 +1001,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
             // TODO: RaisePropertyChanged("KontonummerIsReadOnly");
+            // TODO: RaisePropertyChanged("Tasks");
+            // TODO: RaisePropertyChanged("IsWorking");
         }
 
         /// <summary>
@@ -856,6 +1047,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
             // TODO: RaisePropertyChanged("BudgetkontonummerIsReadOnly");
+            // TODO: RaisePropertyChanged("Tasks");
+            // TODO: RaisePropertyChanged("IsWorking");
         }
 
         /// <summary>
@@ -866,6 +1059,50 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return BudgetkontoReaderTask != null && BudgetkontoReaderTask.IsCompleted == false && BudgetkontoReaderTask.IsCanceled == false && BudgetkontoReaderTask.IsFaulted == false;
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for adressekontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        protected virtual IAdressekontoViewModel AdressekontoViewModel
+        {
+            get
+            {
+                return _adressekontoViewModel;
+            }
+            set 
+            { 
+                _adressekontoViewModel = value;
+                RaisePropertyChanged("AdressekontoNavn");
+                RaisePropertyChanged("AdressekontoSaldo");
+                RaisePropertyChanged("AdressekontoSaldoAsText");
+            }
+        }
+
+        /// <summary>
+        /// Task, der indlæser og opdaterer adressekontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        protected virtual Task<IEnumerable<IAdressekontoViewModel>> AdressekontoReaderTask
+        {
+            get
+            {
+                return null;
+            }
+            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
+            // TODO: RaisePropertyChanged("AdressekontoIsReadOnly");
+            // TODO: RaisePropertyChanged("Tasks");
+            // TODO: RaisePropertyChanged("IsWorking");
+        }
+
+        /// <summary>
+        /// Angivelse af, om den Task, der indlæser og opdaterer adressekontoen, hvortil bogføringslinjen er tilknyttet, er igangværende.
+        /// </summary>
+        protected virtual bool AdressekontoReaderTaskIsActive
+        {
+            get
+            {
+                return AdressekontoReaderTask != null && AdressekontoReaderTask.IsCompleted == false && AdressekontoReaderTask.IsCanceled == false && AdressekontoReaderTask.IsFaulted == false;
             }
         }
 
@@ -885,7 +1122,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             // TODO: RaisePropertyChanged("BudgetkontonummerIsReadOnly");
             // TODO: RaisePropertyChanged("DebitIsReadOnly");
             // TODO: RaisePropertyChanged("KreditIsReadOnly");
-            // TODO: RaisePropertyChanged("ErBogført");
+            // TODO: RaisePropertyChanged("AdressekontoIsReadOnly");
+            // TODO: RaisePropertyChanged("Tasks");
+            // TODO: RaisePropertyChanged("IsWorking");
         }
 
         /// <summary>
@@ -896,6 +1135,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return BogføringTask != null;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om den Task, der udfører den asynkrone bogføring, er igangværende.
+        /// </summary>
+        protected virtual bool BogføringTaskIsActive
+        {
+            get
+            {
+                return BogføringTask != null && BogføringTask.IsCompleted == false && BogføringTask.IsCanceled == false && BogføringTask.IsFaulted == false;
             }
         }
 
@@ -917,6 +1167,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("DatoAsText");
                     KontoViewModelRefresh();
                     BudgetkontoViewModelRefresh();
+                    AdressekontoViewModelCollectionRefresh();
                     break;
 
                 case "Kontonummer":
@@ -925,6 +1176,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case "Budgetkontonummer":
                     BudgetkontoViewModelRefresh();
+                    break;
+
+                case "Adressekonto":
+                    AdressekontoViewModelCollectionRefresh();
                     break;
             }
         }
@@ -935,7 +1190,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private void KontoViewModelRefresh()
         {
             KontoViewModel = null;
-            if (string.IsNullOrEmpty(Model.Kontonummer))
+            if (string.IsNullOrEmpty(Kontonummer))
             {
                 return;
             }
@@ -948,11 +1203,44 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private void BudgetkontoViewModelRefresh()
         {
             BudgetkontoViewModel = null;
-            if (string.IsNullOrEmpty(Model.Budgetkontonummer))
+            if (string.IsNullOrEmpty(Budgetkontonummer))
             {
                 return;
             }
             // TODO: Reload budgetkonto.
+        }
+
+        /// <summary>
+        /// Genindlæser ViewModels for adressekonti og dermed ViewModel for adressekontoen, som bogføringslinjen er tilknyttet.
+        /// </summary>
+        private void AdressekontoViewModelCollectionRefresh()
+        {
+            AdressekontoViewModel = null;
+            if (Adressekonto == 0)
+            {
+                return;
+            }
+            // TODO: Realod adressekonti.
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel for en adressekonto, der kan tilknyttes regnskabet.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnAdressekontoViewModel(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af adressekonti, som kan tilknyttes bogføringslinjen, ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void CollectionChangedOnAdressekontoViewModelCollectionEventHandler(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -1026,6 +1314,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             var result = Validation.ValidateDecimal(value);
             return result != ValidationResult.Success ? result : Validation.ValidateDecimalGreaterOrEqualTo(value, 0M);
+        }
+
+        /// <summary>
+        /// Validerer værdien for en unik identifikation af adressekontoen, som bogføringslinjen skal tilknyttes.
+        /// </summary>
+        /// <param name="value">Værdi, der skal valideres.</param>
+        /// <returns>Valideringsresultat.</returns>
+        public static ValidationResult ValidateAdressekonto(int value)
+        {
+            return ValidationResult.Success;
         }
 
         #endregion

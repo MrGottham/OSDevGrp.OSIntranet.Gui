@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
 {
@@ -386,6 +388,103 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// Label til kreditbeløbet.
         /// </summary>
         string KreditLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Unik identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        int Adressekonto
+        {
+            get; 
+            set;
+        }
+
+        /// <summary>
+        /// Angivelse af, om den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet, kan redigeres.
+        /// </summary>
+        bool AdressekontoIsReadOnly
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        string AdressekontoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Navn på adressekontoen.
+        /// </summary>
+        string AdressekontoNavn
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til navnet på adressekontoen.
+        /// </summary>
+        string AdressekontoNavnLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Saldo på adressekontoen.
+        /// </summary>
+        decimal AdressekontoSaldo
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af saldo på adressekontoen.
+        /// </summary>
+        string AdressekontoSaldoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til saldoen på adressekontoen.
+        /// </summary>
+        string AdressekontoSaldoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Adressekonti, der kan tilknyttes bogføringslinjen.
+        /// </summary>
+        IEnumerable<IAdressekontoViewModel> Adressekonti
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til adressekonti, der kan tilknyttes bogføringslinjen.
+        /// </summary>
+        string AdressekontiLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tasks, der udføres asynkront.
+        /// </summary>
+        IEnumerable<Task> Tasks
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Angivelse af, om asynkront arbejde er igangværende for bogføringslinjen.
+        /// </summary>
+        bool IsWorking
         {
             get;
         }

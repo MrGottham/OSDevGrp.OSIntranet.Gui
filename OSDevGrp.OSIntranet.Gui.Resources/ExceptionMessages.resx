@@ -136,6 +136,9 @@
   <data name="ErrorWhileSettingAccountNumber" xml:space="preserve">
     <value>Error while setting account number for the accounting line.</value>
   </data>
+  <data name="ErrorWhileSettingAddressAccount" xml:space="preserve">
+    <value>Error while setting address account for the accounting line.</value>
+  </data>
   <data name="ErrorWhileSettingAnnex" xml:space="preserve">
     <value>Error while setting annex for the accounting line.</value>
   </data>

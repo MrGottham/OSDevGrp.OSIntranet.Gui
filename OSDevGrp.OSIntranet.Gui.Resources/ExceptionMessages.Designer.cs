@@ -106,6 +106,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error while setting address account for the accounting line..
+        /// </summary>
+        internal static string ErrorWhileSettingAddressAccount {
+            get {
+                return ResourceManager.GetString("ErrorWhileSettingAddressAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error while setting annex for the accounting line..
         /// </summary>
         internal static string ErrorWhileSettingAnnex {

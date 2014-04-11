@@ -160,6 +160,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.KreditLabel, Is.Not.Null);
             Assert.That(bogføringViewModel.KreditLabel, Is.Not.Empty);
             Assert.That(bogføringViewModel.KreditLabel, Is.EqualTo(Resource.GetText(Text.Credit)));
+            Assert.That(bogføringViewModel.Adressekonto, Is.EqualTo(bogføringslinjeModelMock.Adressekonto));
+            Assert.That(bogføringViewModel.AdressekontoIsReadOnly, Is.False);
+            Assert.That(bogføringViewModel.AdressekontoLabel, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoLabel, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoLabel, Is.EqualTo(Resource.GetText(Text.AddressAccount)));
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoNavn, Is.Empty);
+            Assert.That(bogføringViewModel.AdressekontoNavnLabel, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoNavnLabel, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoNavnLabel, Is.EqualTo(Resource.GetText(Text.Name)));
+            Assert.That(bogføringViewModel.AdressekontoSaldo, Is.EqualTo(0M));
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoSaldoAsText, Is.Empty);
+            Assert.That(bogføringViewModel.AdressekontoSaldoLabel, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoSaldoLabel, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoSaldoLabel, Is.EqualTo(Resource.GetText(Text.Balance)));
+            Assert.That(bogføringViewModel.Adressekonti, Is.Not.Null);
+            Assert.That(bogføringViewModel.Adressekonti, Is.Empty);
+            Assert.That(bogføringViewModel.AdressekontiLabel, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontiLabel, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontiLabel, Is.EqualTo(Resource.GetText(Text.AddressAccounts)));
+            Assert.That(bogføringViewModel.Tasks, Is.Not.Null);
+            Assert.That(bogføringViewModel.Tasks, Is.Empty);
+            Assert.That(bogføringViewModel.IsWorking, Is.False);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Dato);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Bilag);
@@ -168,6 +192,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             bogføringslinjeModelMock.AssertWasCalled(m => m.Budgetkontonummer);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit);
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto);
         }
 
         /// <summary>
@@ -3131,6 +3156,368 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til Adressekonto opdaterer Adressekonto på modellen for bogføringslinjen.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterOpdatererAdressekontoOnBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<int>();
+            bogføringViewModel.Adressekonto = newValue;
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Adressekonto kalder HandleException på exceptionhandleren med en IntranetGuiValidationException ved en ArgumentNullException.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterKalderHandleExceptionOnExceptionHandlerViewModelMedIntranetGuiValidationExceptionVedArgumentNullException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto = Arg<int>.Is.Anything)
+                                    .Throw(fixture.Create<ArgumentNullException>())
+                                    .Repeat.Any();
+
+            var newValue = fixture.Create<int>();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var validationException = (IntranetGuiValidationException) e.Arguments.ElementAt(0);
+                                                 Assert.That(validationException, Is.Not.Null);
+                                                 Assert.That(validationException.Message, Is.Not.Null);
+                                                 Assert.That(validationException.Message, Is.Not.Empty);
+                                                 Assert.That(validationException.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAddressAccount)));
+                                                 Assert.That(validationException.ValidationContext, Is.Not.Null);
+                                                 Assert.That(validationException.ValidationContext, Is.TypeOf<BogføringViewModel>());
+                                                 Assert.That(validationException.PropertyName, Is.Not.Null);
+                                                 Assert.That(validationException.PropertyName, Is.Not.Empty);
+                                                 Assert.That(validationException.PropertyName, Is.EqualTo("Adressekonto"));
+                                                 Assert.That(validationException.Value, Is.EqualTo(newValue));
+                                                 Assert.That(validationException.InnerException, Is.Not.Null);
+                                                 Assert.That(validationException.InnerException, Is.TypeOf<ArgumentNullException>());
+                                             })
+                                         .Repeat.Any();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            bogføringViewModel.Adressekonto = newValue;
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Adressekonto kalder HandleException på exceptionhandleren med en IntranetGuiValidationException ved en ArgumentException.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterKalderHandleExceptionOnExceptionHandlerViewModelMedIntranetGuiValidationExceptionVedArgumentException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto = Arg<int>.Is.Anything)
+                                    .Throw(fixture.Create<ArgumentException>())
+                                    .Repeat.Any();
+
+            var newValue = fixture.Create<int>();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var validationException = (IntranetGuiValidationException) e.Arguments.ElementAt(0);
+                                                 Assert.That(validationException, Is.Not.Null);
+                                                 Assert.That(validationException.Message, Is.Not.Null);
+                                                 Assert.That(validationException.Message, Is.Not.Empty);
+                                                 Assert.That(validationException.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAddressAccount)));
+                                                 Assert.That(validationException.ValidationContext, Is.Not.Null);
+                                                 Assert.That(validationException.ValidationContext, Is.TypeOf<BogføringViewModel>());
+                                                 Assert.That(validationException.PropertyName, Is.Not.Null);
+                                                 Assert.That(validationException.PropertyName, Is.Not.Empty);
+                                                 Assert.That(validationException.PropertyName, Is.EqualTo("Adressekonto"));
+                                                 Assert.That(validationException.Value, Is.EqualTo(newValue));
+                                                 Assert.That(validationException.InnerException, Is.Not.Null);
+                                                 Assert.That(validationException.InnerException, Is.TypeOf<ArgumentException>());
+                                             })
+                                         .Repeat.Any();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            bogføringViewModel.Adressekonto = newValue;
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Adressekonto kalder HandleException på exceptionhandleren ved IntranetGuiRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterKalderHandleExceptionOnExceptionHandlerViewModelVedIntranetGuiRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var exception = fixture.Create<IntranetGuiRepositoryException>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto = Arg<int>.Is.Anything)
+                                    .Throw(exception)
+                                    .Repeat.Any();
+
+            var newValue = fixture.Create<int>();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var repositoryException = (IntranetGuiRepositoryException) e.Arguments.ElementAt(0);
+                                                 Assert.That(repositoryException, Is.Not.Null);
+                                                 Assert.That(repositoryException.Message, Is.Not.Null);
+                                                 Assert.That(repositoryException.Message, Is.Not.Empty);
+                                                 Assert.That(repositoryException.Message, Is.EqualTo(exception.Message));
+                                                 Assert.That(repositoryException.InnerException, Is.Null);
+                                             })
+                                         .Repeat.Any();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            bogføringViewModel.Adressekonto = newValue;
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Adressekonto kalder HandleException på exceptionhandleren ved IntranetGuiBusinessException.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterKalderHandleExceptionOnExceptionHandlerViewModelVedIntranetGuiBusinessException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var exception = fixture.Create<IntranetGuiBusinessException>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto = Arg<int>.Is.Anything)
+                                    .Throw(exception)
+                                    .Repeat.Any();
+
+            var newValue = fixture.Create<int>();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var businessException = (IntranetGuiBusinessException) e.Arguments.ElementAt(0);
+                                                 Assert.That(businessException, Is.Not.Null);
+                                                 Assert.That(businessException.Message, Is.Not.Null);
+                                                 Assert.That(businessException.Message, Is.Not.Empty);
+                                                 Assert.That(businessException.Message, Is.EqualTo(exception.Message));
+                                                 Assert.That(businessException.InnerException, Is.Null);
+                                             })
+                                         .Repeat.Any();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            bogføringViewModel.Adressekonto = newValue;
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Adressekonto kalder HandleException på exceptionhandleren ved IntranetGuiSystemException.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterKalderHandleExceptionOnExceptionHandlerViewModelVedIntranetGuiSystemException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var exception = fixture.Create<IntranetGuiSystemException>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto = Arg<int>.Is.Anything)
+                                    .Throw(exception)
+                                    .Repeat.Any();
+
+            var newValue = fixture.Create<int>();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var systemException = (IntranetGuiSystemException) e.Arguments.ElementAt(0);
+                                                 Assert.That(systemException, Is.Not.Null);
+                                                 Assert.That(systemException.Message, Is.Not.Null);
+                                                 Assert.That(systemException.Message, Is.Not.Empty);
+                                                 Assert.That(systemException.Message, Is.EqualTo(exception.Message));
+                                                 Assert.That(systemException.InnerException, Is.Null);
+                                             })
+                                         .Repeat.Any();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            bogføringViewModel.Adressekonto = newValue;
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Adressekonto kalder HandleException på exceptionhandleren ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterKalderHandleExceptionOnExceptionHandlerViewModelVedException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var exception = fixture.Create<Exception>();
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto = Arg<int>.Is.Anything)
+                                    .Throw(exception)
+                                    .Repeat.Any();
+
+            var newValue = fixture.Create<int>();
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf))
+                                         .WhenCalled(e =>
+                                             {
+                                                 var systemException = (IntranetGuiSystemException) e.Arguments.ElementAt(0);
+                                                 Assert.That(systemException, Is.Not.Null);
+                                                 Assert.That(systemException.Message, Is.Not.Null);
+                                                 Assert.That(systemException.Message, Is.Not.Empty);
+                                                 Assert.That(systemException.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Adressekonto", exception.Message)));
+                                                 Assert.That(systemException.InnerException, Is.Not.Null);
+                                                 Assert.That(systemException.InnerException, Is.EqualTo(exception));
+                                             })
+                                         .Repeat.Any();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            bogføringViewModel.Adressekonto = newValue;
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
         /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler rejser PropertyChanged, når modellen for bogføringslinjen opdateres.
         /// </summary>
         [Test]
@@ -3146,6 +3533,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Dato", "BudgetkontoBogførtAsText")]
         [TestCase("Dato", "BudgetkontoDisponibel")]
         [TestCase("Dato", "BudgetkontoDisponibelAsText")]
+        [TestCase("Dato", "AdressekontoNavn")]
+        [TestCase("Dato", "AdressekontoSaldo")]
+        [TestCase("Dato", "AdressekontoSaldoAsText")]
         [TestCase("Bilag", "Bilag")]
         [TestCase("Kontonummer", "Kontonummer")]
         [TestCase("Kontonummer", "Kontonavn")]
@@ -3164,6 +3554,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Debit", "DebitAsText")]
         [TestCase("Kredit", "Kredit")]
         [TestCase("Kredit", "KreditAsText")]
+        [TestCase("Adressekonto", "Adressekonto")]
+        [TestCase("Adressekonto", "AdressekontoNavn")]
+        [TestCase("Adressekonto", "AdressekontoSaldo")]
+        [TestCase("Adressekonto", "AdressekontoSaldoAsText")]
         public void TestAtPropertyChangedOnBogføringslinjeModelEventHandlerRejserPropertyChangedOnBogføringslinjeModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();
@@ -3487,6 +3881,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             }
             Assert.That(result.MemberNames, Is.Not.Null);
             Assert.That(result.MemberNames, Is.Empty);
+        }
+
+        /// <summary>
+        /// Tester, at ValidateAdressekonto returnerer Success ved lovlige værdier.
+        /// </summary>
+        [Test]
+        [TestCase(-1000)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(1000)]
+        public void TestAtValidateAdressekontoReturnererSuccessVedLovligeValues(int value)
+        {
+            var result = BogføringViewModel.ValidateAdressekonto(value);
+            Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
     }
 }

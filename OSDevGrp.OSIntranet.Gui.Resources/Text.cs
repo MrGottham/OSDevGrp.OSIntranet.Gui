@@ -49,6 +49,9 @@
         ValueIsNotDate,
         DateGreaterThan,
         ValueIsNotDecimal,
-        DecimalLowerThan
+        DecimalLowerThan,
+        AddressAccount,
+        AddressAccounts,
+        Name
     }
 }

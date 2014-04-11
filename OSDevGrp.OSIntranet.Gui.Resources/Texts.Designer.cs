@@ -124,6 +124,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Address account.
+        /// </summary>
+        internal static string AddressAccount {
+            get {
+                return ResourceManager.GetString("AddressAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address accounts.
+        /// </summary>
+        internal static string AddressAccounts {
+            get {
+                return ResourceManager.GetString("AddressAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Annex.
         /// </summary>
         internal static string Annex {
@@ -354,6 +372,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string InvalidValueForUri {
             get {
                 return ResourceManager.GetString("InvalidValueForUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
             }
         }
         

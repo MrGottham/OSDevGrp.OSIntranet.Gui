@@ -258,4 +258,13 @@
   <data name="ValueIsNotDecimal" xml:space="preserve">
     <value>Værdien er ikke et valid decimaltal eller er ikke korrekt formateret.</value>
   </data>
+  <data name="AddressAccount" xml:space="preserve">
+    <value>Adressekonto</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Navn</value>
+  </data>
+  <data name="AddressAccounts" xml:space="preserve">
+    <value>Adressekonti</value>
+  </data>
 </root>
