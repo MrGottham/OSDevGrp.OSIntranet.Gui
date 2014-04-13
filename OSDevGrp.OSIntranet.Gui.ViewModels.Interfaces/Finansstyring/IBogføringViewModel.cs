@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
 {
@@ -485,6 +486,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// Angivelse af, om asynkront arbejde er igangværende for bogføringslinjen.
         /// </summary>
         bool IsWorking
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kommando, der kan foretage bogføring af bogføringslinjen.
+        /// </summary>
+        ICommand BogførCommand
         {
             get;
         }

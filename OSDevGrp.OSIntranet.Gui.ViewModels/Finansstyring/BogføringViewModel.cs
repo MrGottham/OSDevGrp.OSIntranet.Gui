@@ -7,10 +7,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -24,12 +26,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
+        private ICommand _bogførCommand;
         private IKontoViewModel _kontoViewModel;
         private Task<IKontoViewModel> _kontoReaderTask;
         private IBudgetkontoViewModel _budgetkontoViewModel;
         private Task<IBudgetkontoViewModel> _budgetkontoReaderTask;
         private IAdressekontoViewModel _adressekontoViewModel;
         private Task<IEnumerable<IAdressekontoViewModel>> _adressekontoReaderTask;
+        private Task _bogføringTask;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
         private readonly ObservableCollection<IAdressekontoViewModel> _adressekontoViewModelCollection = new ObservableCollection<IAdressekontoViewModel>();
@@ -974,6 +978,33 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Kommando, der kan foretage bogføring af bogføringslinjen.
+        /// </summary>
+        public virtual ICommand BogførCommand
+        {
+            get
+            {
+                if (_bogførCommand != null)
+                {
+                    return _bogførCommand;
+                }
+
+                // TODO: Lav IntranetGuiCommandException og check exceptionhandleren m.m.
+
+                // TODO: BogførCommand skal bruge Validate metoder til validering.
+                // TODO: BogførCommand skal kunne kalde tilbage, efter end bogføring.
+                ITaskableCommand cmd = null;
+                var executeCommands = new Collection<ICommand>
+                    {
+                        //cmd,
+                        new RelayCommand(obj => BogføringTask = cmd.ExecuteTask)
+                    };
+                _bogførCommand = new CommandCollectionExecuterCommand(executeCommands);
+                return _bogførCommand;
+            }
+        }
+
+        /// <summary>
         /// ViewModel for kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
         protected virtual IKontoViewModel KontoViewModel
@@ -1103,11 +1134,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             private set
             {
                 _adressekontoReaderTask = value;
+                RaisePropertyChanged("DatoAsTextIsReadOnly");
+                RaisePropertyChanged("AdressekontoIsReadOnly");
+                RaisePropertyChanged("Tasks");
+                RaisePropertyChanged("IsWorking");
             }
-            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
-            // TODO: RaisePropertyChanged("AdressekontoIsReadOnly");
-            // TODO: RaisePropertyChanged("Tasks");
-            // TODO: RaisePropertyChanged("IsWorking");
         }
 
         /// <summary>
@@ -1128,18 +1159,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return null;
+                return _bogføringTask;
             }
-            // TODO: RaisePropertyChanged("DatoAsTextIsReadOnly");
-            // TODO: RaisePropertyChanged("BilagIsReadOnly");
-            // TODO: RaisePropertyChanged("KontonummerIsReadOnly");
-            // TODO: RaisePropertyChanged("TekstIsReadOnly");
-            // TODO: RaisePropertyChanged("BudgetkontonummerIsReadOnly");
-            // TODO: RaisePropertyChanged("DebitIsReadOnly");
-            // TODO: RaisePropertyChanged("KreditIsReadOnly");
-            // TODO: RaisePropertyChanged("AdressekontoIsReadOnly");
-            // TODO: RaisePropertyChanged("Tasks");
-            // TODO: RaisePropertyChanged("IsWorking");
+            private set
+            {
+                _bogføringTask = value;
+                RaisePropertyChanged("DatoAsTextIsReadOnly");
+                RaisePropertyChanged("BilagIsReadOnly");
+                RaisePropertyChanged("KontonummerIsReadOnly");
+                RaisePropertyChanged("TekstIsReadOnly");
+                RaisePropertyChanged("BudgetkontonummerIsReadOnly");
+                RaisePropertyChanged("DebitIsReadOnly");
+                RaisePropertyChanged("KreditIsReadOnly");
+                RaisePropertyChanged("AdressekontoIsReadOnly");
+                RaisePropertyChanged("Tasks");
+                RaisePropertyChanged("IsWorking");
+            }
         }
 
         /// <summary>
@@ -1375,7 +1410,43 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="eventArgs">Argumenter til eventet.</param>
         private void PropertyChangedOnAdressekontoViewModelEventHander(object sender, PropertyChangedEventArgs eventArgs)
         {
-            throw new NotImplementedException();
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var viewModel = sender as AdressekontoViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Navn":
+                    RaisePropertyChanged("Adressekonti");
+                    if (AdressekontoViewModel != null && AdressekontoViewModel.Nummer == viewModel.Nummer)
+                    {
+                        RaisePropertyChanged("AdressekontoNavn");
+                    }
+                    break;
+
+                case "Saldo":
+                    if (AdressekontoViewModel != null && AdressekontoViewModel.Nummer == viewModel.Nummer)
+                    {
+                        RaisePropertyChanged("AdressekontoSaldo");
+                    }
+                    break;
+
+                case "SaldoAsText":
+                    if (AdressekontoViewModel != null && AdressekontoViewModel.Nummer == viewModel.Nummer)
+                    {
+                        RaisePropertyChanged("AdressekontoSaldoAsText");
+                    }
+                    break;
+            }
         }
 
         /// <summary>

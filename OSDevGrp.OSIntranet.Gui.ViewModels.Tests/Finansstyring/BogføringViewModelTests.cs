@@ -5,12 +5,14 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -187,6 +189,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.Tasks, Is.Not.Null);
             Assert.That(bogføringViewModel.Tasks, Is.Empty);
             Assert.That(bogføringViewModel.IsWorking, Is.False);
+            Assert.That(bogføringViewModel.BogførCommand, Is.Not.Null);
+            Assert.That(bogføringViewModel.BogførCommand, Is.TypeOf<CommandCollectionExecuterCommand>());
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Dato);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Bilag);
@@ -3788,6 +3792,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                 .Repeat.Any();
 
             var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            adressekontoModelMock.Expect(m => m.Nummer)
+                                 .Return(adressekonto)
+                                 .Repeat.Any();
             adressekontoModelMock.Expect(m => m.Navn)
                                  .Return(fixture.Create<string>())
                                  .Repeat.Any();
@@ -3915,12 +3922,38 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             Action action = () =>
                 {
-                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Dato"));
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        bogføringViewModel.PropertyChanged += (s, e) =>
+                            {
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.TypeOf<BogføringViewModel>());
+                                Assert.That(e, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Empty);
+                                var viewModel = (BogføringViewModel) s;
+                                switch (e.PropertyName)
+                                {
+                                    case "IsWorking":
+                                        if (viewModel.IsWorking)
+                                        {
+                                            return;
+                                        }
+                                        we.Set();
+                                        break;
+                                }
+                            };
+                        bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Dato"));
 
-                    var tasks = bogføringViewModel.Tasks.ToArray();
-                    Assert.That(tasks, Is.Not.Null);
-                    Assert.That(tasks, Is.Not.Empty);
-                    Task.WaitAll(tasks);
+                        var tasks = bogføringViewModel.Tasks.ToArray();
+                        Assert.That(tasks, Is.Not.Null);
+                        Assert.That(tasks, Is.Not.Empty);
+                        Task.WaitAll(tasks);
+
+                        waitEvent.WaitOne(2500);
+                    }
                 };
             Task.Run(action).Wait(3000);
 
@@ -4092,12 +4125,38 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             Action action = () =>
                 {
-                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Kontonummer"));
-                    
-                    var tasks = bogføringViewModel.Tasks.ToArray();
-                    Assert.That(tasks, Is.Not.Null);
-                    Assert.That(tasks, Is.Not.Empty);
-                    Task.WaitAll(tasks);
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        bogføringViewModel.PropertyChanged += (s, e) =>
+                            {
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.TypeOf<BogføringViewModel>());
+                                Assert.That(e, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Empty);
+                                var viewModel = (BogføringViewModel) s;
+                                switch (e.PropertyName)
+                                {
+                                    case "IsWorking":
+                                        if (viewModel.IsWorking)
+                                        {
+                                            return;
+                                        }
+                                        we.Set();
+                                        break;
+                                }
+                            };
+                        bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Kontonummer"));
+
+                        var tasks = bogføringViewModel.Tasks.ToArray();
+                        Assert.That(tasks, Is.Not.Null);
+                        Assert.That(tasks, Is.Not.Empty);
+                        Task.WaitAll(tasks);
+
+                        waitEvent.WaitOne(2500);
+                    }
                 };
             Task.Run(action).Wait(3000);
 
@@ -4244,12 +4303,38 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             Action action = () =>
                 {
-                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Budgetkontonummer"));
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        bogføringViewModel.PropertyChanged += (s, e) =>
+                            {
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.TypeOf<BogføringViewModel>());
+                                Assert.That(e, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Empty);
+                                var viewModel = (BogføringViewModel) s;
+                                switch (e.PropertyName)
+                                {
+                                    case "IsWorking":
+                                        if (viewModel.IsWorking)
+                                        {
+                                            return;
+                                        }
+                                        we.Set();
+                                        break;
+                                }
+                            };
+                        bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Budgetkontonummer"));
 
-                    var tasks = bogføringViewModel.Tasks.ToArray();
-                    Assert.That(tasks, Is.Not.Null);
-                    Assert.That(tasks, Is.Not.Empty);
-                    Task.WaitAll(tasks);
+                        var tasks = bogføringViewModel.Tasks.ToArray();
+                        Assert.That(tasks, Is.Not.Null);
+                        Assert.That(tasks, Is.Not.Empty);
+                        Task.WaitAll(tasks);
+
+                        waitEvent.WaitOne(2500);
+                    }
                 };
             Task.Run(action).Wait(3000);
 
@@ -4305,6 +4390,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Repeat.Any();
 
             var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            adressekontoModelMock.Expect(m => m.Nummer)
+                                 .Return(adressekonto)
+                                 .Repeat.Any();
             adressekontoModelMock.Expect(m => m.Navn)
                                  .Return(fixture.Create<string>())
                                  .Repeat.Any();
@@ -4373,12 +4461,38 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             Action action = () =>
                 {
-                    bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Adressekonto"));
-                    
-                    var tasks = bogføringViewModel.Tasks.ToArray();
-                    Assert.That(tasks, Is.Not.Null);
-                    Assert.That(tasks, Is.Not.Empty);
-                    Task.WaitAll(tasks);
+                    using (var waitEvent = new AutoResetEvent(false))
+                    {
+                        var we = waitEvent;
+                        bogføringViewModel.PropertyChanged += (s, e) =>
+                            {
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.Not.Null);
+                                Assert.That(s, Is.TypeOf<BogføringViewModel>());
+                                Assert.That(e, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Null);
+                                Assert.That(e.PropertyName, Is.Not.Empty);
+                                var viewModel = (BogføringViewModel) s;
+                                switch (e.PropertyName)
+                                {
+                                    case "IsWorking":
+                                        if (viewModel.IsWorking)
+                                        {
+                                            return;
+                                        }
+                                        we.Set();
+                                        break;
+                                }
+                            };
+                        bogføringslinjeModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeModelMock, new PropertyChangedEventArgs("Adressekonto"));
+
+                        var tasks = bogføringViewModel.Tasks.ToArray();
+                        Assert.That(tasks, Is.Not.Null);
+                        Assert.That(tasks, Is.Not.Empty);
+                        Task.WaitAll(tasks);
+
+                        waitEvent.WaitOne(2500);
+                    }
                 };
             Task.Run(action).Wait(3000);
 
