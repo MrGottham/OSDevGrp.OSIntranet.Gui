@@ -48,6 +48,7 @@
     <Compile Include="Events\IHandleExceptionEventArgs.cs" />
     <Compile Include="Events\IIntranetGuiEventArgs.cs" />
     <Compile Include="Exceptions\IntranetGuiBusinessException.cs" />
+    <Compile Include="Exceptions\IntranetGuiCommandException.cs" />
     <Compile Include="Exceptions\IntranetGuiExceptionBase.cs" />
     <Compile Include="Exceptions\IntranetGuiRepositoryException.cs" />
     <Compile Include="Exceptions\IntranetGuiSystemException.cs" />

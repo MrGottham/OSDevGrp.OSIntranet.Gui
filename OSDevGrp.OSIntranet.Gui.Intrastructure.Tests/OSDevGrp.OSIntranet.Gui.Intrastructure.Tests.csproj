@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Events\HandleExceptionEventArgsTests.cs" />
     <Compile Include="Exceptions\IntranetGuiBusinessExceptionTests.cs" />
+    <Compile Include="Exceptions\IntranetGuiCommandExceptionTests.cs" />
     <Compile Include="Exceptions\IntranetGuiExceptionBaseTests.cs" />
     <Compile Include="Exceptions\IntranetGuiRepositoryExceptionTests.cs" />
     <Compile Include="Exceptions\IntranetGuiSystemExceptionTests.cs" />
