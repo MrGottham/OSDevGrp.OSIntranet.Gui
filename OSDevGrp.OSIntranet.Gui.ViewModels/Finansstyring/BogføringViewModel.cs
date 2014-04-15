@@ -989,8 +989,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     return _bogførCommand;
                 }
 
-                // TODO: Lav IntranetGuiCommandException og check exceptionhandleren m.m.
-
                 // TODO: BogførCommand skal bruge Validate metoder til validering.
                 // TODO: BogførCommand skal kunne kalde tilbage, efter end bogføring.
                 ITaskableCommand cmd = null;

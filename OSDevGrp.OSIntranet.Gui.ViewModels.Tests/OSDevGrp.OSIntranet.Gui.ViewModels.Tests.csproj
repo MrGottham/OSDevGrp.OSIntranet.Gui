@@ -74,6 +74,7 @@
     <Compile Include="Finansstyring\BudgetkontogruppeViewModelTests.cs" />
     <Compile Include="Finansstyring\BudgetkontoViewModelTests.cs" />
     <Compile Include="Finansstyring\Commands\AdressekontoGetCommandTests.cs" />
+    <Compile Include="Finansstyring\Commands\BogføringAddCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\BogføringSetCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\BogføringslinjerGetCommandTests.cs" />
     <Compile Include="Finansstyring\Commands\BudgetkontoGetCommandTests.cs" />
