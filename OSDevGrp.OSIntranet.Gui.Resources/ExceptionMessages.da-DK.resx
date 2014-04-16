@@ -129,6 +129,12 @@
     <value>Fejl ved udførelse af kommandoen '{0}': {1}</value>
     <comment>{0} = Typen på kommandoen, {1} = Fejlbesked.</comment>
   </data>
+  <data name="ErrorPostingAccountingLine" xml:space="preserve">
+    <value>Fejl ved bogføring af bogføringslinjen.</value>
+  </data>
+  <data name="ErrorUpdateFinansstyringRepository" xml:space="preserve">
+    <value>Der opstod en fejl ved opdatering gennem repositoryet, der supporterer finansstyring.</value>
+  </data>
   <data name="ErrorWhileGettingPropertyValue" xml:space="preserve">
     <value>Fejl ved returnering af værdi for propertyen med navnet '{0}': {1}</value>
     <comment>{0} = Navn på property, {1} = Fejlbesked.</comment>

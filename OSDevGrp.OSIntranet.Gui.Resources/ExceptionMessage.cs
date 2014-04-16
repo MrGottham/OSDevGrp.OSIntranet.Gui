@@ -23,6 +23,8 @@
         ErrorWhileSettingBudgetAccountNumber,
         ErrorWhileSettingDebit,
         ErrorWhileSettingCredit,
-        ErrorWhileSettingAddressAccount
+        ErrorWhileSettingAddressAccount,
+        ErrorPostingAccountingLine,
+        ErrorUpdateFinansstyringRepository
     }
 }

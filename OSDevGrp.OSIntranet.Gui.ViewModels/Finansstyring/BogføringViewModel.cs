@@ -14,6 +14,7 @@ using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -989,13 +990,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     return _bogførCommand;
                 }
 
-                // TODO: BogførCommand skal bruge Validate metoder til validering.
                 // TODO: BogførCommand skal kunne kalde tilbage, efter end bogføring.
-                ITaskableCommand cmd = null;
+                ITaskableCommand bogføringAddCommand = new BogføringAddCommand(_finansstyringRepository, _exceptionHandlerViewModel);
                 var executeCommands = new Collection<ICommand>
                     {
-                        //cmd,
-                        new RelayCommand(obj => BogføringTask = cmd.ExecuteTask)
+                        bogføringAddCommand,
+                        new RelayCommand(obj => BogføringTask = bogføringAddCommand.ExecuteTask)
                     };
                 _bogførCommand = new CommandCollectionExecuterCommand(executeCommands);
                 return _bogførCommand;

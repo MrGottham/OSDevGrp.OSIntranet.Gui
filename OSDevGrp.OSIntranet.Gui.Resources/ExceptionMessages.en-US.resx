@@ -129,6 +129,12 @@
     <value>Error while executing the command '{0}': {1}</value>
     <comment>{0} = Type of the command, {1} = Error message.</comment>
   </data>
+  <data name="ErrorPostingAccountingLine" xml:space="preserve">
+    <value>Error when posting the accounting line.</value>
+  </data>
+  <data name="ErrorUpdateFinansstyringRepository" xml:space="preserve">
+    <value>An error occurred while updatering through the repository supporting financial management.</value>
+  </data>
   <data name="ErrorWhileGettingPropertyValue" xml:space="preserve">
     <value>Error while getting value of the property named '{0}': {1}</value>
     <comment>{0} = Name of property, {1} = Error message.</comment>

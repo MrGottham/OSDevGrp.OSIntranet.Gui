@@ -98,7 +98,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
             }
             catch (Exception ex)
             {
-                HandleException(ex);
+                HandleException(ex, parameter);
             }
         }
 
@@ -122,7 +122,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         /// Håndtering af exception ved udførelse af en kommando.
         /// </summary>
         /// <param name="exception">Exception.</param>
-        protected virtual void HandleException(Exception exception)
+        /// <param name="parameter">Parameter, som kommandoen er blevet kaldt med.</param>
+        protected virtual void HandleException(Exception exception, object parameter)
         {
             if (exception == null)
             {
@@ -177,7 +178,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
                     {
                         task.Exception.Handle(exception =>
                             {
-                                HandleException(exception);
+                                HandleException(exception, viewModel);
                                 return true;
                             });
                     }
@@ -191,7 +192,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
             }
             catch (Exception ex)
             {
-                HandleException(ex);
+                HandleException(ex, viewModel);
             }
         }
 
@@ -223,7 +224,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
                 }
                 catch (Exception ex)
                 {
-                    HandleException(ex);
+                    HandleException(ex, viewModel);
                 }
                 return;
             }

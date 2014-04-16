@@ -88,6 +88,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error when posting the accounting line..
+        /// </summary>
+        internal static string ErrorPostingAccountingLine {
+            get {
+                return ResourceManager.GetString("ErrorPostingAccountingLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while updatering through the repository supporting financial management..
+        /// </summary>
+        internal static string ErrorUpdateFinansstyringRepository {
+            get {
+                return ResourceManager.GetString("ErrorUpdateFinansstyringRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error while getting value of the property named &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string ErrorWhileGettingPropertyValue {
