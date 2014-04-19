@@ -59,6 +59,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\EmptyEventArgsTests.cs" />
     <Compile Include="Events\HandleExceptionEventArgsTests.cs" />
     <Compile Include="Exceptions\IntranetGuiBusinessExceptionTests.cs" />
     <Compile Include="Exceptions\IntranetGuiCommandExceptionTests.cs" />

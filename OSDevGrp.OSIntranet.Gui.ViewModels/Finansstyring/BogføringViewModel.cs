@@ -989,9 +989,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     return _bogførCommand;
                 }
-
-                // TODO: BogførCommand skal kunne kalde tilbage, efter end bogføring.
-                ITaskableCommand bogføringAddCommand = new BogføringAddCommand(_finansstyringRepository, _exceptionHandlerViewModel);
+                var bogføringAddCommand = new BogføringAddCommand(_finansstyringRepository, _exceptionHandlerViewModel);
+                bogføringAddCommand.OnError += (s, e) => BogføringTask = null;
                 var executeCommands = new Collection<ICommand>
                     {
                         bogføringAddCommand,

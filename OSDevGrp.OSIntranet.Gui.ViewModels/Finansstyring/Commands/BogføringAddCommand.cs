@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
@@ -42,8 +44,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
 
         #endregion
 
-        // TODO: event OnBogført
-        // TODO: event OnError
+        #region Events
+
+        /// <summary>
+        /// Event, der rejses efter endt bogføring af en bogføringslinje.
+        /// </summary>
+        public virtual event IntranetGuiEventHandler<IEmptyEventArgs> OnBogført;
+
+        /// <summary>
+        /// Event, der rejses, når der opstår en fejl ved bogføring af en bogføringslinje.
+        /// </summary>
+        public virtual event IntranetGuiEventHandler<IHandleExceptionEventArgs> OnError; 
+
+        #endregion
 
         #region Methods
 
@@ -133,6 +146,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         protected override void HandleException(Exception exception, object parameter)
         {
             IntranetGuiCommandException commandException = null;
+            IntranetGuiSystemException systemException = null;
             try
             {
                 if (exception is IntranetGuiCommandException)
@@ -158,10 +172,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                     base.HandleException(commandException, parameter);
                     return;
                 }
-                base.HandleException(exception, parameter);
+                if (exception is IntranetGuiSystemException)
+                {
+                    base.HandleException(exception, parameter);
+                    return;
+                }
+                systemException = new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.CommandError, "BogføringAddCommand", exception.Message), exception);
+                base.HandleException(systemException, parameter);
             }
             finally
             {
+                if (OnError != null)
+                {
+                    OnError.Invoke(this, new HandleExceptionEventArgs(commandException ?? systemException ?? exception));
+                }
             }
         }
 
@@ -198,6 +222,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 foreach (var bogføringsadvarselModel in bogføringsresultatModel.Bogføringsadvarsler)
                 {
                     regnskabViewModel.BogføringsadvarselAdd(new BogføringsadvarselViewModel(regnskabViewModel, bogføringslinjeViewModel, bogføringsadvarselModel, DateTime.Now));
+                }
+                if (OnBogført != null)
+                {
+                    OnBogført.Invoke(this, new EmptyEventArgs());
                 }
             }
             catch (Exception ex)

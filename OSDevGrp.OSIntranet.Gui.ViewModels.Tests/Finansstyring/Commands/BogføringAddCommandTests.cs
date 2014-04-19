@@ -572,6 +572,70 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
         }
 
         /// <summary>
+        /// Tester, at Execute rejser OnBogført ved endt bogføring.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteRejserOnBogførtEfterBogføring()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
+                                 .Return(null)
+                                 .Repeat.Any();
+
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().Date.ToString(CultureInfo.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            bogføringViewModelMock.Expect(m => m.Regnskab)
+                                  .Return(regnskabViewModelMock)
+                                  .Repeat.Any();
+
+            var bogføringsresultatModelMock = MockRepository.GenerateMock<IBogføringsresultatModel>();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringslinje)
+                                       .Return(fixture.Create<IBogføringslinjeModel>())
+                                       .Repeat.Any();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringsadvarsler)
+                                       .Return(new List<IBogføringsadvarselModel>(0))
+                                       .Repeat.Any();
+
+            Func<IBogføringsresultatModel> bogføringsresultatGetter = () => bogføringsresultatModelMock;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything))
+                                       .Return(Task.Run(bogføringsresultatGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new BogføringAddCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            var eventCalled = false;
+            command.OnBogført += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    eventCalled = true;
+                };
+
+            Assert.That(eventCalled, Is.False);
+            Action action = () =>
+                {
+                    command.Execute(bogføringViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
+            Assert.That(eventCalled, Is.True);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
         /// Tester, at Execute udfører kommandoen, der kan sætte en ny ViewModel til bogføring på regnskabet efter endt bogføring.
         /// </summary>
         [Test]
@@ -1084,6 +1148,64 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             finansstyringRepositoryMock.AssertWasCalled(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything));
             regnskabViewModelMock.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<IReadOnlyBogføringslinjeViewModel>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at Execute rejser OnError, hvis der opstår en fejl ved bogføring.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteRejserOnErrorVedBogføringsfejl()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().Date.ToString(CultureInfo.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            bogføringViewModelMock.Expect(m => m.Regnskab)
+                                  .Return(regnskabViewModelMock)
+                                  .Repeat.Any();
+
+            var exception = fixture.Create<Exception>();
+            Func<IBogføringsresultatModel> bogføringsresultatGetter = () =>
+                {
+                    throw exception;
+                };
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything))
+                                       .Return(Task.Run(bogføringsresultatGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new BogføringAddCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            var eventCalled = false;
+            command.OnError += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.Error, Is.Not.Null);
+                    Assert.That(e.Error, Is.TypeOf<IntranetGuiSystemException>());
+                    eventCalled = true;
+                };
+
+            Assert.That(eventCalled, Is.False);
+            Action action = () =>
+                {
+                    command.Execute(bogføringViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
+            Assert.That(eventCalled, Is.True);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
         }
 
         /// <summary>

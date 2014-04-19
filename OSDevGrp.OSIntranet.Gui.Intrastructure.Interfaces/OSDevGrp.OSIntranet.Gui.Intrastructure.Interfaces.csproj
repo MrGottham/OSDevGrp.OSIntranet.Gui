@@ -44,7 +44,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="EventHandlers.cs" />
+    <Compile Include="Events\EmptyEventArgs.cs" />
     <Compile Include="Events\HandleExceptionEventArgs.cs" />
+    <Compile Include="Events\IEmptyEventArgs.cs" />
     <Compile Include="Events\IHandleExceptionEventArgs.cs" />
     <Compile Include="Events\IIntranetGuiEventArgs.cs" />
     <Compile Include="Exceptions\IntranetGuiBusinessException.cs" />

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Xaml;
@@ -11,10 +14,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     /// <summary>
     /// Page til et regnskab.
     /// </summary>
-    public sealed partial class RegnskabPage
+    public sealed partial class RegnskabPage : IDisposable, IEventSubscriber<IHandleExceptionEventArgs>
     {
         #region Private variables
 
+        private bool _disposed;
+        private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (ConfigurationUserControl), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
 
@@ -29,8 +34,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             InitializeComponent();
 
-            var mainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
-            Regnskabsliste = mainViewModel.Regnskabsliste;
+            MainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
+            MainViewModel.Subscribe(this);
+
+            Regnskabsliste = MainViewModel.Regnskabsliste;
 
             SizeChanged += PageSizeChangedEventHandler;
         }
@@ -38,6 +45,21 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// MainViewModel, der skal benyttes til konfiguration.
+        /// </summary>
+        public IMainViewModel MainViewModel
+        {
+            get
+            {
+                return GetValue(MainViewModelProperty) as IMainViewModel;
+            }
+            private set
+            {
+                SetValue(MainViewModelProperty, value);
+            }
+        }
 
         /// <summary>
         /// ViewModel for regnskabet.
@@ -71,7 +93,102 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 
         #endregion
 
+        #region IDisposable members
+
+        /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~RegnskabPage()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Frigørelse af ressourcer.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Frigørelse af ressourcer.
+        /// </summary>
+        /// <param name="disposing">Angivelse af, om managed ressourcer også skal frigøres.</param>
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            MainViewModel.Unsubscribe(this);
+            if (disposing)
+            {
+            }
+            _disposed = true;
+        }
+
+        #endregion
+
         #region Methods
+
+        /// <summary>
+        /// Eventhandler, der rejses, når eventet til håndtering af exceptions publiceres.
+        /// </summary>
+        /// <param name="handleExceptionEventArgs">Argumenter fra eventet, der publiceres.</param>
+        public void OnEvent(IHandleExceptionEventArgs handleExceptionEventArgs)
+        {
+            if (handleExceptionEventArgs == null)
+            {
+                throw new ArgumentNullException("handleExceptionEventArgs");
+            }
+            // Håndtering af kommandoexception.
+            var commandException = handleExceptionEventArgs.Error as IntranetGuiCommandException;
+            if (commandException != null)
+            {
+                var commandContext = commandException.CommandContext as BogføringAddCommand;
+                if (commandContext == null)
+                {
+                    return;
+                }
+                try
+                {
+                    return;
+                }
+                finally
+                {
+                    handleExceptionEventArgs.IsHandled = true;
+                }
+            }
+            // Håndtering af valideringsexception.
+            var validationException = handleExceptionEventArgs.Error as IntranetGuiValidationException;
+            if (validationException == null)
+            {
+                return;
+            }
+            var validationContext = validationException.ValidationContext as IBogføringViewModel;
+            if (validationContext == null)
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(validationException.PropertyName) || string.IsNullOrEmpty(validationException.Message))
+            {
+                return;
+            }
+            try
+            {
+                switch (validationException.PropertyName)
+                {
+                    case "Dato":
+                        break;
+                }
+            }
+            finally
+            {
+                handleExceptionEventArgs.IsHandled = true;
+            }
+        }
 
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
