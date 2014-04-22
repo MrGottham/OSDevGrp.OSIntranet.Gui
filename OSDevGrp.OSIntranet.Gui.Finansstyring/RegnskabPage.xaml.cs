@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -19,9 +20,17 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Private variables
 
         private bool _disposed;
-        private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (ConfigurationUserControl), new PropertyMetadata(null));
+        private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
+        private static readonly DependencyProperty DatoValidationErrorProperty = DependencyProperty.Register("DatoValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+        private static readonly DependencyProperty BilagValidationErrorProperty = DependencyProperty.Register("BilagValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+        private static readonly DependencyProperty KontonummerValidationErrorProperty = DependencyProperty.Register("KontonummerValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+        private static readonly DependencyProperty TekstValidationErrorProperty = DependencyProperty.Register("TekstValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+        private static readonly DependencyProperty BudgetkontonummerValidationErrorProperty = DependencyProperty.Register("BudgetkontonummerValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+        private static readonly DependencyProperty DebitValidationErrorProperty = DependencyProperty.Register("DebitValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+        private static readonly DependencyProperty KreditValidationErrorProperty = DependencyProperty.Register("KreditValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+        private static readonly DependencyProperty AdressekontoValidationErrorProperty = DependencyProperty.Register("AdressekontoValidationError", typeof(string), typeof(RegnskabPage), new PropertyMetadata(string.Empty));
 
         #endregion
 
@@ -72,7 +81,32 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             private set
             {
+                if (Regnskab != null)
+                {
+                    if (Regnskab.Bogføring != null)
+                    {
+                        Regnskab.Bogføring.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                    }
+                    Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
+                }
+                DatoValidationError = string.Empty;
+                BilagValidationError = string.Empty;
+                KontonummerValidationError = string.Empty;
+                TekstValidationError = string.Empty;
+                BudgetkontonummerValidationError = string.Empty;
+                DebitValidationError = string.Empty;
+                KreditValidationError = string.Empty;
+                AdressekontoValidationError = string.Empty;
                 SetValue(RegnskabProperty, value);
+                if (Regnskab == null)
+                {
+                    return;
+                }
+                if (Regnskab.Bogføring != null)
+                {
+                    Regnskab.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
+                }
+                Regnskab.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
             }
         }
 
@@ -88,6 +122,166 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             private set
             {
                 SetValue(RegnskabslisteProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for bogføringsdato.
+        /// </summary>
+        public string DatoValidationError
+        {
+            get
+            {
+                return (string) GetValue(DatoValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(DatoValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(DatoValidationErrorProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for bilagsnummer.
+        /// </summary>
+        public string BilagValidationError
+        {
+            get
+            {
+                return (string) GetValue(BilagValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(BilagValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(BilagValidationErrorProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for kontonummer.
+        /// </summary>
+        public string KontonummerValidationError
+        {
+            get
+            {
+                return (string) GetValue(KontonummerValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(KontonummerValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(KontonummerValidationErrorProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for teksten til bogføringslinjen.
+        /// </summary>
+        public string TekstValidationError
+        {
+            get
+            {
+                return (string) GetValue(TekstValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(TekstValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(TekstValidationErrorProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for kontonummer på budgetkonto.
+        /// </summary>
+        public string BudgetkontonummerValidationError
+        {
+            get
+            {
+                return (string) GetValue(BudgetkontonummerValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(BudgetkontonummerValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(BudgetkontonummerValidationErrorProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for debitbeløb.
+        /// </summary>
+        public string DebitValidationError
+        {
+            get
+            {
+                return (string) GetValue(DebitValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(DebitValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(DebitValidationErrorProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for kreditbeløb.
+        /// </summary>
+        public string KreditValidationError
+        {
+            get
+            {
+                return (string) GetValue(KreditValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(KreditValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(KreditValidationErrorProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl for adressekonto.
+        /// </summary>
+        public string AdressekontoValidationError
+        {
+            get
+            {
+                return (string) GetValue(AdressekontoValidationErrorProperty);
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(AdressekontoValidationErrorProperty, string.Empty);
+                    return;
+                }
+                SetValue(AdressekontoValidationErrorProperty, value);
             }
         }
 
@@ -121,6 +315,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             if (_disposed)
             {
                 return;
+            }
+            if (Regnskab != null)
+            {
+                if (Regnskab.Bogføring != null)
+                {
+                    Regnskab.Bogføring.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                }
+                Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
             }
             MainViewModel.Unsubscribe(this);
             if (disposing)
@@ -181,6 +383,38 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 switch (validationException.PropertyName)
                 {
                     case "Dato":
+                    case "DatoAsText":
+                        DatoValidationError = validationException.Message;
+                        break;
+
+                    case "Bilag":
+                        BilagValidationError = validationException.Message;
+                        break;
+
+                    case "Kontonummer":
+                        KontonummerValidationError = validationException.Message;
+                        break;
+
+                    case "Tekst":
+                        TekstValidationError = validationException.Message;
+                        break;
+
+                    case "Budgetkontonummer":
+                        BudgetkontonummerValidationError = validationException.Message;
+                        break;
+
+                    case "Debit":
+                    case "DebitAsText":
+                        DebitValidationError = validationException.Message;
+                        break;
+
+                    case "Kredit":
+                    case "KreditAsText":
+                        KreditValidationError = validationException.Message;
+                        break;
+
+                    case "Adressekonto":
+                        AdressekontoValidationError = validationException.Message;
                         break;
                 }
             }
@@ -353,6 +587,91 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             Frame.Navigate(typeof (BudgetkontoplanPage), regnskabViewModel.Nummer);
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når en property ændres på ViewModel for regnskabet.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnRegnskabViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException();
+            }
+            var regnskabViewModel = sender as IRegnskabViewModel;
+            if (regnskabViewModel == null)
+            {
+                return;
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Bogføring":
+                    if (regnskabViewModel.Bogføring != null)
+                    {
+                        regnskabViewModel.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når en property ændres på ViewModel til bogføring.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnBogføringViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Dato":
+                case "DatoAsText":
+                    DatoValidationError = string.Empty;
+                    break;
+
+                case "Bilag":
+                    BilagValidationError = string.Empty;
+                    break;
+
+                case "Kontonummer":
+                    KontonummerValidationError = string.Empty;
+                    break;
+
+                case "Tekst":
+                    TekstValidationError = string.Empty;
+                    break;
+
+                case "Budgetkontonummer":
+                    BudgetkontonummerValidationError = string.Empty;
+                    break;
+
+                case "Debit":
+                case "DebitAsText":
+                    DebitValidationError = string.Empty;
+                    break;
+
+                case "Kredit":
+                case "KreditAsText":
+                    KreditValidationError = string.Empty;
+                    break;
+
+                case "Adressekonto":
+                    AdressekontoValidationError = string.Empty;
+                    break;
+            }
         }
 
         #endregion

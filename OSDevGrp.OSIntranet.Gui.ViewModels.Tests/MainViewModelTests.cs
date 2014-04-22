@@ -195,7 +195,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         public void TestAtOnEventKaldesForAlleHandleExceptionEventArgsSubscribers()
         {
             var fixture = new Fixture();
-            fixture.Customize<IEventSubscriber<IHandleExceptionEventArgs>>(e => e.FromFactory(() => MockRepository.GenerateMock<IEventSubscriber<IHandleExceptionEventArgs>>()));
+            fixture.Customize<IEventSubscriber<IHandleExceptionEventArgs>>(e => e.FromFactory(() =>
+                {
+                    var eventSubscriberMock = MockRepository.GenerateMock<IEventSubscriber<IHandleExceptionEventArgs>>();
+                    eventSubscriberMock.Expect(m => m.OnEvent(Arg<IHandleExceptionEventArgs>.Is.NotNull))
+                                       .WhenCalled(a =>
+                                           {
+                                               var handleExceptionEventArgs =
+                                                   (IHandleExceptionEventArgs) a.Arguments.ElementAt(0);
+                                               handleExceptionEventArgs.IsHandled = false;
+                                           });
+                    return eventSubscriberMock;
+                }));
 
             var mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);

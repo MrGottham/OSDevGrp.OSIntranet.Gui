@@ -1,15 +1,18 @@
 ﻿<Page
+    x:Name="RegnskabPageRoot"
     x:Class="OSDevGrp.OSIntranet.Gui.Finansstyring.RegnskabPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:OSDevGrp.OSIntranet.Gui.Finansstyring"
     xmlns:converters="using:OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters"
+    xmlns:behaviors="using:OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     
     <Page.Resources>
         <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConveter"/>
         <converters:CollectionItemToStringConverter x:Key="CollectionItemToStringConverter"/>
         <converters:DateTimeToShortDateConverter x:Key="DateTimeToShortDateConverter"/>
         <converters:ToUpperCaseConverter x:Key="ToUpperCaseConverter"/>
@@ -207,6 +210,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BogføringslinjerHeader}"/>
                         <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BookkeepingListViewStyle}" ItemsSource="{Binding Path=Bogføringslinjer}" HeaderTemplate="{StaticResource BookkeepingHeaderDefaultNavigationDataTemplate}" ItemTemplate="{StaticResource BookkeepingLineDefaultNavigationDataTemplate}" SelectionMode="None">
@@ -229,6 +233,22 @@
                                     </ItemsPanelTemplate>
                                 </GridView.ItemsPanel>
                             </GridView>
+                        </Grid>
+                        <Grid Grid.Row="3" Margin="0,10,0,0" DataContext="{Binding Path=Bogføring}" Visibility="{Binding ElementName=RegnskabPageRoot, Path=Regnskab.Bogføring, Converter={StaticResource ObjectToVisibilityConverter}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <ProgressBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,10" Visibility="{Binding Path=IsWorking, Converter={StaticResource BooleanToVisibilityConveter}}" IsIndeterminate="True" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DatoLabel}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BilagLabel}"/>
+                            <TextBox Grid.Row="2" Grid.Column="0" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=DatoAsTextIsReadOnly}" TextAlignment="Right" Text="{Binding Path=DatoAsText, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=RegnskabPageRoot, Path=DatoValidationError, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=BilagIsReadOnly}" MaxLength="{Binding Path=BilagMaxLength}" TextAlignment="Right" Text="########" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=RegnskabPageRoot, Path=BilagValidationError, Mode=TwoWay}"/>
                         </Grid>
                     </Grid>
                     <Grid Grid.Column="1" Margin="0,0,40,20">

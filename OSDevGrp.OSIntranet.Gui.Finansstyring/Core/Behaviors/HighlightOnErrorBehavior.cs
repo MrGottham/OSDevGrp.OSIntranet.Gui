@@ -10,7 +10,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
     {
         #region Public variables
 
-        public static DependencyProperty PropertyErrorProperty = DependencyProperty.RegisterAttached("PropertyError", typeof (string), typeof (HighlightOnErrorBehavior), new PropertyMetadata(string.Empty, OnPropertyErrorChanged));
+        public readonly static DependencyProperty PropertyErrorProperty = DependencyProperty.RegisterAttached("PropertyError", typeof (string), typeof (HighlightOnErrorBehavior), new PropertyMetadata(string.Empty, OnPropertyErrorChanged));
 
         #endregion
 
@@ -25,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
         {
             if (dependencyObject == null)
             {
-                return null;
+                return string.Empty;
             }
             return (string) dependencyObject.GetValue(PropertyErrorProperty);
         }
@@ -41,6 +41,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
             {
                 return;
             }
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                dependencyObject.SetValue(PropertyErrorProperty, string.Empty);
+                return;
+            }
             dependencyObject.SetValue(PropertyErrorProperty, value);
         }
 
@@ -51,6 +56,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
         /// <param name="eventArgs">Argumenter til eventet.</param>
         private static void OnPropertyErrorChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
+            var x = dependencyObject.GetValue(PropertyErrorProperty);
+            if (x == null)
+            {
+                
+            }
             if (eventArgs == null)
             {
                 return;
@@ -61,8 +71,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
                 return;
             }
             var errorMessage = eventArgs.NewValue as string;
-            var textBoxStyle = string.IsNullOrEmpty(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
-            textBox.Style = textBoxStyle;
+            errorMessage.ToCharArray();
+            //var textBoxStyle = string.IsNullOrEmpty(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
+            //textBox.Style = textBoxStyle;
         }
 
         #endregion

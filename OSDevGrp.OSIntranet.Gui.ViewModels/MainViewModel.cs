@@ -191,7 +191,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
                 }
                 try
                 {
-                    method.Invoke(eventSubscriber, new object[] { eventArgs });
+                    method.Invoke(eventSubscriber, new object[] {eventArgs});
+                    var handleExceptionEventArgs = eventArgs as IHandleExceptionEventArgs;
+                    if (handleExceptionEventArgs != null && handleExceptionEventArgs.IsHandled)
+                    {
+                        return;
+                    }
                 }
                 catch (TargetInvocationException ex)
                 {

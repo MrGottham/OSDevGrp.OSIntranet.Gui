@@ -392,13 +392,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (FaultException ex)
             {
-                throw new IntranetGuiRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
             }
             catch (Exception ex)
             {
-                throw new IntranetGuiRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
             }
         }
 
