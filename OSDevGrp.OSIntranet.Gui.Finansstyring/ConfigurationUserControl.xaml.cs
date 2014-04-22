@@ -110,12 +110,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(FinansstyringServiceUriValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(FinansstyringServiceUriValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, FinansstyringServiceUriValidationErrorProperty, value);
             }
         }
 
@@ -126,16 +121,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(AntalBogføringslinjerValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, AntalBogføringslinjerValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(AntalBogføringslinjerValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(AntalBogføringslinjerValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, AntalBogføringslinjerValidationErrorProperty, value);
             }
         }
 
@@ -146,16 +136,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(DageForNyhederValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, DageForNyhederValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(DageForNyhederValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(DageForNyhederValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, DageForNyhederValidationErrorProperty, value);
             }
         }
 
@@ -235,14 +220,26 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 switch (validationException.PropertyName)
                 {
                     case "FinansstyringServiceUri":
+                        if (string.IsNullOrWhiteSpace(FinansstyringServiceUriValidationError) == false)
+                        {
+                            FinansstyringServiceUriValidationError = string.Empty;
+                        }
                         FinansstyringServiceUriValidationError = validationException.Message;
                         break;
 
                     case "AntalBogføringslinjer":
+                        if (string.IsNullOrWhiteSpace(AntalBogføringslinjerValidationError) == false)
+                        {
+                            AntalBogføringslinjerValidationError = string.Empty;
+                        }
                         AntalBogføringslinjerValidationError = validationException.Message;
                         break;
 
                     case "DageForNyheder":
+                        if (string.IsNullOrWhiteSpace(DageForNyhederValidationError) == false)
+                        {
+                            DageForNyhederValidationError = string.Empty;
+                        }
                         DageForNyhederValidationError = validationException.Message;
                         break;
                 }

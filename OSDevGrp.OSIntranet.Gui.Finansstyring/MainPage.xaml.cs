@@ -240,7 +240,24 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// <param name="validationError"></param>
         public static void SetValidationErrorOnDependencyProperty(DependencyObject dependencyObject, DependencyProperty dependencyProperty, string validationError)
         {
-            
+            if (dependencyObject == null)
+            {
+                throw new ArgumentNullException("dependencyObject");
+            }
+            if (dependencyProperty == null)
+            {
+                throw new ArgumentNullException("dependencyProperty");
+            }
+            var newValue = validationError;
+            if (string.IsNullOrWhiteSpace(newValue))
+            {
+                newValue = string.Empty;
+            }
+            if (newValue == GetValidationErrorFromDependencyProperty(dependencyObject, dependencyProperty))
+            {
+                return;
+            }
+            dependencyObject.SetValue(dependencyProperty, newValue);
         }
 
         #endregion

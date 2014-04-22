@@ -146,20 +146,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(DatoValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, DatoValidationErrorProperty);
             }
             private set
             {
-                var setValue = value;
-                if (string.IsNullOrWhiteSpace(setValue))
-                {
-                    setValue = string.Empty;
-                }
-                if (DatoValidationError == setValue)
-                {
-                    return;
-                }
-                SetValue(DatoValidationErrorProperty, setValue);
+                MainPage.SetValidationErrorOnDependencyProperty(this, DatoValidationErrorProperty, value);
             }
         }
 
@@ -170,16 +161,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(BilagValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, BilagValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(BilagValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(BilagValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, BilagValidationErrorProperty, value);
             }
         }
 
@@ -190,16 +176,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(KontonummerValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, KontonummerValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(KontonummerValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(KontonummerValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, KontonummerValidationErrorProperty, value);
             }
         }
 
@@ -210,16 +191,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(TekstValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, TekstValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(TekstValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(TekstValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, TekstValidationErrorProperty, value);
             }
         }
 
@@ -230,16 +206,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(BudgetkontonummerValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, BudgetkontonummerValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(BudgetkontonummerValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(BudgetkontonummerValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, BudgetkontonummerValidationErrorProperty, value);
             }
         }
 
@@ -250,16 +221,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(DebitValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, DebitValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(DebitValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(DebitValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, DebitValidationErrorProperty, value);
             }
         }
 
@@ -270,16 +236,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(KreditValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, KreditValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(KreditValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(KreditValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, KreditValidationErrorProperty, value);
             }
         }
 
@@ -290,16 +251,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(AdressekontoValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, AdressekontoValidationErrorProperty);
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    SetValue(AdressekontoValidationErrorProperty, string.Empty);
-                    return;
-                }
-                SetValue(AdressekontoValidationErrorProperty, value);
+                MainPage.SetValidationErrorOnDependencyProperty(this, AdressekontoValidationErrorProperty, value);
             }
         }
 
@@ -415,32 +371,60 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                         break;
 
                     case "Bilag":
+                        if (string.IsNullOrWhiteSpace(BilagValidationError) == false)
+                        {
+                            BilagValidationError = string.Empty;
+                        }
                         BilagValidationError = validationException.Message;
                         break;
 
                     case "Kontonummer":
+                        if (string.IsNullOrWhiteSpace(KontonummerValidationError) == false)
+                        {
+                            KontonummerValidationError = string.Empty;
+                        }
                         KontonummerValidationError = validationException.Message;
                         break;
 
                     case "Tekst":
+                        if (string.IsNullOrWhiteSpace(TekstValidationError) == false)
+                        {
+                            TekstValidationError = string.Empty;
+                        }
                         TekstValidationError = validationException.Message;
                         break;
 
                     case "Budgetkontonummer":
+                        if (string.IsNullOrWhiteSpace(BudgetkontonummerValidationError) == false)
+                        {
+                            BudgetkontonummerValidationError = string.Empty;
+                        }
                         BudgetkontonummerValidationError = validationException.Message;
                         break;
 
                     case "Debit":
                     case "DebitAsText":
+                        if (string.IsNullOrWhiteSpace(DebitValidationError) == false)
+                        {
+                            DebitValidationError = string.Empty;
+                        }
                         DebitValidationError = validationException.Message;
                         break;
 
                     case "Kredit":
                     case "KreditAsText":
+                        if (string.IsNullOrWhiteSpace(KreditValidationError) == false)
+                        {
+                            KreditValidationError = string.Empty;
+                        }
                         KreditValidationError = validationException.Message;
                         break;
 
                     case "Adressekonto":
+                        if (string.IsNullOrWhiteSpace(AdressekontoValidationError) == false)
+                        {
+                            AdressekontoValidationError = string.Empty;
+                        }
                         AdressekontoValidationError = validationException.Message;
                         break;
                 }
@@ -673,6 +657,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 case "Dato":
                 case "DatoAsText":
+                    if (string.IsNullOrWhiteSpace(""))
+                    {
+                        break;
+                    }
                     DatoValidationError = string.Empty;
                     break;
 
