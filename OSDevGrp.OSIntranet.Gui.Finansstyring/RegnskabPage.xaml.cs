@@ -134,7 +134,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(DatoValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -154,7 +154,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(BilagValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -174,7 +174,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(KontonummerValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -194,7 +194,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(TekstValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -214,7 +214,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(BudgetkontonummerValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -234,7 +234,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(DebitValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -254,7 +254,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(KreditValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -274,7 +274,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return (string) GetValue(AdressekontoValidationErrorProperty);
             }
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {

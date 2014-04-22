@@ -56,11 +56,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
         /// <param name="eventArgs">Argumenter til eventet.</param>
         private static void OnPropertyErrorChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
-            var x = dependencyObject.GetValue(PropertyErrorProperty);
-            if (x == null)
-            {
-                
-            }
             if (eventArgs == null)
             {
                 return;
@@ -71,9 +66,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
                 return;
             }
             var errorMessage = eventArgs.NewValue as string;
-            errorMessage.ToCharArray();
-            //var textBoxStyle = string.IsNullOrEmpty(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
-            //textBox.Style = textBoxStyle;
+            var textBoxStyle = string.IsNullOrWhiteSpace(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
+            textBox.Style = textBoxStyle;
         }
 
         #endregion

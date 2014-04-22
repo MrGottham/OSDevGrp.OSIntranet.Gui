@@ -248,7 +248,7 @@
                             <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DatoLabel}"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BilagLabel}"/>
                             <TextBox Grid.Row="2" Grid.Column="0" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=DatoAsTextIsReadOnly}" TextAlignment="Right" Text="{Binding Path=DatoAsText, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=RegnskabPageRoot, Path=DatoValidationError, Mode=TwoWay}"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=BilagIsReadOnly}" MaxLength="{Binding Path=BilagMaxLength}" TextAlignment="Right" Text="########" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=RegnskabPageRoot, Path=BilagValidationError, Mode=TwoWay}"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=BilagIsReadOnly}" MaxLength="{Binding Path=BilagMaxLength}" TextAlignment="Right" Text="{Binding Path=Bilag, Mode=TwoWay, Converter={StaticResource ToUpperCaseConverter}}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=RegnskabPageRoot, Path=BilagValidationError, Mode=TwoWay}"/>
                         </Grid>
                     </Grid>
                     <Grid Grid.Column="1" Margin="0,0,40,20">
