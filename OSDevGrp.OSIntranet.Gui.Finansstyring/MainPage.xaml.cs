@@ -213,6 +213,36 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             backgoundTaskBuilder.Register();
         }
 
+        /// <summary>
+        /// Henter og returnerer valideringsfejl, der er sat på en given dependency property.
+        /// </summary>
+        /// <param name="dependencyObject">Objekt, som ejer dependency property.</param>
+        /// <param name="dependencyProperty">Dependency property, hvorfra valideringsfejl skal hentes.</param>
+        /// <returns>Valideringsfejl.</returns>
+        public static string GetValidationErrorFromDependencyProperty(DependencyObject dependencyObject, DependencyProperty dependencyProperty)
+        {
+            if (dependencyObject == null)
+            {
+                throw new ArgumentNullException("dependencyObject");
+            }
+            if (dependencyProperty == null)
+            {
+                throw new ArgumentNullException("dependencyProperty");
+            }
+            return (string) dependencyObject.GetValue(dependencyProperty);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dependencyObject"></param>
+        /// <param name="dependencyProperty"></param>
+        /// <param name="validationError"></param>
+        public static void SetValidationErrorOnDependencyProperty(DependencyObject dependencyObject, DependencyProperty dependencyProperty, string validationError)
+        {
+            
+        }
+
         #endregion
     }
 }

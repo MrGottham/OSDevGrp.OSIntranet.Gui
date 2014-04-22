@@ -106,7 +106,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         {
             get
             {
-                return (string) GetValue(FinansstyringServiceUriValidationErrorProperty);
+                return MainPage.GetValidationErrorFromDependencyProperty(this, FinansstyringServiceUriValidationErrorProperty);
             }
             private set
             {
