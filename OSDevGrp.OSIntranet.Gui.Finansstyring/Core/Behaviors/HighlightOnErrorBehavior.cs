@@ -60,6 +60,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
             {
                 return;
             }
+            if (eventArgs.NewValue == eventArgs.OldValue)
+            {
+                return;
+            }
             var textBox = dependencyObject as TextBox;
             if (textBox == null)
             {
@@ -67,7 +71,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
             }
             var errorMessage = eventArgs.NewValue as string;
             var textBoxStyle = string.IsNullOrWhiteSpace(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
+            if (textBoxStyle == textBox.Style)
+            {
+                return;
+            }
             textBox.Style = textBoxStyle;
+            textBox.UpdateLayout();
         }
 
         #endregion

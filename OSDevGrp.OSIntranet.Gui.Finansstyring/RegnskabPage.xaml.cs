@@ -19,6 +19,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     {
         #region Private variables
 
+        private bool _regnskabPropertyChangedIsSet;
+        private bool _bogføringPropertyChangedIsSet;
+        private IBogføringViewModel _lastBogføringViewModel;
         private bool _disposed;
         private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
@@ -83,11 +86,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 if (Regnskab != null)
                 {
-                    if (Regnskab.Bogføring != null)
+                    if (Regnskab.Bogføring != null && _bogføringPropertyChangedIsSet)
                     {
                         Regnskab.Bogføring.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                        _bogføringPropertyChangedIsSet = false;
                     }
-                    Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
+                    if (_regnskabPropertyChangedIsSet)
+                    {
+                        Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
+                        _regnskabPropertyChangedIsSet = false;
+                    }
                 }
                 DatoValidationError = string.Empty;
                 BilagValidationError = string.Empty;
@@ -102,11 +110,17 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     return;
                 }
-                if (Regnskab.Bogføring != null)
+                if (Regnskab.Bogføring != null && _bogføringPropertyChangedIsSet == false)
                 {
                     Regnskab.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
+                    _bogføringPropertyChangedIsSet = true;
+                }
+                if (_regnskabPropertyChangedIsSet)
+                {
+                    return;
                 }
                 Regnskab.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
+                _regnskabPropertyChangedIsSet = true;
             }
         }
 
@@ -136,12 +150,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             private set
             {
-                if (string.IsNullOrWhiteSpace(value))
+                var setValue = value;
+                if (string.IsNullOrWhiteSpace(setValue))
                 {
-                    SetValue(DatoValidationErrorProperty, string.Empty);
+                    setValue = string.Empty;
+                }
+                if (DatoValidationError == setValue)
+                {
                     return;
                 }
-                SetValue(DatoValidationErrorProperty, value);
+                SetValue(DatoValidationErrorProperty, setValue);
             }
         }
 
@@ -318,11 +336,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             if (Regnskab != null)
             {
-                if (Regnskab.Bogføring != null)
+                if (Regnskab.Bogføring != null && _bogføringPropertyChangedIsSet)
                 {
                     Regnskab.Bogføring.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                    _bogføringPropertyChangedIsSet = false;
                 }
-                Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
+                if (_regnskabPropertyChangedIsSet)
+                {
+                    Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
+                    _regnskabPropertyChangedIsSet = false;
+                }
             }
             MainViewModel.Unsubscribe(this);
             if (disposing)
@@ -384,6 +407,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     case "Dato":
                     case "DatoAsText":
+                        if (string.IsNullOrWhiteSpace(DatoValidationError) == false)
+                        {
+                            DatoValidationError = string.Empty;
+                        }
                         DatoValidationError = validationException.Message;
                         break;
 
@@ -612,9 +639,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             switch (eventArgs.PropertyName)
             {
                 case "Bogføring":
-                    if (regnskabViewModel.Bogføring != null)
+                    if (_lastBogføringViewModel != null && _lastBogføringViewModel != regnskabViewModel.Bogføring && _bogføringPropertyChangedIsSet)
+                    {
+                        _lastBogføringViewModel.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                        _bogføringPropertyChangedIsSet = false;
+                    }
+                    _lastBogføringViewModel = regnskabViewModel.Bogføring;
+                    if (regnskabViewModel.Bogføring != null && _bogføringPropertyChangedIsSet == false)
                     {
                         regnskabViewModel.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
+                        _bogføringPropertyChangedIsSet = true;
                     }
                     break;
             }

@@ -17,6 +17,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
     {
         #region Private variables
 
+        private bool _finansstyringKonfigurationPropertyChangedIsSet;
         private bool _disposed;
         private static readonly DependencyProperty ConfigurationProviderProperty = DependencyProperty.Register("ConfigurationProvider", typeof (ConfigurationProvider), typeof (ConfigurationUserControl), new PropertyMetadata(null));
         private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (ConfigurationUserControl), new PropertyMetadata(null));
@@ -75,9 +76,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 if (MainViewModel != null)
                 {
-                    if (MainViewModel.FinansstyringKonfiguration != null)
+                    if (MainViewModel.FinansstyringKonfiguration != null && _finansstyringKonfigurationPropertyChangedIsSet)
                     {
                         MainViewModel.FinansstyringKonfiguration.PropertyChanged -= FinansstyringKonfigurationPropertyChangedEventHandler;
+                        _finansstyringKonfigurationPropertyChangedIsSet = false;
                     }
                 }
                 SetValue(MainViewModelProperty, value);
@@ -88,11 +90,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 FinansstyringServiceUriValidationError = string.Empty;
                 AntalBogføringslinjerValidationError = string.Empty;
                 DageForNyhederValidationError = string.Empty;
-                if (MainViewModel.FinansstyringKonfiguration == null)
+                if (MainViewModel.FinansstyringKonfiguration == null || _finansstyringKonfigurationPropertyChangedIsSet)
                 {
                     return;
                 }
                 MainViewModel.FinansstyringKonfiguration.PropertyChanged += FinansstyringKonfigurationPropertyChangedEventHandler;
+                _finansstyringKonfigurationPropertyChangedIsSet = true;
             }
         }
 
@@ -187,9 +190,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            if (MainViewModel.FinansstyringKonfiguration != null)
+            if (MainViewModel.FinansstyringKonfiguration != null && _finansstyringKonfigurationPropertyChangedIsSet)
             {
                 MainViewModel.FinansstyringKonfiguration.PropertyChanged -= FinansstyringKonfigurationPropertyChangedEventHandler;
+                _finansstyringKonfigurationPropertyChangedIsSet = false;
             }
             MainViewModel.Unsubscribe(this);
             if (disposing)
