@@ -35,7 +35,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,5,0,0">
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringKonfiguration.FinansstyringServiceUriLabel}"/>
-            <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Text="{Binding Path=FinansstyringKonfiguration.FinansstyringServiceUri, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=ConfigurationUserControlRoot, Path=FinansstyringServiceUriValidationError, Mode=TwoWay}"/>
+            <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Text="{Binding Path=FinansstyringKonfiguration.FinansstyringServiceUri, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding ElementName=ConfigurationUserControlRoot, Path=FinansstyringServiceUriValidationError}"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="0,5,0,0">
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringKonfiguration.AntalBogføringslinjerLabel}"/>
