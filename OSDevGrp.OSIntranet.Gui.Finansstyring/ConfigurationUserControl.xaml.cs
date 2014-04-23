@@ -220,26 +220,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 switch (validationException.PropertyName)
                 {
                     case "FinansstyringServiceUri":
-                        if (string.IsNullOrWhiteSpace(FinansstyringServiceUriValidationError) == false)
-                        {
-                            FinansstyringServiceUriValidationError = string.Empty;
-                        }
                         FinansstyringServiceUriValidationError = validationException.Message;
                         break;
 
                     case "AntalBogføringslinjer":
-                        if (string.IsNullOrWhiteSpace(AntalBogføringslinjerValidationError) == false)
-                        {
-                            AntalBogføringslinjerValidationError = string.Empty;
-                        }
                         AntalBogføringslinjerValidationError = validationException.Message;
                         break;
 
                     case "DageForNyheder":
-                        if (string.IsNullOrWhiteSpace(DageForNyhederValidationError) == false)
-                        {
-                            DageForNyhederValidationError = string.Empty;
-                        }
                         DageForNyhederValidationError = validationException.Message;
                         break;
                 }

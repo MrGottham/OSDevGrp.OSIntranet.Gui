@@ -363,68 +363,36 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     case "Dato":
                     case "DatoAsText":
-                        if (string.IsNullOrWhiteSpace(DatoValidationError) == false)
-                        {
-                            DatoValidationError = string.Empty;
-                        }
                         DatoValidationError = validationException.Message;
                         break;
 
                     case "Bilag":
-                        if (string.IsNullOrWhiteSpace(BilagValidationError) == false)
-                        {
-                            BilagValidationError = string.Empty;
-                        }
                         BilagValidationError = validationException.Message;
                         break;
 
                     case "Kontonummer":
-                        if (string.IsNullOrWhiteSpace(KontonummerValidationError) == false)
-                        {
-                            KontonummerValidationError = string.Empty;
-                        }
                         KontonummerValidationError = validationException.Message;
                         break;
 
                     case "Tekst":
-                        if (string.IsNullOrWhiteSpace(TekstValidationError) == false)
-                        {
-                            TekstValidationError = string.Empty;
-                        }
                         TekstValidationError = validationException.Message;
                         break;
 
                     case "Budgetkontonummer":
-                        if (string.IsNullOrWhiteSpace(BudgetkontonummerValidationError) == false)
-                        {
-                            BudgetkontonummerValidationError = string.Empty;
-                        }
                         BudgetkontonummerValidationError = validationException.Message;
                         break;
 
                     case "Debit":
                     case "DebitAsText":
-                        if (string.IsNullOrWhiteSpace(DebitValidationError) == false)
-                        {
-                            DebitValidationError = string.Empty;
-                        }
                         DebitValidationError = validationException.Message;
                         break;
 
                     case "Kredit":
                     case "KreditAsText":
-                        if (string.IsNullOrWhiteSpace(KreditValidationError) == false)
-                        {
-                            KreditValidationError = string.Empty;
-                        }
                         KreditValidationError = validationException.Message;
                         break;
 
                     case "Adressekonto":
-                        if (string.IsNullOrWhiteSpace(AdressekontoValidationError) == false)
-                        {
-                            AdressekontoValidationError = string.Empty;
-                        }
                         AdressekontoValidationError = validationException.Message;
                         break;
                 }
@@ -657,10 +625,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 case "Dato":
                 case "DatoAsText":
-                    if (string.IsNullOrWhiteSpace(""))
-                    {
-                        break;
-                    }
                     DatoValidationError = string.Empty;
                     break;
 

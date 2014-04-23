@@ -70,6 +70,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
                 return;
             }
             var errorMessage = eventArgs.NewValue as string;
+            if (string.IsNullOrWhiteSpace(errorMessage))
+            {
+                dependencyObject.ClearValue(FrameworkElement.StyleProperty);
+                return;
+            }
+            dependencyObject.SetValue(FrameworkElement.StyleProperty, Application.Current.Resources["RedBorderedTextBoxStyle"]);
+
+            /*
+
             var textBoxStyle = string.IsNullOrWhiteSpace(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
             if (textBoxStyle == textBox.Style)
             {
@@ -77,6 +86,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
             }
             textBox.Style = textBoxStyle;
             textBox.UpdateLayout();
+            */
         }
 
         #endregion

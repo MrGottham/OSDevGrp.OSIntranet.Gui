@@ -253,8 +253,13 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 newValue = string.Empty;
             }
-            if (newValue == GetValidationErrorFromDependencyProperty(dependencyObject, dependencyProperty))
+            if (string.Compare(newValue, GetValidationErrorFromDependencyProperty(dependencyObject, dependencyProperty), StringComparison.Ordinal) == 0)
             {
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(newValue))
+            {
+                dependencyObject.ClearValue(dependencyProperty);
                 return;
             }
             dependencyObject.SetValue(dependencyProperty, newValue);
