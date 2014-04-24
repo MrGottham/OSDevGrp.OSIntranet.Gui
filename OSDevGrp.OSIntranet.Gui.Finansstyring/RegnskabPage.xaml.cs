@@ -26,8 +26,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
-        private static readonly DependencyProperty DatoValidationErrorProperty = DependencyProperty.Register("DatoValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
-        private static readonly DependencyProperty BilagValidationErrorProperty = DependencyProperty.Register("BilagValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
+
         private static readonly DependencyProperty KontonummerValidationErrorProperty = DependencyProperty.Register("KontonummerValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
         private static readonly DependencyProperty TekstValidationErrorProperty = DependencyProperty.Register("TekstValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
         private static readonly DependencyProperty BudgetkontonummerValidationErrorProperty = DependencyProperty.Register("BudgetkontonummerValidationError", typeof (string), typeof (RegnskabPage), new PropertyMetadata(string.Empty));
@@ -97,8 +96,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                         _regnskabPropertyChangedIsSet = false;
                     }
                 }
-                DatoValidationError = string.Empty;
-                BilagValidationError = string.Empty;
                 KontonummerValidationError = string.Empty;
                 TekstValidationError = string.Empty;
                 BudgetkontonummerValidationError = string.Empty;
@@ -136,36 +133,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             private set
             {
                 SetValue(RegnskabslisteProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// Valideringsfejl for bogføringsdato.
-        /// </summary>
-        public string DatoValidationError
-        {
-            get
-            {
-                return MainPage.GetValidationErrorFromDependencyProperty(this, DatoValidationErrorProperty);
-            }
-            private set
-            {
-                MainPage.SetValidationErrorOnDependencyProperty(this, DatoValidationErrorProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// Valideringsfejl for bilagsnummer.
-        /// </summary>
-        public string BilagValidationError
-        {
-            get
-            {
-                return MainPage.GetValidationErrorFromDependencyProperty(this, BilagValidationErrorProperty);
-            }
-            private set
-            {
-                MainPage.SetValidationErrorOnDependencyProperty(this, BilagValidationErrorProperty, value);
             }
         }
 
@@ -363,11 +330,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     case "Dato":
                     case "DatoAsText":
-                        DatoValidationError = validationException.Message;
                         break;
 
                     case "Bilag":
-                        BilagValidationError = validationException.Message;
                         break;
 
                     case "Kontonummer":
@@ -625,11 +590,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 case "Dato":
                 case "DatoAsText":
-                    DatoValidationError = string.Empty;
                     break;
 
                 case "Bilag":
-                    BilagValidationError = string.Empty;
                     break;
 
                 case "Kontonummer":

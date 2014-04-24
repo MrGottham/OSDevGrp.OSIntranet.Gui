@@ -76,6 +76,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.DatoAsText, Is.Not.Null);
             Assert.That(bogføringViewModel.DatoAsText, Is.Not.Empty);
             Assert.That(bogføringViewModel.DatoAsText, Is.EqualTo(bogføringslinjeModelMock.Dato.ToShortDateString()));
+            Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.DatoValidationError, Is.Empty);
             Assert.That(bogføringViewModel.DatoAsTextIsReadOnly, Is.EqualTo(false));
             Assert.That(bogføringViewModel.DatoLabel, Is.Not.Null);
             Assert.That(bogføringViewModel.DatoLabel, Is.Not.Empty);
@@ -83,6 +85,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.Bilag, Is.Not.Null);
             Assert.That(bogføringViewModel.Bilag, Is.Not.Empty);
             Assert.That(bogføringViewModel.Bilag, Is.EqualTo(bogføringslinjeModelMock.Bilag));
+            Assert.That(bogføringViewModel.BilagValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.BilagValidationError, Is.Empty);
             Assert.That(bogføringViewModel.BilagMaxLength, Is.EqualTo(FieldInformations.BilagFieldLength));
             Assert.That(bogføringViewModel.BilagIsReadOnly, Is.False);
             Assert.That(bogføringViewModel.BilagLabel, Is.Not.Null);
@@ -313,6 +317,84 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Dato = Arg<DateTime>.Is.Equal(DateTime.Parse(newValue, CultureInfo.CurrentUICulture)));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til DatoAsText opdaterer DatoValidationError ved valideringsfejl.
+        /// </summary>
+        [TestCase(null, "ValueIsRequiered")]
+        [TestCase("", "ValueIsRequiered")]
+        [TestCase(" ", "ValueIsRequiered")]
+        [TestCase("XYZ", "ValueIsNotDate")]
+        [TestCase("ZYX", "ValueIsNotDate")]
+        [TestCase("2014-31-01", "ValueIsNotDate")]
+        [TestCase("2014-01-32", "ValueIsNotDate")]
+        [TestCase("2050-01-01", "DateGreaterThan")]
+        [TestCase("2050-01-31", "DateGreaterThan")]
+        [TestCase("2050-12-01", "DateGreaterThan")]
+        [TestCase("2050-12-31", "DateGreaterThan")]
+        public void TestAtDatoAsTextSetterOpdatererDatoValidationErrorVedIntranetGuiValiadtionException(string illegalValue, string validationErrorText)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.DatoValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "DatoValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            bogføringViewModel.DatoAsText = illegalValue;
+            Assert.That(eventCalled, Is.True);
+
+            var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
+            switch (text)
+            {
+                case Text.DateGreaterThan:
+                    Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Null);
+                    Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Empty);
+                    Assert.That(bogføringViewModel.DatoValidationError, Is.EqualTo(Resource.GetText(text, DateTime.Now.ToLongDateString())));
+                    break;
+
+                default:
+                    Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Null);
+                    Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Empty);
+                    Assert.That(bogføringViewModel.DatoValidationError, Is.EqualTo(Resource.GetText(text)));
+                    break;
+            }
+
+            bogføringslinjeModelMock.AssertWasNotCalled(m => m.Dato = Arg<DateTime>.Is.Anything);
         }
 
         /// <summary>
@@ -749,6 +831,67 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Bilag = Arg<string>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Bilag opdaterer BilagValidationError ved valideringsfejl.
+        /// </summary>
+        [Test]
+        public void TestAtBilagSetterOpdatererBilagValidationErrorVedIntranetGuiValiadtionException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Bilag = Arg<string>.Is.Anything)
+                                    .Throw(fixture.Create<ArgumentNullException>())
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.BilagValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.BilagValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "BilagValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            var newValue = fixture.Create<string>();
+            
+            Assert.That(eventCalled, Is.False);
+            bogføringViewModel.Bilag = newValue;
+            Assert.That(eventCalled, Is.True);
+
+            Assert.That(bogføringViewModel.BilagValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.BilagValidationError, Is.Not.Empty);
+            Assert.That(bogføringViewModel.BilagValidationError, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAnnex)));
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Bilag = Arg<string>.Is.Equal(newValue));
         }
 
         /// <summary>
@@ -3530,6 +3673,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         [TestCase("Dato", "Dato")]
         [TestCase("Dato", "DatoAsText")]
+        [TestCase("Dato", "DatoValidationError")]
         [TestCase("Dato", "Kontonavn")]
         [TestCase("Dato", "KontoSaldo")]
         [TestCase("Dato", "KontoSaldoAsText")]
@@ -3544,6 +3688,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Dato", "AdressekontoSaldo")]
         [TestCase("Dato", "AdressekontoSaldoAsText")]
         [TestCase("Bilag", "Bilag")]
+        [TestCase("Bilag", "BilagValidationError")]
         [TestCase("Kontonummer", "Kontonummer")]
         [TestCase("Kontonummer", "Kontonavn")]
         [TestCase("Kontonummer", "KontoSaldo")]

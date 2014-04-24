@@ -36,6 +36,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Valideringsfejl ved angivelse af bogføringstidspunkt.
+        /// </summary>
+        string DatoValidationError
+        {
+            get;
+        }
+
+        /// <summary>
         /// Angivelse af, om tekstangivelsen for bogføringstidspunktet kan redigeres.
         /// </summary>
         bool DatoAsTextIsReadOnly
@@ -58,6 +66,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         { 
             get; 
             set; 
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved bilagsnummer.
+        /// </summary>
+        string BilagValidationError
+        {
+            get;
         }
 
         /// <summary>

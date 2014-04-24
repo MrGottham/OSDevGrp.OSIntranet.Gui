@@ -27,6 +27,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
+        private string _datoValidationError;
+        private string _bilagValidationError;
         private ICommand _bogførCommand;
         private IKontoViewModel _kontoViewModel;
         private Task<IKontoViewModel> _kontoReaderTask;
@@ -122,6 +124,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookkeepingDate), this, "DatoAsText", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    DatoValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -130,6 +137,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DatoAsText", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af bogføringstidspunkt.
+        /// </summary>
+        public virtual string DatoValidationError
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_datoValidationError) ? string.Empty : _datoValidationError;
+            }
+            private set
+            {
+                if (string.IsNullOrEmpty(value) == false && _datoValidationError == value)
+                {
+                    return;
+                }
+                _datoValidationError = value;
+                RaisePropertyChanged("DatoValidationError");
             }
         }
 
@@ -187,6 +214,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAnnex), this, "Bilag", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    BilagValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -195,6 +227,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Bilag", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved bilagsnummer.
+        /// </summary>
+        public virtual string BilagValidationError
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_bilagValidationError) ? string.Empty : _bilagValidationError;
+            }
+            private set
+            {
+                if (string.IsNullOrEmpty(value) == false && _bilagValidationError == value)
+                {
+                    return;
+                }
+                _bilagValidationError = value;
+                RaisePropertyChanged("BilagValidationError");
             }
         }
 
@@ -1211,10 +1263,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             switch (eventArgs.PropertyName)
             {
                 case "Dato":
+                    DatoValidationError = null;
                     RaisePropertyChanged("DatoAsText");
                     KontoViewModelRefresh();
                     BudgetkontoViewModelRefresh();
                     AdressekontoViewModelCollectionRefresh();
+                    break;
+
+                case "Bilag":
+                    BilagValidationError = null;
                     break;
 
                 case "Kontonummer":
