@@ -17,6 +17,7 @@
         <converters:DateTimeToShortDateConverter x:Key="DateTimeToShortDateConverter"/>
         <converters:ToUpperCaseConverter x:Key="ToUpperCaseConverter"/>
         <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+        <converters:ReverseBooleanConverter x:Key="ReverseBooleanConverter"/>
         <DataTemplate x:Key="BookkeepingHeaderDefaultNavigationDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -62,9 +63,15 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
                 <TextBlock Grid.Column="1" Margin="10,10,20,10" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=Information}"/>
+                <HyperlinkButton Grid.Column="2" Margin="0,5,5,0" Style="{StaticResource TextSecondaryButtonStyle}" Command="{Binding Path=RemoveCommand}" CommandParameter="{Binding}">
+                    <HyperlinkButton.Content>
+                        <TextBlock Style="{StaticResource BodyTextStyle}" Text="x"/>
+                    </HyperlinkButton.Content>
+                </HyperlinkButton>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="KontoViewModelDefaultNavigationDataTemplate">
@@ -239,16 +246,71 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="110"/>
-                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="110"/>
                             </Grid.ColumnDefinitions>
-                            <ProgressBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,10" Visibility="{Binding Path=IsWorking, Converter={StaticResource BooleanToVisibilityConveter}}" IsIndeterminate="True" VerticalAlignment="Center"/>
+                            <ProgressBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,0,0,10" Visibility="{Binding Path=IsWorking, Converter={StaticResource BooleanToVisibilityConveter}}" IsIndeterminate="True" VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DatoLabel}"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BilagLabel}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KontonummerLabel}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="3" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=TekstLabel}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="4" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontonummerLabel}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="5" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DebitLabel}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="6" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KreditLabel}"/>
                             <TextBox Grid.Row="2" Grid.Column="0" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=DatoAsTextIsReadOnly}" TextAlignment="Right" Text="{Binding Path=DatoAsText, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=DatoValidationError}"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=BilagIsReadOnly}" MaxLength="{Binding Path=BilagMaxLength}" TextAlignment="Right" Text="{Binding Path=Bilag, Mode=TwoWay, Converter={StaticResource ToUpperCaseConverter}}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=BilagValidationError}" TextChanged="UpperCaseTextBoxTextChangedEventHandler"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=KontonummerIsReadOnly}" MaxLength="{Binding Path=KontonummerMaxLength}" TextAlignment="Right" Text="{Binding Path=Kontonummer, Mode=TwoWay, Converter={StaticResource ToUpperCaseConverter}}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=KontonummerValidationError}" TextChanged="UpperCaseTextBoxTextChangedEventHandler"/>
+                            <TextBox Grid.Row="2" Grid.Column="3" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=TekstIsReadOnly}" MaxLength="{Binding Path=TekstMaxLength}" TextAlignment="Left" Text="{Binding Path=Tekst, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=TekstValidationError}"/>
+                            <TextBox Grid.Row="2" Grid.Column="4" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=BudgetkontonummerIsReadOnly}" MaxLength="{Binding Path=BudgetkontonummerMaxLength}" TextAlignment="Right" Text="{Binding Path=Budgetkontonummer, Mode=TwoWay, Converter={StaticResource ToUpperCaseConverter}}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=BudgetkontonummerValidationError}" TextChanged="UpperCaseTextBoxTextChangedEventHandler"/>
+                            <TextBox Grid.Row="2" Grid.Column="5" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=DebitIsReadOnly}" MaxLength="{Binding Path=DebitMaxLength}" TextAlignment="Right" Text="{Binding Path=DebitAsText, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=DebitValidationError}"/>
+                            <TextBox Grid.Row="2" Grid.Column="6" Margin="0,0,10,0" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=KreditIsReadOnly}" MaxLength="{Binding Path=KreditMaxLength}" TextAlignment="Right" Text="{Binding Path=KreditAsText, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=KreditValidationError}"/>
+                            <Grid Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="6" Margin="0,10,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=KontonavnLabel}"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Left" Text="{Binding Path=Kontonavn}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=KontoSaldoLabel}"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=KontoSaldoAsText}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="4" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=KontoDisponibelLabel}"/>
+                                <TextBox Grid.Row="0" Grid.Column="5" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=KontoDisponibelAsText}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetkontonavnLabel}"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Left" Text="{Binding Path=Budgetkontonavn}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetkontoBogførtLabel}"/>
+                                <TextBox Grid.Row="1" Grid.Column="3" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=BudgetkontoBogførtAsText}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="4" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetkontoDisponibelLabel}"/>
+                                <TextBox Grid.Row="1" Grid.Column="5" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=BudgetkontoDisponibelAsText}"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=AdressekontoLabel}"/>
+                                <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,5" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=AdressekontoIsReadOnly}"/>
+                                <!--
+                                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource BlackBorderedComboBoxStyle}" ItemsSource="{Binding Path=Adressekonti}" DisplayMemberPath="Navn" SelectedValuePath="Nummer" IsEnabled="{Binding Path=AdressekontoIsReadOnly, Converter={StaticResource ReverseBooleanConverter}}" SelectedValue="{Binding Path=Adressekonto, Mode=TwoWay}"/>
+                                -->
+                                <TextBlock Grid.Row="2" Grid.Column="2" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=AdressekontoSaldoLabel}"/>
+                                
+                                <TextBox Grid.Row="2" Grid.Column="3" Margin="0,0,10,5" Style="{StaticResource BlackBorderedTextBoxStyle}" VerticalContentAlignment="Center" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=AdressekontoSaldoAsText}"/>
+                                
+                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,0,10,0" ItemsSource="{Binding Path=Adressekonti}" DisplayMemberPath="Navn" SelectedValuePath="Nummer" IsEnabled="{Binding Path=AdressekontoIsReadOnly, Converter={StaticResource ReverseBooleanConverter}}" SelectedValue="{Binding Path=Adressekonto, Mode=TwoWay}"/>
+                            </Grid>
                         </Grid>
                     </Grid>
                     <Grid Grid.Column="1" Margin="0,0,40,20">

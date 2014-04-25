@@ -159,6 +159,7 @@
     <Compile Include="Core\Converters\IntegerToStringConverter.cs" />
     <Compile Include="Core\Converters\IntegerToVisibilityConverter.cs" />
     <Compile Include="Core\Converters\ObjectToVisibilityConverter.cs" />
+    <Compile Include="Core\Converters\ReverseBooleanConverter.cs" />
     <Compile Include="Core\Converters\ToUpperCaseConverter.cs" />
     <Compile Include="Core\SuspensionManager.cs" />
     <Compile Include="Core\SuspensionManagerException.cs" />
