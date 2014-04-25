@@ -3,7 +3,7 @@
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
 {
     /// <summary>
-    /// Interface til en ViewModel i OS Intrranet.
+    /// Interface til en ViewModel i OS Intranet.
     /// </summary>
     public interface IViewModel : INotifyPropertyChanged
     {

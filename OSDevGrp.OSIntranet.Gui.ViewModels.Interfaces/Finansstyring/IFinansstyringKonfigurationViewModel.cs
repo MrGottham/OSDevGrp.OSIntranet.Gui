@@ -25,6 +25,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Valideringsfejl ved angivelse af uri til servicen, der supporterer finansstyring.
+        /// </summary>
+        string FinansstyringServiceUriValidationError
+        {
+            get;
+        }
+
+        /// <summary>
         /// Label til antal bogføringslinjer, der skal hentes.
         /// </summary>
         string AntalBogføringslinjerLabel
@@ -42,6 +50,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Valideringsfejl ved angivelse af antal bogføringslinjer, der skal hentes.
+        /// </summary>
+        string AntalBogføringslinjerValidationError
+        {
+            get;
+        }
+
+        /// <summary>
         /// Label til antal dage, som nyheder er gældende.
         /// </summary>
         string DageForNyhederLabel
@@ -56,6 +72,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get; 
             set; 
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af antal dage, som nyheder er gældende.
+        /// </summary>
+        string DageForNyhederValidationError
+        {
+            get;
         }
     }
 }

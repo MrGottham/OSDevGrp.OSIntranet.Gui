@@ -66,6 +66,7 @@
     <Compile Include="IEventSubscriber.cs" />
     <Compile Include="IMainViewModel.cs" />
     <Compile Include="IRefreshable.cs" />
+    <Compile Include="IValidateableViewModel.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

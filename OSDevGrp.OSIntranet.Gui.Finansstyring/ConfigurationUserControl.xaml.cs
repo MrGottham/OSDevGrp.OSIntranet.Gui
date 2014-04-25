@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Runtime;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
@@ -21,9 +22,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         private bool _disposed;
         private static readonly DependencyProperty ConfigurationProviderProperty = DependencyProperty.Register("ConfigurationProvider", typeof (ConfigurationProvider), typeof (ConfigurationUserControl), new PropertyMetadata(null));
         private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (ConfigurationUserControl), new PropertyMetadata(null));
-        private static readonly DependencyProperty FinansstyringServiceUriValidationErrorProperty = DependencyProperty.Register("FinansstyringServiceUriValidationError", typeof (string), typeof (ConfigurationUserControl), new PropertyMetadata(string.Empty));
-        private static readonly DependencyProperty AntalBogføringslinjerValidationErrorProperty = DependencyProperty.Register("AntalBogføringslinjerValidationError", typeof(string), typeof(ConfigurationUserControl), new PropertyMetadata(string.Empty));
-        private static readonly DependencyProperty DageForNyhederValidationErrorProperty = DependencyProperty.Register("DageForNyhederValidationError", typeof(string), typeof(ConfigurationUserControl), new PropertyMetadata(string.Empty));
 
         #endregion
 
@@ -83,64 +81,17 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                     }
                 }
                 SetValue(MainViewModelProperty, value);
-                if (MainViewModel == null)
+                if (MainViewModel == null || MainViewModel.FinansstyringKonfiguration == null)
                 {
                     return;
                 }
-                FinansstyringServiceUriValidationError = string.Empty;
-                AntalBogføringslinjerValidationError = string.Empty;
-                DageForNyhederValidationError = string.Empty;
-                if (MainViewModel.FinansstyringKonfiguration == null || _finansstyringKonfigurationPropertyChangedIsSet)
+                MainViewModel.FinansstyringKonfiguration.ClearValidationErrors();
+                if (_finansstyringKonfigurationPropertyChangedIsSet)
                 {
                     return;
                 }
                 MainViewModel.FinansstyringKonfiguration.PropertyChanged += FinansstyringKonfigurationPropertyChangedEventHandler;
                 _finansstyringKonfigurationPropertyChangedIsSet = true;
-            }
-        }
-
-        /// <summary>
-        /// Valideringsfejl for URI til service, der supporterer finansstyring.
-        /// </summary>
-        public string FinansstyringServiceUriValidationError
-        {
-            get
-            {
-                return MainPage.GetValidationErrorFromDependencyProperty(this, FinansstyringServiceUriValidationErrorProperty);
-            }
-            private set
-            {
-                MainPage.SetValidationErrorOnDependencyProperty(this, FinansstyringServiceUriValidationErrorProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// Valideringsfejl for antallet af bogføringslinjer, der skal hentes.
-        /// </summary>
-        public string AntalBogføringslinjerValidationError
-        {
-            get
-            {
-                return MainPage.GetValidationErrorFromDependencyProperty(this, AntalBogføringslinjerValidationErrorProperty);
-            }
-            private set
-            {
-                MainPage.SetValidationErrorOnDependencyProperty(this, AntalBogføringslinjerValidationErrorProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// Valideringsfejl for antallet af dage, hvor nyheder skal være gældende.
-        /// </summary>
-        public string DageForNyhederValidationError
-        {
-            get
-            {
-                return MainPage.GetValidationErrorFromDependencyProperty(this, DageForNyhederValidationErrorProperty);
-            }
-            private set
-            {
-                MainPage.SetValidationErrorOnDependencyProperty(this, DageForNyhederValidationErrorProperty, value);
             }
         }
 
@@ -195,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// Eventhandler, der rejses, når eventet til håndtering af exceptions publiceres.
         /// </summary>
         /// <param name="handleExceptionEventArgs">Argumenter fra eventet, der publiceres.</param>
-        public void OnEvent(IHandleExceptionEventArgs handleExceptionEventArgs)
+        public async void OnEvent(IHandleExceptionEventArgs handleExceptionEventArgs)
         {
             if (handleExceptionEventArgs == null)
             {
@@ -220,15 +171,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 switch (validationException.PropertyName)
                 {
                     case "FinansstyringServiceUri":
-                        FinansstyringServiceUriValidationError = validationException.Message;
+                        // Usernotification gives via behaviors.
                         break;
 
-                    case "AntalBogføringslinjer":
-                        AntalBogføringslinjerValidationError = validationException.Message;
-                        break;
-
-                    case "DageForNyheder":
-                        DageForNyhederValidationError = validationException.Message;
+                    default:
+                        var messageDialog = new MessageDialog(validationException.Message);
+                        await messageDialog.ShowAsync();
                         break;
                 }
             }
@@ -265,17 +213,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             switch (eventArgs.PropertyName)
             {
                 case "FinansstyringServiceUri":
-                    FinansstyringServiceUriValidationError = string.Empty;
                     ConfigurationProvider.SetValue("FinansstyringServiceUri", finansstyringKonfiguration.FinansstyringServiceUri);
                     break;
 
                 case "AntalBogføringslinjer":
-                    AntalBogføringslinjerValidationError = string.Empty;
                     ConfigurationProvider.SetValue("AntalBogføringslinjer", finansstyringKonfiguration.AntalBogføringslinjer);
                     break;
 
                 case "DageForNyheder":
-                    DageForNyhederValidationError = string.Empty;
                     ConfigurationProvider.SetValue("DageForNyheder", finansstyringKonfiguration.DageForNyheder);
                     break;
             }

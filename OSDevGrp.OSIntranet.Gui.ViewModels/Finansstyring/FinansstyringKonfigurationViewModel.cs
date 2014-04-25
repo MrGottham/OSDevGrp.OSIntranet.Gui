@@ -14,7 +14,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// <summary>
     /// ViewModel indeholdende konfiguration til finansstyring.
     /// </summary>
-    public class FinansstyringKonfigurationViewModel : ViewModelBase, IFinansstyringKonfigurationViewModel
+    public class FinansstyringKonfigurationViewModel : ValidateableViewModelBase, IFinansstyringKonfigurationViewModel
     {
         #region Private variables
 
@@ -124,6 +124,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     {
                         throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "FinansstyringServiceUri", value);
                     }
+                    FinansstyringServiceUriValidationError = null;
                     var uri = new Uri(value);
                     if (_finansstyringKonfigurationRepository.FinansstyringServiceUri == uri)
                     {
@@ -131,6 +132,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     }
                     _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"FinansstyringServiceUri", uri}});
                     RaisePropertyChanged("FinansstyringServiceUri");
+                }
+                catch (IntranetGuiValidationException ex)
+                {
+                    FinansstyringServiceUriValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
                 }
                 catch (IntranetGuiExceptionBase ex)
                 {
@@ -140,6 +146,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "FinansstyringServiceUri", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af uri til servicen, der supporterer finansstyring.
+        /// </summary>
+        public virtual string FinansstyringServiceUriValidationError
+        {
+            get
+            {
+                return GetValidationError("FinansstyringServiceUri");
+            }
+            private set
+            {
+                SetValidationError("FinansstyringServiceUri", value, "FinansstyringServiceUriValidationError");
             }
         }
 
@@ -186,12 +207,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     {
                         throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "AntalBogføringslinjer", value);
                     }
+                    AntalBogføringslinjerValidationError = null;
                     if (_finansstyringKonfigurationRepository.AntalBogføringslinjer == value)
                     {
                         return;
                     }
                     _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"AntalBogføringslinjer", value}});
                     RaisePropertyChanged("AntalBogføringslinjer");
+                }
+                catch (IntranetGuiValidationException ex)
+                {
+                    AntalBogføringslinjerValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
                 }
                 catch (IntranetGuiExceptionBase ex)
                 {
@@ -201,6 +228,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "AntalBogføringslinjer", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af antal bogføringslinjer, der skal hentes.
+        /// </summary>
+        public virtual string AntalBogføringslinjerValidationError
+        {
+            get
+            {
+                return GetValidationError("AntalBogføringslinjer");
+            }
+            private set
+            {
+                SetValidationError("AntalBogføringslinjer", value, "AntalBogføringslinjerValidationError");
             }
         }
 
@@ -247,12 +289,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     {
                         throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "DageForNyheder", value);
                     }
+                    DageForNyhederValidationError = null;
                     if (_finansstyringKonfigurationRepository.DageForNyheder == value)
                     {
                         return;
                     }
                     _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"DageForNyheder", value}});
                     RaisePropertyChanged("DageForNyheder");
+                }
+                catch (IntranetGuiValidationException ex)
+                {
+                    DageForNyhederValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
                 }
                 catch (IntranetGuiExceptionBase ex)
                 {
@@ -265,9 +313,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
         }
 
+        /// <summary>
+        /// Valideringsfejl ved angivelse af antal dage, som nyheder er gældende.
+        /// </summary>
+        public virtual string DageForNyhederValidationError
+        {
+            get
+            {
+                return GetValidationError("DageForNyheder");
+            }
+            private set
+            {
+                SetValidationError("DageForNyheder", value, "DageForNyhederValidationError");
+            }
+        }
+
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Nulstiller alle valideringsfejl.
+        /// </summary>
+        public override void ClearValidationErrors()
+        {
+            FinansstyringServiceUriValidationError = null;
+            AntalBogføringslinjerValidationError = null;
+            DageForNyhederValidationError = null;
+        }
 
         /// <summary>
         /// Validerer værdien for uri til servicen, der supporterer finansstyring.

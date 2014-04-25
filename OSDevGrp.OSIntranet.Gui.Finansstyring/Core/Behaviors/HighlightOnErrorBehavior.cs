@@ -76,17 +76,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Behaviors
                 return;
             }
             dependencyObject.SetValue(FrameworkElement.StyleProperty, Application.Current.Resources["RedBorderedTextBoxStyle"]);
-
-            /*
-
-            var textBoxStyle = string.IsNullOrWhiteSpace(errorMessage) ? null : (Style) Application.Current.Resources["RedBorderedTextBoxStyle"];
-            if (textBoxStyle == textBox.Style)
-            {
-                return;
-            }
-            textBox.Style = textBoxStyle;
-            textBox.UpdateLayout();
-            */
         }
 
         #endregion

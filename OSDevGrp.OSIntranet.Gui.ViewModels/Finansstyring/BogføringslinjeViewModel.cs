@@ -9,7 +9,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// <summary>
     /// ViewModel for en bogføringslinje.
     /// </summary>
-    public class BogføringslinjeViewModel : ViewModelBase, IReadOnlyBogføringslinjeViewModel
+    public class BogføringslinjeViewModel : ValidateableViewModelBase, IReadOnlyBogføringslinjeViewModel
     {
         #region Private variables
 

@@ -93,6 +93,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.BilagLabel, Is.Not.Empty);
             Assert.That(bogføringViewModel.BilagLabel, Is.EqualTo(Resource.GetText(Text.Annex)));
             Assert.That(bogføringViewModel.Kontonummer, Is.Null);
+            Assert.That(bogføringViewModel.KontonummerValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontonummerValidationError, Is.Empty);
             Assert.That(bogføringViewModel.KontonummerMaxLength, Is.EqualTo(FieldInformations.KontonummerFieldLength));
             Assert.That(bogføringViewModel.KontonummerIsReadOnly, Is.False);
             Assert.That(bogføringViewModel.KontonummerLabel, Is.Not.Null);
@@ -123,12 +125,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.Tekst, Is.Not.Null);
             Assert.That(bogføringViewModel.Tekst, Is.Not.Empty);
             Assert.That(bogføringViewModel.Tekst, Is.EqualTo(bogføringslinjeModelMock.Tekst));
+            Assert.That(bogføringViewModel.TekstValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.TekstValidationError, Is.Empty);
             Assert.That(bogføringViewModel.TekstMaxLength, Is.EqualTo(FieldInformations.BogføringstekstFieldLength));
             Assert.That(bogføringViewModel.TekstIsReadOnly, Is.False);
             Assert.That(bogføringViewModel.TekstLabel, Is.Not.Null);
             Assert.That(bogføringViewModel.TekstLabel, Is.Not.Empty);
             Assert.That(bogføringViewModel.TekstLabel, Is.EqualTo(Resource.GetText(Text.Text)));
             Assert.That(bogføringViewModel.Budgetkontonummer, Is.Null);
+            Assert.That(bogføringViewModel.BudgetkontonummerValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontonummerValidationError, Is.Empty);
             Assert.That(bogføringViewModel.BudgetkontonummerMaxLength, Is.EqualTo(FieldInformations.KontonummerFieldLength));
             Assert.That(bogføringViewModel.BudgetkontonummerIsReadOnly, Is.False);
             Assert.That(bogføringViewModel.BudgetkontonummerLabel, Is.Not.Null);
@@ -155,6 +161,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.DebitAsText, Is.Not.Null);
             Assert.That(bogføringViewModel.DebitAsText, Is.Not.Empty);
             Assert.That(bogføringViewModel.DebitAsText, Is.EqualTo(bogføringslinjeModelMock.Debit.ToString("C")));
+            Assert.That(bogføringViewModel.DebitValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.DebitValidationError, Is.Empty);
             Assert.That(bogføringViewModel.DebitMaxLength, Is.EqualTo(FieldInformations.DebitFieldLength));
             Assert.That(bogføringViewModel.DebitIsReadOnly, Is.False);
             Assert.That(bogføringViewModel.DebitLabel, Is.Not.Null);
@@ -164,12 +172,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.KreditAsText, Is.Not.Null);
             Assert.That(bogføringViewModel.KreditAsText, Is.Not.Empty);
             Assert.That(bogføringViewModel.KreditAsText, Is.EqualTo(bogføringslinjeModelMock.Kredit.ToString("C")));
+            Assert.That(bogføringViewModel.KreditValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.KreditValidationError, Is.Empty);
             Assert.That(bogføringViewModel.KreditMaxLength, Is.EqualTo(FieldInformations.KreditFieldLength));
             Assert.That(bogføringViewModel.KreditIsReadOnly, Is.False);
             Assert.That(bogføringViewModel.KreditLabel, Is.Not.Null);
             Assert.That(bogføringViewModel.KreditLabel, Is.Not.Empty);
             Assert.That(bogføringViewModel.KreditLabel, Is.EqualTo(Resource.GetText(Text.Credit)));
             Assert.That(bogføringViewModel.Adressekonto, Is.EqualTo(bogføringslinjeModelMock.Adressekonto));
+            Assert.That(bogføringViewModel.AdressekontoValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoValidationError, Is.Empty);
             Assert.That(bogføringViewModel.AdressekontoIsReadOnly, Is.False);
             Assert.That(bogføringViewModel.AdressekontoLabel, Is.Not.Null);
             Assert.That(bogføringViewModel.AdressekontoLabel, Is.Not.Empty);
@@ -1257,6 +1269,66 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til Kontonummer opdaterer KontonummerValidationError ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(null, "ValueIsRequiered")]
+        [TestCase("", "ValueIsRequiered")]
+        [TestCase(" ", "ValueIsRequiered")]
+        public void TestAtKontonummerSetterOpdatererKontonummerValidationErrorVedIntranetGuiValiadtionException(string illegalValue, string validationErrorText)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontonummerValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontonummerValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "KontonummerValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            bogføringViewModel.Kontonummer = illegalValue;
+            Assert.That(eventCalled, Is.True);
+
+            var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
+            Assert.That(bogføringViewModel.KontonummerValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.KontonummerValidationError, Is.Not.Empty);
+            Assert.That(bogføringViewModel.KontonummerValidationError, Is.EqualTo(Resource.GetText(text)));
+
+            bogføringslinjeModelMock.AssertWasNotCalled(m => m.Kontonummer = Arg<string>.Is.Anything);
+        }
+
+        /// <summary>
         /// Tester, at sætteren til Kontonummer kalder HandleExcetion på exceptionhandleren ved valideringsfejl.
         /// </summary>
         [Test]
@@ -1673,6 +1745,66 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Tekst = Arg<string>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til Tekst opdaterer TekstValidationError ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(null, "ValueIsRequiered")]
+        [TestCase("", "ValueIsRequiered")]
+        [TestCase(" ", "ValueIsRequiered")]
+        public void TestAtTekstSetterOpdatererTekstValidationErrorVedIntranetGuiValiadtionException(string illegalValue, string validationErrorText)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.TekstValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.TekstValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "TekstValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            bogføringViewModel.Tekst = illegalValue;
+            Assert.That(eventCalled, Is.True);
+
+            var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
+            Assert.That(bogføringViewModel.TekstValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.TekstValidationError, Is.Not.Empty);
+            Assert.That(bogføringViewModel.TekstValidationError, Is.EqualTo(Resource.GetText(text)));
+
+            bogføringslinjeModelMock.AssertWasNotCalled(m => m.Tekst = Arg<string>.Is.Anything);
         }
 
         /// <summary>
@@ -2095,6 +2227,67 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til Budgetkontonummer opdaterer BudgetkontonummerValidationError ved valideringsfejl.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontonummerSetterOpdatererBudgetkontonummerValidationErrorVedIntranetGuiValiadtionException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer = Arg<string>.Is.Anything)
+                                    .Throw(fixture.Create<ArgumentNullException>())
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontonummerValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontonummerValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "BudgetkontonummerValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            var newValue = fixture.Create<string>();
+
+            Assert.That(eventCalled, Is.False);
+            bogføringViewModel.Budgetkontonummer = newValue;
+            Assert.That(eventCalled, Is.True);
+
+            Assert.That(bogføringViewModel.BudgetkontonummerValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.BudgetkontonummerValidationError, Is.Not.Empty);
+            Assert.That(bogføringViewModel.BudgetkontonummerValidationError, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBudgetAccountNumber)));
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Budgetkontonummer = Arg<string>.Is.Equal(newValue));
+        }
+
+        /// <summary>
         /// Tester, at sætteren til Budgetkontonummer kalder HandleException på exceptionhandleren med en IntranetGuiValidationException ved en ArgumentNullException.
         /// </summary>
         [Test]
@@ -2464,6 +2657,82 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(expectedValue));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til DebitAsText opdaterer DebitValidationError ved valideringsfejl
+        /// </summary>
+        [Test]
+        [TestCase("XYZ", "ValueIsNotDecimal")]
+        [TestCase("ZYX", "ValueIsNotDecimal")]
+        [TestCase("$ -0.01", "DecimalLowerThan")]
+        [TestCase("$ -1000.00", "DecimalLowerThan")]
+        [TestCase("$ -2000.00", "DecimalLowerThan")]
+        [TestCase("$ -3000.00", "DecimalLowerThan")]
+        [TestCase("$ -4000.00", "DecimalLowerThan")]
+        public void TestAtDebitAsTextSetterOpdatererDebitValidationErrorVedIntranetGuiValiadtionException(string illegalValue, string validationErrorText)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.DebitValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.DebitValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "DebitValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            decimal valueAsDecimal;
+            bogføringViewModel.DebitAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue;
+            Assert.That(eventCalled, Is.True);
+
+            var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
+            switch (text)
+            {
+                case Text.DecimalLowerThan:
+                    Assert.That(bogføringViewModel.DebitValidationError, Is.Not.Null);
+                    Assert.That(bogføringViewModel.DebitValidationError, Is.Not.Empty);
+                    Assert.That(bogføringViewModel.DebitValidationError, Is.EqualTo(Resource.GetText(text, 0M)));
+                    break;
+
+                default:
+                    Assert.That(bogføringViewModel.DebitValidationError, Is.Not.Null);
+                    Assert.That(bogføringViewModel.DebitValidationError, Is.Not.Empty);
+                    Assert.That(bogføringViewModel.DebitValidationError, Is.EqualTo(Resource.GetText(text)));
+                    break;
+            }
+
+            bogføringslinjeModelMock.AssertWasNotCalled(m => m.Debit = Arg<decimal>.Is.Anything);
         }
 
         /// <summary>
@@ -2910,6 +3179,80 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til KreditAsText opdaterer KreditValidationError ved valideringsfejl
+        /// </summary>
+        [Test]
+        [TestCase("XYZ", "ValueIsNotDecimal")]
+        [TestCase("ZYX", "ValueIsNotDecimal")]
+        [TestCase("$ -0.01", "DecimalLowerThan")]
+        [TestCase("$ -1000.00", "DecimalLowerThan")]
+        [TestCase("$ -2000.00", "DecimalLowerThan")]
+        [TestCase("$ -3000.00", "DecimalLowerThan")]
+        [TestCase("$ -4000.00", "DecimalLowerThan")]
+        public void TestAtKreditAsTextSetterOpdatererKreditValidationErrorVedIntranetGuiValiadtionException(string illegalValue, string validationErrorText)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.KreditValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.KreditValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "KreditValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            decimal valueAsDecimal;
+            bogføringViewModel.KreditAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue;
+            var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
+            switch (text)
+            {
+                case Text.DecimalLowerThan:
+                    Assert.That(bogføringViewModel.KreditValidationError, Is.Not.Null);
+                    Assert.That(bogføringViewModel.KreditValidationError, Is.Not.Empty);
+                    Assert.That(bogføringViewModel.KreditValidationError, Is.EqualTo(Resource.GetText(text, 0M)));
+                    break;
+
+                default:
+                    Assert.That(bogføringViewModel.KreditValidationError, Is.Not.Null);
+                    Assert.That(bogføringViewModel.KreditValidationError, Is.Not.Empty);
+                    Assert.That(bogføringViewModel.KreditValidationError, Is.EqualTo(Resource.GetText(text)));
+                    break;
+            }
+
+            bogføringslinjeModelMock.AssertWasNotCalled(m => m.Kredit = Arg<decimal>.Is.Anything);
+        }
+
+        /// <summary>
         /// Tester, at sætteren til KreditAsText kalder HandleExcetion på exceptionhandleren ved valideringsfejl.
         /// </summary>
         [Test]
@@ -3343,6 +3686,67 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til Adressekonto opdaterer AdressekontoValidationError ved valideringsfejl
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoSetterOpdatererAdressekontoValidationErrorVedIntranetGuiValiadtionException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto = Arg<int>.Is.Anything)
+                                    .Throw(fixture.Create<ArgumentNullException>())
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoValidationError, Is.Empty);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "AdressekontoValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            var newValue = fixture.Create<int>();
+
+            Assert.That(eventCalled, Is.False);
+            bogføringViewModel.Adressekonto = newValue;
+            Assert.That(eventCalled, Is.True);
+
+            Assert.That(bogføringViewModel.AdressekontoValidationError, Is.Not.Null);
+            Assert.That(bogføringViewModel.AdressekontoValidationError, Is.Not.Empty);
+            Assert.That(bogføringViewModel.AdressekontoValidationError, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAddressAccount)));
+
+            bogføringslinjeModelMock.AssertWasCalled(m => m.Adressekonto = Arg<int>.Is.Equal(newValue));
+        }
+
+        /// <summary>
         /// Tester, at sætteren til Adressekonto kalder HandleException på exceptionhandleren med en IntranetGuiValidationException ved en ArgumentNullException.
         /// </summary>
         [Test]
@@ -3668,6 +4072,64 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at CleanValidationErrors nulstiller valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase("DatoValidationError")]
+        [TestCase("BilagValidationError")]
+        [TestCase("KontonummerValidationError")]
+        [TestCase("TekstValidationError")]
+        [TestCase("BudgetkontonummerValidationError")]
+        [TestCase("DebitValidationError")]
+        [TestCase("KreditValidationError")]
+        [TestCase("AdressekontoValidationError")]
+        public void TestAtCleanValidationErrorsNulstillerValideringsfejl(string expectedPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                                    .Return(fixture.Create<DateTime>())
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                                    .Return(null)
+                                    .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                                    .Return(0)
+                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(bogføringViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            bogføringViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, expectedPropertyName, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            bogføringViewModel.ClearValidationErrors();
+            Assert.That(eventCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
         /// Tester, at PropertyChangedOnBogføringslinjeModelEventHandler rejser PropertyChanged, når modellen for bogføringslinjen opdateres.
         /// </summary>
         [Test]
@@ -3690,13 +4152,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Bilag", "Bilag")]
         [TestCase("Bilag", "BilagValidationError")]
         [TestCase("Kontonummer", "Kontonummer")]
+        [TestCase("Kontonummer", "KontonummerValidationError")]
         [TestCase("Kontonummer", "Kontonavn")]
         [TestCase("Kontonummer", "KontoSaldo")]
         [TestCase("Kontonummer", "KontoSaldoAsText")]
         [TestCase("Kontonummer", "KontoDisponibel")]
         [TestCase("Kontonummer", "KontoDisponibelAsText")]
         [TestCase("Tekst", "Tekst")]
+        [TestCase("Tekst", "TekstValidationError")]
         [TestCase("Budgetkontonummer", "Budgetkontonummer")]
+        [TestCase("Budgetkontonummer", "BudgetkontonummerValidationError")]
         [TestCase("Budgetkontonummer", "Budgetkontonavn")]
         [TestCase("Budgetkontonummer", "BudgetkontoBogført")]
         [TestCase("Budgetkontonummer", "BudgetkontoBogførtAsText")]
@@ -3704,9 +4169,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Budgetkontonummer", "BudgetkontoDisponibelAsText")]
         [TestCase("Debit", "Debit")]
         [TestCase("Debit", "DebitAsText")]
+        [TestCase("Debit", "DebitValidationError")]
         [TestCase("Kredit", "Kredit")]
         [TestCase("Kredit", "KreditAsText")]
+        [TestCase("Kredit", "KreditValidationError")]
         [TestCase("Adressekonto", "Adressekonto")]
+        [TestCase("Adressekonto", "AdressekontoValidationError")]
         [TestCase("Adressekonto", "AdressekontoNavn")]
         [TestCase("Adressekonto", "AdressekontoSaldo")]
         [TestCase("Adressekonto", "AdressekontoSaldoAsText")]

@@ -27,8 +27,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     {
         #region Private variables
 
-        private string _datoValidationError;
-        private string _bilagValidationError;
         private ICommand _bogførCommand;
         private IKontoViewModel _kontoViewModel;
         private Task<IKontoViewModel> _kontoReaderTask;
@@ -147,16 +145,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return string.IsNullOrEmpty(_datoValidationError) ? string.Empty : _datoValidationError;
+                return GetValidationError("Dato");
             }
             private set
             {
-                if (string.IsNullOrEmpty(value) == false && _datoValidationError == value)
-                {
-                    return;
-                }
-                _datoValidationError = value;
-                RaisePropertyChanged("DatoValidationError");
+                SetValidationError("Dato", value, "DatoValidationError");
             }
         }
 
@@ -231,22 +224,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// Valideringsfejl ved bilagsnummer.
+        /// Valideringsfejl ved angivelse af bilagsnummer.
         /// </summary>
         public virtual string BilagValidationError
         {
             get
             {
-                return string.IsNullOrEmpty(_bilagValidationError) ? string.Empty : _bilagValidationError;
+                return GetValidationError("Bilag");
             }
             private set
             {
-                if (string.IsNullOrEmpty(value) == false && _bilagValidationError == value)
-                {
-                    return;
-                }
-                _bilagValidationError = value;
-                RaisePropertyChanged("BilagValidationError");
+                SetValidationError("Bilag", value, "BilagValidationError");
             }
         }
 
@@ -315,6 +303,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAccountNumber), this, "Kontonummer", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    KontonummerValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -323,6 +316,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Kontonummer", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af kontonummer, hvortil bogføringslinjen er tilknyttet..
+        /// </summary>
+        public virtual string KontonummerValidationError
+        {
+            get
+            {
+                return GetValidationError("Kontonummer");
+            }
+            private set
+            {
+                SetValidationError("Kontonummer", value, "KontonummerValidationError");
             }
         }
 
@@ -479,6 +487,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBookkeepingText), this, "Tekst", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    TekstValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -487,6 +500,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Tekst", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af tekst.
+        /// </summary>
+        public virtual string TekstValidationError
+        {
+            get
+            {
+                return GetValidationError("Tekst");
+            }
+            private set
+            {
+                SetValidationError("Tekst", value, "TekstValidationError");
             }
         }
 
@@ -555,6 +583,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingBudgetAccountNumber), this, "Budgetkontonummer", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    BudgetkontonummerValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -563,6 +596,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Budgetkontonummer", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af kontonummer på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string BudgetkontonummerValidationError
+        {
+            get
+            {
+                return GetValidationError("Budgetkontonummer");
+            }
+            private set
+            {
+                SetValidationError("Budgetkontonummer", value, "BudgetkontonummerValidationError");
             }
         }
 
@@ -724,6 +772,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingDebit), this, "DebitAsText", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    DebitValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -732,6 +785,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DebitAsText", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af debitbeløb.
+        /// </summary>
+        public virtual string DebitValidationError
+        {
+            get
+            {
+                return GetValidationError("Debit");
+            }
+            private set
+            {
+                SetValidationError("Debit", value, "DebitValidationError");
             }
         }
 
@@ -805,6 +873,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingCredit), this, "KreditAsText", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    KreditValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -813,6 +886,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "KreditAsText", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af kreditbeløb.
+        /// </summary>
+        public virtual string KreditValidationError
+        {
+            get
+            {
+                return GetValidationError("Kredit");
+            }
+            private set
+            {
+                SetValidationError("Kredit", value, "KreditValidationError");
             }
         }
 
@@ -881,6 +969,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         throw new IntranetGuiValidationException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingAddressAccount), this, "Adressekonto", value, ex);
                     }
                 }
+                catch (IntranetGuiValidationException ex)
+                {
+                    AdressekontoValidationError = ex.Message;
+                    _exceptionHandlerViewModel.HandleException(ex);
+                }
                 catch (IntranetGuiExceptionBase ex)
                 {
                     _exceptionHandlerViewModel.HandleException(ex);
@@ -889,6 +982,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "Adressekonto", ex.Message), ex));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        public virtual string AdressekontoValidationError
+        {
+            get
+            {
+                return GetValidationError("Adressekonto");
+            }
+            private set
+            {
+                SetValidationError("Adressekonto", value, "AdressekontoValidationError");
             }
         }
 
@@ -1253,6 +1361,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Methods
 
         /// <summary>
+        /// Nulstiller alle valideringsfejl.
+        /// </summary>
+        public override void ClearValidationErrors()
+        {
+            DatoValidationError = null;
+            BilagValidationError = null;
+            KontonummerValidationError = null;
+            TekstValidationError = null;
+            BudgetkontonummerValidationError = null;
+            DebitValidationError = null;
+            KreditValidationError = null;
+            AdressekontoValidationError = null;
+        }
+
+        /// <summary>
         /// Eventhandler, der kaldes, når en property ændres på modellen for bogføringslinjen.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -1275,14 +1398,29 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     break;
 
                 case "Kontonummer":
+                    KontonummerValidationError = null;
                     KontoViewModelRefresh();
                     break;
 
+                case "Tekst":
+                    TekstValidationError = null;
+                    break;
+
                 case "Budgetkontonummer":
+                    BudgetkontonummerValidationError = null;
                     BudgetkontoViewModelRefresh();
                     break;
 
+                case "Debit":
+                    DebitValidationError = null;
+                    break;
+
+                case "Kredit":
+                    KreditValidationError = null;
+                    break;
+
                 case "Adressekonto":
+                    AdressekontoValidationError = null;
                     AdressekontoViewModelCollectionRefresh();
                     break;
             }

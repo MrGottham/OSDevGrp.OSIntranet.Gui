@@ -8,7 +8,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
     /// <summary>
     /// Interface til en ViewModel, hvorfra der kan bogføres.
     /// </summary>
-    public interface IBogføringViewModel : IViewModel
+    public interface IBogføringViewModel : IValidateableViewModel
     {
         /// <summary>
         /// Regnskabet, som bogføringslinjen kan bogføres på.
@@ -69,7 +69,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
-        /// Valideringsfejl ved bilagsnummer.
+        /// Valideringsfejl ved angivelse af bilagsnummer.
         /// </summary>
         string BilagValidationError
         {
@@ -107,6 +107,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get; 
             set; 
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af kontonummer, hvortil bogføringslinjen er tilknyttet..
+        /// </summary>
+        string KontonummerValidationError
+        {
+            get;
         }
 
         /// <summary>
@@ -207,6 +215,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Valideringsfejl ved angivelse af tekst.
+        /// </summary>
+        string TekstValidationError
+        {
+            get;
+        }
+
+        /// <summary>
         /// Angivelse af den maksimale tekstlængde for teksten til bogføringslinjen.
         /// </summary>
         int TekstMaxLength
@@ -237,6 +253,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af kontonummer på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        string BudgetkontonummerValidationError
+        {
+            get;
         }
 
         /// <summary>
@@ -345,6 +369,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Valideringsfejl ved angivelse af debitbeløb.
+        /// </summary>
+        string DebitValidationError
+        {
+            get;
+        }
+
+        /// <summary>
         /// Angivelse af den maksimale tekstlængde for debitbeløbet.
         /// </summary>
         int DebitMaxLength
@@ -386,6 +418,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Valideringsfejl ved angivelse af kreditbeløb.
+        /// </summary>
+        string KreditValidationError
+        {
+            get;
+        }
+
+        /// <summary>
         /// Angivelse af den maksimale tekstlængde for kreditbeløbet.
         /// </summary>
         int KreditMaxLength
@@ -416,6 +456,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get; 
             set;
+        }
+
+        /// <summary>
+        /// Valideringsfejl ved angivelse af den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
+        /// </summary>
+        string AdressekontoValidationError
+        {
+            get;
         }
 
         /// <summary>

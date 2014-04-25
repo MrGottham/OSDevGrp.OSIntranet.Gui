@@ -37,12 +37,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(finansstyringKonfigurationViewModel.Configuration, Is.EqualTo("OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.FinansstyringKonfigurationViewModel"));
             Assert.That(finansstyringKonfigurationViewModel.Keys, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.Keys, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Empty);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.EqualTo(Resource.GetText(Text.SupportingServiceUri)));
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Empty);
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.EqualTo(Resource.GetText(Text.NumberOfAccountingLinesToGet)));
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.EqualTo(Resource.GetText(Text.DaysForNews)));
@@ -269,6 +275,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("FinansstyringServiceUri")]
+        [TestCase("FinansstyringServiceUriValidationError")]
         public void TestAtFinansstyringServiceUriSetterRejserPropertyChangedVedOpdateringAfValue(string exceptPropertyName)
         {
             var fixture = new Fixture();
@@ -304,6 +311,49 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at setteren til FinansstyringServiceUri opdaterer FinansstyringServiceUriValidationError ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("XYZ")]
+        public void TestAtFinansstyringServiceUriOpdatererFinansstyringServiceUriValidationErrorVedIntranetGuiValidationException(string illegalValue)
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Empty);
+
+            var eventCalled = false;
+            finansstyringKonfigurationViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "FinansstyringServiceUriValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            finansstyringKonfigurationViewModel.FinansstyringServiceUri = illegalValue;
+            Assert.That(eventCalled, Is.True);
+
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.EqualTo(Resource.GetText(Text.InvalidValueForUri, illegalValue)));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.FinansstyringServiceUri);
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.Anything));
         }
 
         /// <summary>
@@ -656,6 +706,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("AntalBogføringslinjer")]
+        [TestCase("AntalBogføringslinjerValidationError")]
         public void TestAtAntalBogføringslinjerSetterRejserPropertyChangedVedOpdateringAfValue(string exceptPropertyName)
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
@@ -688,6 +739,50 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.AntalBogføringslinjer);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at setteren til AntalBogføringslinjer opdaterer AntalBogføringslinjerValidationError ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(0)]
+        [TestCase(9)]
+        [TestCase(251)]
+        [TestCase(512)]
+        public void TestAtAntalBogføringslinjerSetterOpdatererAntalBogføringslinjerValidationErrorVedIntranetGuiValidationException(int illegalValue)
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Empty);
+
+            var eventCalled = false;
+            finansstyringKonfigurationViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "AntalBogføringslinjerValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            finansstyringKonfigurationViewModel.AntalBogføringslinjer = illegalValue;
+            Assert.That(eventCalled, Is.True);
+
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 10, 250)));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.AntalBogføringslinjer);
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.Anything));
         }
 
         /// <summary>
@@ -1037,6 +1132,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("DageForNyheder")]
+        [TestCase("DageForNyhederValidationError")]
         public void TestAtDageForNyhederSetterRejserPropertyChangedVedOpdateringAfValue(string exceptPropertyName)
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
@@ -1069,6 +1165,50 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at setteren til DageForNyheder opdaterer DageForNyhederValidationError ved valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase(-10)]
+        [TestCase(-1)]
+        [TestCase(31)]
+        [TestCase(50)]
+        public void TestAtDageForNyhederSetterOpdatererDageForNyhederValidationErrorVedIntranetGuiValidationException(int illegalValue)
+        {
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Empty);
+
+            var eventCalled = false;
+            finansstyringKonfigurationViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, "DageForNyhederValidationError", StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            finansstyringKonfigurationViewModel.DageForNyheder = illegalValue;
+            Assert.That(eventCalled, Is.True);
+
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.EqualTo(Resource.GetText(Text.ValueOutsideInterval, 0, 30)));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.DageForNyheder);
+            finansstyringKonfigurationRepositoryMock.AssertWasNotCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.Anything));
         }
 
         /// <summary>
@@ -1232,6 +1372,43 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.DageForNyheder);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at CleanValidationErrors nulstiller valideringsfejl.
+        /// </summary>
+        [Test]
+        [TestCase("FinansstyringServiceUriValidationError")]
+        [TestCase("AntalBogføringslinjerValidationError")]
+        [TestCase("DageForNyhederValidationError")]
+        public void TestAtCleanValidationErrorsNulstillerValideringsfejl(string expectedPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(fixture.Create<IFinansstyringKonfigurationRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            finansstyringKonfigurationViewModel.PropertyChanged += (s, e) =>
+                {
+                    Assert.That(s, Is.Not.Null);
+                    Assert.That(e, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Null);
+                    Assert.That(e.PropertyName, Is.Not.Empty);
+                    if (string.Compare(e.PropertyName, expectedPropertyName, StringComparison.Ordinal) == 0)
+                    {
+                        eventCalled = true;
+                    }
+                };
+
+            Assert.That(eventCalled, Is.False);
+            finansstyringKonfigurationViewModel.ClearValidationErrors();
+            Assert.That(eventCalled, Is.True);
+
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
         /// <summary>
