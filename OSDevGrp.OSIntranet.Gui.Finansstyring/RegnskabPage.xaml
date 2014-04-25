@@ -184,6 +184,7 @@
         <Grid.Resources>
             <CollectionViewSource x:Key="KontiTopCollectionViewSource" Source="{Binding Path=KontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
             <CollectionViewSource x:Key="BudgetkontiTopCollectionViewSource" Source="{Binding Path=BudgetkontiTopGrouped}" IsSourceGrouped="True" ItemsPath="Value"/>
+            <CollectionViewSource x:Key="AdressekontiCollectionViewSource" Source="{Binding Path=Bogføring.Adressekonti}" IsSourceGrouped="False"/>
         </Grid.Resources>
         
         <Grid.ChildrenTransitions>
@@ -299,17 +300,11 @@
                                 <TextBox Grid.Row="1" Grid.Column="3" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=BudgetkontoBogførtAsText}"/>
                                 <TextBlock Grid.Row="1" Grid.Column="4" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetkontoDisponibelLabel}"/>
                                 <TextBox Grid.Row="1" Grid.Column="5" Margin="0,0,10,10" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=BudgetkontoDisponibelAsText}"/>
-                                
                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=AdressekontoLabel}"/>
-                                <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,5" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=AdressekontoIsReadOnly}"/>
-                                <!--
-                                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource BlackBorderedComboBoxStyle}" ItemsSource="{Binding Path=Adressekonti}" DisplayMemberPath="Navn" SelectedValuePath="Nummer" IsEnabled="{Binding Path=AdressekontoIsReadOnly, Converter={StaticResource ReverseBooleanConverter}}" SelectedValue="{Binding Path=Adressekonto, Mode=TwoWay}"/>
-                                -->
+                                <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,10,5" Style="{StaticResource BlackBorderedTextBoxStyle}" IsReadOnly="{Binding Path=AdressekontoIsReadOnly}" Text="{Binding Path=AdressekontoNavn, Mode=OneWay}" TextChanged="AdressekontoSearchTextBoxTextChangedEventHandler"/>
                                 <TextBlock Grid.Row="2" Grid.Column="2" Margin="0,0,10,5" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=AdressekontoSaldoLabel}"/>
-                                
                                 <TextBox Grid.Row="2" Grid.Column="3" Margin="0,0,10,5" Style="{StaticResource BlackBorderedTextBoxStyle}" VerticalContentAlignment="Center" IsReadOnly="True" IsEnabled="False" TextAlignment="Right" Text="{Binding Path=AdressekontoSaldoAsText}"/>
-                                
-                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,0,10,0" ItemsSource="{Binding Path=Adressekonti}" DisplayMemberPath="Navn" SelectedValuePath="Nummer" IsEnabled="{Binding Path=AdressekontoIsReadOnly, Converter={StaticResource ReverseBooleanConverter}}" SelectedValue="{Binding Path=Adressekonto, Mode=TwoWay}"/>
+                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,0,10,0" ItemsSource="{Binding Source={StaticResource AdressekontiCollectionViewSource}}" DisplayMemberPath="Navn" SelectedValuePath="Nummer" IsEnabled="{Binding Path=AdressekontoIsReadOnly, Converter={StaticResource ReverseBooleanConverter}}" SelectedValue="{Binding Path=Adressekonto, Mode=TwoWay}"/>
                             </Grid>
                         </Grid>
                     </Grid>

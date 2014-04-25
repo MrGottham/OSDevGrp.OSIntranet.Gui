@@ -78,6 +78,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     return;
                 }
+                Regnskab.Bogføring.Adressekonto = 0;
                 Regnskab.Bogføring.ClearValidationErrors();
             }
         }
@@ -405,6 +406,38 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             textBox.Text = value.ToUpper();
             textBox.SelectionStart = value.Length;
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer, at tekst i tekstboksen til fremsøgning af adressekontoen ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void AdressekontoSearchTextBoxTextChangedEventHandler(object sender, TextChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            if (Regnskab.Bogføring == null)
+            {
+                return;
+            }
+            var textBox = sender as TextBox;
+            if (textBox == null)
+            {
+                return;
+            }
+            var value = textBox.Text;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Regnskab.Bogføring.Adressekonto = 0;
+                return;
+            }
         }
 
         #endregion
