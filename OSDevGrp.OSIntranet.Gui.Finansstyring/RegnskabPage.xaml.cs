@@ -105,8 +105,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                         return;
                     }
                     AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
-                    // TODO: ???
-
                     Regnskab.Bogføring.ClearValidationErrors();
                     Regnskab.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
                 }
@@ -367,8 +365,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                             return;
                         }
                         AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
-                        // TODO: ???
-
                         regnskabViewModel.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
                     }
                     finally
@@ -398,20 +394,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             if (bogføringViewModel == null)
             {
                 return;
-            }
-            switch (eventArgs.PropertyName)
-            {
-                case "IsWorking":
-                    if (bogføringViewModel.IsWorking)
-                    {
-                        AdressekontiCollectionViewSource.Source = null;
-                        return;
-                    }
-                        
-                    AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
-                    // TODO: ???
-
-                    break;
             }
         }
 
