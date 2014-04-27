@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -8,6 +9,7 @@ using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Navigation;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
@@ -20,6 +22,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Private variables
 
         private bool _disposed;
+        private static IBogføringViewModel _lastBogføringViewModel;
         private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
@@ -36,7 +39,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             InitializeComponent();
 
             MainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
-            MainViewModel.Subscribe(this);
 
             Regnskabsliste = MainViewModel.Regnskabsliste;
 
@@ -58,7 +60,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             private set
             {
+                if (MainViewModel != null)
+                {
+                    MainViewModel.Unsubscribe(this);
+                }
                 SetValue(MainViewModelProperty, value);
+                if (MainViewModel == null)
+                {
+                    return;
+                }
+                MainViewModel.Subscribe(this);
             }
         }
 
@@ -73,13 +84,36 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             private set
             {
+                if (Regnskab != null)
+                {
+                    if (Regnskab.Bogføring != null)
+                    {
+                        Regnskab.Bogføring.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                    }
+                    Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
+                }
                 SetValue(RegnskabProperty, value);
-                if (Regnskab == null || Regnskab.Bogføring == null)
+                if (Regnskab == null)
                 {
                     return;
                 }
-                Regnskab.Bogføring.Adressekonto = 0;
-                Regnskab.Bogføring.ClearValidationErrors();
+                Regnskab.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
+                try
+                {
+                    if (Regnskab.Bogføring == null)
+                    {
+                        return;
+                    }
+                    AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
+                    // TODO: ???
+
+                    Regnskab.Bogføring.ClearValidationErrors();
+                    Regnskab.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
+                }
+                finally
+                {
+                    _lastBogføringViewModel = Regnskab.Bogføring;
+                }
             }
         }
 
@@ -95,6 +129,18 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             private set
             {
                 SetValue(RegnskabslisteProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Finder og returnerer CollectionViewSource til adressekonti.
+        /// </summary>
+        private CollectionViewSource AdressekontiCollectionViewSource
+        {
+            get
+            {
+                var mainGrid = (Grid) Content;
+                return (CollectionViewSource) mainGrid.Resources["AdressekontiCollectionViewSource"];
             }
         }
 
@@ -129,7 +175,18 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            MainViewModel.Unsubscribe(this);
+            if (Regnskab != null)
+            {
+                if (Regnskab.Bogføring != null)
+                {
+                    Regnskab.Bogføring.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                }
+                Regnskab.PropertyChanged -= PropertyChangedOnRegnskabViewModelEventHandler;
+            }
+            if (MainViewModel != null)
+            {
+                MainViewModel.Unsubscribe(this);
+            }
             if (disposing)
             {
             }
@@ -273,6 +330,88 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 DefaultNavigationProgressBar.Visibility = Visibility.Collapsed;
                 MinimalNavigationProgressBar.IsIndeterminate = false;
                 MinimalNavigationProgressBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når en property på ViewModel for regnskabet ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnRegnskabViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var regnskabViewModel = sender as IRegnskabViewModel;
+            if (regnskabViewModel == null)
+            {
+                return;
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Bogføring":
+                    if (_lastBogføringViewModel != null)
+                    {
+                        _lastBogføringViewModel.PropertyChanged -= PropertyChangedOnBogføringViewModelEventHandler;
+                    }
+                    try
+                    {
+                        if (regnskabViewModel.Bogføring == null)
+                        {
+                            return;
+                        }
+                        AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
+                        // TODO: ???
+
+                        regnskabViewModel.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
+                    }
+                    finally
+                    {
+                        _lastBogføringViewModel = regnskabViewModel.Bogføring;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når en property på ViewModel til bogføring ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnBogføringViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var bogføringViewModel = sender as IBogføringViewModel;
+            if (bogføringViewModel == null)
+            {
+                return;
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "IsWorking":
+                    if (bogføringViewModel.IsWorking)
+                    {
+                        AdressekontiCollectionViewSource.Source = null;
+                        return;
+                    }
+                        
+                    AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
+                    // TODO: ???
+
+                    break;
             }
         }
 

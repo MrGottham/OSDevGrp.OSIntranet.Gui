@@ -36,7 +36,6 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             ConfigurationProvider = ConfigurationProvider.Instance;
 
             MainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
-            MainViewModel.Subscribe(this);
 
             DataContext = MainViewModel;
         }
@@ -71,12 +70,21 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             private set
             {
-                if (MainViewModel != null && MainViewModel.FinansstyringKonfiguration != null)
+                if (MainViewModel != null)
                 {
-                    MainViewModel.FinansstyringKonfiguration.PropertyChanged -= FinansstyringKonfigurationPropertyChangedEventHandler;
+                    if (MainViewModel.FinansstyringKonfiguration != null)
+                    {
+                        MainViewModel.FinansstyringKonfiguration.PropertyChanged -= FinansstyringKonfigurationPropertyChangedEventHandler;
+                    }
+                    MainViewModel.Unsubscribe(this);
                 }
                 SetValue(MainViewModelProperty, value);
-                if (MainViewModel == null || MainViewModel.FinansstyringKonfiguration == null)
+                if (MainViewModel == null)
+                {
+                    return;
+                }
+                MainViewModel.Subscribe(this);
+                if (MainViewModel.FinansstyringKonfiguration == null)
                 {
                     return;
                 }
@@ -116,11 +124,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            if (MainViewModel.FinansstyringKonfiguration != null)
+            if (MainViewModel != null)
             {
-                MainViewModel.FinansstyringKonfiguration.PropertyChanged -= FinansstyringKonfigurationPropertyChangedEventHandler;
+                if (MainViewModel.FinansstyringKonfiguration != null)
+                {
+                    MainViewModel.FinansstyringKonfiguration.PropertyChanged -= FinansstyringKonfigurationPropertyChangedEventHandler;
+                }
+                MainViewModel.Unsubscribe(this);
             }
-            MainViewModel.Unsubscribe(this);
             if (disposing)
             {
             }
