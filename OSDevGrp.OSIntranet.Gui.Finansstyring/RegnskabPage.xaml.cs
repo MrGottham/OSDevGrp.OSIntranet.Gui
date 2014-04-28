@@ -403,6 +403,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             switch (eventArgs.PropertyName)
             {
                 case "Adressekonti":
+                    var i = AdressekontiCollectionViewSource.View.CurrentPosition;
+                    i.ToString();
                     AdressekontiCollectionViewSource.Source = bogføringViewModel.Adressekonti;
                     if (bogføringViewModel.Adressekonto == 0)
                     {
