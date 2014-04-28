@@ -104,8 +104,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                     {
                         return;
                     }
+                    var adressekonto = Regnskab.Bogføring.Adressekonto;
                     AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
                     Regnskab.Bogføring.ClearValidationErrors();
+                    Regnskab.Bogføring.Adressekonto = adressekonto;
                     Regnskab.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
                 }
                 finally
@@ -364,7 +366,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                         {
                             return;
                         }
+                        var adressekonto = Regnskab.Bogføring.Adressekonto;
                         AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
+                        regnskabViewModel.Bogføring.ClearValidationErrors();
+                        regnskabViewModel.Bogføring.Adressekonto = adressekonto;
                         regnskabViewModel.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
                     }
                     finally
@@ -394,6 +399,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             if (bogføringViewModel == null)
             {
                 return;
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Adressekonti":
+                    AdressekontiCollectionViewSource.Source = bogføringViewModel.Adressekonti;
+                    if (bogføringViewModel.Adressekonto == 0)
+                    {
+                        break;
+                    }
+                    break;
             }
         }
 
