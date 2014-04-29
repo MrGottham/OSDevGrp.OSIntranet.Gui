@@ -568,7 +568,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 throw new ArgumentNullException("eventArgs");
             }
-            if (Regnskab.Bogføring == null)
+            if (Regnskab.Bogføring == null || Regnskab.Bogføring.AdressekontoIsReadOnly)
             {
                 return;
             }
@@ -625,50 +625,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 }
                 adressekontoViewModelCollection.Add(adressekontoViewModel);
             }
-
-
-
-            //var value = textBox.Text;
-            //var adressekonti = new List<IAdressekontoViewModel>
-            //                {
-            //                    null
-            //                };
-            //adressekonti.AddRange(Regnskab.Bogføring.Adressekonti);
-            //if (string.IsNullOrWhiteSpace(value))
-            //{
-            //    AdressekontiCollectionViewSource.Source = adressekonti;
-            //    AdressekontiCollectionViewSource.View.MoveCurrentTo(null);
-            //    return;
-            //}
-            //if (Regnskab.Bogføring.Adressekonto != 0)
-            //{
-            //    AdressekontiCollectionViewSource.Source = adressekonti;
-            //    AdressekontiCollectionViewSource.View.MoveCurrentTo(adressekonti.FirstOrDefault(m => m != null && m.Nummer == Regnskab.Bogføring.Adressekonto));
-            //    return;
-            //}
-            //var filteredAdressekonti = adressekonti
-            //    .Where(m =>
-            //        {
-            //            if (m == null)
-            //            {
-            //                return true;
-            //            }
-            //            if (string.IsNullOrEmpty(m.Navn))
-            //            {
-            //                return false;
-            //            }
-            //            if (m.Navn.Length < value.Length)
-            //            {
-            //                return false;
-            //            }
-            //            return string.Compare(m.Navn.Substring(0, value.Length), value, StringComparison.OrdinalIgnoreCase) == 0;
-            //        })
-            //    .ToList();
-            //AdressekontiCollectionViewSource.Source = filteredAdressekonti;
-            //if (filteredAdressekonti.Count(m => m != null) == 1)
-            //{
-            //    AdressekontiCollectionViewSource.View.MoveCurrentTo(filteredAdressekonti.First(m => m != null));
-            //}
+            if (adressekontoViewModelCollection.Count(m => m != null) == 1)
+            {
+                AdressekontiCollectionViewSource.View.MoveCurrentTo(adressekontoViewModelCollection.First(m => m != null));
+            }
         }
 
         /// <summary>
