@@ -22,7 +22,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         #region Private variables
 
         private bool _disposed;
-        private static IBogføringViewModel _lastBogføringViewModel;
+        private bool _adressekontiIsLoaded;
+        private IBogføringViewModel _lastBogføringViewModel;
         private static readonly DependencyProperty MainViewModelProperty = DependencyProperty.Register("MainViewModel", typeof (IMainViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabProperty = DependencyProperty.Register("Regnskab", typeof (IRegnskabViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
         private static readonly DependencyProperty RegnskabslisteProperty = DependencyProperty.Register("Regnskabsliste", typeof (IRegnskabslisteViewModel), typeof (RegnskabPage), new PropertyMetadata(null));
@@ -100,10 +101,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 Regnskab.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
                 try
                 {
+                    _adressekontiIsLoaded = false;
                     if (Regnskab.Bogføring == null)
                     {
                         return;
                     }
+                    _adressekontiIsLoaded = Regnskab.Bogføring.Adressekonti.Any();
                     var adressekonto = Regnskab.Bogføring.Adressekonto;
                     AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
                     Regnskab.Bogføring.ClearValidationErrors();
@@ -362,12 +365,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                     }
                     try
                     {
+                        _adressekontiIsLoaded = false;
                         if (regnskabViewModel.Bogføring == null)
                         {
                             return;
                         }
-                        var adressekonto = Regnskab.Bogføring.Adressekonto;
-                        AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
+                        _adressekontiIsLoaded = regnskabViewModel.Bogføring.Adressekonti.Any();
+                        var adressekonto = regnskabViewModel.Bogføring.Adressekonto;
+                        AdressekontiCollectionViewSource.Source = regnskabViewModel.Bogføring.Adressekonti;
                         regnskabViewModel.Bogføring.ClearValidationErrors();
                         regnskabViewModel.Bogføring.Adressekonto = adressekonto;
                         regnskabViewModel.Bogføring.PropertyChanged += PropertyChangedOnBogføringViewModelEventHandler;
@@ -402,14 +407,15 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             }
             switch (eventArgs.PropertyName)
             {
-                case "Adressekonti":
-                    var i = AdressekontiCollectionViewSource.View.CurrentPosition;
-                    i.ToString();
-                    AdressekontiCollectionViewSource.Source = bogføringViewModel.Adressekonti;
-                    if (bogføringViewModel.Adressekonto == 0)
+                case "AdressekontoIsReadOnly":
+                    if (bogføringViewModel.AdressekontoIsReadOnly || _adressekontiIsLoaded)
                     {
-                        break;
+                        return;
                     }
+                    _adressekontiIsLoaded = true;
+                    var adressekonto = bogføringViewModel.Adressekonto;
+                    AdressekontiCollectionViewSource.Source = bogføringViewModel.Adressekonti;
+                    bogføringViewModel.Adressekonto = adressekonto;
                     break;
             }
         }
@@ -573,8 +579,33 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             var value = textBox.Text;
             if (string.IsNullOrWhiteSpace(value))
             {
+                AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti;
                 Regnskab.Bogføring.Adressekonto = 0;
                 return;
+            }
+            if (Regnskab.Bogføring.Adressekonto != 0)
+            {
+                AdressekontiCollectionViewSource.Source = Regnskab.Bogføring.Adressekonti.Where(m => m.Nummer == Regnskab.Bogføring.Adressekonto);
+                return;
+            }
+            var filteredAdressekonti = Regnskab.Bogføring.Adressekonti
+                                               .Where(m =>
+                                                   {
+                                                       if (string.IsNullOrWhiteSpace(m.Navn))
+                                                       {
+                                                           return false;
+                                                       }
+                                                       if (m.Navn.Length < value.Length)
+                                                       {
+                                                           return false;
+                                                       }
+                                                       return string.Compare(m.Navn.Substring(0, value.Length), value, StringComparison.OrdinalIgnoreCase) == 0;
+                                                   })
+                                               .ToList();
+            AdressekontiCollectionViewSource.Source = filteredAdressekonti;
+            if (filteredAdressekonti.Count() == 1)
+            {
+                AdressekontiCollectionViewSource.View.MoveCurrentTo(filteredAdressekonti.First());
             }
         }
 
