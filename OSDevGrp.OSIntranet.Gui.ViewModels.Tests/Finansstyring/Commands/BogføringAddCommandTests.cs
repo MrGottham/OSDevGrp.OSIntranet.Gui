@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -356,6 +357,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             regnskabViewModelMock.Expect(m => m.Nummer)
                                  .Return(regnskabsnummer)
                                  .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
             regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
                                  .Return(null)
                                  .Repeat.Any();
@@ -418,6 +431,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             regnskabViewModelMock.Expect(m => m.Nummer)
                                  .Return(fixture.Create<int>())
                                  .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
             regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
                                  .Return(null)
                                  .Repeat.Any();
@@ -472,6 +497,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
             regnskabViewModelMock.Expect(m => m.Nummer)
                                  .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
                                  .Repeat.Any();
             regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
                                  .Return(null)
@@ -529,6 +566,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             regnskabViewModelMock.Expect(m => m.Nummer)
                                  .Return(fixture.Create<int>())
                                  .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
             regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
                                  .Return(null)
                                  .Repeat.Any();
@@ -572,6 +621,259 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
         }
 
         /// <summary>
+        /// Tester, at Execute udfører RefreshCommand på kontoen, hvorpå bogføringslinjen er bogført.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteExecutesRefreshCommandForKonto()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+
+            var refreshCommandMock = MockRepository.GenerateMock<ICommand>();
+            refreshCommandMock.Expect(m => m.CanExecute(Arg<object>.Is.NotNull))
+                              .Return(true)
+                              .Repeat.Any();
+
+            var kontonummer = fixture.Create<string>();
+            var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+            kontoViewModelMock.Expect(m => m.Kontonummer)
+                              .Return(kontonummer)
+                              .Repeat.Any();
+            kontoViewModelMock.Expect(m => m.RefreshCommand)
+                              .Return(refreshCommandMock)
+                              .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel> {kontoViewModelMock})
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
+                                 .Return(null)
+                                 .Repeat.Any();
+
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().Date.ToString(CultureInfo.CurrentUICulture), string.Empty, kontonummer, fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            bogføringViewModelMock.Expect(m => m.Regnskab)
+                                  .Return(regnskabViewModelMock)
+                                  .Repeat.Any();
+
+            var bogføringsresultatModelMock = MockRepository.GenerateMock<IBogføringsresultatModel>();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringslinje)
+                                       .Return(fixture.Create<IBogføringslinjeModel>())
+                                       .Repeat.Any();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringsadvarsler)
+                                       .Return(new List<IBogføringsadvarselModel>(0))
+                                       .Repeat.Any();
+
+            Func<IBogføringsresultatModel> bogføringsresultatGetter = () => bogføringsresultatModelMock;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything))
+                                       .Return(Task.Run(bogføringsresultatGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new BogføringAddCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            Action action = () =>
+                {
+                    command.Execute(bogføringViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything));
+            regnskabViewModelMock.AssertWasCalled(m => m.Konti);
+            kontoViewModelMock.AssertWasCalled(m => m.RefreshCommand);
+            refreshCommandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(kontoViewModelMock)));
+            refreshCommandMock.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(kontoViewModelMock)));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at Execute udfører RefreshCommand på budgetkontoen, hvorpå bogføringslinjen er bogført.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteExecutesRefreshCommandForBudgetkonto()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+
+            var refreshCommandMock = MockRepository.GenerateMock<ICommand>();
+            refreshCommandMock.Expect(m => m.CanExecute(Arg<object>.Is.NotNull))
+                              .Return(true)
+                              .Repeat.Any();
+
+            var budgetkontonummer = fixture.Create<string>();
+            var budgetkontoViewModelMock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+            budgetkontoViewModelMock.Expect(m => m.Kontonummer)
+                                    .Return(budgetkontonummer)
+                                    .Repeat.Any();
+            budgetkontoViewModelMock.Expect(m => m.RefreshCommand)
+                                    .Return(refreshCommandMock)
+                                    .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel> {budgetkontoViewModelMock})
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
+                                 .Return(null)
+                                 .Repeat.Any();
+
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().Date.ToString(CultureInfo.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), budgetkontonummer, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            bogføringViewModelMock.Expect(m => m.Regnskab)
+                                  .Return(regnskabViewModelMock)
+                                  .Repeat.Any();
+
+            var bogføringsresultatModelMock = MockRepository.GenerateMock<IBogføringsresultatModel>();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringslinje)
+                                       .Return(fixture.Create<IBogføringslinjeModel>())
+                                       .Repeat.Any();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringsadvarsler)
+                                       .Return(new List<IBogføringsadvarselModel>(0))
+                                       .Repeat.Any();
+
+            Func<IBogføringsresultatModel> bogføringsresultatGetter = () => bogføringsresultatModelMock;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything))
+                                       .Return(Task.Run(bogføringsresultatGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new BogføringAddCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            Action action = () =>
+                {
+                    command.Execute(bogføringViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything));
+            regnskabViewModelMock.AssertWasCalled(m => m.Budgetkonti);
+            budgetkontoViewModelMock.AssertWasCalled(m => m.RefreshCommand);
+            refreshCommandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(budgetkontoViewModelMock)));
+            refreshCommandMock.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(budgetkontoViewModelMock)));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at Execute udfører RefreshCommand på adressekontoen, hvorpå bogføringslinjen er bogført.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteExecutesRefreshCommandForAdressekonto()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+
+            var refreshCommandMock = MockRepository.GenerateMock<ICommand>();
+            refreshCommandMock.Expect(m => m.CanExecute(Arg<object>.Is.NotNull))
+                              .Return(true)
+                              .Repeat.Any();
+
+            var adressekonto = fixture.Create<int>();
+            var adressekontoViewModelMock = MockRepository.GenerateMock<IAdressekontoViewModel>();
+            adressekontoViewModelMock.Expect(m => m.Nummer)
+                                     .Return(adressekonto)
+                                     .Repeat.Any();
+            adressekontoViewModelMock.Expect(m => m.RefreshCommand)
+                                     .Return(refreshCommandMock)
+                                     .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Nummer)
+                                 .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel> {adressekontoViewModelMock})
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel> {adressekontoViewModelMock})
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
+                                 .Return(null)
+                                 .Repeat.Any();
+
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().Date.ToString(CultureInfo.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, adressekonto);
+            bogføringViewModelMock.Expect(m => m.Regnskab)
+                                  .Return(regnskabViewModelMock)
+                                  .Repeat.Any();
+
+            var bogføringsresultatModelMock = MockRepository.GenerateMock<IBogføringsresultatModel>();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringslinje)
+                                       .Return(fixture.Create<IBogføringslinjeModel>())
+                                       .Repeat.Any();
+            bogføringsresultatModelMock.Expect(m => m.Bogføringsadvarsler)
+                                       .Return(new List<IBogføringsadvarselModel>(0))
+                                       .Repeat.Any();
+
+            Func<IBogføringsresultatModel> bogføringsresultatGetter = () => bogføringsresultatModelMock;
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.GreaterThan(0)))
+                                       .Return(Task.Run(bogføringsresultatGetter))
+                                       .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var command = new BogføringAddCommand(finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(command, Is.Not.Null);
+
+            Action action = () =>
+                {
+                    command.Execute(bogføringViewModelMock);
+                    Assert.That(command.ExecuteTask, Is.Not.Null);
+                    command.ExecuteTask.Wait();
+                };
+            Task.Run(action).Wait(3000);
+
+            finansstyringRepositoryMock.AssertWasCalled(m => m.BogførAsync(Arg<int>.Is.GreaterThan(0), Arg<DateTime>.Is.GreaterThan(DateTime.MinValue), Arg<string>.Is.Anything, Arg<string>.Is.NotNull, Arg<string>.Is.NotNull, Arg<string>.Is.Anything, Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<decimal>.Is.GreaterThanOrEqual(0M), Arg<int>.Is.Anything));
+            regnskabViewModelMock.AssertWasCalled(m => m.Debitorer);
+            regnskabViewModelMock.AssertWasCalled(m => m.Kreditorer);
+            adressekontoViewModelMock.AssertWasCalled(m => m.RefreshCommand, opt => opt.Repeat.Times(2));
+            refreshCommandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(adressekontoViewModelMock)), opt => opt.Repeat.Times(2));
+            refreshCommandMock.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(adressekontoViewModelMock)), opt => opt.Repeat.Times(2));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
         /// Tester, at Execute rejser OnBogført ved endt bogføring.
         /// </summary>
         [Test]
@@ -584,6 +886,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
             regnskabViewModelMock.Expect(m => m.Nummer)
                                  .Return(fixture.Create<int>())
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
                                  .Repeat.Any();
             regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
                                  .Return(null)
@@ -654,6 +968,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             regnskabViewModelMock.Expect(m => m.Nummer)
                                  .Return(fixture.Create<int>())
                                  .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                                 .Return(new List<IKontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                                 .Return(new List<IBudgetkontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Debitorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
+            regnskabViewModelMock.Expect(m => m.Kreditorer)
+                                 .Return(new List<IAdressekontoViewModel>(0))
+                                 .Repeat.Any();
             regnskabViewModelMock.Expect(m => m.BogføringSetCommand)
                                  .Return(bogføringSetCommandMock)
                                  .Repeat.Any();
@@ -696,6 +1022,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             bogføringSetCommandMock.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(regnskabViewModelMock)));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
+
 
         /// <summary>
         /// Tester, at Execute kalder HandleException på exceptionhandleren med en IntranetGuiCommandException ved IntranetGuiCommandException.

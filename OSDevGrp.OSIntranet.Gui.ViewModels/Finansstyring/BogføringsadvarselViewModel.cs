@@ -196,6 +196,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Label til kommandoen, der fjerner advarslen fra regnskabet, hvorpå den er tilknyttet.
+        /// </summary>
+        public virtual string RemoveCommandLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Ignore);
+            }
+        }
+
+        /// <summary>
         /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
         /// </summary>
         public override string DisplayName

@@ -97,6 +97,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Label til kommandoen, der fjerner advarslen fra regnskabet, hvorpå den er tilknyttet.
+        /// </summary>
+        string RemoveCommandLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Billede, der illustrerer en advarsel ved en bogføring.
         /// </summary>
         byte[] Image

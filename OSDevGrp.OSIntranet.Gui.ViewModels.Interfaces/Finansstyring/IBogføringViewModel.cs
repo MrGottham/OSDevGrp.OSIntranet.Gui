@@ -561,5 +561,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
+
+        /// <summary>
+        /// Label til kommandoen, der kan foretage bogføring af bogføringslinjen.
+        /// </summary>
+        string BogførCommandLabel
+        {
+            get;
+        }
     }
 }

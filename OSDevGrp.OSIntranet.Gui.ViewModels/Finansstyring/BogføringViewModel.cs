@@ -1162,6 +1162,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Label til kommandoen, der kan foretage bogføring af bogføringslinjen.
+        /// </summary>
+        public virtual string BogførCommandLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.AddBookkeeping);
+            }
+        }
+
+        /// <summary>
         /// ViewModel for kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
         protected virtual IKontoViewModel KontoViewModel

@@ -78,6 +78,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringsadvarselViewModel.Information, Is.Not.Empty);
             Assert.That(bogføringsadvarselViewModel.RemoveCommand, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.RemoveCommand, Is.TypeOf<RelayCommand>());
+            Assert.That(bogføringsadvarselViewModel.RemoveCommandLabel, Is.Not.Null);
+            Assert.That(bogføringsadvarselViewModel.RemoveCommandLabel, Is.Not.Empty);
+            Assert.That(bogføringsadvarselViewModel.RemoveCommandLabel, Is.EqualTo(Resource.GetText(Text.Ignore)));
             Assert.That(bogføringsadvarselViewModel.DisplayName, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.DisplayName, Is.Not.Empty);
             Assert.That(bogføringsadvarselViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.PostingWarning)));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -222,6 +223,43 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 foreach (var bogføringsadvarselModel in bogføringsresultatModel.Bogføringsadvarsler)
                 {
                     regnskabViewModel.BogføringsadvarselAdd(new BogføringsadvarselViewModel(regnskabViewModel, bogføringslinjeViewModel, bogføringsadvarselModel, DateTime.Now));
+                }
+                if (string.IsNullOrEmpty(bogføringViewModel.Kontonummer) == false)
+                {
+                    var kontoViewModel = regnskabViewModel.Konti.FirstOrDefault(m => string.Compare(m.Kontonummer, bogføringViewModel.Kontonummer, StringComparison.Ordinal) == 0);
+                    if (kontoViewModel != null)
+                    {
+                        var refreshCommand = kontoViewModel.RefreshCommand;
+                        if (refreshCommand.CanExecute(kontoViewModel))
+                        {
+                            refreshCommand.Execute(kontoViewModel);
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(bogføringViewModel.Budgetkontonummer) == false)
+                {
+                    var budgetkontoViewModel = regnskabViewModel.Budgetkonti.FirstOrDefault(m => string.Compare(m.Kontonummer, bogføringViewModel.Budgetkontonummer, StringComparison.Ordinal) == 0);
+                    if (budgetkontoViewModel != null)
+                    {
+                        var refreshCommand = budgetkontoViewModel.RefreshCommand;
+                        if (refreshCommand.CanExecute(budgetkontoViewModel))
+                        {
+                            refreshCommand.Execute(budgetkontoViewModel);
+                        }
+                    }
+                }
+                if (bogføringViewModel.Adressekonto != 0)
+                {
+                    var adressekontoViewModelCollection = regnskabViewModel.Debitorer.Where(m => m.Nummer == bogføringViewModel.Adressekonto).ToList();
+                    adressekontoViewModelCollection.AddRange(regnskabViewModel.Kreditorer.Where(m => m.Nummer == bogføringViewModel.Adressekonto).ToList());
+                    foreach (var adressekontoViewModel in adressekontoViewModelCollection)
+                    {
+                        var refreshCommand = adressekontoViewModel.RefreshCommand;
+                        if (refreshCommand.CanExecute(adressekontoViewModel))
+                        {
+                            refreshCommand.Execute(adressekontoViewModel);
+                        }
+                    }
                 }
                 if (OnBogført != null)
                 {

@@ -267,4 +267,10 @@
   <data name="AddressAccounts" xml:space="preserve">
     <value>Address accounts</value>
   </data>
+  <data name="AddBookkeeping" xml:space="preserve">
+    <value>Post</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>Ignore</value>
+  </data>
 </root>

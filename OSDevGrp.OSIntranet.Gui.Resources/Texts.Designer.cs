@@ -124,6 +124,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Post.
+        /// </summary>
+        internal static string AddBookkeeping {
+            get {
+                return ResourceManager.GetString("AddBookkeeping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Address account.
         /// </summary>
         internal static string AddressAccount {
@@ -354,6 +363,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string Hide {
             get {
                 return ResourceManager.GetString("Hide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore.
+        /// </summary>
+        internal static string Ignore {
+            get {
+                return ResourceManager.GetString("Ignore", resourceCulture);
             }
         }
         

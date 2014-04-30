@@ -207,6 +207,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringViewModel.IsWorking, Is.False);
             Assert.That(bogføringViewModel.BogførCommand, Is.Not.Null);
             Assert.That(bogføringViewModel.BogførCommand, Is.TypeOf<CommandCollectionExecuterCommand>());
+            Assert.That(bogføringViewModel.BogførCommandLabel, Is.Not.Null);
+            Assert.That(bogføringViewModel.BogførCommandLabel, Is.Not.Empty);
+            Assert.That(bogføringViewModel.BogførCommandLabel, Is.EqualTo(Resource.GetText(Text.AddBookkeeping)));
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Dato);
             bogføringslinjeModelMock.AssertWasCalled(m => m.Bilag);

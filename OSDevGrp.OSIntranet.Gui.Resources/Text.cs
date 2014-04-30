@@ -52,6 +52,8 @@
         DecimalLowerThan,
         AddressAccount,
         AddressAccounts,
-        Name
+        Name,
+        AddBookkeeping,
+        Ignore
     }
 }

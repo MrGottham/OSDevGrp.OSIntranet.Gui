@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
@@ -225,7 +226,12 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 }
                 try
                 {
-                    return;
+                    var messageBuilder = new StringBuilder(commandException.Message);
+                    messageBuilder.AppendLine();
+                    messageBuilder.AppendLine();
+                    messageBuilder.Append(commandException.Reason);
+                    var messageDialog = new MessageDialog(messageBuilder.ToString());
+                    await messageDialog.ShowAsync();
                 }
                 finally
                 {
