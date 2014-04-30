@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="d2419bd8-b7af-414f-8173-e2292b84ce17" Publisher="CN=Ole" Version="1.0.0.0" />
+  <Identity Name="13038MrGottham.OSFinansstyring" Publisher="CN=6C89856B-6378-4895-AE0B-8AFBF7818257" Version="1.0.0.0" />
   <Properties>
     <DisplayName>OS Finansstyring</DisplayName>
-    <PublisherDisplayName>Ole Sørensen</PublisherDisplayName>
+    <PublisherDisplayName>MrGottham</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>

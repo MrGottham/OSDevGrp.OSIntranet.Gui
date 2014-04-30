@@ -12,13 +12,15 @@
     <DefaultLanguage>da-DK</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>OSDevGrp.OSIntranet.Gui.Finansstyring_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>OSDevGrp.OSIntranet.Gui.Finansstyring_StoreKey.pfx</PackageCertificateKeyFile>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+    <PackageCertificateThumbprint>763F20F0391FC855D482FD4796A3EE4B28D601C6</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -182,6 +184,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="OSDevGrp.OSIntranet.Gui.Finansstyring_StoreKey.pfx" />
     <None Include="OSDevGrp.OSIntranet.Gui.Finansstyring_TemporaryKey.pfx" />
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />
     <None Include="packages.config" />
@@ -212,6 +215,7 @@
     <Content Include="Assets\WideLogo.scale-140.png" />
     <Content Include="Assets\WideLogo.scale-180.png" />
     <Content Include="Assets\WideLogo.scale-80.png" />
+    <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
