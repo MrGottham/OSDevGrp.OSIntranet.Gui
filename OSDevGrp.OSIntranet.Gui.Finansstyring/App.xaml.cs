@@ -40,6 +40,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             InitializeComponent();
             Suspending += OnSuspending;
 
+            // TODO: http://msdn.microsoft.com/en-us/library/windows/apps/hh846296.aspx
             // TODO: Search.
         }
 
