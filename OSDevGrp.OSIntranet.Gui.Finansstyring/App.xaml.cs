@@ -41,6 +41,7 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             Suspending += OnSuspending;
 
             // TODO: http://msdn.microsoft.com/en-us/library/windows/apps/hh846296.aspx
+            // TODO: http://stackoverflow.com/questions/14581782/window-8-24x24-badge-logo-image-failing-wac-tool-test
             // TODO: Search.
         }
 
