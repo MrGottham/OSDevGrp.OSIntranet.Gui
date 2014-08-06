@@ -183,6 +183,10 @@
     <value>Konfigurationsværdien med navnet '{0}' er ikke defineret.</value>
     <comment>{0} = Navn på konfigurationsværdi.</comment>
   </data>
+  <data name="OfflineFinansstyringRepository" xml:space="preserve">
+    <value>Repositoryet, der supporterer finansstyring, var offline ved kaldet af '{0}': {1}</value>
+    <comment>{0} = Metodenavn, {1} = Fejlbesked.</comment>
+  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Fejl i repositorymetode '{0}': {1}</value>
     <comment>{0} = Metodenavn, {1} = Fejlbesked.</comment>

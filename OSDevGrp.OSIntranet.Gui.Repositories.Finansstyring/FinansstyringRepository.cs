@@ -163,6 +163,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     {
                         throw;
                     }
+                    catch (IntranetGuiOfflineRepositoryException)
+                    {
+                        throw;
+                    }
                     catch (IntranetGuiRepositoryException)
                     {
                         throw;
@@ -302,11 +306,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new RegnskabslisteGetQuery();
-                    
+
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginRegnskabslisteGet(query, null, null);
                     result.AddRange(serviceInterface.EndRegnskabslisteGet(asyncResult).Select(m => new RegnskabModel(m.Nummer, m.Navn)));
-                    
+
                     client.CloseAsync();
                 }
                 catch
@@ -320,9 +324,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "RegnskabslisteGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "RegnskabslisteGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "RegnskabslisteGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -347,10 +359,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new KontoplanGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginKontoplanGet(query, null, null);
@@ -390,9 +402,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontoplanGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -422,11 +442,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new KontoGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            Kontonummer = kontonummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        Kontonummer = kontonummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginKontoGet(query, null, null);
@@ -455,9 +475,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontoGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -482,10 +510,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new BudgetkontoplanGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginBudgetkontoplanGet(query, null, null);
@@ -514,7 +542,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -525,9 +553,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "BudgetkontoplanGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -557,11 +593,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new BudgetkontoGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            Kontonummer = budgetkontonummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        Kontonummer = budgetkontonummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginBudgetkontoGet(query, null, null);
@@ -579,7 +615,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -590,9 +626,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "BudgetkontoGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -618,11 +662,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new BogføringerGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            StatusDato = statusDato,
-                            Linjer = antalBogføringslinjer
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        StatusDato = statusDato,
+                        Linjer = antalBogføringslinjer
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginBogføringerGet(query, null, null);
@@ -670,9 +714,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BogføringslinjerGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BogføringslinjerGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "BogføringslinjerGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -704,28 +756,28 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var command = new BogføringslinjeOpretCommand
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            Dato = dato,
-                            Bilag = string.IsNullOrEmpty(bilag) ? null : bilag,
-                            Kontonummer = kontonummer,
-                            Tekst = tekst,
-                            Budgetkontonummer = string.IsNullOrEmpty(budgetkontonummer) ? null : budgetkontonummer,
-                            Debit = debit,
-                            Kredit = kredit,
-                            Adressekonto = adressekonto
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        Dato = dato,
+                        Bilag = string.IsNullOrEmpty(bilag) ? null : bilag,
+                        Kontonummer = kontonummer,
+                        Tekst = tekst,
+                        Budgetkontonummer = string.IsNullOrEmpty(budgetkontonummer) ? null : budgetkontonummer,
+                        Debit = debit,
+                        Kredit = kredit,
+                        Adressekonto = adressekonto
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginBogføringslinjeOpret(command, null, null);
                     var response = serviceInterface.EndBogføringslinjeOpret(asyncResult);
 
                     var bogføringslinjeModel = new BogføringslinjeModel(regnskabsnummer, response.Løbenr, response.Dato, response.Konto.Kontonummer, response.Tekst, response.Debit, response.Kredit)
-                        {
-                            Bilag = string.IsNullOrEmpty(response.Bilag) ? null : response.Bilag,
-                            Budgetkontonummer = response.Budgetkonto == null ? null : string.IsNullOrEmpty(response.Budgetkonto.Kontonummer) ? null : response.Budgetkonto.Kontonummer,
-                            Adressekonto = response.Adressekonto == null ? 0 : response.Adressekonto.Nummer
-                        };
+                    {
+                        Bilag = string.IsNullOrEmpty(response.Bilag) ? null : response.Bilag,
+                        Budgetkontonummer = response.Budgetkonto == null ? null : string.IsNullOrEmpty(response.Budgetkonto.Kontonummer) ? null : response.Budgetkonto.Kontonummer,
+                        Adressekonto = response.Adressekonto == null ? 0 : response.Adressekonto.Nummer
+                    };
                     var bogføringsadvarselModelCollection = new List<IBogføringsadvarselModel>();
                     if (response.Advarsler != null)
                     {
@@ -735,7 +787,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -746,9 +798,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Bogfør", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Bogfør", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "Bogfør", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -773,10 +833,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new DebitorlisteGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginDebitorlisteGet(query, null, null);
@@ -810,7 +870,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -821,9 +881,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DebitorlisteGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DebitorlisteGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "DebitorlisteGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -848,10 +916,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new KreditorlisteGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginKreditorlisteGet(query, null, null);
@@ -885,7 +953,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -896,9 +964,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KreditorlisteGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KreditorlisteGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KreditorlisteGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -923,10 +999,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new AdressekontolisteGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginAdressekontolisteGet(query, null, null);
@@ -960,7 +1036,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -971,9 +1047,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontolisteGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontolisteGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "AdressekontolisteGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -999,11 +1083,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 try
                 {
                     var query = new AdressekontoGetQuery
-                        {
-                            Regnskabsnummer = regnskabsnummer,
-                            Nummer = nummer,
-                            StatusDato = statusDato
-                        };
+                    {
+                        Regnskabsnummer = regnskabsnummer,
+                        Nummer = nummer,
+                        StatusDato = statusDato
+                    };
 
                     var serviceInterface = (FinansstyringService) client;
                     var asyncResult = serviceInterface.BeginAdressekontoGet(query, null, null);
@@ -1025,7 +1109,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -1036,9 +1120,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontoGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontoGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "AdressekontoGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -1068,7 +1160,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -1079,9 +1171,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontogruppelisteGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {
@@ -1111,7 +1211,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
                     client.CloseAsync();
                 }
-                catch (Exception)
+                catch
                 {
                     client.Abort();
                     throw;
@@ -1122,9 +1222,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw;
             }
+            catch (FaultException<IntranetFault> ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontogruppelisteGet", ex.Detail.Message), ex);
+            }
             catch (FaultException ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontogruppelisteGet", ex.Message), ex);
+            }
+            catch (CommunicationException ex)
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontogruppelisteGet", ex.Message), this, ex);
             }
             catch (Exception ex)
             {

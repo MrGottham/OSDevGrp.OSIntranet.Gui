@@ -232,6 +232,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The repository supporting financial management was offline while calling &apos;{0}&apos;: {1}.
+        /// </summary>
+        internal static string OfflineFinansstyringRepository {
+            get {
+                return ResourceManager.GetString("OfflineFinansstyringRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error in repository method &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string RepositoryError {

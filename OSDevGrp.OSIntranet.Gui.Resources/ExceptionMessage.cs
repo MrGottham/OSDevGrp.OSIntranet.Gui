@@ -25,6 +25,7 @@
         ErrorWhileSettingCredit,
         ErrorWhileSettingAddressAccount,
         ErrorPostingAccountingLine,
-        ErrorUpdateFinansstyringRepository
+        ErrorUpdateFinansstyringRepository,
+        OfflineFinansstyringRepository
     }
 }
