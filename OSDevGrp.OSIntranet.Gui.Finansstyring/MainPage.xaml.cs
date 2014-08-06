@@ -126,6 +126,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
 
+            var offlineRepositoryException = eventArgs.Error as IntranetGuiOfflineRepositoryException;
+            if (offlineRepositoryException != null)
+            {
+                Debug.WriteLine("{0}: {1}", offlineRepositoryException.GetType().Name, offlineRepositoryException.Message);
+                eventArgs.IsHandled = true;
+                return;
+            }
+
             var repositoryException = eventArgs.Error as IntranetGuiRepositoryException;
             if (repositoryException != null)
             {

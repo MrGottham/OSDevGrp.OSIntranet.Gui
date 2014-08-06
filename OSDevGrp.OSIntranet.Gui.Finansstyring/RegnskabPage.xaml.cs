@@ -224,19 +224,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     return;
                 }
-                try
-                {
-                    var messageBuilder = new StringBuilder(commandException.Message);
-                    messageBuilder.AppendLine();
-                    messageBuilder.AppendLine();
-                    messageBuilder.Append(commandException.Reason);
-                    var messageDialog = new MessageDialog(messageBuilder.ToString());
-                    await messageDialog.ShowAsync();
-                }
-                finally
-                {
-                    handleExceptionEventArgs.IsHandled = true;
-                }
+                handleExceptionEventArgs.IsHandled = true;
+                var messageBuilder = new StringBuilder(commandException.Message);
+                messageBuilder.AppendLine();
+                messageBuilder.AppendLine();
+                messageBuilder.Append(commandException.Reason);
+                var messageDialog = new MessageDialog(messageBuilder.ToString());
+                await messageDialog.ShowAsync();
+                return;
             }
             // Håndtering af valideringsexception.
             var validationException = handleExceptionEventArgs.Error as IntranetGuiValidationException;
@@ -253,33 +248,27 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 return;
             }
-            try
+            handleExceptionEventArgs.IsHandled = true;
+            switch (validationException.PropertyName)
             {
-                switch (validationException.PropertyName)
-                {
-                    case "Dato":
-                    case "DatoAsText":
-                    case "Bilag":
-                    case "Kontonummer":
-                    case "Tekst":
-                    case "Budgetkontonummer":
-                    case "Debit":
-                    case "DebitAsText":
-                    case "Kredit":
-                    case "KreditAsText":
-                    case "Adressekonto":
-                        // Usernotification gives via behaviors.
-                        break;
+                case "Dato":
+                case "DatoAsText":
+                case "Bilag":
+                case "Kontonummer":
+                case "Tekst":
+                case "Budgetkontonummer":
+                case "Debit":
+                case "DebitAsText":
+                case "Kredit":
+                case "KreditAsText":
+                case "Adressekonto":
+                    // Usernotification gives via behaviors.
+                    break;
 
-                    default:
-                        var messageDialog = new MessageDialog(validationException.Message);
-                        await messageDialog.ShowAsync();
-                        break;
-                }
-            }
-            finally
-            {
-                handleExceptionEventArgs.IsHandled = true;
+                default:
+                    var messageDialog = new MessageDialog(validationException.Message);
+                    await messageDialog.ShowAsync();
+                    break;
             }
         }
 
