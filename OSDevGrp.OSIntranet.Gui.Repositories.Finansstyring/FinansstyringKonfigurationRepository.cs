@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
@@ -38,6 +39,68 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     try
                     {
                         return new Uri(Convert.ToString(_konfigurationer[konfigurationNavn]));
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, konfigurationNavn), ex);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Filnavn til det lokale synkroniseringslager.
+        /// </summary>
+        public virtual string LokalDataFil
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    const string konfigurationNavn = "LokalDataFil";
+                    if (_konfigurationer.ContainsKey(konfigurationNavn) == false)
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.MissingConfigurationSetting, konfigurationNavn));
+                    }
+                    var value = Convert.ToString(_konfigurationer[konfigurationNavn]);
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, konfigurationNavn));
+                    }
+                    try
+                    {
+                        return Path.GetFileName(value);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, konfigurationNavn), ex);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Filnavn til det lokale synkroniseringslager.
+        /// </summary>
+        public virtual string SynkroniseringDataFil
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    const string konfigurationNavn = "SynkroniseringDataFil";
+                    if (_konfigurationer.ContainsKey(konfigurationNavn) == false)
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.MissingConfigurationSetting, konfigurationNavn));
+                    }
+                    var value = Convert.ToString(_konfigurationer[konfigurationNavn]);
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, konfigurationNavn));
+                    }
+                    try
+                    {
+                        return Path.GetFileName(value);
                     }
                     catch (Exception ex)
                     {
@@ -123,6 +186,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 return new List<string>(3)
                     {
                         "FinansstyringServiceUri",
+                        "LokalDataFil",
+                        "SynkroniseringDataFil",
                         "AntalBogføringslinjer",
                         "DageForNyheder"
                     };

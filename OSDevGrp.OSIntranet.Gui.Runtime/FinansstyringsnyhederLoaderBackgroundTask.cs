@@ -30,12 +30,22 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 var configurationProvider = new ConfigurationProvider();
 
+                var finansstyringConfiguration = configurationProvider.Settings
+                    .Where(m => FinansstyringKonfigurationRepository.Keys.Contains(m.Key))
+                    .ToDictionary(m => m.Key, m => m.Value);
                 var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
-                finansstyringKonfigurationRepository.KonfigurationerAdd(configurationProvider.Settings);
+                finansstyringKonfigurationRepository.KonfigurationerAdd(finansstyringConfiguration);
 
-                var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepository);
-
-                var finansstyringsnyheder = await FinansstyringsnyhederGetAsync(finansstyringRepository);
+                IEnumerable<INyhedModel> finansstyringsnyheder;
+                try
+                {
+                    var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepository);
+                    finansstyringsnyheder = await FinansstyringsnyhederGetAsync(finansstyringRepository);
+                }
+                catch (IntranetGuiOfflineRepositoryException)
+                {
+                    finansstyringsnyheder = new List<INyhedModel>();
+                }
                 UpdateTile(finansstyringsnyheder);
             }
             catch (Exception ex)
@@ -67,7 +77,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 var konfiguration = finansstyringRepository.Konfiguration;
                 var nyhederFromDate = statusDato.AddDays(konfiguration.DageForNyheder*-1);
                 var nyhederToDate = statusDato;
-                    
+
                 foreach (var regnskab in await finansstyringRepository.RegnskabslisteGetAsync())
                 {
                     nyheder.AddRange((await finansstyringRepository.BogføringslinjerGetAsync(regnskab.Nummer, statusDato, konfiguration.AntalBogføringslinjer)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederFromDate.Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederToDate.Date) <= 0).ToList());
@@ -75,6 +85,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     nyheder.AddRange((await finansstyringRepository.KreditorlisteGetAsync(regnskab.Nummer, statusDato)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederFromDate.Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederToDate.Date) <= 0).ToList());
                 }
                 return nyheder;
+            }
+            catch (IntranetGuiOfflineRepositoryException)
+            {
+                throw;
             }
             catch (IntranetGuiRepositoryException)
             {

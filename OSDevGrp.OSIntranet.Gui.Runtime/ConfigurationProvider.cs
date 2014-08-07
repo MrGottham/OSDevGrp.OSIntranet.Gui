@@ -28,6 +28,14 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 _roamingSettings.Values.Add("FinansstyringServiceUri", "http://mother/osintranet/finansstyringservice.svc/mobile");
             }
+            if (_roamingSettings.Values.ContainsKey("LokalDataFil") == false)
+            {
+                _roamingSettings.Values.Add("LokalDataFil", "FinansstyringLocaleData.xml");
+            }
+            if (_roamingSettings.Values.ContainsKey("SynkroniseringDataFil") == false)
+            {
+                _roamingSettings.Values.Add("SynkroniseringDataFil", "FinansstyringSyncData.xml");
+            }
             if (_roamingSettings.Values.ContainsKey("AntalBogføringslinjer") == false)
             {
                 _roamingSettings.Values.Add("AntalBogføringslinjer", 50);

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -47,8 +49,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(keys, Is.Not.Empty);
 
             var keyArray = keys.ToArray();
-            Assert.That(keyArray.Length, Is.EqualTo(3));
+            Assert.That(keyArray.Length, Is.EqualTo(5));
             Assert.That(keyArray.Contains("FinansstyringServiceUri"), Is.True);
+            Assert.That(keyArray.Contains("LokalDataFil"), Is.True);
+            Assert.That(keyArray.Contains("SynkroniseringDataFil"), Is.True);
             Assert.That(keyArray.Contains("AntalBogføringslinjer"), Is.True);
             Assert.That(keyArray.Contains("DageForNyheder"), Is.True);
         }
@@ -73,7 +77,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
-        /// Tester, at FinansstyringServiceUri kaster en IntranetGuiRepositoryException, hvis konfigurationsværiden er invalid.
+        /// Tester, at FinansstyringServiceUri kaster en IntranetGuiRepositoryException, hvis konfigurationsværdien er invalid.
         /// </summary>
         [Test]
         public void TestAtFinansstyringServiceUriKasterIntranetGuiRepositoryExceptionVedInvalidSettingValue()
@@ -120,8 +124,300 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(result, Is.EqualTo(new Uri(uri)));
         }
 
+        /// <summary> 
+        /// Tester, at LokalDataFil kaster en IntranetGuiRepositoryException, hvis setting for filnavnet til det lokale datalager mangler.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilKasterIntranetGuiRepositoryExceptionHvisSettingMangler()
+        {
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.LokalDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.MissingConfigurationSetting, "LokalDataFil")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
         /// <summary>
-        /// Tester, at AntalBogføringslinjer kaster en IntranetGuiRepositoryException, hvis setting for Uri til servicen, der supporterer finansstyring, mangler.
+        /// Tester, at LokalDataFil kaster en IntranetGuiRepositoryException, hvis konfigurationsværdien er invalid.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        public void TestAtLokalDataFilKasterIntranetGuiRepositoryExceptionVedInvalidSettingValue(string invalidValue)
+        {
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"LokalDataFil", invalidValue}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.LokalDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, "LokalDataFil")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at LokalDataFil kaster en IntranetGuiRepositoryException, hvis mappenavnet er invalid.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilKasterIntranetGuiRepositoryExceptionVedDirectoryNameErInvalid()
+        {
+            var rand = new Random(DateTime.Now.Millisecond);
+            var illegalChars = Path.GetInvalidPathChars();
+            var tempFile = new FileInfo(Path.GetTempFileName());
+
+            char illegalChar;
+            do
+            {
+                illegalChar = illegalChars[rand.Next(0, illegalChars.Length - 1)];
+            } while (illegalChar == Path.DirectorySeparatorChar);
+            var invalidFileName = string.Format("{0}{1}{2}{3}{4}", tempFile.DirectoryName, Path.DirectorySeparatorChar, Convert.ToString(illegalChar), Path.DirectorySeparatorChar, tempFile.Name);
+            Debug.WriteLine(string.Format("invalidFileName={0}", invalidFileName));
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"LokalDataFil", invalidFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.LokalDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, "LokalDataFil")));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<ArgumentException>());
+        }
+
+        /// <summary>
+        /// Tester, at LokalDataFil kaster en IntranetGuiRepositoryException, hvis filnavnet er invalid.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilKasterIntranetGuiRepositoryExceptionVedFileNameErInvalid()
+        {
+            var rand = new Random(DateTime.Now.Millisecond);
+            var illegalChars = Path.GetInvalidFileNameChars();
+            var tempFile = new FileInfo(Path.GetTempFileName());
+
+            char illegalChar;
+            do
+            {
+                illegalChar = illegalChars[rand.Next(0, illegalChars.Length - 1)];
+            } while (illegalChar == Path.DirectorySeparatorChar);
+            var invalidFileName = string.Format("{0}{1}{2}{3}{4}", tempFile.DirectoryName, Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(tempFile.Name), Convert.ToString(illegalChar), Path.GetExtension(tempFile.Name));
+            Debug.WriteLine(string.Format("invalidFileName={0}", invalidFileName));
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"LokalDataFil", invalidFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.LokalDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, "LokalDataFil")));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<ArgumentException>());
+        }
+
+        /// <summary>
+        /// Tester, at LokalDataFil returnerer konfigurationsværdi.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilReturnererKonfigurationValue()
+        {
+            var tempFileName = Path.GetFileName(Path.GetTempFileName());
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"LokalDataFil", tempFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            var result = finansstyringKonfigurationRepository.LokalDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(tempFileName));
+        }
+
+        /// <summary> 
+        /// Tester, at SynkroniseringDataFil kaster en IntranetGuiRepositoryException, hvis setting for filnavnet til det lokale synkroniseringslager mangler.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilKasterIntranetGuiRepositoryExceptionHvisSettingMangler()
+        {
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.SynkroniseringDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.MissingConfigurationSetting, "SynkroniseringDataFil")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at SynkroniseringDataFil kaster en IntranetGuiRepositoryException, hvis konfigurationsværdien er invalid.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        public void TestAtSynkroniseringDataFilKasterIntranetGuiRepositoryExceptionVedInvalidSettingValue(string invalidValue)
+        {
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"SynkroniseringDataFil", invalidValue}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.SynkroniseringDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, "SynkroniseringDataFil")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at SynkroniseringDataFil kaster en IntranetGuiRepositoryException, hvis mappenavnet er invalid.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilKasterIntranetGuiRepositoryExceptionVedDirectoryNameErInvalid()
+        {
+            var rand = new Random(DateTime.Now.Millisecond);
+            var illegalChars = Path.GetInvalidPathChars();
+            var tempFile = new FileInfo(Path.GetTempFileName());
+
+            char illegalChar;
+            do
+            {
+                illegalChar = illegalChars[rand.Next(0, illegalChars.Length - 1)];
+            } while (illegalChar == Path.DirectorySeparatorChar);
+            var invalidFileName = string.Format("{0}{1}{2}{3}{4}", tempFile.DirectoryName, Path.DirectorySeparatorChar, Convert.ToString(illegalChar), Path.DirectorySeparatorChar, tempFile.Name);
+            Debug.WriteLine(string.Format("invalidFileName={0}", invalidFileName));
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"SynkroniseringDataFil", invalidFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.SynkroniseringDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, "SynkroniseringDataFil")));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<ArgumentException>());
+        }
+
+        /// <summary>
+        /// Tester, at SynkroniseringDataFil kaster en IntranetGuiRepositoryException, hvis filnavnet er invalid.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilKasterIntranetGuiRepositoryExceptionVedFileNameErInvalid()
+        {
+            var rand = new Random(DateTime.Now.Millisecond);
+            var illegalChars = Path.GetInvalidFileNameChars();
+            var tempFile = new FileInfo(Path.GetTempFileName());
+
+            char illegalChar;
+            do
+            {
+                illegalChar = illegalChars[rand.Next(0, illegalChars.Length - 1)];
+            } while (illegalChar == Path.DirectorySeparatorChar);
+            var invalidFileName = string.Format("{0}{1}{2}{3}{4}", tempFile.DirectoryName, Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(tempFile.Name), Convert.ToString(illegalChar), Path.GetExtension(tempFile.Name));
+            Debug.WriteLine(string.Format("invalidFileName={0}", invalidFileName));
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"SynkroniseringDataFil", invalidFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => finansstyringKonfigurationRepository.SynkroniseringDataFil.Clone());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, "SynkroniseringDataFil")));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<ArgumentException>());
+        }
+
+        /// <summary>
+        /// Tester, at SynkroniseringDataFil returnerer konfigurationsværdi.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilReturnererKonfigurationValue()
+        {
+            var tempFileName = Path.GetFileName(Path.GetTempFileName());
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"SynkroniseringDataFil", tempFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            var result = finansstyringKonfigurationRepository.SynkroniseringDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(tempFileName));
+        }
+
+        /// <summary>
+        /// Tester, at AntalBogføringslinjer kaster en IntranetGuiRepositoryException, hvis setting for antallet af bogføringslinjer, der skal hentes, mangler.
         /// </summary>
         [Test]
         public void TestAtAntalBogføringslinjerKasterIntranetGuiRepositoryExceptionHvisSettingMangler()
@@ -140,7 +436,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
-        /// Tester, at AntalBogføringslinjer kaster en IntranetGuiRepositoryException, hvis konfigurationsværiden er invalid.
+        /// Tester, at AntalBogføringslinjer kaster en IntranetGuiRepositoryException, hvis konfigurationsværdien er invalid.
         /// </summary>
         [Test]
         public void TestAtAntalBogføringslinjerKasterIntranetGuiRepositoryExceptionVedInvalidSettingValue()
@@ -189,7 +485,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
-        /// Tester, at DageForNyheder kaster en IntranetGuiRepositoryException, hvis setting for Uri til servicen, der supporterer finansstyring, mangler.
+        /// Tester, at DageForNyheder kaster en IntranetGuiRepositoryException, hvis setting for antallet af dage for nyheder mangler.
         /// </summary>
         [Test]
         public void TestAtDageForNyhederKasterIntranetGuiRepositoryExceptionHvisSettingMangler()
@@ -208,7 +504,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
-        /// Tester, at DageForNyheder kaster en IntranetGuiRepositoryException, hvis konfigurationsværiden er invalid.
+        /// Tester, at DageForNyheder kaster en IntranetGuiRepositoryException, hvis konfigurationsværdien er invalid.
         /// </summary>
         [Test]
         public void TestAtDageForNyhederKasterIntranetGuiRepositoryExceptionVedInvalidSettingValue()
@@ -282,12 +578,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var konfigurationer = new Dictionary<string, object>
                 {
                     {"FinansstyringServiceUri", "http://www.google.dk"},
+                    {"LokalDataFil", Path.GetTempFileName()},
+                    {"SynkroniseringDataFil", Path.GetTempFileName()},
                     {"AntalBogføringslinjer", fixture.Create<int>()},
                     {"DageForNyheder", fixture.Create<int>()}
                 };
             finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
 
             Assert.That(finansstyringKonfigurationRepository.FinansstyringServiceUri, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationRepository.LokalDataFil, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationRepository.LokalDataFil, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationRepository.SynkroniseringDataFil, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationRepository.SynkroniseringDataFil, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationRepository.AntalBogføringslinjer, Is.GreaterThan(0));
             Assert.That(finansstyringKonfigurationRepository.DageForNyheder, Is.GreaterThan(0));
         }

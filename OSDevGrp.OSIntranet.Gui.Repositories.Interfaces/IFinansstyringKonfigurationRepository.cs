@@ -17,6 +17,22 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         }
 
         /// <summary>
+        /// Filnavn til det lokale datalager.
+        /// </summary>
+        string LokalDataFil
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Filnavn til det lokale synkroniseringslager.
+        /// </summary>
+        string SynkroniseringDataFil
+        {
+            get;
+        }
+
+        /// <summary>
         /// Antal bogføringslinjer, der skal hentes.
         /// </summary>
         int AntalBogføringslinjer
