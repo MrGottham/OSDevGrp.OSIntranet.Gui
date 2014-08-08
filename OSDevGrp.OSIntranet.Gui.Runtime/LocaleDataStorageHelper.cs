@@ -36,11 +36,34 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         }
 
         /// <summary>
-        /// Eventhandler, der danner stream til det lokale datalager.
+        /// Eventhandler, der danner en læsestream til det lokale datalager.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>
-        public static void CreateStreamEventHandler(object sender, object eventArgs)
+        public static void CreateReaderStreamEventHandler(object sender, object eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+
+            var handleEvaluationEventArgs = eventArgs as IHandleEvaluationEventArgs;
+            if (handleEvaluationEventArgs == null)
+            {
+                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "eventArgs", eventArgs.GetType()));
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der danner en skrivestream til det lokale datalager.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        public static void CreateWriterStreamEventHandler(object sender, object eventArgs)
         {
             if (sender == null)
             {

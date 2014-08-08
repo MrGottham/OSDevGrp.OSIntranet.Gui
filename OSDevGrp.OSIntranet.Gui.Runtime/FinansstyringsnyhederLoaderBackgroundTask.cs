@@ -46,7 +46,8 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 {
                     var localeDataStorage = new LocaleDataStorage();
                     localeDataStorage.OnHasLocaleData += LocaleDataStorageHelper.HasLocaleDataEventHandler;
-                    localeDataStorage.OnCreateStream += LocaleDataStorageHelper.CreateStreamEventHandler;
+                    localeDataStorage.OnCreateReaderStream += LocaleDataStorageHelper.CreateReaderStreamEventHandler;
+                    localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;
 
                     finansstyringsnyheder = new List<INyhedModel>();
                 }

@@ -20,9 +20,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         public virtual event IntranetGuiEventHandler<IHandleEvaluationEventArgs> OnHasLocaleData;
 
         /// <summary>
-        /// Event, der rejses, når stream til det lokale datalager skal dannes.
+        /// Event, der rejses, når læsestream til det lokale datalager skal dannes.
         /// </summary>
-        public virtual event IntranetGuiEventHandler<IHandleStreamCreationEventArgs> OnCreateStream; 
+        public virtual event IntranetGuiEventHandler<IHandleStreamCreationEventArgs> OnCreateReaderStream;
+
+        /// <summary>
+        /// Event, der rejses, når skrivetream til det lokale datalager skal dannes.
+        /// </summary>
+        public virtual event IntranetGuiEventHandler<IHandleStreamCreationEventArgs> OnCreateWriterStream;
 
         #endregion
 
@@ -65,9 +70,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>XML reader, der kan læse data fra det lokale datalager.</returns>
         public XmlReader GetLocaleData()
         {
-            if (OnCreateStream != null)
+            if (OnCreateReaderStream != null)
             {
                 
+            }
+            if (OnCreateWriterStream != null)
+            {
+
             }
             throw new NotImplementedException();
         }

@@ -16,10 +16,15 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         event IntranetGuiEventHandler<IHandleEvaluationEventArgs> OnHasLocaleData;
 
         /// <summary>
-        /// Event, der rejses, når stream til det lokale datalager skal dannes.
+        /// Event, der rejses, når en læsestream til det lokale datalager skal dannes.
         /// </summary>
-        event IntranetGuiEventHandler<IHandleStreamCreationEventArgs> OnCreateStream; 
- 
+        event IntranetGuiEventHandler<IHandleStreamCreationEventArgs> OnCreateReaderStream;
+
+        /// <summary>
+        /// Event, der rejses, når en skrivestream til det lokale datalager skal dannes.
+        /// </summary>
+        event IntranetGuiEventHandler<IHandleStreamCreationEventArgs> OnCreateWriterStream;
+
         /// <summary>
         /// Angivelse af, om der findes et lokalt datalager indeholdende data.
         /// </summary>
