@@ -37,21 +37,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(finansstyringKonfigurationViewModel.Configuration, Is.EqualTo("OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.FinansstyringKonfigurationViewModel"));
             Assert.That(finansstyringKonfigurationViewModel.Keys, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.Keys, Is.Not.Empty);
-            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Not.Null);
-            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Empty);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriLabel, Is.EqualTo(Resource.GetText(Text.SupportingServiceUri)));
-            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Not.Null);
-            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.FinansstyringServiceUriValidationError, Is.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.LokalDataFilLabel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.LokalDataFilLabel, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.LokalDataFilLabel, Is.EqualTo(Resource.GetText(Text.LocaleDataFile)));
+            Assert.That(finansstyringKonfigurationViewModel.SynkroniseringDataFilLabel, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.SynkroniseringDataFilLabel, Is.Not.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.SynkroniseringDataFilLabel, Is.EqualTo(Resource.GetText(Text.SyncDataFile)));
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerLabel, Is.EqualTo(Resource.GetText(Text.NumberOfAccountingLinesToGet)));
-            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Not.Null);
-            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Empty);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.AntalBogføringslinjerValidationError, Is.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DageForNyhederLabel, Is.EqualTo(Resource.GetText(Text.DaysForNews)));
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Not.Null);
+            Assert.That(finansstyringKonfigurationViewModel.DageForNyhederValidationError, Is.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.Not.Empty);
             Assert.That(finansstyringKonfigurationViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.Configuration)));
@@ -519,6 +525,268 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.KonfigurationerAdd(Arg<IDictionary<string, object>>.Is.NotNull));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til LokalDataFil henter og returnerer værdien fra konfigurationsrepositoryet til finansstyring.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilGetterReturnererValueFraFinansstyringKonfigurationRepository()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.LokalDataFil)
+                                                    .Return(fixture.Create<string>())
+                                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.LokalDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(finansstyringKonfigurationRepositoryMock.LokalDataFil));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.LokalDataFil);
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til LokalDataFil kalder exceptionhandleren ved en IntranetGuiRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilGetterKalderExceptionHandlerViewModelVedIntranetGuiRepositoryException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.LokalDataFil)
+                .Throw(fixture.Create<IntranetGuiRepositoryException>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.LokalDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.LokalDataFil);
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til LokalDataFil kalder exceptionhandleren ved en IntranetGuiBusinessException.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilGetterKalderExceptionHandlerViewModelVedIntranetGuiBusinessException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.LokalDataFil)
+                .Throw(fixture.Create<IntranetGuiBusinessException>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.LokalDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.LokalDataFil);
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til LokalDataFil kalder exceptionhandleren ved en IntranetGuiSystemException.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilGetterKalderExceptionHandlerViewModelVedIntranetGuiSystemException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.LokalDataFil)
+                .Throw(fixture.Create<IntranetGuiSystemException>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.LokalDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.LokalDataFil);
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til LokalDataFil kalder exceptionhandleren ved en Exception.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilGetterKalderExceptionHandlerViewModelVedException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.LokalDataFil)
+                .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.LokalDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.LokalDataFil);
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til SynkroniseringDataFil henter og returnerer værdien fra konfigurationsrepositoryet til finansstyring.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilGetterReturnererValueFraFinansstyringKonfigurationRepository()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.SynkroniseringDataFil)
+                                                    .Return(fixture.Create<string>())
+                                                    .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.SynkroniseringDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(finansstyringKonfigurationRepositoryMock.SynkroniseringDataFil));
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.SynkroniseringDataFil);
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til SynkroniseringDataFil kalder exceptionhandleren ved en IntranetGuiRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilGetterKalderExceptionHandlerViewModelVedIntranetGuiRepositoryException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.SynkroniseringDataFil)
+                .Throw(fixture.Create<IntranetGuiRepositoryException>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.SynkroniseringDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.SynkroniseringDataFil);
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til SynkroniseringDataFil kalder exceptionhandleren ved en IntranetGuiBusinessException.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilGetterKalderExceptionHandlerViewModelVedIntranetGuiBusinessException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.SynkroniseringDataFil)
+                .Throw(fixture.Create<IntranetGuiBusinessException>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.SynkroniseringDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.SynkroniseringDataFil);
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til SynkroniseringDataFil kalder exceptionhandleren ved en IntranetGuiSystemException.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilGetterKalderExceptionHandlerViewModelVedIntranetGuiSystemException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.SynkroniseringDataFil)
+                .Throw(fixture.Create<IntranetGuiSystemException>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.SynkroniseringDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.SynkroniseringDataFil);
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til SynkroniseringDataFil kalder exceptionhandleren ved en Exception.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilGetterKalderExceptionHandlerViewModelVedException()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
+            finansstyringKonfigurationRepositoryMock.Expect(m => m.SynkroniseringDataFil)
+                .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var finansstyringKonfigurationViewModel = new FinansstyringKonfigurationViewModel(finansstyringKonfigurationRepositoryMock, exceptionHandlerViewModelMock);
+            Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
+
+            var result = finansstyringKonfigurationViewModel.SynkroniseringDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Empty);
+
+            finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.SynkroniseringDataFil);
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
         }
 

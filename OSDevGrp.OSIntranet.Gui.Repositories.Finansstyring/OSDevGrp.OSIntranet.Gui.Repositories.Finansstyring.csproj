@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="FinansstyringKonfigurationRepository.cs" />
     <Compile Include="FinansstyringRepository.cs" />
+    <Compile Include="LocaleDataStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\Service\Reference.cs">
       <AutoGen>True</AutoGen>

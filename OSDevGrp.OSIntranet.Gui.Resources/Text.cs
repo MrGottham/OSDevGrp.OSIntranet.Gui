@@ -54,6 +54,8 @@
         AddressAccounts,
         Name,
         AddBookkeeping,
-        Ignore
+        Ignore,
+        LocaleDataFile,
+        SyncDataFile
     }
 }

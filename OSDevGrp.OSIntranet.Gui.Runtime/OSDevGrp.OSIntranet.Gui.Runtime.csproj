@@ -110,6 +110,7 @@
   <ItemGroup>
     <Compile Include="ConfigurationProvider.cs" />
     <Compile Include="FinansstyringsnyhederLoaderBackgroundTask.cs" />
+    <Compile Include="LocaleDataStorageHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +129,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Repositories.Interfaces\OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.csproj">
       <Project>{5e8cbc9f-811c-423b-8ad7-3afa33cc42d9}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Repositories.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Resources\OSDevGrp.OSIntranet.Gui.Resources.csproj">
+      <Project>{1f572194-e97c-4e22-a027-3412817475e3}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Resources</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">

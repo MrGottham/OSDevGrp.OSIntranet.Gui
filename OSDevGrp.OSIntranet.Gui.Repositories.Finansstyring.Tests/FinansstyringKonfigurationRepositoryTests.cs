@@ -248,6 +248,29 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at LokalDataFil returnerer filnavn uden mappenavn.
+        /// </summary>
+        [Test]
+        public void TestAtLokalDataFilReturnererFileNameUdenDirectoryName()
+        {
+            var tempFileName = Path.GetTempFileName();
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"LokalDataFil", tempFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            var result = finansstyringKonfigurationRepository.LokalDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Contains(Path.DirectorySeparatorChar), Is.False);
+        }
+
+        /// <summary>
         /// Tester, at LokalDataFil returnerer konfigurationsværdi.
         /// </summary>
         [Test]
@@ -391,6 +414,29 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.InvalidConfigurationSettingValue, "SynkroniseringDataFil")));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.TypeOf<ArgumentException>());
+        }
+
+        /// <summary>
+        /// Tester, at SynkroniseringDataFil returnerer filnavn uden mappenavn.
+        /// </summary>
+        [Test]
+        public void TestAtSynkroniseringDataFilReturnererFileNameUdenDirectoryName()
+        {
+            var tempFileName = Path.GetTempFileName();
+
+            var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+            Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
+
+            var konfigurationer = new Dictionary<string, object>
+                {
+                    {"SynkroniseringDataFil", tempFileName}
+                };
+            finansstyringKonfigurationRepository.KonfigurationerAdd(konfigurationer);
+
+            var result = finansstyringKonfigurationRepository.SynkroniseringDataFil;
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Contains(Path.DirectorySeparatorChar), Is.False);
         }
 
         /// <summary>

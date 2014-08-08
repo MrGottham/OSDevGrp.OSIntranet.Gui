@@ -394,6 +394,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Locale data file.
+        /// </summary>
+        internal static string LocaleDataFile {
+            get {
+                return ResourceManager.GetString("LocaleDataFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         internal static string Name {
@@ -462,6 +471,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string SupportingServiceUri {
             get {
                 return ResourceManager.GetString("SupportingServiceUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Locale data file for synchronization.
+        /// </summary>
+        internal static string SyncDataFile {
+            get {
+                return ResourceManager.GetString("SyncDataFile", resourceCulture);
             }
         }
         

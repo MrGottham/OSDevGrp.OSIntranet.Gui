@@ -20,9 +20,11 @@
             <converters:IntegerToStringConverter x:Key="IntegerToStringConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
     <Grid Background="{StaticResource SettingsFlyoutContentBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:ConfigurationUserControl.MainViewModel}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -36,7 +38,15 @@
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringKonfiguration.FinansstyringServiceUriLabel}"/>
             <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Text="{Binding Path=FinansstyringKonfiguration.FinansstyringServiceUri, Mode=TwoWay}" behaviors:HighlightOnErrorBehavior.PropertyError="{Binding Path=FinansstyringKonfiguration.FinansstyringServiceUriValidationError}"/>
         </StackPanel>
-        <StackPanel Grid.Row="2" Margin="0,5,0,0">
+        <StackPanel Grid.Row="2" Margin="0,5,0,0" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringKonfiguration.LokalDataFilLabel}"/>
+            <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" IsReadOnly="True" Text="{Binding Path=FinansstyringKonfiguration.LokalDataFil, Mode=OneWay}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Margin="0,5,0,0" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringKonfiguration.SynkroniseringDataFilLabel}"/>
+            <TextBox Style="{StaticResource BlackBorderedTextBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" IsReadOnly="True" Text="{Binding Path=FinansstyringKonfiguration.SynkroniseringDataFil, Mode=OneWay}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="4" Margin="0,5,0,0">
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringKonfiguration.AntalBogføringslinjerLabel}"/>
             <ComboBox Style="{StaticResource BlackBorderedComboBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" SelectedValue="{Binding Path=FinansstyringKonfiguration.AntalBogføringslinjer, Mode=TwoWay, Converter={StaticResource IntegerToStringConverter}}" SelectedValuePath="Content">
                 <ComboBoxItem>10</ComboBoxItem>
@@ -50,7 +60,7 @@
                 <ComboBoxItem>250</ComboBoxItem>
             </ComboBox>
         </StackPanel>
-        <StackPanel  Grid.Row="3" Margin="0,5,0,0">
+        <StackPanel  Grid.Row="5" Margin="0,5,0,0">
             <TextBlock Style="{StaticResource ItemTextStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" Margin="0,0,0,5" Text="{Binding Path=FinansstyringKonfiguration.DageForNyhederLabel}"/>
             <ComboBox Style="{StaticResource BlackBorderedComboBoxStyle}" Foreground="{StaticResource SettingsFlyoutContentForegroundThemeBrush}" SelectedValue="{Binding Path=FinansstyringKonfiguration.DageForNyheder, Mode=TwoWay, Converter={StaticResource IntegerToStringConverter}}" SelectedValuePath="Content">
                 <ComboBoxItem>0</ComboBoxItem>

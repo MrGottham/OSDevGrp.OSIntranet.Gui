@@ -45,9 +45,13 @@
   <ItemGroup>
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Events\EmptyEventArgs.cs" />
+    <Compile Include="Events\HandleEvaluationEventArgs.cs" />
     <Compile Include="Events\HandleExceptionEventArgs.cs" />
+    <Compile Include="Events\HandleStreamCreationEventArgs.cs" />
     <Compile Include="Events\IEmptyEventArgs.cs" />
+    <Compile Include="Events\IHandleEvaluationEventArgs.cs" />
     <Compile Include="Events\IHandleExceptionEventArgs.cs" />
+    <Compile Include="Events\IHandleStreamCreationEventArgs.cs" />
     <Compile Include="Events\IIntranetGuiEventArgs.cs" />
     <Compile Include="Exceptions\IntranetGuiBusinessException.cs" />
     <Compile Include="Exceptions\IntranetGuiCommandException.cs" />

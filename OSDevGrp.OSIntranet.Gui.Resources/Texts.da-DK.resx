@@ -273,4 +273,10 @@
   <data name="Ignore" xml:space="preserve">
     <value>Ignorer</value>
   </data>
+  <data name="LocaleDataFile" xml:space="preserve">
+    <value>Lokal datafil</value>
+  </data>
+  <data name="SyncDataFile" xml:space="preserve">
+    <value>Lokal datafil til synkronisering</value>
+  </data>
 </root>

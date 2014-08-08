@@ -44,6 +44,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 }
                 catch (IntranetGuiOfflineRepositoryException)
                 {
+                    var localeDataStorage = new LocaleDataStorage();
+                    localeDataStorage.OnHasLocaleData += LocaleDataStorageHelper.HasLocaleDataEventHandler;
+                    localeDataStorage.OnCreateStream += LocaleDataStorageHelper.CreateStreamEventHandler;
+
                     finansstyringsnyheder = new List<INyhedModel>();
                 }
                 UpdateTile(finansstyringsnyheder);

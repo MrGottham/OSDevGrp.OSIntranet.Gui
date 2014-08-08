@@ -60,7 +60,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Events\EmptyEventArgsTests.cs" />
+    <Compile Include="Events\HandleEvaluationEventArgsTests.cs" />
     <Compile Include="Events\HandleExceptionEventArgsTests.cs" />
+    <Compile Include="Events\HandleStreamCreationEventArgsTests.cs" />
     <Compile Include="Exceptions\IntranetGuiBusinessExceptionTests.cs" />
     <Compile Include="Exceptions\IntranetGuiCommandExceptionTests.cs" />
     <Compile Include="Exceptions\IntranetGuiExceptionBaseTests.cs" />

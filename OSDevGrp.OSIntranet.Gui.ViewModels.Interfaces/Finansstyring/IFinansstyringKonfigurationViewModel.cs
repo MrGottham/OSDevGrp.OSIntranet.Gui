@@ -33,6 +33,38 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Label til filnavnet for det lokale datalager.
+        /// </summary>
+        string LokalDataFilLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Filnavn til det lokale datalager.
+        /// </summary>
+        string LokalDataFil
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til filnavnet for det lokale synkroniseringslager.
+        /// </summary>
+        string SynkroniseringDataFilLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Filnavn til det lokale synkroniseringslager.
+        /// </summary>
+        string SynkroniseringDataFil
+        {
+            get;
+        }
+
+        /// <summary>
         /// Label til antal bogføringslinjer, der skal hentes.
         /// </summary>
         string AntalBogføringslinjerLabel

@@ -165,6 +165,76 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Label til filnavnet for det lokale datalager.
+        /// </summary>
+        public virtual string LokalDataFilLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.LocaleDataFile);
+            }
+        }
+
+        /// <summary>
+        /// Filnavn til det lokale datalager.
+        /// </summary>
+        public virtual string LokalDataFil
+        {
+            get
+            {
+                try
+                {
+                    return _finansstyringKonfigurationRepository.LokalDataFil;
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                    return string.Empty;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "LokalDataFil", ex.Message), ex));
+                    return string.Empty;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Label til filnavnet for det lokale synkroniseringslager.
+        /// </summary>
+        public virtual string SynkroniseringDataFilLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.SyncDataFile);
+            }
+        }
+
+        /// <summary>
+        /// Filnavn til det lokale synkroniseringslager.
+        /// </summary>
+        public virtual string SynkroniseringDataFil
+        {
+            get
+            {
+                try
+                {
+                    return _finansstyringKonfigurationRepository.SynkroniseringDataFil;
+                }
+                catch (IntranetGuiExceptionBase ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(ex);
+                    return string.Empty;
+                }
+                catch (Exception ex)
+                {
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "SynkroniseringDataFil", ex.Message), ex));
+                    return string.Empty;
+                }
+            }
+        }
+
+        /// <summary>
         /// Label til antal bogføringslinjer, der skal hentes.
         /// </summary>
         public virtual string AntalBogføringslinjerLabel
