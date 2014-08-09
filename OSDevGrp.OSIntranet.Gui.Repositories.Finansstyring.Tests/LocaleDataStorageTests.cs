@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Xml.Schema;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
@@ -29,7 +32,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(localeDataStorage.SyncDataFileName, Is.Not.Null);
             Assert.That(localeDataStorage.SyncDataFileName, Is.Not.Empty);
             Assert.That(localeDataStorage.SyncDataFileName, Is.EqualTo(syncDataFileName));
-            Assert.That(localeDataStorage.Schema, Is.Not.Null);
+
+            using (var schemaReader = localeDataStorage.Schema)
+            {
+                Assert.That(schemaReader, Is.Not.Null);
+                schemaReader.Close();
+            }
         }
 
         /// <summary>
@@ -185,6 +193,48 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(localeDataStorage.SyncDataFileName.Contains(Path.DirectorySeparatorChar), Is.False);
             Assert.That(localeDataStorage.SyncDataFileName, Is.EqualTo(Path.GetFileName(syncDataFileName)));
 
+        }
+
+        /// <summary>
+        /// Tester, at Schema kaster en IntranetGuiRepositoryException, hvis skemaet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtSchemaKasterIntranetGuiRepositoryExceptionHvisSchemaLocationIkkeFindes()
+        {
+            var fixture = new Fixture();
+
+            var resourceName = fixture.Create<string>();
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), resourceName);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.Schema.ToString());
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.UnableToLoadResource, resourceName)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at Schema giver en XML reader indeholdende XML schema til validering af data i det lokale datalager. 
+        /// </summary>
+        [Test]
+        public void TestAtSchemaGiverXmlReaderIndeholdendeXmlSchema()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            using (var schemaReader = localeDataStorage.Schema)
+            {
+                var schema = XmlSchema.Read(schemaReader, null);
+                Assert.That(schema, Is.Not.Null);
+
+                schemaReader.Close();
+            }
         }
     }
 }

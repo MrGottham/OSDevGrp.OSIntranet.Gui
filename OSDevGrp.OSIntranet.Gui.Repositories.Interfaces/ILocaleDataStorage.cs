@@ -1,5 +1,4 @@
 ﻿using System.Xml;
-using System.Xml.Schema;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
@@ -51,9 +50,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         }
 
         /// <summary>
-        /// XML schema, der benyttes til validering af de lokale data.
+        /// XML reader, der kan læse XML schema, som kan benyttes til validering af de lokale data.
         /// </summary>
-        XmlSchema Schema
+        XmlReader Schema
         {
             get;
         }

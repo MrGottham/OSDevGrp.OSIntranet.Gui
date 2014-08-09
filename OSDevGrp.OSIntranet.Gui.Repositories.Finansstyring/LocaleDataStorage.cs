@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Xml;
-using System.Xml.Schema;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 {
@@ -18,6 +20,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
         private readonly string _localeDataFileName;
         private readonly string _syncDataFileName;
+        private readonly string _schemaLocation;
 
         #endregion
 
@@ -45,6 +48,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             _localeDataFileName = localeDataFileName;
             _syncDataFileName = syncDataFileName;
+            _schemaLocation = schemaLocation;
         }
 
         #endregion
@@ -110,13 +114,27 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
-        /// XML schema, der benyttes til validering af de lokale data.
+        /// XML reader, der kan læse XML schema, som kan benyttes til validering af de lokale data.
         /// </summary>
-        public virtual XmlSchema Schema
+        public virtual XmlReader Schema
         {
             get
             {
-                throw new NotImplementedException();
+                var assembly = GetType().GetTypeInfo().Assembly;
+                using (var resourceStream = assembly.GetManifestResourceStream(string.Format("{0}.{1}", assembly.GetName().Name, _schemaLocation)))
+                {
+                    if (resourceStream == null)
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnableToLoadResource, _schemaLocation));
+                    }
+                    var readerSettings = new XmlReaderSettings
+                    {
+                        IgnoreComments = true,
+                        IgnoreProcessingInstructions = true,
+                        IgnoreWhitespace = true
+                    };
+                    return XmlReader.Create(resourceStream, readerSettings);
+                }
             }
         }
 
@@ -132,7 +150,6 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             if (OnCreateReaderStream != null)
             {
-                
             }
             throw new NotImplementedException();
         }

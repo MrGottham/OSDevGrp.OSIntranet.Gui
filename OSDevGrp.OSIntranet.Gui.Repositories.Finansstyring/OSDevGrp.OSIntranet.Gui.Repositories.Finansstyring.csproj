@@ -79,6 +79,9 @@
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />
     <None Include="Properties\ServiceReferences.Designer.ClientConfig" />
+    <EmbeddedResource Include="Schemas\FinansstyringRepositoryLocale.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="Service References\Service\FinansstyringService.wsdl" />
     <None Include="Service References\Service\finansstyringservice.xsd">
       <SubType>Designer</SubType>
