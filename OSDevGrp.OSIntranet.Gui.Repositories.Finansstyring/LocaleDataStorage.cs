@@ -3,6 +3,7 @@ using System.Xml;
 using System.Xml.Schema;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
@@ -50,6 +51,29 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Filnavn indeholdende data i det lokale datalager.
+        /// </summary>
+        public virtual string LocaleDataFileName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Filnavn indeholdende synkroniseringsdata i det lokale datalager.
+        /// </summary>
+        public virtual string SyncDataFileName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+
+        /// <summary>
         /// XML schema, der benyttes til validering af de lokale data.
         /// </summary>
         public virtual XmlSchema Schema
@@ -68,15 +92,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// Henter data fra det lokale datalager.
         /// </summary>
         /// <returns>XML reader, der kan læse data fra det lokale datalager.</returns>
-        public XmlReader GetLocaleData()
+        public virtual XmlReader GetLocaleData()
         {
             if (OnCreateReaderStream != null)
             {
                 
             }
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gemmer data i det lokale datalager.
+        /// </summary>
+        /// <typeparam name="T">Typen på data, der skal gemmes i det lokale datalager.</typeparam>
+        /// <param name="model">Data, der skal gemmes i det lokale datalager.</param>
+        public virtual void StoreLocaleData<T>(T model) where T : IModel
+        {
             if (OnCreateWriterStream != null)
             {
+            }
+            throw new NotImplementedException();
+        }
 
+        /// <summary>
+        /// Gemmer synkroniseringsdata i det lokale datalager.
+        /// </summary>
+        /// <typeparam name="T">Typen på synkroniseringsdata, der skal gemmes i det lokale datalager.</typeparam>
+        /// <param name="model">Synkroniseringsdata, der skal gemmes i det lokale datalager.</param>
+        public virtual void StoreSyncData<T>(T model) where T : IModel
+        {
+            if (OnCreateWriterStream != null)
+            {
             }
             throw new NotImplementedException();
         }
