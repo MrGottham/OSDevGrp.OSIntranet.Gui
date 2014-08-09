@@ -223,7 +223,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             do
             {
                 illegalChar = illegalChars[rand.Next(0, illegalChars.Length - 1)];
-            } while (illegalChar == Path.DirectorySeparatorChar);
+            } while (illegalChar == Path.DirectorySeparatorChar || illegalChar == Path.VolumeSeparatorChar);
             var invalidFileName = string.Format("{0}{1}{2}{3}{4}", tempFile.DirectoryName, Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(tempFile.Name), Convert.ToString(illegalChar), Path.GetExtension(tempFile.Name));
             Debug.WriteLine(string.Format("invalidFileName={0}", invalidFileName));
 
@@ -392,7 +392,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             do
             {
                 illegalChar = illegalChars[rand.Next(0, illegalChars.Length - 1)];
-            } while (illegalChar == Path.DirectorySeparatorChar);
+            } while (illegalChar == Path.DirectorySeparatorChar || illegalChar == Path.VolumeSeparatorChar);
             var invalidFileName = string.Format("{0}{1}{2}{3}{4}", tempFile.DirectoryName, Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(tempFile.Name), Convert.ToString(illegalChar), Path.GetExtension(tempFile.Name));
             Debug.WriteLine(string.Format("invalidFileName={0}", invalidFileName));
 
