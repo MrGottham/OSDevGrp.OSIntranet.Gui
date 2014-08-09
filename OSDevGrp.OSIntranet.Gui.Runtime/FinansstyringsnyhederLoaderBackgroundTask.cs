@@ -44,7 +44,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 }
                 catch (IntranetGuiOfflineRepositoryException)
                 {
-                    var localeDataStorage = new LocaleDataStorage();
+                    var localeDataStorage = new LocaleDataStorage(finansstyringKonfigurationRepository.LokalDataFil, finansstyringKonfigurationRepository.SynkroniseringDataFil, FinansstyringRepositoryLocale.XmlSchema);
                     localeDataStorage.OnHasLocaleData += LocaleDataStorageHelper.HasLocaleDataEventHandler;
                     localeDataStorage.OnCreateReaderStream += LocaleDataStorageHelper.CreateReaderStreamEventHandler;
                     localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;

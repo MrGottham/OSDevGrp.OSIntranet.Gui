@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
@@ -13,6 +14,41 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
     /// </summary>
     public class LocaleDataStorage : ILocaleDataStorage
     {
+        #region Private variables
+
+        private readonly string _localeDataFileName;
+        private readonly string _syncDataFileName;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Danner det lokale datalager.
+        /// </summary>
+        /// <param name="localeDataFileName">Filnavn indeholdende data i det lokale datalager.</param>
+        /// <param name="syncDataFileName">Filnavn indeholdende synkroniseringsdata i det lokale datalager.</param>
+        /// <param name="schemaLocation">Lokation for XML schema, der benyttes til validering af de lokale data.</param>
+        public LocaleDataStorage(string localeDataFileName, string syncDataFileName, string schemaLocation)
+        {
+            if (string.IsNullOrEmpty(localeDataFileName))
+            {
+                throw new ArgumentNullException("localeDataFileName");
+            }
+            if (string.IsNullOrEmpty(syncDataFileName))
+            {
+                throw new ArgumentNullException("syncDataFileName");
+            }
+            if (string.IsNullOrEmpty(schemaLocation))
+            {
+                throw new ArgumentNullException("schemaLocation");
+            }
+            _localeDataFileName = localeDataFileName;
+            _syncDataFileName = syncDataFileName;
+        }
+
+        #endregion
+
         #region Events
 
         /// <summary>
@@ -41,12 +77,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             get
             {
-
-                if (OnHasLocaleData != null)
+                if (OnHasLocaleData == null)
                 {
-                    
+                    return false;
                 }
-                throw new NotImplementedException();
+                var handleEvaluationEventArgs = new HandleEvaluationEventArgs(this);
+                OnHasLocaleData.Invoke(this, handleEvaluationEventArgs);
+                return handleEvaluationEventArgs.Result;
             }
         }
 
@@ -57,7 +94,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Path.GetFileName(_localeDataFileName);
             }
         }
 
@@ -68,10 +105,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Path.GetFileName(_syncDataFileName);
             }
         }
-
 
         /// <summary>
         /// XML schema, der benyttes til validering af de lokale data.
