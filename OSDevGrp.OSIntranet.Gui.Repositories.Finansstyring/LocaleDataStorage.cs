@@ -148,8 +148,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>XML reader, der kan læse data fra det lokale datalager.</returns>
         public virtual XmlReader GetLocaleData()
         {
-            if (OnCreateReaderStream != null)
+            if (OnCreateReaderStream == null)
             {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateReaderStream"));
             }
             throw new NotImplementedException();
         }
@@ -161,8 +162,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="model">Data, der skal gemmes i det lokale datalager.</param>
         public virtual void StoreLocaleData<T>(T model) where T : IModel
         {
-            if (OnCreateWriterStream != null)
+            if (OnCreateWriterStream == null)
             {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
             throw new NotImplementedException();
         }
@@ -174,8 +176,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="model">Synkroniseringsdata, der skal gemmes i det lokale datalager.</param>
         public virtual void StoreSyncData<T>(T model) where T : IModel
         {
-            if (OnCreateWriterStream != null)
+            if (OnCreateWriterStream == null)
             {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
             throw new NotImplementedException();
         }

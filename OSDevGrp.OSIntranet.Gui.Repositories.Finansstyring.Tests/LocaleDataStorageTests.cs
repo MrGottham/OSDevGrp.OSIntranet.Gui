@@ -4,8 +4,10 @@ using System.Linq;
 using System.Xml.Schema;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
 {
@@ -230,10 +232,90 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
 
             using (var schemaReader = localeDataStorage.Schema)
             {
-                var schema = XmlSchema.Read(schemaReader, null);
+                var schema = XmlSchema.Read(schemaReader, ValidationEventHandler);
                 Assert.That(schema, Is.Not.Null);
 
                 schemaReader.Close();
+            }
+        }
+
+        /// <summary>
+        /// Tester, at GetLocaleData kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en læsestream til det lokale datalager skal dannes, er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetLocaleDataKasterIntranetGuiRepositoryExceptionHvisOnOnCreateReaderStreamErNull()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.GetLocaleData());
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateReaderStream")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataKasterIntranetGuiRepositoryExceptionHvisOnOnCreateWriterStreamErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreLocaleData(fixture.Create<IModel>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataKasterIntranetGuiRepositoryExceptionHvisOnOnCreateWriterStreamErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreLocaleData(fixture.Create<IModel>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Eventhandler, der håndterer XML validering.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
+        private static void ValidationEventHandler(object sender, ValidationEventArgs eventArgs)
+        {
+            Assert.That(sender, Is.Not.Null);
+            Assert.That(eventArgs, Is.Not.Null);
+            switch (eventArgs.Severity)
+            {
+                case XmlSeverityType.Warning:
+                    Assert.Fail(eventArgs.Message);
+                    break;
+
+                case XmlSeverityType.Error:
+                    Assert.Fail(eventArgs.Message);
+                    break;
             }
         }
     }

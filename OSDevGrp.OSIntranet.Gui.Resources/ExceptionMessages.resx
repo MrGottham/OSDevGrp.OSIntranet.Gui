@@ -167,6 +167,10 @@
     <value>Error while setting value of the property named '{0}': {1}</value>
     <comment>{0} = Name of property, {1} = Error message.</comment>
   </data>
+  <data name="EventHandlerNotDefined" xml:space="preserve">
+    <value>The event handler for '{0}' is not defined.</value>
+    <comment>{0} = Name of event.</comment>
+  </data>
   <data name="IllegalArgumentValue" xml:space="preserve">
     <value>Illegal value for '{0}': {1}</value>
     <comment>{0} = Name of argument, {1} = value.</comment>

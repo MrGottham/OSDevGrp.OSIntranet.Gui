@@ -26,6 +26,7 @@
         ErrorWhileSettingAddressAccount,
         ErrorPostingAccountingLine,
         ErrorUpdateFinansstyringRepository,
-        OfflineFinansstyringRepository
+        OfflineFinansstyringRepository,
+        EventHandlerNotDefined
     }
 }

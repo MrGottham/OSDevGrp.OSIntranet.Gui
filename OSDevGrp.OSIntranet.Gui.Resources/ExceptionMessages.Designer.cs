@@ -196,6 +196,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The event handler for &apos;{0}&apos; is not defined..
+        /// </summary>
+        internal static string EventHandlerNotDefined {
+            get {
+                return ResourceManager.GetString("EventHandlerNotDefined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Illegal value for &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string IllegalArgumentValue {
