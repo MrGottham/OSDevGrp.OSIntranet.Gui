@@ -1,4 +1,4 @@
-﻿using System.Xml;
+﻿using System.Xml.Linq;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
@@ -50,9 +50,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         }
 
         /// <summary>
-        /// XML reader, der kan læse XML schema, som kan benyttes til validering af de lokale data.
+        /// XDocument, der inderholder XML skemaet, som kan benyttes til validering af de lokale data.
         /// </summary>
-        XmlReader Schema
+        XDocument Schema
         {
             get;
         }
@@ -60,8 +60,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <summary>
         /// Henter data fra det lokale datalager.
         /// </summary>
-        /// <returns>XML reader, der kan læse data fra det lokale datalager.</returns>
-        XmlReader GetLocaleData();
+        /// <returns>XDocument, der indeholder data fra det lokale datalager.</returns>
+        XDocument GetLocaleData();
 
         /// <summary>
         /// Gemmer data i det lokale datalager.

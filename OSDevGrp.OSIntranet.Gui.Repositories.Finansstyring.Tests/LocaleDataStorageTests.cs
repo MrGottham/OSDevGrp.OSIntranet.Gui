@@ -34,12 +34,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(localeDataStorage.SyncDataFileName, Is.Not.Null);
             Assert.That(localeDataStorage.SyncDataFileName, Is.Not.Empty);
             Assert.That(localeDataStorage.SyncDataFileName, Is.EqualTo(syncDataFileName));
-
-            using (var schemaReader = localeDataStorage.Schema)
-            {
-                Assert.That(schemaReader, Is.Not.Null);
-                schemaReader.Close();
-            }
+            Assert.That(localeDataStorage.Schema, Is.Not.Null);
         }
 
         /// <summary>
@@ -230,12 +225,15 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
             Assert.That(localeDataStorage, Is.Not.Null);
 
-            using (var schemaReader = localeDataStorage.Schema)
+            var schemaDocument = localeDataStorage.Schema;
+            Assert.That(schemaDocument, Is.Not.Null);
+
+            using (var reader = schemaDocument.CreateReader())
             {
-                var schema = XmlSchema.Read(schemaReader, ValidationEventHandler);
+                var schema = XmlSchema.Read(reader, ValidationEventHandler);
                 Assert.That(schema, Is.Not.Null);
 
-                schemaReader.Close();
+                reader.Close();
             }
         }
 
@@ -259,6 +257,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at GetLocaleData rejser eventet, der skal danne læsestreamen til det lokale datalager.
+        /// </summary>
+        [Test]
+        public void TestAtGetLocaleDataRejserOnCreateReaderStreamEvent()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventCalled = false;
+            localeDataStorage.OnCreateReaderStream += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(s, Is.EqualTo(localeDataStorage));
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(e.CreationContext, Is.EqualTo(localeDataStorage));
+                Assert.That(e.Result, Is.Null);
+                e.Result = new MemoryStream();
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            Assert.That(localeDataStorage.GetLocaleData(), Is.Not.Null);
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
         /// Tester, at StoreLocaleData kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
         /// </summary>
         [Test]
@@ -279,6 +308,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at StoreLocaleData rejser eventet, der skal danne skrivestreamen til det lokale datalager.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataRejserOnCreateWriterStreamEvent()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventCalled = false;
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(s, Is.EqualTo(localeDataStorage));
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.TypeOf<bool>());
+                Assert.That(e.CreationContext, Is.EqualTo(false));
+                Assert.That(e.Result, Is.Null);
+                e.Result = new MemoryStream();
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreLocaleData(fixture.Create<IModel>());
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
         /// Tester, at StoreSyncData kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
         /// </summary>
         [Test]
@@ -296,6 +357,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.Message, Is.Not.Empty);
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream")));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData rejser eventet, der skal danne skrivestreamen til det lokale datalager.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataRejserOnCreateWriterStreamEvent()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventCalled = false;
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(s, Is.EqualTo(localeDataStorage));
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.TypeOf<bool>());
+                Assert.That(e.CreationContext, Is.EqualTo(true));
+                Assert.That(e.Result, Is.Null);
+                e.Result = new MemoryStream();
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreSyncData(fixture.Create<IModel>());
+            Assert.That(eventCalled, Is.True);
         }
 
         /// <summary>

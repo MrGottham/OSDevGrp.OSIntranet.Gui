@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Linq;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -116,7 +117,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <summary>
         /// XML reader, der kan læse XML schema, som kan benyttes til validering af de lokale data.
         /// </summary>
-        public virtual XmlReader Schema
+        public virtual XDocument Schema
         {
             get
             {
@@ -133,7 +134,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         IgnoreProcessingInstructions = true,
                         IgnoreWhitespace = true
                     };
-                    return XmlReader.Create(resourceStream, readerSettings);
+                    using (var reader = XmlReader.Create(resourceStream, readerSettings))
+                    {
+                        return XDocument.Load(reader);
+                    }
                 }
             }
         }
@@ -145,8 +149,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <summary>
         /// Henter data fra det lokale datalager.
         /// </summary>
-        /// <returns>XML reader, der kan læse data fra det lokale datalager.</returns>
-        public virtual XmlReader GetLocaleData()
+        /// <returns>XDocument, der indeholder data fra det lokale datalager.</returns>
+        public virtual XDocument GetLocaleData()
         {
             if (OnCreateReaderStream == null)
             {
