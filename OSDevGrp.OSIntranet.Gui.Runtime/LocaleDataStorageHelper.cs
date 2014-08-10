@@ -113,7 +113,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             catch (FileNotFoundException)
             {
                 storageFile = GetStorageFolder().CreateFileAsync(localeDataStorage.LocaleDataFileName).AsTask().Result;
-           }
+            }
             var storageFileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite).AsTask();
             handleStreamCreationEventArgs.Result = storageFileStream.AsStream();
         }

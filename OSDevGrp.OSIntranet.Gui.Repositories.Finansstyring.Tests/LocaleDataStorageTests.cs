@@ -288,6 +288,57 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at GetLocaleData kaster en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtGetLocaleDataKasterIntranetGuiRepositoryExceptionVedIntranetGuiRepositoryException()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventException = fixture.Create<IntranetGuiRepositoryException>();
+            localeDataStorage.OnCreateReaderStream += (s, e) =>
+            {
+                throw eventException;
+            };
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.GetLocaleData());
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(eventException.Message));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at GetLocaleData kaster en IntranetGuiRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtGetLocaleDataKasterIntranetGuiRepositoryExceptionVedException()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventException = fixture.Create<Exception>();
+            localeDataStorage.OnCreateReaderStream += (s, e) =>
+            {
+                throw eventException;
+            };
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.GetLocaleData());
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "GetLocaleData", eventException.Message)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.EqualTo(eventException));
+        }
+
+        /// <summary>
         /// Tester, at StoreLocaleData kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
         /// </summary>
         [Test]
@@ -340,6 +391,59 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at StoreLocaleData kaster en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataKasterIntranetGuiRepositoryExceptionVedIntranetGuiRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventException = fixture.Create<IntranetGuiRepositoryException>();
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                throw eventException;
+            };
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreLocaleData(fixture.Create<IModel>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(eventException.Message));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData kaster en IntranetGuiRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataKasterIntranetGuiRepositoryExceptionVedException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventException = fixture.Create<Exception>();
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                throw eventException;
+            };
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreLocaleData(fixture.Create<IModel>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreLocaleData", eventException.Message)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.EqualTo(eventException));
+        }
+
+        /// <summary>
         /// Tester, at StoreSyncData kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
         /// </summary>
         [Test]
@@ -389,6 +493,59 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(eventCalled, Is.False);
             localeDataStorage.StoreSyncData(fixture.Create<IModel>());
             Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData kaster en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataKasterIntranetGuiRepositoryExceptionVedIntranetGuiRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventException = fixture.Create<IntranetGuiRepositoryException>();
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                throw eventException;
+            };
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreSyncData(fixture.Create<IModel>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(eventException.Message));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData kaster en IntranetGuiRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataKasterIntranetGuiRepositoryExceptionVedException()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventException = fixture.Create<Exception>();
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                throw eventException;
+            };
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreSyncData(fixture.Create<IModel>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreSyncData", eventException.Message)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.EqualTo(eventException));
         }
 
         /// <summary>
