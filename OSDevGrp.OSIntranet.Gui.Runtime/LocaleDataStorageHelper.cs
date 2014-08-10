@@ -106,13 +106,27 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "eventArgs", eventArgs.GetType()));
             }
             StorageFile storageFile;
-            try
+            if (Convert.ToBoolean(handleStreamCreationEventArgs.CreationContext))
             {
-                storageFile = await GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
+                try
+                {
+                    storageFile = await GetStorageFile(localeDataStorage.SyncDataFileName);
+                }
+                catch (FileNotFoundException)
+                {
+                    storageFile = GetStorageFolder().CreateFileAsync(localeDataStorage.SyncDataFileName).AsTask().Result;
+                }
             }
-            catch (FileNotFoundException)
+            else
             {
-                storageFile = GetStorageFolder().CreateFileAsync(localeDataStorage.LocaleDataFileName).AsTask().Result;
+                try
+                {
+                    storageFile = await GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
+                }
+                catch (FileNotFoundException)
+                {
+                    storageFile = GetStorageFolder().CreateFileAsync(localeDataStorage.LocaleDataFileName).AsTask().Result;
+                }
             }
             var storageFileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite).AsTask();
             handleStreamCreationEventArgs.Result = storageFileStream.AsStream();

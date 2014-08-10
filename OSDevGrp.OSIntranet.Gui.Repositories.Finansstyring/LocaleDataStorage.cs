@@ -156,7 +156,32 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateReaderStream"));
             }
-            throw new NotImplementedException();
+            try
+            {
+                var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(this);
+                OnCreateReaderStream.Invoke(this, handleStreamCreationEventArgs);
+                using (var readerStream = handleStreamCreationEventArgs.Result)
+                {
+                    var readerSettings = new XmlReaderSettings
+                    {
+                        IgnoreComments = true,
+                        IgnoreProcessingInstructions = true,
+                        IgnoreWhitespace = true
+                    };
+                    using (var reader = XmlReader.Create(readerStream, readerSettings))
+                    {
+                        return XDocument.Load(reader);
+                    }
+                }
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "GetLocaleData", ex.Message), ex);
+            }
         }
 
         /// <summary>
@@ -170,7 +195,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
-            throw new NotImplementedException();
+            try
+            {
+                var localeDataDocument = GetLocaleData();
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreLocaleData", ex.Message), ex);
+            }
         }
 
         /// <summary>
@@ -184,7 +220,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
-            throw new NotImplementedException();
+            try
+            {
+                var localeDataDocument = GetLocaleData();
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreSyncData", ex.Message), ex);
+            }
         }
 
         #endregion

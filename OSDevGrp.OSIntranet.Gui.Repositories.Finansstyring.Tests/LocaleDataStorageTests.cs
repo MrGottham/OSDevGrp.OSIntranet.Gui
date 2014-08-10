@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml;
 using System.Xml.Schema;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -278,13 +280,55 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.That(e.CreationContext, Is.TypeOf<LocaleDataStorage>());
                 Assert.That(e.CreationContext, Is.EqualTo(localeDataStorage));
                 Assert.That(e.Result, Is.Null);
-                e.Result = new MemoryStream();
+                e.Result = CreateMemoryStreamWithXmlContent();
                 eventCalled = true;
             };
 
             Assert.That(eventCalled, Is.False);
             Assert.That(localeDataStorage.GetLocaleData(), Is.Not.Null);
             Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at GetLocaleData returnerer et XDocument indeholdende lokale data.
+        /// </summary>
+        [Test]
+        public void TestAtGetLocaleDataReturnererXDocumentMedLokaleData()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
+
+            XmlSchema schema;
+            using (var schemaReader = localeDataStorage.Schema.CreateReader())
+            {
+                schema = XmlSchema.Read(schemaReader, ValidationEventHandler);
+                schemaReader.Close();
+            }
+            Assert.That(schema, Is.Not.Null);
+
+            var localeData = new XmlDocument();
+            using (var localeDataReader = localeDataStorage.GetLocaleData().CreateReader())
+            {
+                var readerSettings = new XmlReaderSettings
+                {
+                    IgnoreComments = true,
+                    IgnoreProcessingInstructions = true,
+                    IgnoreWhitespace = true,
+                    ValidationType = ValidationType.Schema
+                };
+                readerSettings.Schemas.Add(schema);
+                readerSettings.ValidationEventHandler += ValidationEventHandler;
+                using (var reader = XmlReader.Create(localeDataReader, readerSettings))
+                {
+                    localeData.Load(reader);
+                    reader.Close();
+                }
+                localeDataReader.Close();
+            }
         }
 
         /// <summary>
@@ -370,6 +414,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(localeDataStorage, Is.Not.Null);
 
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
+
             var eventCalled = false;
             localeDataStorage.OnCreateWriterStream += (s, e) =>
             {
@@ -402,6 +448,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(localeDataStorage, Is.Not.Null);
 
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
+
             var eventException = fixture.Create<IntranetGuiRepositoryException>();
             localeDataStorage.OnCreateWriterStream += (s, e) =>
             {
@@ -427,6 +475,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
 
             var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
 
             var eventException = fixture.Create<Exception>();
             localeDataStorage.OnCreateWriterStream += (s, e) =>
@@ -475,6 +525,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(localeDataStorage, Is.Not.Null);
 
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
+
             var eventCalled = false;
             localeDataStorage.OnCreateWriterStream += (s, e) =>
             {
@@ -507,6 +559,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(localeDataStorage, Is.Not.Null);
 
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
+
             var eventException = fixture.Create<IntranetGuiRepositoryException>();
             localeDataStorage.OnCreateWriterStream += (s, e) =>
             {
@@ -533,6 +587,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(localeDataStorage, Is.Not.Null);
 
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
+
             var eventException = fixture.Create<Exception>();
             localeDataStorage.OnCreateWriterStream += (s, e) =>
             {
@@ -546,6 +602,19 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreSyncData", eventException.Message)));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(eventException));
+        }
+
+        /// <summary>
+        /// Danner en stream indeholdende XML, der kan benyttes til test.
+        /// </summary>
+        private static Stream CreateMemoryStreamWithXmlContent()
+        {
+            var memoryStream = new MemoryStream();
+            var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
+            streamWriter.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?><FinansstyringRepository xmlns=\"{0}\"/>", FinansstyringRepositoryLocale.Namespace);
+            streamWriter.Flush();
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return memoryStream;
         }
 
         /// <summary>
