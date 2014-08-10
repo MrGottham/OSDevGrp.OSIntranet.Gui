@@ -3,6 +3,8 @@ using System.Diagnostics;
 using OSDevGrp.OSIntranet.Gui.Finansstyring.Core;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Runtime;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 using Windows.ApplicationModel.Background;
 using Windows.UI.Xaml;
@@ -129,7 +131,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             var offlineRepositoryException = eventArgs.Error as IntranetGuiOfflineRepositoryException;
             if (offlineRepositoryException != null)
             {
-                Debug.WriteLine("{0}: {1}", offlineRepositoryException.GetType().Name, offlineRepositoryException.Message);
+                var finansstyringKonfigurationRepository = FinansstyringKonfigurationRepository.Instance;
+                var localeDataStorage = new LocaleDataStorage(finansstyringKonfigurationRepository.LokalDataFil, finansstyringKonfigurationRepository.SynkroniseringDataFil, FinansstyringRepositoryLocale.XmlSchema);
+                localeDataStorage.OnHasLocaleData += LocaleDataStorageHelper.HasLocaleDataEventHandler;
+                localeDataStorage.OnCreateReaderStream += LocaleDataStorageHelper.CreateReaderStreamEventHandler;
+                localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;
                 eventArgs.IsHandled = true;
                 return;
             }

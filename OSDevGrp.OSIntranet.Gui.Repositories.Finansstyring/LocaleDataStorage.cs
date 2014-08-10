@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
@@ -22,6 +23,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         private readonly string _localeDataFileName;
         private readonly string _syncDataFileName;
         private readonly string _schemaLocation;
+        private static readonly object SyncRoot = new object();
 
         #endregion
 
@@ -82,13 +84,16 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             get
             {
-                if (OnHasLocaleData == null)
+                lock (SyncRoot)
                 {
-                    return false;
+                    if (OnHasLocaleData == null)
+                    {
+                        return false;
+                    }
+                    var handleEvaluationEventArgs = new HandleEvaluationEventArgs(this);
+                    OnHasLocaleData.Invoke(this, handleEvaluationEventArgs);
+                    return handleEvaluationEventArgs.Result;
                 }
-                var handleEvaluationEventArgs = new HandleEvaluationEventArgs(this);
-                OnHasLocaleData.Invoke(this, handleEvaluationEventArgs);
-                return handleEvaluationEventArgs.Result;
             }
         }
 
@@ -128,16 +133,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     {
                         throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnableToLoadResource, _schemaLocation));
                     }
-                    var readerSettings = new XmlReaderSettings
-                    {
-                        IgnoreComments = true,
-                        IgnoreProcessingInstructions = true,
-                        IgnoreWhitespace = true
-                    };
-                    using (var reader = XmlReader.Create(resourceStream, readerSettings))
-                    {
-                        return XDocument.Load(reader);
-                    }
+                    return ReadDocument(resourceStream);
                 }
             }
         }
@@ -158,19 +154,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             try
             {
-                var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(this);
-                OnCreateReaderStream.Invoke(this, handleStreamCreationEventArgs);
-                using (var readerStream = handleStreamCreationEventArgs.Result)
+                lock (SyncRoot)
                 {
-                    var readerSettings = new XmlReaderSettings
+                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(this);
+                    OnCreateReaderStream.Invoke(this, handleStreamCreationEventArgs);
+                    using (var readerStream = handleStreamCreationEventArgs.Result)
                     {
-                        IgnoreComments = true,
-                        IgnoreProcessingInstructions = true,
-                        IgnoreWhitespace = true
-                    };
-                    using (var reader = XmlReader.Create(readerStream, readerSettings))
-                    {
-                        return XDocument.Load(reader);
+                        return (ReadDocument(readerStream));
                     }
                 }
             }
@@ -191,13 +181,39 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="model">Data, der skal gemmes i det lokale datalager.</param>
         public virtual void StoreLocaleData<T>(T model) where T : IModel
         {
+            if (Equals(model, null))
+            {
+                throw new ArgumentNullException("model");
+            }
             if (OnCreateWriterStream == null)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
             try
             {
-                var localeDataDocument = GetLocaleData();
+                lock (SyncRoot)
+                {
+                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(false);
+                    OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
+                    using (var writerStream = handleStreamCreationEventArgs.Result)
+                    {
+                        XDocument localeDataDocument;
+                        if (writerStream.Length == 0)
+                        {
+                            var localeDataSchema = Schema;
+                            var localeDataNamespace = localeDataSchema.Root.GetDefaultNamespace().NamespaceName;
+                            var localeDataRootName = localeDataSchema.Root.Element(XName.Get("element", "http://www.w3.org/2001/XMLSchema")).Attribute(XName.Get("name", string.Empty)).Value;
+                            localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+                            localeDataDocument.Add(new XElement(XName.Get(localeDataRootName, localeDataNamespace)));
+                        }
+                        else
+                        {
+                            localeDataDocument = ReadDocument(writerStream);
+                        }
+                        StoreInDocument(model, localeDataDocument);
+                        WriteDocument(localeDataDocument, writerStream);
+                    }
+                }
             }
             catch (IntranetGuiRepositoryException)
             {
@@ -216,13 +232,39 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="model">Synkroniseringsdata, der skal gemmes i det lokale datalager.</param>
         public virtual void StoreSyncData<T>(T model) where T : IModel
         {
+            if (Equals(model, null))
+            {
+                throw new ArgumentNullException("model");
+            }
             if (OnCreateWriterStream == null)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
             try
             {
-                var localeDataDocument = GetLocaleData();
+                lock (SyncRoot)
+                {
+                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(true);
+                    OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
+                    using (var writerStream = handleStreamCreationEventArgs.Result)
+                    {
+                        XDocument localeDataDocument;
+                        if (writerStream.Length == 0)
+                        {
+                            var localeDataSchema = Schema;
+                            var localeDataNamespace = localeDataSchema.Root.GetDefaultNamespace().NamespaceName;
+                            var localeDataRootName = localeDataSchema.Root.Element(XName.Get("element", "http://www.w3.org/2001/XMLSchema")).Attribute(XName.Get("name", string.Empty)).Value;
+                            localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+                            localeDataDocument.Add(new XElement(XName.Get(localeDataRootName, localeDataNamespace)));
+                        }
+                        else
+                        {
+                            localeDataDocument = ReadDocument(writerStream);
+                        }
+                        StoreInDocument(model, localeDataDocument);
+                        WriteDocument(localeDataDocument, writerStream);
+                    }
+                }
             }
             catch (IntranetGuiRepositoryException)
             {
@@ -231,6 +273,74 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreSyncData", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Indlæser en given stream i et XDocument.
+        /// </summary>
+        /// <param name="stream">Stream, der skal indlæses i et XDocument.</param>
+        /// <returns>XDocument indeholdende data fra det givne stream.</returns>
+        private static XDocument ReadDocument(Stream stream)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+            var readerSettings = new XmlReaderSettings
+            {
+                IgnoreComments = true,
+                IgnoreProcessingInstructions = true,
+                IgnoreWhitespace = true
+            };
+            using (var reader = XmlReader.Create(stream, readerSettings))
+            {
+                return XDocument.Load(reader);
+            }
+        }
+
+        /// <summary>
+        /// Skriver et XDocument til en given stream.
+        /// </summary>
+        /// <param name="document">XDocument, der skal skrives.</param>
+        /// <param name="stream">Stream, der skal skrive indholdet af det given XDocument.</param>
+        private static void WriteDocument(XDocument document, Stream stream)
+        {
+            if (document == null)
+            {
+                throw new ArgumentNullException("document");
+            }
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+            stream.Seek(0, SeekOrigin.Begin);
+            var writerSettings = new XmlWriterSettings
+            {
+                Encoding = Encoding.UTF8,
+                Indent = true
+            };
+            using (var writer = XmlWriter.Create(stream, writerSettings))
+            {
+                document.WriteTo(writer);
+                writer.Flush();
+            }
+        }
+
+        /// <summary>
+        /// Gemmer data i et XDocument.
+        /// </summary>
+        /// <param name="model">Data, der skal gemmes i XDocument.</param>
+        /// <param name="document">XDocument, hvori data skal gemmes.</param>
+        private static void StoreInDocument(IModel model, XDocument document)
+        {
+            if (Equals(model, null))
+            {
+                throw new ArgumentNullException("model");
+            }
+            if (document == null)
+            {
+                throw new ArgumentNullException("document");
             }
         }
 
