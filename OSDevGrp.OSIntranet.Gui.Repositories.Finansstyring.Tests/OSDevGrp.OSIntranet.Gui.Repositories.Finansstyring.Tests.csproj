@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FinansstyringKonfigurationRepositoryTests.cs" />
+    <Compile Include="FinansstyringRepositoryLocaleTests.cs" />
     <Compile Include="FinansstyringRepositoryTests.cs" />
     <Compile Include="LocaleDataStorageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
