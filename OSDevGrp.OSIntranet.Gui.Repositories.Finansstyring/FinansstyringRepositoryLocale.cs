@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Resources;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 {
@@ -71,7 +76,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Liste af regnskaber.</returns>
         public virtual Task<IEnumerable<IRegnskabModel>> RegnskabslisteGetAsync()
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IRegnskabModel>> func = RegnskabslisteGet;
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -223,6 +229,40 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         public virtual Task<IEnumerable<IBudgetkontogruppeModel>> BudgetkontogruppelisteGetAsync()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Henter en liste af regnskaber.
+        /// </summary>
+        /// <returns>Liste af regnskaber.</returns>
+        private IEnumerable<IRegnskabModel> RegnskabslisteGet()
+        {
+            try
+            {
+                var regnskaber = new List<IRegnskabModel>();
+                var localeDataDocument = _localeDataStorage.GetLocaleData();
+                foreach (var regnskabElement in localeDataDocument.Root.Elements(XName.Get("Regnskab", Namespace)))
+                {
+                    try
+                    {
+                        var regnskabModel = new RegnskabModel(int.Parse(regnskabElement.Attribute(XName.Get("nummer", string.Empty)).Value), regnskabElement.Attribute(XName.Get("navn", string.Empty)).Value);
+                        regnskaber.Add(regnskabModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+                return regnskaber;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "RegnskabslisteGet", ex.Message), ex);
+            }
         }
 
         #endregion

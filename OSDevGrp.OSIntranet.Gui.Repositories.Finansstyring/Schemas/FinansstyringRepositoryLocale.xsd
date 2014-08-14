@@ -5,8 +5,32 @@
            xmlns:mstns="urn:osdevgrp:osintranet:finansstyringrepository:locale:1.0.0"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
   
+  <!-- RegnskabModelType -->
+  <xs:complexType name="RegnskabModelType">
+    <xs:attribute name="nummer" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+          <xs:maxInclusive value="9999"/>
+       </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="navn" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  
   <xs:element name="FinansstyringRepository">
     <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="Regnskab" type="RegnskabModelType" minOccurs="1" maxOccurs="1"/>
+        </xs:choice>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
 </xs:schema>

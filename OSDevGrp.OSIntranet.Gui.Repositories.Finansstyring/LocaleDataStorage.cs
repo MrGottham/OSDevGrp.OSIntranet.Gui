@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 
@@ -341,6 +342,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             if (document == null)
             {
                 throw new ArgumentNullException("document");
+            }
+            var regnskabModel = model as IRegnskabModel;
+            if (regnskabModel != null)
+            {
+                regnskabModel.StoreInDocument(document);
+                return;
             }
         }
 
