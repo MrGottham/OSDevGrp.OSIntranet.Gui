@@ -23,12 +23,40 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:complexType>
-  
+
+  <!-- KontogruppeModelType -->
+  <xs:complexType name="KontogruppeModelType">
+    <xs:attribute name="nummer" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+          <xs:maxExclusive value="99"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tekst" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="balanceType" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Aktiver"/>
+          <xs:enumeration value="Passiver"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+    
   <xs:element name="FinansstyringRepository">
     <xs:complexType>
       <xs:sequence>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element name="Regnskab" type="RegnskabModelType" minOccurs="1" maxOccurs="1"/>
+          <xs:element name="Regnskab" type="RegnskabModelType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="Kontogruppe" type="KontogruppeModelType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:choice>
       </xs:sequence>
     </xs:complexType>

@@ -44,5 +44,26 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             navnAttribute.Value = regnskabModel.Navn;
         }
+
+        /// <summary>
+        /// Gemmer data for en kontogruppe i det lokale datalager.
+        /// </summary>
+        /// <param name="kontogruppeModel">Model for en kontogruppe.</param>
+        /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
+        public static void StoreInDocument(this IKontogruppeModel kontogruppeModel, XDocument localeDataDocument)
+        {
+            if (kontogruppeModel == null)
+            {
+                throw new ArgumentNullException("kontogruppeModel");
+            }
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            var rootElement = localeDataDocument.Root;
+            var kontogruppeElement = rootElement.Elements(XName.Get("Kontogruppe", rootElement.Name.NamespaceName)).SingleOrDefault();
+
+//            var regnskabElement = rootElement.Elements(XName.Get("Regnskab", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) == null || string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, regnskabModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+        }
     }
 }

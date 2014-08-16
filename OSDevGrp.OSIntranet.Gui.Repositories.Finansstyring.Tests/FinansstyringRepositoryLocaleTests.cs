@@ -19,6 +19,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
     [TestFixture]
     public class FinansstyringRepositoryLocaleTests
     {
+        #region Private variables
+
+        private static XDocument _localeDataDocument;
+        private static readonly object SyncRoot = new object();
+
+        #endregion
+
         /// <summary>
         /// Tester, at konstruktøren initierer repositoryet, der supporterer lokale data til finansstyring.
         /// </summary>
@@ -99,6 +106,66 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at KontoplanGetAsync henter kontoplanen til et regnskab.
+        /// </summary>
+        [Test]
+        [TestCase(1, 15)]
+        [TestCase(2, 15)]
+        [TestCase(3, 15)]
+        [TestCase(4, 0)]
+        [TestCase(5, 0)]
+        public async void TestAtKontoplanGetAsyncHenterKontoplan(int regnskabsnummer, int expectedKonti)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.KontoplanGetAsync(regnskabsnummer, DateTime.Now);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(expectedKonti));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at KontogruppelisteGetAsync henter listen af kontogrupper.
+        /// </summary>
+        [Test]
+        public async void TestAtKontogruppelisteGetAsyncHenterKontogrupper()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.KontogruppelisteGetAsync();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Count(), Is.EqualTo(15));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
         /// Danner testdata.
         /// </summary>
         /// <param name="fixture">Fixture, der kan generere random data.</param>
@@ -109,30 +176,42 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             {
                 throw new ArgumentNullException("fixture");
             }
-            // Create testdata.
-            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
-            localeDataDocument.Add(new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace)));
-            for (var i = 0; i < 3; i++)
+            lock (SyncRoot)
             {
-                var regnskabModel = CreateRegnskab(fixture, i + 1);
-                regnskabModel.StoreInDocument(localeDataDocument);
-            }
-            
-            // Validation.
-            var schemaSet = new XmlSchemaSet();
-            var assembly = typeof(FinansstyringRepositoryLocale).Assembly;
-            using (var resourceReader = assembly.GetManifestResourceStream(string.Format("{0}.{1}", assembly.GetName().Name, FinansstyringRepositoryLocale.XmlSchema)))
-            {
-                if (resourceReader == null)
+                if (_localeDataDocument != null)
                 {
-                    throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnableToLoadResource, FinansstyringRepositoryLocale.XmlSchema));
+                    return _localeDataDocument;
                 }
-                schemaSet.Add(XmlSchema.Read(resourceReader, ValidationEventHandler));
-                resourceReader.Close();
-            }
-            localeDataDocument.Validate(schemaSet, ValidationEventHandler);
+                // Create testdata.
+                var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+                localeDataDocument.Add(new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace)));
+                for (var i = 0; i < 3; i++)
+                {
+                    var regnskabModel = CreateRegnskab(fixture, i + 1);
+                    regnskabModel.StoreInDocument(localeDataDocument);
+                }
+                for (var i = 0; i < 15; i++)
+                {
+                    var kontogruppeModel = CreateKontogruppe(fixture, i + 1);
+                }
 
-            return localeDataDocument;
+                // Validation.
+                var schemaSet = new XmlSchemaSet();
+                var assembly = typeof(FinansstyringRepositoryLocale).Assembly;
+                using (var resourceReader = assembly.GetManifestResourceStream(string.Format("{0}.{1}", assembly.GetName().Name, FinansstyringRepositoryLocale.XmlSchema)))
+                {
+                    if (resourceReader == null)
+                    {
+                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnableToLoadResource, FinansstyringRepositoryLocale.XmlSchema));
+                    }
+                    schemaSet.Add(XmlSchema.Read(resourceReader, ValidationEventHandler));
+                    resourceReader.Close();
+                }
+                localeDataDocument.Validate(schemaSet, ValidationEventHandler);
+
+                _localeDataDocument = localeDataDocument;
+                return _localeDataDocument;
+            }
         }
 
         /// <summary>
@@ -143,6 +222,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// <returns>Testdata til et regnskab.</returns>
         private static IRegnskabModel CreateRegnskab(ISpecimenBuilder fixture, int nummer)
         {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
             var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
             regnskabModelMock.Expect(m => m.Nummer)
                 .Return(nummer)
@@ -151,6 +234,31 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
             return regnskabModelMock;
+        }
+
+        /// <summary>
+        /// Danner testdata til en kontogruppe.
+        /// </summary>
+        /// <param name="fixture">Fixture, der kan generere random data.</param>
+        /// <param name="nummer">Unik identifikation af kontogruppen.</param>
+        /// <returns>Testdata til en kontogruppe.</returns>
+        private static IKontogruppeModel CreateKontogruppe(ISpecimenBuilder fixture, int nummer)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(nummer)
+                .Repeat.Any();
+            kontogruppeModelMock.Expect(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModelMock.Expect(m => m.Balancetype)
+                .Return(nummer%2 != 0 ? Balancetype.Aktiver : Balancetype.Passiver)
+                .Repeat.Any();
+            return kontogruppeModelMock;
         }
 
         /// <summary>
