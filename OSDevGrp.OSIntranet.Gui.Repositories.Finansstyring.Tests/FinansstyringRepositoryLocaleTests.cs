@@ -189,10 +189,16 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 {
                     var regnskabModel = CreateRegnskab(fixture, i + 1);
                     regnskabModel.StoreInDocument(localeDataDocument);
+                    for (var j = 0; j < 15; j++)
+                    {
+                        var kontoModel = CreateKonto(fixture, i + 1, string.Format("KONTO{0:00}", j + 1));
+                        kontoModel.StoreInDocument(localeDataDocument);
+                    }
                 }
                 for (var i = 0; i < 15; i++)
                 {
                     var kontogruppeModel = CreateKontogruppe(fixture, i + 1);
+                    kontogruppeModel.StoreInDocument(localeDataDocument);
                 }
 
                 // Validation.
@@ -234,6 +240,55 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
             return regnskabModelMock;
+        }
+
+        /// <summary>
+        /// Danner testdata til en konto.
+        /// </summary>
+        /// <param name="fixture">Fixture, der kan generere random data.</param>
+        /// <param name="regnskabsnummer">Unik identifikation af regnskabet, som kontoen skal være tilknyttet.</param>
+        /// <param name="kontonummer">Unik identifikation af kontoen.</param>
+        /// <returns>Testdata til en konto.</returns>
+        private static IKontoModel CreateKonto(ISpecimenBuilder fixture, int regnskabsnummer, string kontonummer)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            var kontogruppe = (DateTime.Now.Millisecond%15) + 1;
+            var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            kontoModelMock.Expect(m => m.Regnskabsnummer)
+                .Return(regnskabsnummer)
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.Kontonummer)
+                .Return(kontonummer)
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.Kontogruppe)
+                .Return(kontogruppe)
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.StatusDato)
+                .Return(DateTime.Now.Date)
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            kontoModelMock.Expect(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            return kontoModelMock;
         }
 
         /// <summary>

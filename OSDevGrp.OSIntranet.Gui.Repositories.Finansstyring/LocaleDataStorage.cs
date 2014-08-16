@@ -349,6 +349,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 regnskabModel.StoreInDocument(document);
                 return;
             }
+            var kontoModel = model as IKontoModel;
+            if (kontoModel != null)
+            {
+                kontoModel.StoreInDocument(document);
+                return;
+            }
             var kontogruppeModel = model as IKontogruppeModel;
             if (kontogruppeModel != null)
             {

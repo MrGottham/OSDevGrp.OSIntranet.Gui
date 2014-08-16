@@ -88,7 +88,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Kontoplan.</returns>
         public virtual Task<IEnumerable<IKontoModel>> KontoplanGetAsync(int regnskabsnummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IKontoModel>> func = () => KontoplanGet(regnskabsnummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -219,7 +220,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Kontogrupper.</returns>
         public virtual Task<IEnumerable<IKontogruppeModel>> KontogruppelisteGetAsync()
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IKontogruppeModel>> func = KontogruppelisteGet;
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -262,6 +264,68 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "RegnskabslisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter kontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil kontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoplanen.</param>
+        /// <returns>Kontoplan.</returns>
+        private IEnumerable<IKontoModel> KontoplanGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var localeDataDocument = _localeDataStorage.GetLocaleData();
+                var regnskabElement = localeDataDocument.GetRegnskabElement(regnskabsnummer);
+                if (regnskabElement == null)
+                {
+                    return new List<IKontoModel>(0);
+                }
+                return null;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af kontogrupper.
+        /// </summary>
+        /// <returns>Kontogrupper.</returns>
+        private IEnumerable<IKontogruppeModel> KontogruppelisteGet()
+        {
+            try
+            {
+                var kontogrupper = new List<IKontogruppeModel>();
+                var localeDataDocument = _localeDataStorage.GetLocaleData();
+                foreach (var kontogruppeElement in localeDataDocument.Root.Elements(XName.Get("Kontogruppe", Namespace)))
+                {
+                    try
+                    {
+                        var kontogruppe = new KontogruppeModel(int.Parse(kontogruppeElement.Attribute(XName.Get("nummer", string.Empty)).Value), kontogruppeElement.Attribute(XName.Get("tekst", string.Empty)).Value, (Balancetype) Enum.Parse(typeof (Balancetype), kontogruppeElement.Attribute(XName.Get("balanceType")).Value));
+                        kontogrupper.Add(kontogruppe);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+                return kontogrupper;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Message), ex);
             }
         }
 
