@@ -31,18 +31,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 var rootElement = localeDataDocument.Root;
                 regnskabElement = new XElement(XName.Get("Regnskab", rootElement.Name.NamespaceName));
-                regnskabElement.Add(new XAttribute(XName.Get("nummer", string.Empty), regnskabModel.Nummer.ToString(CultureInfo.InvariantCulture)));
-                regnskabElement.Add(new XAttribute(XName.Get("navn", string.Empty), regnskabModel.Navn));
+                regnskabElement.UpdateAttribute(XName.Get("nummer", string.Empty), regnskabModel.Nummer.ToString(CultureInfo.InvariantCulture));
+                regnskabElement.UpdateAttribute(XName.Get("navn", string.Empty), regnskabModel.Navn);
                 rootElement.Add(regnskabElement);
                 return;
             }
-            var navnAttribute = regnskabElement.Attribute(XName.Get("navn", string.Empty));
-            if (navnAttribute == null)
-            {
-                regnskabElement.Add(new XAttribute(XName.Get("navn", string.Empty), regnskabModel.Navn));
-                return;
-            }
-            navnAttribute.Value = regnskabModel.Navn;
+            regnskabElement.UpdateAttribute(XName.Get("navn", string.Empty), regnskabModel.Navn);
         }
 
         /// <summary>
@@ -69,31 +63,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             if (kontoElement == null)
             {
                 kontoElement = new XElement(XName.Get("Konto", regnskabElement.Name.NamespaceName));
-                kontoElement.Add(new XAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer));
-                kontoElement.Add(new XAttribute(XName.Get("kontonavn", string.Empty), kontoModel.Kontonavn));
-                kontoElement.Add(new XAttribute(XName.Get("kontogruppe", string.Empty), kontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
-                // TODO: Continue....
+                kontoElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer);
+                kontoElement.UpdateAttribute(XName.Get("kontonavn", string.Empty), kontoModel.Kontonavn);
+                kontoElement.UpdateAttribute(XName.Get("kontogruppe", string.Empty), kontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture));
+                kontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), kontoModel.Beskrivelse, false);
+                kontoElement.UpdateAttribute(XName.Get("note", string.Empty), kontoModel.Notat, false);
                 regnskabElement.Add(kontoElement);
                 return;
             }
-            var kontonavnAttribute = kontoElement.Attribute(XName.Get("kontonavn", string.Empty));
-            if (kontonavnAttribute == null)
-            {
-                kontoElement.Add(new XAttribute(XName.Get("kontonavn", string.Empty), kontoModel.Kontonavn));
-            }
-            else
-            {
-                kontonavnAttribute.Value = kontoModel.Kontonavn;
-            }
-            var kontogruppeAttribute = kontoElement.Attribute(XName.Get("kontogruppe", string.Empty));
-            if (kontogruppeAttribute == null)
-            {
-                kontoElement.Add(new XAttribute(XName.Get("kontogruppe", string.Empty), kontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
-            }
-            else
-            {
-                kontogruppeAttribute.Value = kontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture);
-            }
+            kontoElement.UpdateAttribute(XName.Get("kontonavn", string.Empty), kontoModel.Kontonavn);
+            kontoElement.UpdateAttribute(XName.Get("kontogruppe", string.Empty), kontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture));
+            kontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), kontoModel.Beskrivelse, false);
+            kontoElement.UpdateAttribute(XName.Get("note", string.Empty), kontoModel.Notat, false);
         }
 
         /// <summary>
@@ -116,28 +97,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 var rootElement = localeDataDocument.Root;
                 kontogruppeElement = new XElement(XName.Get("Kontogruppe", rootElement.Name.NamespaceName));
-                kontogruppeElement.Add(new XAttribute(XName.Get("nummer", string.Empty), kontogruppeModel.Nummer.ToString(CultureInfo.InvariantCulture)));
-                kontogruppeElement.Add(new XAttribute(XName.Get("tekst", string.Empty), kontogruppeModel.Tekst));
-                kontogruppeElement.Add(new XAttribute(XName.Get("balanceType", string.Empty), kontogruppeModel.Balancetype.ToString()));
+                kontogruppeElement.UpdateAttribute(XName.Get("nummer", string.Empty), kontogruppeModel.Nummer.ToString(CultureInfo.InvariantCulture));
+                kontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), kontogruppeModel.Tekst);
+                kontogruppeElement.UpdateAttribute(XName.Get("balanceType", string.Empty), kontogruppeModel.Balancetype.ToString());
                 rootElement.Add(kontogruppeElement);
                 return;
             }
-            var tekstAttribute = kontogruppeElement.Attribute(XName.Get("tekst", string.Empty));
-            if (tekstAttribute == null)
-            {
-                kontogruppeElement.Add(new XAttribute(XName.Get("tekst", string.Empty), kontogruppeModel.Tekst));
-            }
-            else
-            {
-                tekstAttribute.Value = kontogruppeModel.Tekst;
-            }
-            var balanceTypeNode = kontogruppeElement.Attribute(XName.Get("balanceType", string.Empty));
-            if (balanceTypeNode == null)
-            {
-                kontogruppeElement.Add(new XAttribute(XName.Get("balanceType", string.Empty), kontogruppeModel.Balancetype.ToString()));
-                return;
-            }
-            balanceTypeNode.Value = kontogruppeModel.Balancetype.ToString();
+            kontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), kontogruppeModel.Tekst);
+            kontogruppeElement.UpdateAttribute(XName.Get("balanceType", string.Empty), kontogruppeModel.Balancetype.ToString());
         }
 
         /// <summary>
@@ -170,6 +137,45 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             var rootElement = localeDataDocument.Root;
             return rootElement.Elements(XName.Get("Kontogruppe", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+        }
+
+        /// <summary>
+        /// Opdaterer værdien af en given XML attribute.
+        /// </summary>
+        /// <param name="localeDataElement">XML element, hvorpå attributværdi skal opdateres.</param>
+        /// <param name="attributeName">Navn på XML attributten, der skal opdateres.</param>
+        /// <param name="attributeValue">Værdi, som XML attributten skal opdateres med.</param>
+        /// <param name="required">Angivelse af, om XML attributten er requried.</param>
+        private static void UpdateAttribute(this XElement localeDataElement, XName attributeName, string attributeValue, bool required = true)
+        {
+            if (localeDataElement == null)
+            {
+                throw new ArgumentNullException("localeDataElement");
+            }
+            if (attributeName == null)
+            {
+                throw new ArgumentNullException("attributeName");
+            }
+            if (string.IsNullOrEmpty(attributeValue) && required)
+            {
+                throw new ArgumentNullException("attributeValue");
+            }
+            var attribute = localeDataElement.Attribute(attributeName);
+            if (attribute == null)
+            {
+                if (string.IsNullOrEmpty(attributeValue) && required == false)
+                {
+                    return;
+                }
+                localeDataElement.Add(new XAttribute(attributeName, attributeValue));
+                return;
+            }
+            if (string.IsNullOrEmpty(attributeValue) && required == false)
+            {
+                attribute.Remove();
+                return;
+            }
+            attribute.Value = attributeValue;
         }
     }
 }
