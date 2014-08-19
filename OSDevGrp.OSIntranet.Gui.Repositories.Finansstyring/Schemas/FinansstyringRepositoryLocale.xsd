@@ -21,6 +21,15 @@
       <xs:maxInclusive value="99"/>
     </xs:restriction>
   </xs:simpleType>
+  
+  <!-- HistorikDatoType -->
+  <xs:simpleType name="HistorikDatoType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="8"/>
+      <xs:maxLength value="8"/>
+      <xs:pattern value="(19|20)\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])"/>
+    </xs:restriction>
+  </xs:simpleType>
 
   <!-- KontoModelBaseType -->
   <xs:complexType name="KontoModelBaseType">
@@ -36,12 +45,21 @@
     <xs:attribute name="beskrivelse" type="xs:string" use="optional"/>
     <xs:attribute name="note" type="xs:string" use="optional"/>
   </xs:complexType>
+
+  <!-- KontoHistorikType -->
+  <xs:complexType name="KontoHistorikType">
+    <xs:attribute name="kontonummer" type="KontonummerType" use="required"/>
+    <xs:attribute name="dato" type="HistorikDatoType" use="required"/>
+    <xs:attribute name="kredit" type="xs:decimal" use="required"/>
+    <xs:attribute name="saldo" type="xs:decimal" use="required"/>
+  </xs:complexType>
   
   <!-- RegnskabModelType -->
   <xs:complexType name="RegnskabModelType">
     <xs:sequence>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element name="Konto" type="KontoModelBaseType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="KontoHistorik" type="KontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="nummer" use="required">
