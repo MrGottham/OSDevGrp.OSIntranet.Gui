@@ -71,9 +71,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 kontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), kontoModel.Beskrivelse, false);
                 kontoElement.UpdateAttribute(XName.Get("note", string.Empty), kontoModel.Notat, false);
                 regnskabElement.Add(kontoElement);
+
                 kontoHistorikElement = new XElement(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName));
                 kontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer);
-                kontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), kontoModel.StatusDato.ToString("yyyyMMdd"));
+                kontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(kontoModel.StatusDato));
                 kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("N", CultureInfo.InvariantCulture));
                 kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("N", CultureInfo.InvariantCulture));
                 regnskabElement.Add(kontoHistorikElement);
@@ -84,33 +85,20 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             kontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), kontoModel.Beskrivelse, false);
             kontoElement.UpdateAttribute(XName.Get("note", string.Empty), kontoModel.Notat, false);
 
-            var kontoHistorikElements = localeDataDocument.GetHistorikElements(kontoModel).ToList();
-            try
+            var kontoHistorikDato = GetHistorikDato(kontoModel.StatusDato);
+            kontoHistorikElement = localeDataDocument.GetHistorikElements(kontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoHistorikDato, StringComparison.Ordinal) == 0);
+            if (kontoHistorikElement == null)
             {
-                kontoHistorikElement = kontoHistorikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoModel.StatusDato.ToString("yyyyMMdd"), StringComparison.Ordinal) == 0);
-                if (kontoHistorikElement == null)
-                {
-                    kontoHistorikElement = new XElement(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName));
-                    kontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer);
-                    kontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), kontoModel.StatusDato.ToString("yyyyMMdd"));
-                    kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("N", CultureInfo.InvariantCulture));
-                    kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("N", CultureInfo.InvariantCulture));
-                    regnskabElement.Add(kontoHistorikElement);
-                    return;
-                }
+                kontoHistorikElement = new XElement(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName));
+                kontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer);
+                kontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), kontoHistorikDato);
                 kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("N", CultureInfo.InvariantCulture));
                 kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("N", CultureInfo.InvariantCulture));
+                regnskabElement.Add(kontoHistorikElement);
+                return;
             }
-            finally
-            {
-                var elementsToDelete = kontoHistorikElements.Where(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoModel.StatusDato.AddYears(-1).ToString("yyyyMMdd"), StringComparison.Ordinal) <= 0).ToList();
-                while (elementsToDelete.Count > 0)
-                {
-                    var elementToDelete = elementsToDelete.First();
-                    elementToDelete.Remove();
-                    elementsToDelete.Remove(elementToDelete);
-                }
-            }
+            kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("N", CultureInfo.InvariantCulture));
+            kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("N", CultureInfo.InvariantCulture));
         }
 
         /// <summary>
@@ -180,6 +168,15 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 return new List<XElement>(0);
             }
+
+            var historikElements = regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName))
+                .Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0);
+
+
+
+
+
+
             return regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoModel.StatusDato.ToString("yyyyMMdd"), StringComparison.Ordinal) <= 0).OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
         }
 
@@ -236,6 +233,16 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 return;
             }
             attribute.Value = attributeValue;
+        }
+
+        /// <summary>
+        /// Konverterer en statudato til formatet, der benyttes til en historisk dato i XML dokumentet.
+        /// </summary>
+        /// <param name="statusDato">Statusdato.</param>
+        /// <returns>Historisk dato, som kan benyttes i XML dokumentet.</returns>
+        private static string GetHistorikDato(DateTime statusDato)
+        {
+            return statusDato.ToString("yyyyMMdd");
         }
     }
 }
