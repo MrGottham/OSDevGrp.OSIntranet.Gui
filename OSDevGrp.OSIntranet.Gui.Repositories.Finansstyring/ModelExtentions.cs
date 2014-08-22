@@ -168,16 +168,16 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 return new List<XElement>(0);
             }
-
-            var historikElements = regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName))
-                .Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare() <= 0);
-
-
-
-
-
-
-            return regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoModel.StatusDato.ToString("yyyyMMdd"), StringComparison.Ordinal) <= 0).OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
+            var historikElements = regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(kontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
+            var remoteElementUntil = DateTime.Now.AddYears(-1);
+            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+            while (elementToDelete != null)
+            {
+                elementToDelete.Remove();
+                historikElements.Remove(elementToDelete);
+                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+            }
+            return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
         }
 
         /// <summary>
