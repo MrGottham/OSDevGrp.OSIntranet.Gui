@@ -132,6 +132,34 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Gemmer data for en budgetkontogruppe i det lokale datalager.
+        /// </summary>
+        /// <param name="budgetkontogruppeModel">Model for en kontogruppe til budgetkonti.</param>
+        /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
+        public static void StoreInDocument(this IBudgetkontogruppeModel budgetkontogruppeModel, XDocument localeDataDocument)
+        {
+            if (budgetkontogruppeModel == null)
+            {
+                throw new ArgumentNullException("budgetkontogruppeModel");
+            }
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            var budgetkontogruppeElement = localeDataDocument.GetBudgetkontogruppeElement(budgetkontogruppeModel.Nummer);
+            if (budgetkontogruppeElement == null)
+            {
+                var rootElement = localeDataDocument.Root;
+                budgetkontogruppeElement = new XElement(XName.Get("Budgetkontogruppe", rootElement.Name.NamespaceName));
+                budgetkontogruppeElement.UpdateAttribute(XName.Get("nummer", string.Empty), budgetkontogruppeModel.Nummer.ToString(CultureInfo.InvariantCulture));
+                budgetkontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), budgetkontogruppeModel.Tekst);
+                rootElement.Add(budgetkontogruppeElement);
+                return;
+            }
+            budgetkontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), budgetkontogruppeModel.Tekst);
+        }
+
+        /// <summary>
         /// Finder og returnerer elementet til et givent regnskab.
         /// </summary>
         /// <param name="localeDataDocument">XML dokument, hvorfra elementet skal returneres.</param>
@@ -194,6 +222,22 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             var rootElement = localeDataDocument.Root;
             return rootElement.Elements(XName.Get("Kontogruppe", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+        }
+
+        /// <summary>
+        /// Finder og returnerer elementet til en given kontogruppe til budgetkonti.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokument, hvorfra elementet skal returneres.</param>
+        /// <param name="nummer">Unik identifikation af kontogruppen til budgetkonti.</param>
+        /// <returns>Elementet til den givne kontogruppe for budgetkonti.</returns>
+        public static XElement GetBudgetkontogruppeElement(this XDocument localeDataDocument, int nummer)
+        {
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            var rootElement = localeDataDocument.Root;
+            return rootElement.Elements(XName.Get("Budgetkontogruppe", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
         }
 
         /// <summary>

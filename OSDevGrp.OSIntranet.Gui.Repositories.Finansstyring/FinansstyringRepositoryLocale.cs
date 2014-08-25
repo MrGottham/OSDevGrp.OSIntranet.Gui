@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -230,7 +232,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Grupper til budgetkonti.</returns>
         public virtual Task<IEnumerable<IBudgetkontogruppeModel>> BudgetkontogruppelisteGetAsync()
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IBudgetkontogruppeModel>> func = BudgetkontogruppelisteGet;
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -247,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 {
                     try
                     {
-                        var regnskabModel = new RegnskabModel(int.Parse(regnskabElement.Attribute(XName.Get("nummer", string.Empty)).Value), regnskabElement.Attribute(XName.Get("navn", string.Empty)).Value);
+                        var regnskabModel = new RegnskabModel(int.Parse(regnskabElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), regnskabElement.Attribute(XName.Get("navn", string.Empty)).Value);
                         regnskaber.Add(regnskabModel);
                     }
                     catch (Exception ex)
@@ -255,7 +258,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         Debug.WriteLine(ex.Message);
                     }
                 }
-                return regnskaber;
+                return regnskaber.OrderBy(m => m.Nummer).ToList();
             }
             catch (IntranetGuiRepositoryException)
             {
@@ -283,7 +286,40 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 {
                     return new List<IKontoModel>(0);
                 }
-                return null;
+                var kontogrupper = KontogruppelisteGet().ToList();
+                var kontoplan = new List<IKontoModel>();
+                foreach (var kontoElement in regnskabElement.Elements(XName.Get("Konto", Namespace)))
+                {
+                    try
+                    {
+                        var kontogruppeAttribute = kontoElement.Attribute(XName.Get("kontogruppe", string.Empty));
+                        if (kontogruppeAttribute == null || kontogrupper.Select(m => m.Nummer).Contains(int.Parse(kontogruppeAttribute.Value, NumberStyles.Integer, CultureInfo.InvariantCulture)) == false) 
+                        {
+                            continue;
+                        }
+                        var kontoModel = new KontoModel(int.Parse(regnskabElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), kontoElement.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoElement.Attribute(XName.Get("kontonavn")).Value, int.Parse(kontogruppeAttribute.Value, NumberStyles.Integer, CultureInfo.InvariantCulture), statusDato);
+                        if (kontoElement.Attribute(XName.Get("beskrivelse", string.Empty)) != null)
+                        {
+                            kontoModel.Beskrivelse = kontoElement.Attribute(XName.Get("beskrivelse", string.Empty)).Value;
+                        }
+                        if (kontoElement.Attribute(XName.Get("note", string.Empty)) != null)
+                        {
+                            kontoModel.Notat = kontoElement.Attribute(XName.Get("note", string.Empty)).Value;
+                        }
+                        var historikElements = localeDataDocument.GetHistorikElements(kontoModel).FirstOrDefault();
+                        if (historikElements != null)
+                        {
+                            kontoModel.Kredit = decimal.Parse(historikElements.Attribute(XName.Get("kredit", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            kontoModel.Saldo = decimal.Parse(historikElements.Attribute(XName.Get("saldo", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        }
+                        kontoplan.Add(kontoModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+                return kontoplan.OrderBy(m => m.Kontonummer).ToList();
             }
             catch (IntranetGuiRepositoryException)
             {
@@ -309,7 +345,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 {
                     try
                     {
-                        var kontogruppe = new KontogruppeModel(int.Parse(kontogruppeElement.Attribute(XName.Get("nummer", string.Empty)).Value), kontogruppeElement.Attribute(XName.Get("tekst", string.Empty)).Value, (Balancetype) Enum.Parse(typeof (Balancetype), kontogruppeElement.Attribute(XName.Get("balanceType")).Value));
+                        var kontogruppe = new KontogruppeModel(int.Parse(kontogruppeElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), kontogruppeElement.Attribute(XName.Get("tekst", string.Empty)).Value, (Balancetype) Enum.Parse(typeof (Balancetype), kontogruppeElement.Attribute(XName.Get("balanceType")).Value));
                         kontogrupper.Add(kontogruppe);
                     }
                     catch (Exception ex)
@@ -317,7 +353,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         Debug.WriteLine(ex.Message);
                     }
                 }
-                return kontogrupper;
+                return kontogrupper.OrderBy(m => m.Nummer).ToList();
             }
             catch (IntranetGuiRepositoryException)
             {
@@ -326,6 +362,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af grupper til budgetkonti.
+        /// </summary>
+        /// <returns>Grupper til budgetkonti.</returns>
+        private IEnumerable<IBudgetkontogruppeModel> BudgetkontogruppelisteGet()
+        {
+            try
+            {
+                var budgetkontogrupper = new List<IBudgetkontogruppeModel>();
+                var localeDataDocument = _localeDataStorage.GetLocaleData();
+                foreach (var budgetkontogruppeElement in localeDataDocument.Root.Elements(XName.Get("Budgetkontogruppe", Namespace)))
+                {
+                    try
+                    {
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+                return budgetkontogrupper.OrderBy(m => m.Nummer).ToList();
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontogruppelisteGet", ex.Message), ex);
             }
         }
 

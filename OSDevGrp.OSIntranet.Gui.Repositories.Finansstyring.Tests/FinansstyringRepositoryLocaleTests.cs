@@ -166,6 +166,34 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at BudgetkontogruppelisteGetAsync henter listen af kontogrupper til budgetkonti.
+        /// </summary>
+        [Test]
+        public async void TestAtBudgetkontogruppelisteGetAsyncHenterBudgetkontogrupper()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.BudgetkontogruppelisteGetAsync();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result.Count(), Is.EqualTo(25));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
         /// Danner testdata.
         /// </summary>
         /// <param name="fixture">Fixture, der kan generere random data.</param>
@@ -199,6 +227,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 {
                     var kontogruppeModel = CreateKontogruppe(fixture, i + 1);
                     kontogruppeModel.StoreInDocument(localeDataDocument);
+                }
+                for (var i = 0; i < 25; i++)
+                {
+                    var budgetkontogruppeModel = CreateBudgetkontogruppe(fixture, i + 1);
+                    budgetkontogruppeModel.StoreInDocument(localeDataDocument);
                 }
 
                 // Validation.
@@ -314,6 +347,28 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(nummer%2 != 0 ? Balancetype.Aktiver : Balancetype.Passiver)
                 .Repeat.Any();
             return kontogruppeModelMock;
+        }
+
+        /// <summary>
+        /// Danner testdata til en kontogruppe for budgetkonti.
+        /// </summary>
+        /// <param name="fixture">Fixture, der kan generere random data.</param>
+        /// <param name="nummer">Unik identifikation af kontogruppen.</param>
+        /// <returns>Testdata til en kontogruppe.</returns>
+        private static IBudgetkontogruppeModel CreateBudgetkontogruppe(ISpecimenBuilder fixture, int nummer)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            var budgetkontogruppeModelMock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(nummer)
+                .Repeat.Any();
+            budgetkontogruppeModelMock.Expect(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            return budgetkontogruppeModelMock;
         }
 
         /// <summary>
