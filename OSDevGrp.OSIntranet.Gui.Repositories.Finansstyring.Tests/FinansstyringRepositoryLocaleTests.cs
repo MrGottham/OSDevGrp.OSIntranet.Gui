@@ -138,6 +138,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at BudgetkontoplanGetAsync henter budgetkontoplanen til et regnskab.
+        /// </summary>
+        [Test]
+        [TestCase(1, 30)]
+        [TestCase(2, 30)]
+        [TestCase(3, 30)]
+        [TestCase(4, 0)]
+        [TestCase(5, 0)]
+        public async void TestAtBudgetkontoplanGetAsyncHenterKontoplan(int regnskabsnummer, int expectedKonti)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.BudgetkontoplanGetAsync(regnskabsnummer, DateTime.Now);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(expectedKonti));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
         /// Tester, at KontogruppelisteGetAsync henter listen af kontogrupper.
         /// </summary>
         [Test]
@@ -221,6 +253,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     {
                         var kontoModel = CreateKonto(fixture, i + 1, string.Format("KONTO{0:00}", j + 1));
                         kontoModel.StoreInDocument(localeDataDocument);
+                    }
+                    for (var j = 0; j < 30; j++)
+                    {
+                        var budgetkontoModel = CreateBudgetkonto(fixture, i + 1, string.Format("BUDGETKONTO{0:00}", j + 1));
+                        budgetkontoModel.StoreInDocument(localeDataDocument);
                     }
                 }
                 for (var i = 0; i < 15; i++)
@@ -322,6 +359,58 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<decimal>())
                 .Repeat.Any();
             return kontoModelMock;
+        }
+
+        /// <summary>
+        /// Danner testdata til en budgetkonto.
+        /// </summary>
+        /// <param name="fixture">Fixture, der kan generere random data.</param>
+        /// <param name="regnskabsnummer">Unik identifikation af regnskabet, som budgetkontoen skal være tilknyttet.</param>
+        /// <param name="kontonummer">Unik identifikation af kontoen.</param>
+        /// <returns>Testdata til en budgetkonto.</returns>
+        private static IBudgetkontoModel CreateBudgetkonto(ISpecimenBuilder fixture, int regnskabsnummer, string kontonummer)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            var budgetkontogruppe = (DateTime.Now.Millisecond%25) + 1;
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Expect(m => m.Regnskabsnummer)
+                .Return(regnskabsnummer)
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Kontonummer)
+                .Return(kontonummer)
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Kontogruppe)
+                .Return(budgetkontogruppe)
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.StatusDato)
+                .Return(DateTime.Now.Date)
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Indtægter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Udgifter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            return budgetkontoModelMock;
         }
 
         /// <summary>

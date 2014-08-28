@@ -114,7 +114,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Budgetkontoplan.</returns>
         public virtual Task<IEnumerable<IBudgetkontoModel>> BudgetkontoplanGetAsync(int regnskabsnummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IBudgetkontoModel>> func = () => BudgetkontoplanGet(regnskabsnummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -327,7 +328,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (Exception ex)
             {
-                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontogruppelisteGet", ex.Message), ex);
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoplanGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter budgetkontoplanen til et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil budgetkontoplanen skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoplanen.</param>
+        /// <returns>Budgetkontoplan.</returns>
+        private IEnumerable<IBudgetkontoModel> BudgetkontoplanGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var localeDataDocument = _localeDataStorage.GetLocaleData();
+                var regnskabElement = localeDataDocument.GetRegnskabElement(regnskabsnummer);
+                if (regnskabElement == null)
+                {
+                    return new List<IBudgetkontoModel>(0);
+                }
+                var budgetkontogrupper = BudgetkontogruppelisteGet().ToList();
+                var budgetkontoplan = new List<IBudgetkontoModel>();
+                return budgetkontoplan;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Message), ex);
             }
         }
 
@@ -379,6 +410,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 {
                     try
                     {
+                        var budgetkontogruppe = new BudgetkontogruppeModel(int.Parse(budgetkontogruppeElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), budgetkontogruppeElement.Attribute(XName.Get("tekst", string.Empty)).Value);
+                        budgetkontogrupper.Add(budgetkontogruppe);
                     }
                     catch (Exception ex)
                     {

@@ -53,6 +53,14 @@
     <xs:attribute name="kredit" type="xs:decimal" use="required"/>
     <xs:attribute name="saldo" type="xs:decimal" use="required"/>
   </xs:complexType>
+
+  <xs:complexType name="BudgetkontoHistorikType">
+    <xs:attribute name="kontonummer" type="KontonummerType" use="required"/>
+    <xs:attribute name="dato" type="HistorikDatoType" use="required"/>
+    <xs:attribute name="indtaegter" type="xs:decimal" use="required"/>
+    <xs:attribute name="udgifter" type="xs:decimal" use="required"/>
+    <xs:attribute name="bogfoert" type="xs:decimal" use="required"/>
+  </xs:complexType>
   
   <!-- RegnskabModelType -->
   <xs:complexType name="RegnskabModelType">
@@ -60,6 +68,8 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element name="Konto" type="KontoModelBaseType" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="KontoHistorik" type="KontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Budgetkonto" type="KontoModelBaseType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="BudgetkontoHistorik" type="BudgetkontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="nummer" use="required">

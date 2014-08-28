@@ -355,12 +355,24 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 kontoModel.StoreInDocument(document);
                 return;
             }
+            var budgetkontoModel = model as IBudgetkontoModel;
+            if (budgetkontoModel != null)
+            {
+                budgetkontoModel.StoreInDocument(document);
+                return;
+            }
             var kontogruppeModel = model as IKontogruppeModel;
             if (kontogruppeModel != null)
             {
                 kontogruppeModel.StoreInDocument(document);
                 return;
             }
+            var budgetkontogruppeModel = model as IBudgetkontogruppeModel;
+            if (budgetkontogruppeModel == null)
+            {
+                return;
+            }
+            budgetkontogruppeModel.StoreInDocument(document);
         }
 
         #endregion

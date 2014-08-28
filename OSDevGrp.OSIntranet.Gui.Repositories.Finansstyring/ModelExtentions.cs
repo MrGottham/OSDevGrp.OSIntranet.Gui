@@ -75,8 +75,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 kontoHistorikElement = new XElement(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName));
                 kontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer);
                 kontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(kontoModel.StatusDato));
-                kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("N", CultureInfo.InvariantCulture));
-                kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("N", CultureInfo.InvariantCulture));
+                kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("#.##", CultureInfo.InvariantCulture));
+                kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("#.##", CultureInfo.InvariantCulture));
                 regnskabElement.Add(kontoHistorikElement);
                 return;
             }
@@ -92,13 +92,77 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 kontoHistorikElement = new XElement(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName));
                 kontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer);
                 kontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), kontoHistorikDato);
-                kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("N", CultureInfo.InvariantCulture));
-                kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("N", CultureInfo.InvariantCulture));
+                kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("#.##", CultureInfo.InvariantCulture));
+                kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("#.##", CultureInfo.InvariantCulture));
                 regnskabElement.Add(kontoHistorikElement);
                 return;
             }
-            kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("N", CultureInfo.InvariantCulture));
-            kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("N", CultureInfo.InvariantCulture));
+            kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString("#.##", CultureInfo.InvariantCulture));
+            kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString("#.##", CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
+        /// Gemmer data for en konto i det lokale datalager.
+        /// </summary>
+        /// <param name="budgetkontoModel">Model for en budgetkonto.</param>
+        /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
+        public static void StoreInDocument(this IBudgetkontoModel budgetkontoModel, XDocument localeDataDocument)
+        {
+            if (budgetkontoModel== null)
+            {
+                throw new ArgumentNullException("budgetkontoModel");
+            }
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            var regnskabElement = localeDataDocument.GetRegnskabElement(budgetkontoModel.Regnskabsnummer);
+            if (regnskabElement == null)
+            {
+                return;
+            }
+            XElement budgetkontoHistorikElement;
+            var budgetkontoElement = regnskabElement.Elements(XName.Get("Budgetkonto", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0);
+            if (budgetkontoElement == null)
+            {
+                budgetkontoElement = new XElement(XName.Get("Budgetkonto", regnskabElement.Name.NamespaceName));
+                budgetkontoElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), budgetkontoModel.Kontonummer);
+                budgetkontoElement.UpdateAttribute(XName.Get("kontonavn", string.Empty), budgetkontoModel.Kontonavn);
+                budgetkontoElement.UpdateAttribute(XName.Get("kontogruppe", string.Empty), budgetkontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture));
+                budgetkontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), budgetkontoModel.Beskrivelse, false);
+                budgetkontoElement.UpdateAttribute(XName.Get("note", string.Empty), budgetkontoModel.Notat, false);
+                regnskabElement.Add(budgetkontoElement);
+
+                budgetkontoHistorikElement = new XElement(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), budgetkontoModel.Kontonummer);
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(budgetkontoModel.StatusDato));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.##", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.##", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.##", CultureInfo.InvariantCulture));
+                regnskabElement.Add(budgetkontoHistorikElement);
+                return;
+            }
+            budgetkontoElement.UpdateAttribute(XName.Get("kontonavn", string.Empty), budgetkontoModel.Kontonavn);
+            budgetkontoElement.UpdateAttribute(XName.Get("kontogruppe", string.Empty), budgetkontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture));
+            budgetkontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), budgetkontoModel.Beskrivelse, false);
+            budgetkontoElement.UpdateAttribute(XName.Get("note", string.Empty), budgetkontoModel.Notat, false);
+
+            var kontoHistorikDato = GetHistorikDato(budgetkontoModel.StatusDato);
+            budgetkontoHistorikElement = localeDataDocument.GetHistorikElements(budgetkontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoHistorikDato, StringComparison.Ordinal) == 0);
+            if (budgetkontoHistorikElement == null)
+            {
+                budgetkontoHistorikElement = new XElement(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), budgetkontoModel.Kontonummer);
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(budgetkontoModel.StatusDato));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.##", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.##", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.##", CultureInfo.InvariantCulture));
+                regnskabElement.Add(budgetkontoHistorikElement);
+                return;
+            }
+            budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.##", CultureInfo.InvariantCulture));
+            budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.##", CultureInfo.InvariantCulture));
+            budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.##", CultureInfo.InvariantCulture));
         }
 
         /// <summary>
@@ -197,6 +261,39 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 return new List<XElement>(0);
             }
             var historikElements = regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(kontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
+            var remoteElementUntil = DateTime.Now.AddYears(-1);
+            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+            while (elementToDelete != null)
+            {
+                elementToDelete.Remove();
+                historikElements.Remove(elementToDelete);
+                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+            }
+            return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
+        }
+
+        /// <summary>
+        /// Finder og returnerer elementer med historiske data for en given budgetkonto.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokument, hvorfra elementer skal returneres.</param>
+        /// <param name="budgetkontoModel">Model for budgetkontoen, hvortil historiske data skal returneres.</param>
+        /// <returns>Elementer indeholdende historiske data til den givne budgetkonto.</returns>
+        public static IEnumerable<XElement> GetHistorikElements(this XDocument localeDataDocument, IBudgetkontoModel budgetkontoModel)
+        {
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            if (budgetkontoModel == null)
+            {
+                throw new ArgumentNullException("budgetkontoModel");
+            }
+            var regnskabElement = localeDataDocument.GetRegnskabElement(budgetkontoModel.Regnskabsnummer);
+            if (regnskabElement == null)
+            {
+                return new List<XElement>(0);
+            }
+            var historikElements = regnskabElement.Elements(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(budgetkontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
             var remoteElementUntil = DateTime.Now.AddYears(-1);
             var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
             while (elementToDelete != null)
