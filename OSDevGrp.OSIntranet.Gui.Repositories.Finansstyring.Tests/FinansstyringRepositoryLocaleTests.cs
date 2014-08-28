@@ -146,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         [TestCase(3, 30)]
         [TestCase(4, 0)]
         [TestCase(5, 0)]
-        public async void TestAtBudgetkontoplanGetAsyncHenterKontoplan(int regnskabsnummer, int expectedKonti)
+        public async void TestAtBudgetkontoplanGetAsyncHenterKontoplan(int regnskabsnummer, int expectedBudgetkonti)
         {
             var fixture = new Fixture();
             fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
@@ -164,7 +164,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
 
             var result = await finansstyringRepositoryLocale.BudgetkontoplanGetAsync(regnskabsnummer, DateTime.Now);
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(expectedKonti));
+            Assert.That(result.Count(), Is.EqualTo(expectedBudgetkonti));
 
             localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
         }
