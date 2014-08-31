@@ -22,6 +22,13 @@
     </xs:restriction>
   </xs:simpleType>
   
+  <!-- AdressekontoIdentifierType -->
+  <xs:simpleType name="AdressekontoIdentifierType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
   <!-- HistorikDatoType -->
   <xs:simpleType name="HistorikDatoType">
     <xs:restriction base="xs:string">
@@ -54,12 +61,34 @@
     <xs:attribute name="saldo" type="xs:decimal" use="required"/>
   </xs:complexType>
 
+  <!-- BudgetkontoHistorikType -->
   <xs:complexType name="BudgetkontoHistorikType">
     <xs:attribute name="kontonummer" type="KontonummerType" use="required"/>
     <xs:attribute name="dato" type="HistorikDatoType" use="required"/>
     <xs:attribute name="indtaegter" type="xs:decimal" use="required"/>
     <xs:attribute name="udgifter" type="xs:decimal" use="required"/>
     <xs:attribute name="bogfoert" type="xs:decimal" use="required"/>
+  </xs:complexType>
+  
+  <!-- AdressekontoModelType -->
+  <xs:complexType name="AdressekontoModelType">
+    <xs:attribute name="nummer" type="AdressekontoIdentifierType" use="required"/>
+    <xs:attribute name="navn" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="primaerTelefon" type="xs:string" use="optional"/>
+    <xs:attribute name="sekundaerTelefon" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <!-- AdressekontoHistorikType -->
+  <xs:complexType name="AdressekontoHistorikType">
+    <xs:attribute name="nummer" type="AdressekontoIdentifierType" use="required"/>
+    <xs:attribute name="dato" type="HistorikDatoType" use="required"/>
+    <xs:attribute name="saldo" type="xs:decimal" use="required"/>
   </xs:complexType>
   
   <!-- RegnskabModelType -->
@@ -70,6 +99,8 @@
         <xs:element name="KontoHistorik" type="KontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="Budgetkonto" type="KontoModelBaseType" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="BudgetkontoHistorik" type="BudgetkontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Adressekonto" type="AdressekontoModelType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="AdressekontoHistorik" type="AdressekontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="nummer" use="required">

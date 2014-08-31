@@ -259,6 +259,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                         var budgetkontoModel = CreateBudgetkonto(fixture, i + 1, string.Format("BUDGETKONTO{0:00}", j + 1));
                         budgetkontoModel.StoreInDocument(localeDataDocument);
                     }
+                    for (var j = 0; j < 25; j++)
+                    {
+                        var adressekontoModel = CreateAdressekontoModel(fixture, i + 1, 100 + j + 1, 1);
+                    }
+                    for (var j = 0; j < 15; j++)
+                    {
+                        var adressekontoModel = CreateAdressekontoModel(fixture, i + 1, 100 + j + 1, -1);
+                    }
                 }
                 for (var i = 0; i < 15; i++)
                 {
@@ -411,6 +419,45 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<decimal>())
                 .Repeat.Any();
             return budgetkontoModelMock;
+        }
+
+        /// <summary>
+        /// Danner testdata til en adressekonto.
+        /// </summary>
+        /// <param name="fixture">Fixture, der kan generere random data.</param>
+        /// <param name="regnskabsnummer">Unik identifikation af regnskabet, som adressekontoen skal være tilknyttet.</param>
+        /// <param name="nummer">Unik identifikation af adressekontoen.</param>
+        /// <param name="saldoOffset">Offset, som saldoen skal ganges med.</param>
+        /// <returns>Testdata til en adressekonto.</returns>
+        private static IAdressekontoModel CreateAdressekontoModel(ISpecimenBuilder fixture, int regnskabsnummer, int nummer, int saldoOffset)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            adressekontoModelMock.Expect(m => m.Regnskabsnummer)
+                .Return(regnskabsnummer)
+                .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.Nummer)
+                .Return(nummer)
+                .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.PrimærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.SekundærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.StatusDato)
+                .Return(DateTime.Now.Date)
+                .Repeat.Any();
+            adressekontoModelMock.Expect(m => m.Saldo)
+                .Return(Math.Abs(fixture.Create<decimal>())*saldoOffset)
+                .Repeat.Any();
+            return adressekontoModelMock;
         }
 
         /// <summary>

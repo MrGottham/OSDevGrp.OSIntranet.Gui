@@ -307,11 +307,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         {
                             kontoModel.Notat = kontoElement.Attribute(XName.Get("note", string.Empty)).Value;
                         }
-                        var historikElements = localeDataDocument.GetHistorikElements(kontoModel).FirstOrDefault();
-                        if (historikElements != null)
+                        var historikElement = localeDataDocument.GetHistorikElements(kontoModel).FirstOrDefault();
+                        if (historikElement != null)
                         {
-                            kontoModel.Kredit = decimal.Parse(historikElements.Attribute(XName.Get("kredit", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                            kontoModel.Saldo = decimal.Parse(historikElements.Attribute(XName.Get("saldo", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            kontoModel.Kredit = decimal.Parse(historikElement.Attribute(XName.Get("kredit", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            kontoModel.Saldo = decimal.Parse(historikElement.Attribute(XName.Get("saldo", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
                         }
                         kontoplan.Add(kontoModel);
                     }
@@ -350,6 +350,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 }
                 var budgetkontogrupper = BudgetkontogruppelisteGet().ToList();
                 var budgetkontoplan = new List<IBudgetkontoModel>();
+                foreach (var budgetkontoElement in regnskabElement.Elements(XName.Get("Budgetkonto", Namespace)))
+                {
+                    try
+                    {
+                        var kontogruppeAttribute = budgetkontoElement.Attribute(XName.Get("kontogruppe", string.Empty));
+                        if (kontogruppeAttribute == null || budgetkontogrupper.Select(m => m.Nummer).Contains(int.Parse(kontogruppeAttribute.Value, NumberStyles.Integer, CultureInfo.InvariantCulture)) == false)
+                        {
+                            continue;
+                        }
+                        var budgetkontoModel = new BudgetkontoModel(int.Parse(regnskabElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), budgetkontoElement.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoElement.Attribute(XName.Get("kontonavn", string.Empty)).Value, int.Parse(kontogruppeAttribute.Value, NumberStyles.Integer, CultureInfo.InvariantCulture), statusDato);
+                        if (budgetkontoElement.Attribute(XName.Get("beskrivelse", string.Empty)) != null)
+                        {
+                            budgetkontoModel.Beskrivelse = budgetkontoElement.Attribute(XName.Get("beskrivelse", string.Empty)).Value;
+                        }
+                        if (budgetkontoElement.Attribute(XName.Get("note", string.Empty)) != null)
+                        {
+                            budgetkontoModel.Notat = budgetkontoElement.Attribute(XName.Get("note", string.Empty)).Value;
+                        }
+                        var historikElement = localeDataDocument.GetHistorikElements(budgetkontoModel).FirstOrDefault();
+                        if (historikElement != null)
+                        {
+                            budgetkontoModel.Indtægter = decimal.Parse(historikElement.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.Indtægter = decimal.Parse(historikElement.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.Indtægter = decimal.Parse(historikElement.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        }
+                        budgetkontoplan.Add(budgetkontoModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
                 return budgetkontoplan;
             }
             catch (IntranetGuiRepositoryException)
