@@ -361,6 +361,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 budgetkontoModel.StoreInDocument(document);
                 return;
             }
+            var adressekontoModel = model as IAdressekontoModel;
+            if (adressekontoModel != null)
+            {
+                adressekontoModel.StoreInDocument(document);
+                return;
+            }
             var kontogruppeModel = model as IKontogruppeModel;
             if (kontogruppeModel != null)
             {

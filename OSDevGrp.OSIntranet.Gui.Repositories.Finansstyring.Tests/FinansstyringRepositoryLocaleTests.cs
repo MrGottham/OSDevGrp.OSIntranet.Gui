@@ -262,10 +262,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     for (var j = 0; j < 25; j++)
                     {
                         var adressekontoModel = CreateAdressekontoModel(fixture, i + 1, 100 + j + 1, 1);
+                        adressekontoModel.StoreInDocument(localeDataDocument);
                     }
                     for (var j = 0; j < 15; j++)
                     {
                         var adressekontoModel = CreateAdressekontoModel(fixture, i + 1, 100 + j + 1, -1);
+                        adressekontoModel.StoreInDocument(localeDataDocument);
                     }
                 }
                 for (var i = 0; i < 15; i++)

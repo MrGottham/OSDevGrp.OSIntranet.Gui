@@ -102,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
-        /// Gemmer data for en konto i det lokale datalager.
+        /// Gemmer data for en budgetkonto i det lokale datalager.
         /// </summary>
         /// <param name="budgetkontoModel">Model for en budgetkonto.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
@@ -163,6 +163,41 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.##", CultureInfo.InvariantCulture));
             budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.##", CultureInfo.InvariantCulture));
             budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.##", CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
+        /// Gemmer data for en adressekonto i det lokale datalager.
+        /// </summary>
+        /// <param name="adressekontoModel">Model for adressekontoen.</param>
+        /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
+        public static void StoreInDocument(this IAdressekontoModel adressekontoModel, XDocument localeDataDocument)
+        {
+            if (adressekontoModel == null)
+            {
+                throw new ArgumentNullException("adressekontoModel");
+            }
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            var regnskabElement = localeDataDocument.GetRegnskabElement(adressekontoModel.Regnskabsnummer);
+            if (regnskabElement == null)
+            {
+                return;
+            }
+//            XElement adressekontoHistorikElement;
+            var adressekontoElement = regnskabElement.Elements(XName.Get("Adressekonto", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+            if (adressekontoElement == null)
+            {
+                adressekontoElement = new XElement(XName.Get("Adressekonto", regnskabElement.Name.NamespaceName));
+                adressekontoElement.UpdateAttribute(XName.Get("nummer", string.Empty), adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture));
+                adressekontoElement.UpdateAttribute(XName.Get("navn", string.Empty), adressekontoModel.Navn);
+                adressekontoElement.UpdateAttribute(XName.Get("p", string.Empty), adressekontoModel.PrimærTelefon);
+                adressekontoElement.UpdateAttribute(XName.Get("s", string.Empty), adressekontoModel.SekundærTelefon);
+                regnskabElement.Add(adressekontoElement);
+                return;
+            }
+            adressekontoElement.UpdateAttribute(XName.Get("navn", string.Empty), adressekontoModel.Navn);
         }
 
         /// <summary>
