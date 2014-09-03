@@ -146,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         [TestCase(3, 30)]
         [TestCase(4, 0)]
         [TestCase(5, 0)]
-        public async void TestAtBudgetkontoplanGetAsyncHenterKontoplan(int regnskabsnummer, int expectedBudgetkonti)
+        public async void TestAtBudgetkontoplanGetAsyncHenterBudgetkontoplan(int regnskabsnummer, int expectedBudgetkonti)
         {
             var fixture = new Fixture();
             fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
@@ -165,6 +165,102 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var result = await finansstyringRepositoryLocale.BudgetkontoplanGetAsync(regnskabsnummer, DateTime.Now);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.EqualTo(expectedBudgetkonti));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at DebitorlisteGetAsync henter listen af debitorer i et regnskab.
+        /// </summary>
+        [Test]
+        [TestCase(1, 25)]
+        [TestCase(2, 25)]
+        [TestCase(3, 25)]
+        [TestCase(4, 0)]
+        [TestCase(5, 0)]
+        public async void TestAtDebitorlisteGetAsyncHenterDebitorer(int regnskabsnummer, int expectedDebitorer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.DebitorlisteGetAsync(regnskabsnummer, DateTime.Now);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(expectedDebitorer));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at KreditorlisteGetAsync henter listen af kreditorer i et regnskab.
+        /// </summary>
+        [Test]
+        [TestCase(1, 15)]
+        [TestCase(2, 15)]
+        [TestCase(3, 15)]
+        [TestCase(4, 0)]
+        [TestCase(5, 0)]
+        public async void TestAtKreditorlisteGetAsyncHenterKreditorer(int regnskabsnummer, int expectedKreditorer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.KreditorlisteGetAsync(regnskabsnummer, DateTime.Now);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(expectedKreditorer));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontolisteGetAsync henter adressekonti til et regnskab.
+        /// </summary>
+        [Test]
+        [TestCase(1, 40)]
+        [TestCase(2, 40)]
+        [TestCase(3, 40)]
+        [TestCase(4, 0)]
+        [TestCase(5, 0)]
+        public async void TestAtAdressekontolisteGetAsyncHenterAdressekonti(int regnskabsnummer, int expectedAdressekonti)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.AdressekontolisteGetAsync(regnskabsnummer, DateTime.Now);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(expectedAdressekonti));
 
             localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
         }
@@ -266,7 +362,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     }
                     for (var j = 0; j < 15; j++)
                     {
-                        var adressekontoModel = CreateAdressekontoModel(fixture, i + 1, 100 + j + 1, -1);
+                        var adressekontoModel = CreateAdressekontoModel(fixture, i + 1, 200 + j + 1, -1);
                         adressekontoModel.StoreInDocument(localeDataDocument);
                     }
                 }

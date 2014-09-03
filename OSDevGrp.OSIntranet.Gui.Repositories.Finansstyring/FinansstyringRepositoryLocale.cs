@@ -180,7 +180,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Debitorer i regnskabet.</returns>
         public virtual Task<IEnumerable<IAdressekontoModel>> DebitorlisteGetAsync(int regnskabsummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IAdressekontoModel>> func = () => DebitorlisteGet(regnskabsummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -191,7 +192,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Kreditorer i regnskabet.</returns>
         public virtual Task<IEnumerable<IAdressekontoModel>> KreditorlisteGetAsync(int regnskabsummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IAdressekontoModel>> func = () => KreditorlisteGet(regnskabsummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -202,7 +204,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Adressekonti til regnskabet.</returns>
         public virtual Task<IEnumerable<IAdressekontoModel>> AdressekontolisteGetAsync(int regnskabsnummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IAdressekontoModel>> func = () => AdressekontolisteGet(regnskabsnummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -391,6 +394,104 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af debitorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsummer">Regnskabsnummer, hvortil listen af debitorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af debitorer.</param>
+        /// <returns>Debitorer i regnskabet.</returns>
+        private IEnumerable<IAdressekontoModel> DebitorlisteGet(int regnskabsummer, DateTime statusDato)
+        {
+            try
+            {
+                return null;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DebitorlisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af kreditorer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsummer">Regnskabsnummer, hvortil listen af kreditorer skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af kreditorer.</param>
+        /// <returns>Kreditorer i regnskabet.</returns>
+        private IEnumerable<IAdressekontoModel> KreditorlisteGet(int regnskabsummer, DateTime statusDato)
+        {
+            try
+            {
+                return null;
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KreditorlisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter listen af adressekonti til en regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil listen af adressekonti skal hentes.</param>
+        /// <param name="statusDato">Statusdato for listen af adressekonti.</param>
+        /// <returns>Adressekonti til regnskabet.</returns>
+        private IEnumerable<IAdressekontoModel> AdressekontolisteGet(int regnskabsnummer, DateTime statusDato)
+        {
+            try
+            {
+                var localeDataDocument = _localeDataStorage.GetLocaleData();
+                var regnskabElement = localeDataDocument.GetRegnskabElement(regnskabsnummer);
+                if (regnskabElement == null)
+                {
+                    return new List<IAdressekontoModel>(0);
+                }
+                var adressekonti = new List<IAdressekontoModel>();
+                foreach (var adressekontoElement in regnskabElement.Elements(XName.Get("Adressekonto", Namespace)))
+                {
+                    try
+                    {
+                        var adressekontoModel = new AdressekontoModel(int.Parse(regnskabElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), int.Parse(adressekontoElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), adressekontoElement.Attribute(XName.Get("navn", string.Empty)).Value, statusDato, 0M);
+                        if (adressekontoElement.Attribute(XName.Get("primaerTelefon", string.Empty)) != null)
+                        {
+                            adressekontoModel.PrimærTelefon = adressekontoElement.Attribute(XName.Get("primaerTelefon", string.Empty)).Value;
+                        }
+                        if (adressekontoElement.Attribute(XName.Get("sekundaerTelefon", string.Empty)) != null)
+                        {
+                            adressekontoModel.PrimærTelefon = adressekontoElement.Attribute(XName.Get("sekundaerTelefon", string.Empty)).Value;
+                        }
+                        var historikElement = localeDataDocument.GetHistorikElements(adressekontoModel).FirstOrDefault();
+                        if (historikElement != null)
+                        {
+                            adressekontoModel.Saldo = decimal.Parse(historikElement.Attribute(XName.Get("saldo", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        }
+                        adressekonti.Add(adressekontoModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+                return adressekonti.OrderBy(m => m.Nummer).ToList();
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontolisteGet", ex.Message), ex);
             }
         }
 
