@@ -385,7 +385,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         Debug.WriteLine(ex.Message);
                     }
                 }
-                return budgetkontoplan;
+                return budgetkontoplan.OrderBy(m => m.Kontonummer).ToList();
             }
             catch (IntranetGuiRepositoryException)
             {
