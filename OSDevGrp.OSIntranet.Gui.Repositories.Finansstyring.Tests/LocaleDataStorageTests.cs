@@ -581,6 +581,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.InnerException, Is.EqualTo(eventException));
         }
 
+        // TODO: Test StoreLocaleData with Models.
+
         /// <summary>
         /// Tester, at StoreSyncData kaster en ArgumentNullException, hvis synkronseringsdata, der skal gemmes i det lokale datalager, er null.
         /// </summary>
@@ -779,6 +781,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(eventException));
         }
+
+        // TODO: Test StoreSyncData with Models.
 
         /// <summary>
         /// Danner en stream indeholdende XML, der kan benyttes til test.
