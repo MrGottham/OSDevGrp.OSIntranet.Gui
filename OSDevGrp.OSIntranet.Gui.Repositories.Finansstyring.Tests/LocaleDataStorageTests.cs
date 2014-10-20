@@ -7,6 +7,7 @@ using System.Xml.Schema;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -582,6 +583,44 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         // TODO: Test StoreLocaleData with Models (creations and updates).
+
+        /// <summary>
+        /// Tester, at StoreLocaleData gemmer et regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataGemmerRegnskabModel()
+        {
+            var fixture = new Fixture();
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            using (var memoryStream = CreateMemoryStreamWithXmlContent())
+            {
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    e.Result = memoryStream;
+                };
+
+                var localeDataDocument = new XmlDocument();
+                localeDataDocument.Load(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+
+                localeDataStorage.StoreLocaleData(regnskabModelMock);
+
+                // TODO: Retænk dette....
+
+
+            }
+        }
+
 
         /// <summary>
         /// Tester, at StoreSyncData kaster en ArgumentNullException, hvis synkronseringsdata, der skal gemmes i det lokale datalager, er null.
