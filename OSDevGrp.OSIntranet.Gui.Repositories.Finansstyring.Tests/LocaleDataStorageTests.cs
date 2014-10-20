@@ -598,26 +598,47 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             regnskabModelMock.Stub(m => m.Navn)
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
+            var updatedRegnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            updatedRegnskabModelMock.Stub(m => m.Nummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            updatedRegnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
 
-            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
-            Assert.That(localeDataStorage, Is.Not.Null);
-
-            using (var memoryStream = CreateMemoryStreamWithXmlContent())
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
             {
+                var localeDataStorage = new LocaleDataStorage(tempFile.FullName, fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
                 localeDataStorage.OnCreateWriterStream += (s, e) =>
                 {
-                    e.Result = memoryStream;
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
                 };
 
-                var localeDataDocument = new XmlDocument();
-                localeDataDocument.Load(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-
                 localeDataStorage.StoreLocaleData(regnskabModelMock);
+                var regnskabNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']", regnskabModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(regnskabNode, "navn", regnskabModelMock.Navn));
 
-                // TODO: Retænk dette....
-
-
+                localeDataStorage.StoreLocaleData(updatedRegnskabModelMock);
+                var updatedRegnskabNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']", regnskabModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedRegnskabNode, "navn", updatedRegnskabModelMock.Navn));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
             }
         }
 
@@ -864,6 +885,61 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     Assert.Fail(eventArgs.Message);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Finder og returnerer en given node i et givent XML dokument på baggrund af en xpath.
+        /// </summary>
+        /// <param name="localeDataFileName">Filnavnet på XML dokumentet, hvorfra en given node skal returneres.</param>
+        /// <param name="xpath">XPath til noden, der ønskes returneret.</param>
+        /// <returns>XML node.</returns>
+        private static XmlNode GetNodeFromXPath(string localeDataFileName, string xpath)
+        {
+            if (string.IsNullOrEmpty(localeDataFileName))
+            {
+                throw new ArgumentNullException("localeDataFileName");
+            }
+            if (string.IsNullOrEmpty(xpath))
+            {
+                throw new ArgumentNullException("xpath");
+            }
+            
+            var localeDataDocument = new XmlDocument();
+            localeDataDocument.Load(localeDataFileName);
+
+            var namespaceManager = new XmlNamespaceManager(localeDataDocument.NameTable);
+            namespaceManager.AddNamespace("ns", FinansstyringRepositoryLocale.Namespace);
+
+            return localeDataDocument.SelectSingleNode(xpath, namespaceManager);
+        }
+
+        /// <summary>
+        /// Undersøger om en given node har en givent attribute med en given værdi.
+        /// </summary>
+        /// <param name="xmlNode">XML noden, der skal have den givne attribute.</param>
+        /// <param name="attributeName">Navnet på attributten, som skal have den givne værdi.</param>
+        /// <param name="attributeValue">Værdi, som den givne attribute skal have.</param>
+        /// <returns>True, hvis den givne attribute findes og har den givne værdi, ellers false.</returns>
+        private static bool HasAttributeWhichMatchValue(XmlNode xmlNode, string attributeName, string attributeValue)
+        {
+            if (xmlNode == null)
+            {
+                throw new ArgumentNullException("xmlNode");
+            }
+            if (string.IsNullOrEmpty(attributeName))
+            {
+                throw new ArgumentNullException("attributeName");
+            }
+            if (xmlNode.Attributes == null)
+            {
+                return false;
+            }
+            var attribute = xmlNode.Attributes[attributeName];
+            if (attribute == null)
+            {
+                return false;
+            }
+            return string.Compare(attribute.Value, attributeValue, StringComparison.InvariantCulture) == 0;
         }
     }
 }
