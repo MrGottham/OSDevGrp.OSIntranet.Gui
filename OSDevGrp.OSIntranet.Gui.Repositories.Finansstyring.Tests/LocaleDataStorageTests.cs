@@ -642,7 +642,6 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             }
         }
 
-
         /// <summary>
         /// Tester, at StoreSyncData kaster en ArgumentNullException, hvis synkronseringsdata, der skal gemmes i det lokale datalager, er null.
         /// </summary>
@@ -843,6 +842,64 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         // TODO: Test StoreSyncData with Models (creations and updates).
+
+        /// <summary>
+        /// Tester, at StoreSyncData gemmer et regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataGemmerRegnskabModel()
+        {
+            var fixture = new Fixture();
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            var updatedRegnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            updatedRegnskabModelMock.Stub(m => m.Nummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            updatedRegnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), tempFile.FullName, FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreSyncData(regnskabModelMock);
+                var regnskabNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']", regnskabModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(regnskabNode, "navn", regnskabModelMock.Navn));
+
+                localeDataStorage.StoreSyncData(updatedRegnskabModelMock);
+                var updatedRegnskabNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']", regnskabModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedRegnskabNode, "navn", updatedRegnskabModelMock.Navn));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
 
         /// <summary>
         /// Danner en stream indeholdende XML, der kan benyttes til test.
