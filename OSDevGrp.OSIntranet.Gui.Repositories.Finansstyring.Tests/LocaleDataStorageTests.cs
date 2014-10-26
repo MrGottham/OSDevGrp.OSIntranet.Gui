@@ -643,6 +643,72 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at StoreLocaleData gemmer en kontogruppe.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataGemmerKontogruppeModel()
+        {
+            var fixture = new Fixture();
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            kontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModelMock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Aktiver)
+                .Repeat.Any();
+            var updatedKontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            updatedKontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(kontogruppeModelMock.Nummer)
+                .Repeat.Any();
+            updatedKontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontogruppeModelMock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Passiver)
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(tempFile.FullName, fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreLocaleData(kontogruppeModelMock);
+                var kontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Kontogruppe[@nummer = '{0}']", kontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontogruppeNode, "tekst", kontogruppeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontogruppeNode, "balanceType", kontogruppeModelMock.Balancetype.ToString()));
+
+                localeDataStorage.StoreLocaleData(updatedKontogruppeModelMock);
+                var updatedKontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Kontogruppe[@nummer = '{0}']", kontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontogruppeNode, "tekst", updatedKontogruppeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontogruppeNode, "balanceType", updatedKontogruppeModelMock.Balancetype.ToString()));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
         /// Tester, at StoreSyncData kaster en ArgumentNullException, hvis synkronseringsdata, der skal gemmes i det lokale datalager, er null.
         /// </summary>
         [Test]
