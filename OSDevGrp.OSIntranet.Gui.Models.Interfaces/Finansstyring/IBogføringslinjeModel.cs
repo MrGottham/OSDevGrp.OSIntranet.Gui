@@ -54,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring
         /// <summary>
         /// Tekst.
         /// </summary>
-        string Tekst 
+        string Tekst
         { 
             get; 
             set; 

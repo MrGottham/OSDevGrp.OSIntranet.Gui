@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -582,8 +583,6 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.InnerException, Is.EqualTo(eventException));
         }
 
-        // TODO: Test StoreLocaleData with Models (creations and updates).
-
         /// <summary>
         /// Tester, at StoreLocaleData gemmer et regnskab.
         /// </summary>
@@ -630,6 +629,550 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 localeDataStorage.StoreLocaleData(updatedRegnskabModelMock);
                 var updatedRegnskabNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']", regnskabModelMock.Nummer));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedRegnskabNode, "navn", updatedRegnskabModelMock.Navn));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData gemmer en konto.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataGemmerKontoModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            
+            var kontogruppeModel1Mock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModel1Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            kontogruppeModel1Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModel1Mock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Aktiver)
+                .Repeat.Any();
+
+            var kontogruppeModel2Mock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModel2Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            kontogruppeModel2Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModel2Mock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Aktiver)
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100)*-1);
+            var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            kontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(kontogruppeModel1Mock.Nummer)
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.StatusDato)
+                .Return(statusDato)
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedKontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            updatedKontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(kontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kontonummer)
+                .Return(kontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(kontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.StatusDato)
+                .Return(kontoModelMock.StatusDato)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedSaldoOnKontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(kontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kontonummer)
+                .Return(kontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(kontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.StatusDato)
+                .Return(kontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(tempFile.FullName, fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreLocaleData(regnskabModelMock);
+                localeDataStorage.StoreLocaleData(kontogruppeModel1Mock);
+                localeDataStorage.StoreLocaleData(kontogruppeModel2Mock);
+
+                localeDataStorage.StoreLocaleData(kontoModelMock);
+                var kontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Konto[@kontonummer = '{1}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "kontonavn", kontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "beskrivelse", kontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "note", kontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "kontogruppe", kontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var kontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "kredit", kontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "saldo", kontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreLocaleData(updatedKontoModelMock);
+                var updatedKontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Konto[@kontonummer = '{1}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "kontonavn", updatedKontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "beskrivelse", updatedKontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "note", updatedKontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "kontogruppe", updatedKontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var updatedKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "kredit", updatedKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "saldo", updatedKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreLocaleData(updatedSaldoOnKontoModelMock);
+                var updatedSaldoOnKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, updatedSaldoOnKontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "kredit", updatedSaldoOnKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "saldo", updatedSaldoOnKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData gemmer en budgetkonto.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataGemmerBudgetkontoModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var budgetkontogruppeModel1Mock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModel1Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            budgetkontogruppeModel1Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var budgetkontogruppeModel2Mock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModel2Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            budgetkontogruppeModel2Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(budgetkontogruppeModel1Mock.Nummer)
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.StatusDato)
+                .Return(statusDato)
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Indtægter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Udgifter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Budget)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedBudgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            updatedBudgetkontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(budgetkontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Kontonummer)
+                .Return(budgetkontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(budgetkontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.StatusDato)
+                .Return(budgetkontoModelMock.StatusDato)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Indtægter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Udgifter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Budget)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedSaldoOnBudgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(budgetkontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Kontonummer)
+                .Return(budgetkontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(budgetkontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.StatusDato)
+                .Return(budgetkontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Indtægter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Udgifter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Budget)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(tempFile.FullName, fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreLocaleData(regnskabModelMock);
+                localeDataStorage.StoreLocaleData(budgetkontogruppeModel1Mock);
+                localeDataStorage.StoreLocaleData(budgetkontogruppeModel2Mock);
+
+                localeDataStorage.StoreLocaleData(budgetkontoModelMock);
+                var budgetkontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Budgetkonto[@kontonummer = '{1}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "kontonavn", budgetkontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "beskrivelse", budgetkontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "note", budgetkontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "kontogruppe", budgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var budgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "indtaegter", budgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "udgifter", budgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreLocaleData(updatedBudgetkontoModelMock);
+                var updatedBudgetkontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Budgetkonto[@kontonummer = '{1}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "kontonavn", updatedBudgetkontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "beskrivelse", updatedBudgetkontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "note", updatedBudgetkontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "kontogruppe", updatedBudgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var updatedBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "indtaegter", updatedBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "udgifter", updatedBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreLocaleData(updatedSaldoOnBudgetkontoModelMock);
+                var updatedSaldoOnBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, updatedSaldoOnBudgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "indtaegter", updatedSaldoOnBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "udgifter", updatedSaldoOnBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData gemmer en adressekonto.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataGemmerAdressekontoModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            adressekontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.PrimærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.SekundærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.StatusDato)
+                .Return(statusDato)
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedAdressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            updatedAdressekontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(adressekontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.Nummer)
+                .Return(adressekontoModelMock.Nummer)
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.PrimærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.SekundærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.StatusDato)
+                .Return(adressekontoModelMock.StatusDato)
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedSaldoOnAdressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(adressekontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Nummer)
+                .Return(adressekontoModelMock.Nummer)
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.PrimærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.SekundærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.StatusDato)
+                .Return(adressekontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(tempFile.FullName, fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreLocaleData(regnskabModelMock);
+
+                localeDataStorage.StoreLocaleData(adressekontoModelMock);
+                var adressekontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Adressekonto[@nummer = '{1}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "navn", adressekontoModelMock.Navn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "primaerTelefon", adressekontoModelMock.PrimærTelefon));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "sekundaerTelefon", adressekontoModelMock.SekundærTelefon));
+
+                var adressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoHistorikNode, "saldo", adressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreLocaleData(updatedAdressekontoModelMock);
+                var updatedAdressekontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Adressekonto[@nummer = '{1}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "navn", updatedAdressekontoModelMock.Navn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "primaerTelefon", updatedAdressekontoModelMock.PrimærTelefon));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "sekundaerTelefon", updatedAdressekontoModelMock.SekundærTelefon));
+
+                var updatedAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoHistorikNode, "saldo", updatedAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreLocaleData(updatedSaldoOnAdressekontoModelMock);
+                var updatedSaldoOnAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, updatedSaldoOnAdressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), updatedSaldoOnAdressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
             }
             finally
             {
@@ -696,6 +1239,64 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 var updatedKontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Kontogruppe[@nummer = '{0}']", kontogruppeModelMock.Nummer));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontogruppeNode, "tekst", updatedKontogruppeModelMock.Tekst));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontogruppeNode, "balanceType", updatedKontogruppeModelMock.Balancetype.ToString()));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData gemmer en kontogruppe til budgetkonti.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataGemmerBudgetkontogruppeModel()
+        {
+            var fixture = new Fixture();
+            var budgetkontogruppeModelMock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            budgetkontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            var updatedBudgetkontogruppeModelMock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            updatedBudgetkontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(budgetkontogruppeModelMock.Nummer)
+                .Repeat.Any();
+            updatedBudgetkontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(tempFile.FullName, fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreLocaleData(budgetkontogruppeModelMock);
+                var budgetkontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Budgetkontogruppe[@nummer = '{0}']", budgetkontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontogruppeNode, "tekst", budgetkontogruppeModelMock.Tekst));
+
+                localeDataStorage.StoreLocaleData(updatedBudgetkontogruppeModelMock);
+                var updatedBudgetkontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Budgetkontogruppe[@nummer = '{0}']", budgetkontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontogruppeNode, "tekst", updatedBudgetkontogruppeModelMock.Tekst));
             }
             finally
             {
@@ -814,7 +1415,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
-        /// Tester, at StoreSyncData( gemmer data i et lokalt fil storage.
+        /// Tester, at StoreSyncData gemmer data i et lokalt fil storage.
         /// </summary>
         [Test]
         public void TestAtStoreSyncDataGemmerDataILocalDataFileStorage()
@@ -907,8 +1508,6 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.InnerException, Is.EqualTo(eventException));
         }
 
-        // TODO: Test StoreSyncData with Models (creations and updates).
-
         /// <summary>
         /// Tester, at StoreSyncData gemmer et regnskab.
         /// </summary>
@@ -955,6 +1554,674 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 localeDataStorage.StoreSyncData(updatedRegnskabModelMock);
                 var updatedRegnskabNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']", regnskabModelMock.Nummer));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedRegnskabNode, "navn", updatedRegnskabModelMock.Navn));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData gemmer en konto.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataGemmerKontoModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var kontogruppeModel1Mock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModel1Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            kontogruppeModel1Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModel1Mock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Aktiver)
+                .Repeat.Any();
+
+            var kontogruppeModel2Mock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModel2Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            kontogruppeModel2Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModel2Mock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Aktiver)
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            kontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(kontogruppeModel1Mock.Nummer)
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.StatusDato)
+                .Return(statusDato)
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            kontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedKontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            updatedKontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(kontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kontonummer)
+                .Return(kontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(kontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.StatusDato)
+                .Return(kontoModelMock.StatusDato)
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedKontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedSaldoOnKontoModelMock = MockRepository.GenerateMock<IKontoModel>();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(kontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kontonummer)
+                .Return(kontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(kontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.StatusDato)
+                .Return(kontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnKontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), tempFile.FullName, FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreSyncData(regnskabModelMock);
+                localeDataStorage.StoreSyncData(kontogruppeModel1Mock);
+                localeDataStorage.StoreSyncData(kontogruppeModel2Mock);
+
+                localeDataStorage.StoreSyncData(kontoModelMock);
+                var kontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Konto[@kontonummer = '{1}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "kontonavn", kontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "beskrivelse", kontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "note", kontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "kontogruppe", kontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var kontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "kredit", kontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "saldo", kontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreSyncData(updatedKontoModelMock);
+                var updatedKontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Konto[@kontonummer = '{1}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "kontonavn", updatedKontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "beskrivelse", updatedKontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "note", updatedKontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "kontogruppe", updatedKontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var updatedKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "kredit", updatedKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "saldo", updatedKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreSyncData(updatedSaldoOnKontoModelMock);
+                var updatedSaldoOnKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, updatedSaldoOnKontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "kredit", updatedSaldoOnKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "saldo", updatedSaldoOnKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData gemmer en budgetkonto.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataGemmerBudgetkontoModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var budgetkontogruppeModel1Mock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModel1Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            budgetkontogruppeModel1Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var budgetkontogruppeModel2Mock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModel2Mock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            budgetkontogruppeModel2Mock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(budgetkontogruppeModel1Mock.Nummer)
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.StatusDato)
+                .Return(statusDato)
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Indtægter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Udgifter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Budget)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedBudgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            updatedBudgetkontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(budgetkontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Kontonummer)
+                .Return(budgetkontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(budgetkontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.StatusDato)
+                .Return(budgetkontoModelMock.StatusDato)
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Indtægter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Udgifter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Budget)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBudgetkontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedSaldoOnBudgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(budgetkontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Kontonummer)
+                .Return(budgetkontoModelMock.Kontonummer)
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Kontonavn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Beskrivelse)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Notat)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Kontogruppe)
+                .Return(budgetkontogruppeModel2Mock.Nummer)
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.StatusDato)
+                .Return(budgetkontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Indtægter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Udgifter)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Budget)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Disponibel)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), tempFile.FullName, FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreSyncData(regnskabModelMock);
+                localeDataStorage.StoreSyncData(budgetkontogruppeModel1Mock);
+                localeDataStorage.StoreSyncData(budgetkontogruppeModel2Mock);
+
+                localeDataStorage.StoreSyncData(budgetkontoModelMock);
+                var budgetkontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Budgetkonto[@kontonummer = '{1}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "kontonavn", budgetkontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "beskrivelse", budgetkontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "note", budgetkontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "kontogruppe", budgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var budgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "indtaegter", budgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "udgifter", budgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreSyncData(updatedBudgetkontoModelMock);
+                var updatedBudgetkontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Budgetkonto[@kontonummer = '{1}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "kontonavn", updatedBudgetkontoModelMock.Kontonavn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "beskrivelse", updatedBudgetkontoModelMock.Beskrivelse));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "note", updatedBudgetkontoModelMock.Notat));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "kontogruppe", updatedBudgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
+
+                var updatedBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "indtaegter", updatedBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "udgifter", updatedBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreSyncData(updatedSaldoOnBudgetkontoModelMock);
+                var updatedSaldoOnBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, updatedSaldoOnBudgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "indtaegter", updatedSaldoOnBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "udgifter", updatedSaldoOnBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData gemmer en adressekonto.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataGemmerAdressekontoModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            adressekontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.PrimærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.SekundærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.StatusDato)
+                .Return(statusDato)
+                .Repeat.Any();
+            adressekontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedAdressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            updatedAdressekontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(adressekontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.Nummer)
+                .Return(adressekontoModelMock.Nummer)
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.PrimærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.SekundærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.StatusDato)
+                .Return(adressekontoModelMock.StatusDato)
+                .Repeat.Any();
+            updatedAdressekontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var updatedSaldoOnAdressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(adressekontoModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Nummer)
+                .Return(adressekontoModelMock.Nummer)
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.PrimærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.SekundærTelefon)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.StatusDato)
+                .Return(adressekontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Repeat.Any();
+            updatedSaldoOnAdressekontoModelMock.Stub(m => m.Saldo)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), tempFile.FullName, FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreSyncData(regnskabModelMock);
+
+                localeDataStorage.StoreSyncData(adressekontoModelMock);
+                var adressekontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Adressekonto[@nummer = '{1}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "navn", adressekontoModelMock.Navn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "primaerTelefon", adressekontoModelMock.PrimærTelefon));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "sekundaerTelefon", adressekontoModelMock.SekundærTelefon));
+
+                var adressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoHistorikNode, "saldo", adressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreSyncData(updatedAdressekontoModelMock);
+                var updatedAdressekontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Adressekonto[@nummer = '{1}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "navn", updatedAdressekontoModelMock.Navn));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "primaerTelefon", updatedAdressekontoModelMock.PrimærTelefon));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "sekundaerTelefon", updatedAdressekontoModelMock.SekundærTelefon));
+
+                var updatedAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoHistorikNode, "saldo", updatedAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+
+                localeDataStorage.StoreSyncData(updatedSaldoOnAdressekontoModelMock);
+                var updatedSaldoOnAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, updatedSaldoOnAdressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), updatedSaldoOnAdressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData gemmer en kontogruppe.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataGemmerKontogruppeModel()
+        {
+            var fixture = new Fixture();
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            kontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModelMock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Aktiver)
+                .Repeat.Any();
+            var updatedKontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            updatedKontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(kontogruppeModelMock.Nummer)
+                .Repeat.Any();
+            updatedKontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedKontogruppeModelMock.Stub(m => m.Balancetype)
+                .Return(Balancetype.Passiver)
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), tempFile.FullName, FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreSyncData(kontogruppeModelMock);
+                var kontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Kontogruppe[@nummer = '{0}']", kontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontogruppeNode, "tekst", kontogruppeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontogruppeNode, "balanceType", kontogruppeModelMock.Balancetype.ToString()));
+
+                localeDataStorage.StoreSyncData(updatedKontogruppeModelMock);
+                var updatedKontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Kontogruppe[@nummer = '{0}']", kontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontogruppeNode, "tekst", updatedKontogruppeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontogruppeNode, "balanceType", updatedKontogruppeModelMock.Balancetype.ToString()));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData gemmer en kontogruppe til budgetkonti.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataGemmerBudgetkontogruppeModel()
+        {
+            var fixture = new Fixture();
+            var budgetkontogruppeModelMock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            budgetkontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            var updatedBudgetkontogruppeModelMock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            updatedBudgetkontogruppeModelMock.Stub(m => m.Nummer)
+                .Return(budgetkontogruppeModelMock.Nummer)
+                .Repeat.Any();
+            updatedBudgetkontogruppeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), tempFile.FullName, FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreSyncData(budgetkontogruppeModelMock);
+                var budgetkontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Budgetkontogruppe[@nummer = '{0}']", budgetkontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontogruppeNode, "tekst", budgetkontogruppeModelMock.Tekst));
+
+                localeDataStorage.StoreSyncData(updatedBudgetkontogruppeModelMock);
+                var updatedBudgetkontogruppeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Budgetkontogruppe[@nummer = '{0}']", budgetkontogruppeModelMock.Nummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontogruppeNode, "tekst", updatedBudgetkontogruppeModelMock.Tekst));
             }
             finally
             {

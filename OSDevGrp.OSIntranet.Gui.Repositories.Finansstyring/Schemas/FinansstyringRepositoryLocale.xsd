@@ -90,6 +90,44 @@
     <xs:attribute name="dato" type="HistorikDatoType" use="required"/>
     <xs:attribute name="saldo" type="xs:decimal" use="required"/>
   </xs:complexType>
+
+  <!-- BogfoeringslinjeType -->
+  <xs:complexType name="BogfoeringslinjeType">
+    <xs:attribute name="loebenummer" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dato" type="HistorikDatoType" use="required"/>
+    <xs:attribute name="bilag" type="xs:string" use="optional"/>
+    <xs:attribute name="kontonummer" type="KontonummerType" use="required"/>
+    <xs:attribute name="tekst" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="budgetkontonummer" type="KontonummerType" use="optional"/>
+    <xs:attribute name="debit" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:minInclusive value="0"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="kredit" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:decimal">
+          <xs:minInclusive value="0"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="adressekonto" type="AdressekontoIdentifierType" use="optional"/>
+    <xs:attribute name="synkroniseret" type="xs:boolean" use="required"/>
+  </xs:complexType>
   
   <!-- RegnskabModelType -->
   <xs:complexType name="RegnskabModelType">
@@ -101,6 +139,7 @@
         <xs:element name="BudgetkontoHistorik" type="BudgetkontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="Adressekonto" type="AdressekontoModelType" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="AdressekontoHistorik" type="AdressekontoHistorikType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Bogfoeringslinje" type="BogfoeringslinjeType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="nummer" use="required">

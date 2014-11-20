@@ -222,6 +222,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Gemmer data for en bogføringslinje i det lokale datalager.
+        /// </summary>
+        /// <param name="bogføringslinjeModel">Model for bogføringslinjen.</param>
+        /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
+        /// <param name="isStoringSynchronizedData">Angivelse af, om det er synkroniserede data, der gemmes.</param>
+        public static void StoreInDocument(this IBogføringslinjeModel bogføringslinjeModel, XDocument localeDataDocument, bool isStoringSynchronizedData)
+        {
+            if (bogføringslinjeModel == null)
+            {
+                throw new ArgumentNullException("bogføringslinjeModel");
+            }
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            var regnskabElement = localeDataDocument.GetRegnskabElement(bogføringslinjeModel.Regnskabsnummer);
+            if (regnskabElement == null)
+            {
+                return;
+            }
+            var bogføringslinjeElement = regnskabElement.Elements(XName.Get("Bogfoeringslinje", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+            if (bogføringslinjeElement == null)
+            {
+                bogføringslinjeElement = new XElement(XName.Get("Bogfoeringslinje", regnskabElement.Name.NamespaceName));
+                bogføringslinjeElement.UpdateAttribute(XName.Get("loebenummer", string.Empty), bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture));
+                regnskabElement.Add(bogføringslinjeElement);
+                return;
+            }
+        }
+
+        /// <summary>
         /// Gemmer data for en kontogruppe i det lokale datalager.
         /// </summary>
         /// <param name="kontogruppeModel">Model for en kontogruppe.</param>

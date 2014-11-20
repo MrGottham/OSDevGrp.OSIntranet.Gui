@@ -407,7 +407,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             try
             {
-                return null;
+                return AdressekontolisteGet(regnskabsummer, statusDato)
+                    .Where(m => m.Saldo > 0M)
+                    .OrderBy(m => m.Nummer)
+                    .ToList();
             }
             catch (IntranetGuiRepositoryException)
             {
@@ -429,7 +432,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             try
             {
-                return null;
+                return AdressekontolisteGet(regnskabsummer, statusDato)
+                    .Where(m => m.Saldo < 0M)
+                    .OrderBy(m => m.Nummer)
+                    .ToList();
             }
             catch (IntranetGuiRepositoryException)
             {

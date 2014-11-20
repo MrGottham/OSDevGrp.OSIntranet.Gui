@@ -211,7 +211,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         {
                             localeDataDocument = ReadDocument(writerStream);
                         }
-                        StoreInDocument(model, localeDataDocument);
+                        StoreInDocument(model, localeDataDocument, false);
                         WriteDocument(localeDataDocument, writerStream);
                     }
                 }
@@ -262,7 +262,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         {
                             localeDataDocument = ReadDocument(writerStream);
                         }
-                        StoreInDocument(model, localeDataDocument);
+                        StoreInDocument(model, localeDataDocument, true);
                         WriteDocument(localeDataDocument, writerStream);
                     }
                 }
@@ -316,6 +316,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 throw new ArgumentNullException("stream");
             }
             stream.Seek(0, SeekOrigin.Begin);
+            stream.SetLength(0);
             var writerSettings = new XmlWriterSettings
             {
                 Encoding = Encoding.UTF8,
@@ -333,7 +334,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="model">Data, der skal gemmes i XDocument.</param>
         /// <param name="document">XDocument, hvori data skal gemmes.</param>
-        private static void StoreInDocument(IModel model, XDocument document)
+        /// <param name="isStoringSynchronizedData">Angivelse af, om det er synkroniserede data, der gemmes.</param>
+        private static void StoreInDocument(IModel model, XDocument document, bool isStoringSynchronizedData)
         {
             if (Equals(model, null))
             {
@@ -365,6 +367,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             if (adressekontoModel != null)
             {
                 adressekontoModel.StoreInDocument(document);
+                return;
+            }
+            var bogføringslinjeModel = model as IBogføringslinjeModel;
+            if (bogføringslinjeModel != null)
+            {
+                bogføringslinjeModel.StoreInDocument(document, isStoringSynchronizedData);
                 return;
             }
             var kontogruppeModel = model as IKontogruppeModel;
