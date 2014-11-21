@@ -70,11 +70,38 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The account with the account number &apos;{0}&apos; could not be found..
+        /// </summary>
+        internal static string AccountNotFound {
+            get {
+                return ResourceManager.GetString("AccountNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The address account with the account number &apos;{0}&apos; could not be found..
+        /// </summary>
+        internal static string AddressAccountNotFound {
+            get {
+                return ResourceManager.GetString("AddressAccountNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The budget account group with the unique number &apos;{0}&apos; could not be found..
         /// </summary>
         internal static string BudgetAccountGroupNotFound {
             get {
                 return ResourceManager.GetString("BudgetAccountGroupNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The budget account with the accout number &apos;{0}&apos; could not be found..
+        /// </summary>
+        internal static string BudgetAccountNotFound {
+            get {
+                return ResourceManager.GetString("BudgetAccountNotFound", resourceCulture);
             }
         }
         

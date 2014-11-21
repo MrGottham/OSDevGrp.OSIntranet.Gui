@@ -121,9 +121,21 @@
     <value>Kunne ikke finde en kontogruppe med det unikke nummer: {0}</value>
     <comment>{0} = Unikt nummer på den manglende kontogruppe.</comment>
   </data>
+  <data name="AccountNotFound" xml:space="preserve">
+    <value>Kunne ikke finde en konto med kontonummer: {0}</value>
+    <comment>{0} = Kontonummer.</comment>
+  </data>
+  <data name="AddressAccountNotFound" xml:space="preserve">
+    <value>Kunne ikke finde en adressekonto med kontonummer: {0}</value>
+    <comment>{0} = Kontonummer.</comment>
+  </data>
   <data name="BudgetAccountGroupNotFound" xml:space="preserve">
     <value>Kunne ikke finde en kontogruppe til budgetkonti med den unikke nummer: {0}</value>
     <comment>{0} = Unikt nummer på den manglende kontogruppe til budgetkonti.</comment>
+  </data>
+  <data name="BudgetAccountNotFound" xml:space="preserve">
+    <value>Kunne ikke finde en budgetkonto med kontonummer: '{0}'</value>
+    <comment>{0} = Kontonummer.</comment>
   </data>
   <data name="CommandError" xml:space="preserve">
     <value>Fejl ved udførelse af kommandoen '{0}': {1}</value>

@@ -121,9 +121,21 @@
     <value>The account group with the unique number '{0}' could not be found.</value>
     <comment>{0} = Unique number for the missing account group.</comment>
   </data>
+  <data name="AccountNotFound" xml:space="preserve">
+    <value>The account with the account number '{0}' could not be found.</value>
+    <comment>{0} = Account number.</comment>
+  </data>
+  <data name="AddressAccountNotFound" xml:space="preserve">
+    <value>The address account with the account number '{0}' could not be found.</value>
+    <comment>{0} = Account number.</comment>
+  </data>
   <data name="BudgetAccountGroupNotFound" xml:space="preserve">
     <value>The budget account group with the unique number '{0}' could not be found.</value>
     <comment>{0} = Unique number for the missing budget account group.</comment>
+  </data>
+  <data name="BudgetAccountNotFound" xml:space="preserve">
+    <value>The budget account with the accout number '{0}' could not be found.</value>
+    <comment>{0} = Account number.</comment>
   </data>
   <data name="CommandError" xml:space="preserve">
     <value>Error while executing the command '{0}': {1}</value>

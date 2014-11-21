@@ -103,7 +103,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Konto.</returns>
         public virtual Task<IKontoModel> KontoGetAsync(int regnskabsnummer, string kontonummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            Func<IKontoModel> func = () => KontoGet(regnskabsnummer, kontonummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -127,7 +132,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Budgetkonto.</returns>
         public virtual Task<IBudgetkontoModel> BudgetkontoGetAsync(int regnskabsnummer, string budgetkontonummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(budgetkontonummer))
+            {
+                throw new ArgumentNullException("budgetkontonummer");
+            }
+            Func<IBudgetkontoModel> func = () => BudgetkontoGet(regnskabsnummer, budgetkontonummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -218,7 +228,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Adressekonto.</returns>
         public virtual Task<IAdressekontoModel> AdressekontoGetAsync(int regnskabsnummer, int nummer, DateTime statusDato)
         {
-            throw new NotImplementedException();
+            Func<IAdressekontoModel> func = () => AdressekontoGet(regnskabsnummer, nummer, statusDato);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -337,6 +348,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Henter en given konto i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra kontoen skal hentes.</param>
+        /// <param name="kontonummer">Kontonummer på kontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for kontoen.</param>
+        /// <returns>Konto.</returns>
+        private IKontoModel KontoGet(int regnskabsnummer, string kontonummer, DateTime statusDato)
+        {
+            try
+            {
+                var kontoplan = KontoplanGet(regnskabsnummer, statusDato).ToList();
+                try
+                {
+                    return kontoplan.Single(m => string.Compare(m.Kontonummer, kontonummer, StringComparison.Ordinal) == 0);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.AccountNotFound, kontonummer), ex);
+                }
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "KontoGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Henter budgetkontoplanen til et givent regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer, hvortil budgetkontoplanen skal hentes.</param>
@@ -395,6 +437,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en given budgetkonto i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvorfra budgetkontoen skal hentes.</param>
+        /// <param name="budgetkontonummer">Kontonummer på budgetkontoen, der skal hentes.</param>
+        /// <param name="statusDato">Statusdato for budgetkontoen.</param>
+        /// <returns>Budgetkonto.</returns>
+        private IBudgetkontoModel BudgetkontoGet(int regnskabsnummer, string budgetkontonummer, DateTime statusDato)
+        {
+            try
+            {
+                var budgetkontoplan = BudgetkontoplanGet(regnskabsnummer, statusDato).ToList();
+                try
+                {
+                    return budgetkontoplan.Single(m => string.Compare(m.Kontonummer, budgetkontonummer, StringComparison.Ordinal) == 0);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountNotFound, budgetkontonummer), ex);
+                }
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoGet", ex.Message), ex);
             }
         }
 
@@ -563,6 +636,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontolisteGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en given adressekonto til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil adressekontoen skal hentes.</param>
+        /// <param name="nummer">Bogføringsdato, som den nye bogføringslinje skal initieres med.</param>
+        /// <param name="statusDato">Statusdato, hvorpå adressekontoen skal hentes.</param>
+        /// <returns>Ny bogføringslinje, der efterfølgende kan bogføres.</returns>
+        private IAdressekontoModel AdressekontoGet(int regnskabsnummer, int nummer, DateTime statusDato)
+        {
+            try
+            {
+                var adressekontoliste = AdressekontolisteGet(regnskabsnummer, statusDato).ToList();
+                try
+                {
+                    return adressekontoliste.Single(m => m.Nummer == nummer);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.AddressAccountNotFound, nummer), ex);
+                }
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "AdressekontoGet", ex.Message), ex);
             }
         }
 

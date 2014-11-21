@@ -138,6 +138,121 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at KontoGetAsync kaster en ArgumentNullException, hvis kontonummeret er invalid.
+        /// </summary>
+        [Test]
+        [TestCase(1, null)]
+        [TestCase(1, "")]
+        [TestCase(2, null)]
+        [TestCase(2, "")]
+        [TestCase(3, null)]
+        [TestCase(3, "")]
+        [TestCase(4, null)]
+        [TestCase(4, "")]
+        [TestCase(5, null)]
+        [TestCase(5, "")]
+        public void TestAtKontoGetAsyncKasterArgumentNullExceptionHvisKontonummerErInvalid(int regnskabsnummer, string invalidKontonummer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepositoryLocale.KontoGetAsync(regnskabsnummer, invalidKontonummer, DateTime.Now));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at KontoGetAsync kaster en IntranetGuiRepositoryException, hvis kontonummeret ikke findes.
+        /// </summary>
+        [Test]
+        [TestCase(1, "XXX")]
+        [TestCase(2, "YYY")]
+        [TestCase(3, "ZZZ")]
+        [TestCase(4, "KONTO01")]
+        [TestCase(5, "KONTO02")]
+        public void TestAtKontoGetAsyncKasterIntranetGuiRepositoryExceptionHvisKontonummerIkkeFindes(int regnskabsnummer, string unknownKontonummer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(async () => await finansstyringRepositoryLocale.KontoGetAsync(regnskabsnummer, unknownKontonummer, DateTime.Now));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.AccountNotFound, unknownKontonummer)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at KontoGetAsync henter en given konto.
+        /// </summary>
+        [Test]
+        [TestCase(1, "KONTO01")]
+        [TestCase(1, "KONTO02")]
+        [TestCase(1, "KONTO03")]
+        [TestCase(2, "KONTO01")]
+        [TestCase(2, "KONTO02")]
+        [TestCase(2, "KONTO03")]
+        [TestCase(3, "KONTO01")]
+        [TestCase(3, "KONTO02")]
+        [TestCase(3, "KONTO03")]
+        public async void TestAtKontoGetAsyncHenterKontoModel(int regnskabsnummer, string kontonummer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var kontoModel =  await finansstyringRepositoryLocale.KontoGetAsync(regnskabsnummer, kontonummer, DateTime.Now);
+            Assert.That(kontoModel, Is.Not.Null);
+            Assert.That(kontoModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
+            Assert.That(kontoModel.Kontonummer, Is.Not.Null);
+            Assert.That(kontoModel.Kontonummer, Is.Not.Empty);
+            Assert.That(kontoModel.Kontonummer, Is.EqualTo(kontonummer));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
         /// Tester, at BudgetkontoplanGetAsync henter budgetkontoplanen til et regnskab.
         /// </summary>
         [Test]
@@ -165,6 +280,121 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var result = await finansstyringRepositoryLocale.BudgetkontoplanGetAsync(regnskabsnummer, DateTime.Now);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.EqualTo(expectedBudgetkonti));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGetAsync kaster en ArgumentNullException, hvis budgetkontonummeret er invalid.
+        /// </summary>
+        [Test]
+        [TestCase(1, null)]
+        [TestCase(1, "")]
+        [TestCase(2, null)]
+        [TestCase(2, "")]
+        [TestCase(3, null)]
+        [TestCase(3, "")]
+        [TestCase(4, null)]
+        [TestCase(4, "")]
+        [TestCase(5, null)]
+        [TestCase(5, "")]
+        public void TestAtBudgetkontoGetAsyncKasterArgumentNullExceptionHvisBudgetkontonummerErInvalid(int regnskabsnummer, string invalidBudgetkontonummer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepositoryLocale.BudgetkontoGetAsync(regnskabsnummer, invalidBudgetkontonummer, DateTime.Now));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("budgetkontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGetAsync kaster en IntranetGuiRepositoryException, hvis budgetkontonummeret ikke findes.
+        /// </summary>
+        [Test]
+        [TestCase(1, "XXX")]
+        [TestCase(2, "YYY")]
+        [TestCase(3, "ZZZ")]
+        [TestCase(4, "BUDGETKONTO01")]
+        [TestCase(5, "BUDGETKONTO02")]
+        public void TestAtBudgetkontoGetAsyncKasterIntranetGuiRepositoryExceptionHvisBudgetkontonummerIkkeFindes(int regnskabsnummer, string unknownBudgetkontonummer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(async () => await finansstyringRepositoryLocale.BudgetkontoGetAsync(regnskabsnummer, unknownBudgetkontonummer, DateTime.Now));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountNotFound, unknownBudgetkontonummer)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGetAsync henter en given budgetkonto.
+        /// </summary>
+        [Test]
+        [TestCase(1, "BUDGETKONTO01")]
+        [TestCase(1, "BUDGETKONTO02")]
+        [TestCase(1, "BUDGETKONTO03")]
+        [TestCase(2, "BUDGETKONTO01")]
+        [TestCase(2, "BUDGETKONTO02")]
+        [TestCase(2, "BUDGETKONTO03")]
+        [TestCase(3, "BUDGETKONTO01")]
+        [TestCase(3, "BUDGETKONTO02")]
+        [TestCase(3, "BUDGETKONTO03")]
+        public async void TestAtBudgetkontoGetAsyncHenterBudgetkontoModel(int regnskabsnummer, string budgetkontonummer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var budgetkontoModel =  await finansstyringRepositoryLocale.BudgetkontoGetAsync(regnskabsnummer, budgetkontonummer, DateTime.Now);
+            Assert.That(budgetkontoModel, Is.Not.Null);
+            Assert.That(budgetkontoModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
+            Assert.That(budgetkontoModel.Kontonummer, Is.Not.Null);
+            Assert.That(budgetkontoModel.Kontonummer, Is.Not.Empty);
+            Assert.That(budgetkontoModel.Kontonummer, Is.EqualTo(budgetkontonummer));
 
             localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
         }
@@ -293,6 +523,88 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var result = await finansstyringRepositoryLocale.AdressekontolisteGetAsync(regnskabsnummer, DateTime.Now);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.EqualTo(expectedAdressekonti));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAsync kaster en IntranetGuiRepositoryException, hvis adressekontoen ikke findes.
+        /// </summary>
+        [Test]
+        [TestCase(1, 777)]
+        [TestCase(2, 888)]
+        [TestCase(3, 999)]
+        [TestCase(4, 101)]
+        [TestCase(5, 102)]
+        public void TestAtAdressekontoGetAsyncKasterIntranetGuiRepositoryExceptionHvisAdressekontoIkkeFindes(int regnskabsnummer, int unknownAdressekonto)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(async () => await finansstyringRepositoryLocale.AdressekontoGetAsync(regnskabsnummer, unknownAdressekonto, DateTime.Now));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.AddressAccountNotFound, unknownAdressekonto)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAsync henter en given adressekonto.
+        /// </summary>
+        [Test]
+        [TestCase(1, 101)]
+        [TestCase(1, 102)]
+        [TestCase(1, 103)]
+        [TestCase(1, 201)]
+        [TestCase(1, 202)]
+        [TestCase(1, 203)]
+        [TestCase(2, 101)]
+        [TestCase(2, 102)]
+        [TestCase(2, 103)]
+        [TestCase(2, 201)]
+        [TestCase(2, 202)]
+        [TestCase(2, 203)]
+        [TestCase(3, 101)]
+        [TestCase(3, 102)]
+        [TestCase(3, 103)]
+        [TestCase(3, 201)]
+        [TestCase(3, 202)]
+        [TestCase(3, 203)]
+        public async void TestAtAdressekontoGetAsyncHenterAdressekontoModel(int regnskabsnummer, int adressekonto)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var adressekontoModel = await finansstyringRepositoryLocale.AdressekontoGetAsync(regnskabsnummer, adressekonto, DateTime.Now);
+            Assert.That(adressekontoModel, Is.Not.Null);
+            Assert.That(adressekontoModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
+            Assert.That(adressekontoModel.Nummer, Is.EqualTo(adressekonto));
 
             localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
         }

@@ -27,6 +27,9 @@
         ErrorPostingAccountingLine,
         ErrorUpdateFinansstyringRepository,
         OfflineFinansstyringRepository,
-        EventHandlerNotDefined
+        EventHandlerNotDefined,
+        AccountNotFound,
+        BudgetAccountNotFound,
+        AddressAccountNotFound
     }
 }
