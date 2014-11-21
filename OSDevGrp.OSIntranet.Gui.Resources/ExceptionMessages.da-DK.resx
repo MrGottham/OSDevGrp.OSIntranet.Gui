@@ -122,7 +122,7 @@
     <comment>{0} = Unikt nummer på den manglende kontogruppe.</comment>
   </data>
   <data name="AccountingNotFound" xml:space="preserve">
-    <value>Kunne ikke findet et regnskab med regnskabsnummer: {0}</value>
+    <value>Kunne ikke finde et regnskab med regnskabsnummer: {0}</value>
     <comment>{0} = Regnskabsnummer.</comment>
   </data>
   <data name="AccountNotFound" xml:space="preserve">

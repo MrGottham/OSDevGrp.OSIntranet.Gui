@@ -623,26 +623,60 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             nextLøbenummer = value + 1;
                         }
                     }
-                    var bogføringslinjeModel = (IBogføringslinjeModel) new BogføringslinjeModel(kontoModel.Regnskabsnummer, nextLøbenummer, dato, kontoModel.Kontonummer, tekst, debit, kredit)
+                    IBogføringslinjeModel bogføringslinjeModel = new BogføringslinjeModel(kontoModel.Regnskabsnummer, nextLøbenummer, dato, kontoModel.Kontonummer, tekst, debit, kredit)
                     {
                         Bilag = string.IsNullOrWhiteSpace(bilag) ? null : bilag,
                         Budgetkontonummer = budgetkontoModel == null ? null : budgetkontoModel.Kontonummer,
                         Adressekonto = adressekontoModel == null ? 0 : adressekontoModel.Nummer
                     };
-                    _localeDataStorage.StoreLocaleData(bogføringslinjeModel);
+                    bogføringslinjeModel.StoreInDocument(localeDataDocument, false);
 
-                    kontoModel.Saldo += debit - kredit;
-                    _localeDataStorage.StoreLocaleData(kontoModel);
+                    kontoModel.Saldo += bogføringslinjeModel.Bogført;
+                    kontoModel.StoreInDocument(localeDataDocument);
+                    foreach (var kontoHistorikElement in regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, ModelExtentions.GetHistorikDato(bogføringslinjeModel.Dato), StringComparison.Ordinal) > 0))
+                    {
+                        var saldoAttribute = kontoHistorikElement.Attribute(XName.Get("saldo", string.Empty));
+                        if (saldoAttribute == null)
+                        {
+                            continue;
+                        }
+                        var newSaldo = decimal.Parse(saldoAttribute.Value, NumberStyles.Any, CultureInfo.InvariantCulture) + bogføringslinjeModel.Bogført;
+                        kontoHistorikElement.UpdateAttribute(saldoAttribute.Name, newSaldo.ToString("#.00", CultureInfo.InvariantCulture));
+                    }
 
-                    //foreach (var kontoHistorikElement in regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(kontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList())
+                    if (budgetkontoModel != null)
+                    {
+                        budgetkontoModel.Bogført += bogføringslinjeModel.Bogført;
+                        budgetkontoModel.StoreInDocument(localeDataDocument);
+                        foreach (var budgetkontoHistorikElement in regnskabElement.Elements(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, ModelExtentions.GetHistorikDato(bogføringslinjeModel.Dato), StringComparison.Ordinal) > 0))
+                        {
+                            var bogførtAttribute = budgetkontoHistorikElement.Attribute(XName.Get("bogfoert", string.Empty));
+                            if (bogførtAttribute == null)
+                            {
+                                continue;
+                            }
+                            var newBogført = decimal.Parse(bogførtAttribute.Value, NumberStyles.Any, CultureInfo.InvariantCulture) + bogføringslinjeModel.Bogført;
+                            budgetkontoHistorikElement.UpdateAttribute(bogførtAttribute.Name, newBogført.ToString("#.00", CultureInfo.InvariantCulture));
+                        }
+                    }
 
+                    if (adressekontoModel != null)
+                    {
+                        adressekontoModel.Saldo += bogføringslinjeModel.Bogført;
+                        adressekontoModel.StoreInDocument(localeDataDocument);
+                        foreach (var adressekontoHistorikElement in regnskabElement.Elements(XName.Get("AdressekontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, ModelExtentions.GetHistorikDato(bogføringslinjeModel.Dato), StringComparison.Ordinal) > 0))
+                        {
+                            var saldoAttribute = adressekontoHistorikElement.Attribute(XName.Get("saldo", string.Empty));
+                            if (saldoAttribute == null)
+                            {
+                                continue;
+                            }
+                            var newSaldo = decimal.Parse(saldoAttribute.Value, NumberStyles.Any, CultureInfo.InvariantCulture) + bogføringslinjeModel.Bogført;
+                            adressekontoHistorikElement.UpdateAttribute(saldoAttribute.Name, newSaldo.ToString("#.00", CultureInfo.InvariantCulture));
+                        }
+                    }
 
-                    
-                    
-                    //localeDataDocument.GetHistorikElements()
-
-            //var historikElements = regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(kontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
-
+                    _localeDataStorage.StoreLocaleDocument(localeDataDocument);
                     return new BogføringsresultatModel(bogføringslinjeModel, new List<BogføringsadvarselModel>(0));
                 }
             }

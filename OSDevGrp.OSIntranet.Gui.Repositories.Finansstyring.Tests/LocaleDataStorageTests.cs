@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -382,6 +383,100 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "GetLocaleData", eventException.Message)));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(eventException));
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleDocument kaster en ArgumentNullException, hvis XML dokumentet er null.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDocumentKasterArgumentNullExceptionHvisLocaleDataDocumentErNull()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => localeDataStorage.StoreLocaleDocument(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("localeDataDocument"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleDocument kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDocumentKasterIntranetGuiRepositoryExceptionHvisOnOnCreateWriterStreamErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreLocaleDocument(new XDocument()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleDocument rejser eventet, der skal danne skrivestreamen til det lokale datalager.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDocumentRejserOnCreateWriterStreamEvent()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventCalled = false;
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(s, Is.EqualTo(localeDataStorage));
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.TypeOf<bool>());
+                Assert.That(e.CreationContext, Is.EqualTo(false));
+                Assert.That(e.Result, Is.Null);
+                e.Result = CreateMemoryStreamWithoutXmlContext();
+                eventCalled = true;
+            };
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", Encoding.UTF8.BodyName, null));
+            localeDataDocument.Add(new XElement(XName.Get("Test")));
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreLocaleDocument(localeDataDocument);
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleDocument gemmer XML dokumentet.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDocumentGemmerLocalDataDocument()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateWriterStream += (s, e) => e.Result = CreateMemoryStreamWithoutXmlContext();
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", Encoding.UTF8.BodyName, null));
+            localeDataDocument.Add(new XElement(XName.Get("Test")));
+
+            localeDataStorage.StoreLocaleDocument(localeDataDocument);
         }
 
         /// <summary>
@@ -1449,6 +1544,100 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     tempFile.Refresh();
                 }
             }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncDocument kaster en ArgumentNullException, hvis XML dokumentet er null.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDocumentKasterArgumentNullExceptionHvisLocaleDataDocumentErNull()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => localeDataStorage.StoreSyncDocument(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("localeDataDocument"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncDocument kaster en IntranetGuiRepositoryException, hvis eventet, der rejses, når en skrivestream til det lokale datalager skal dannes, er null.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDocumentKasterIntranetGuiRepositoryExceptionHvisOnOnCreateWriterStreamErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetGuiRepositoryException>(() => localeDataStorage.StoreSyncDocument(new XDocument()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncDocument rejser eventet, der skal danne skrivestreamen til det lokale datalager.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDocumentRejserOnCreateWriterStreamEvent()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            var eventCalled = false;
+            localeDataStorage.OnCreateWriterStream += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(s, Is.EqualTo(localeDataStorage));
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.Not.Null);
+                Assert.That(e.CreationContext, Is.TypeOf<bool>());
+                Assert.That(e.CreationContext, Is.EqualTo(true));
+                Assert.That(e.Result, Is.Null);
+                e.Result = CreateMemoryStreamWithoutXmlContext();
+                eventCalled = true;
+            };
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", Encoding.UTF8.BodyName, null));
+            localeDataDocument.Add(new XElement(XName.Get("Test")));
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreSyncDocument(localeDataDocument);
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleDocument gemmer XML dokumentet.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDocumentGemmerLocalDataDocument()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateWriterStream += (s, e) => e.Result = CreateMemoryStreamWithoutXmlContext();
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", Encoding.UTF8.BodyName, null));
+            localeDataDocument.Add(new XElement(XName.Get("Test")));
+
+            localeDataStorage.StoreSyncDocument(localeDataDocument);
         }
 
         /// <summary>

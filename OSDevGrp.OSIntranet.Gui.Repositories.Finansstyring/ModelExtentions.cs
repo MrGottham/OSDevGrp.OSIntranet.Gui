@@ -485,7 +485,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="attributeName">Navn på XML attributten, der skal opdateres.</param>
         /// <param name="attributeValue">Værdi, som XML attributten skal opdateres med.</param>
         /// <param name="required">Angivelse af, om XML attributten er requried.</param>
-        private static void UpdateAttribute(this XElement localeDataElement, XName attributeName, string attributeValue, bool required = true)
+        public static void UpdateAttribute(this XElement localeDataElement, XName attributeName, string attributeValue, bool required = true)
         {
             if (localeDataElement == null)
             {
@@ -522,7 +522,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="statusDato">Statusdato.</param>
         /// <returns>Historisk dato, som kan benyttes i XML dokumentet.</returns>
-        private static string GetHistorikDato(DateTime statusDato)
+        public static string GetHistorikDato(DateTime statusDato)
         {
             return statusDato.ToString("yyyyMMdd");
         }

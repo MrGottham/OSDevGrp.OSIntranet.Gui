@@ -176,6 +176,42 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Gemmer XML dokumentet indeholdende lokale data i det lokale datalager.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokumentet indeholdende lokale data.</param>
+        public virtual void StoreLocaleDocument(XDocument localeDataDocument)
+        {
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            if (OnCreateWriterStream == null)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
+            }
+            try
+            {
+                lock (SyncRoot)
+                {
+                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(false);
+                    OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
+                    using (var writerStream = handleStreamCreationEventArgs.Result)
+                    {
+                        WriteDocument(localeDataDocument, writerStream);
+                    }
+                }
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreLocaleDocument", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Gemmer data i det lokale datalager.
         /// </summary>
         /// <typeparam name="T">Typen på data, der skal gemmes i det lokale datalager.</typeparam>
@@ -223,6 +259,42 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreLocaleData", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Gemmer XML dokumentet indeholdende lokale synkroniserede data i det lokale datalager.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokumentet indeholdende lokale synkroniserede data.</param>
+        public virtual void StoreSyncDocument(XDocument localeDataDocument)
+        {
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            if (OnCreateWriterStream == null)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
+            }
+            try
+            {
+                lock (SyncRoot)
+                {
+                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(true);
+                    OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
+                    using (var writerStream = handleStreamCreationEventArgs.Result)
+                    {
+                        WriteDocument(localeDataDocument, writerStream);
+                    }
+                }
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StoreSyncDocument", ex.Message), ex);
             }
         }
 

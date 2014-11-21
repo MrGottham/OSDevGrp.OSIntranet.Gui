@@ -64,11 +64,23 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         XDocument GetLocaleData();
 
         /// <summary>
+        /// Gemmer XML dokumentet indeholdende lokale data i det lokale datalager.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokumentet indeholdende lokale data.</param>
+        void StoreLocaleDocument(XDocument localeDataDocument);
+
+        /// <summary>
         /// Gemmer data i det lokale datalager.
         /// </summary>
         /// <typeparam name="T">Typen på data, der skal gemmes i det lokale datalager.</typeparam>
         /// <param name="model">Data, der skal gemmes i det lokale datalager.</param>
         void StoreLocaleData<T>(T model) where T : IModel;
+
+        /// <summary>
+        /// Gemmer XML dokumentet indeholdende lokale synkroniserede data i det lokale datalager.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokumentet indeholdende lokale synkroniserede data.</param>
+        void StoreSyncDocument(XDocument localeDataDocument);
 
         /// <summary>
         /// Gemmer synkroniseringsdata i det lokale datalager.

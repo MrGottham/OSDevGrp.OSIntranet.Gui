@@ -766,12 +766,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var fixture = new Fixture();
             fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
 
+            var localData = GenerateTestData(fixture);
             var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
             localeDataStorageMock.Stub(m => m.HasLocaleData)
                 .Return(true)
                 .Repeat.Any();
             localeDataStorageMock.Stub(m => m.GetLocaleData())
-                .Return(GenerateTestData(fixture))
+                .Return(localData)
                 .Repeat.Any();
 
             var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
@@ -783,8 +784,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(bogføringsresultat.Bogføringsadvarsler, Is.Not.Null);
 
             localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
-            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IBogføringslinjeModel>.Is.TypeOf), opt => opt.Repeat.Times(1));
-            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IKontoModel>.Is.TypeOf), opt => opt.Repeat.Times(2));
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleDocument(Arg<XDocument>.Is.Equal(localData)));
         }
 
         /// <summary>
