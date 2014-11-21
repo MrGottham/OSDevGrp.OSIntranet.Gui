@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -160,9 +161,6 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             localeDataStorageMock.Stub(m => m.HasLocaleData)
                 .Return(true)
                 .Repeat.Any();
-            localeDataStorageMock.Stub(m => m.GetLocaleData())
-                .Return(GenerateTestData(fixture))
-                .Repeat.Any();
 
             var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
             Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
@@ -307,9 +305,6 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             localeDataStorageMock.Stub(m => m.HasLocaleData)
                 .Return(true)
                 .Repeat.Any();
-            localeDataStorageMock.Stub(m => m.GetLocaleData())
-                .Return(GenerateTestData(fixture))
-                .Repeat.Any();
 
             var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
             Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
@@ -429,6 +424,367 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(result.Count(), Is.EqualTo(expectedBogføringslinjer));
 
             localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync kaster en ArgumentException ved illegale regnskabsnumre.
+        /// </summary>
+        [Test]
+        [TestCase(-1024)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        public void TestAtBogføringslinjeCreateNewAsyncArgumentExceptionVedIllegalRegnskabsnummer(int illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepositoryLocale.BogføringslinjeCreateNewAsync(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("regnskabsnummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync kaster en ArgumentException ved illegale datoer.
+        /// </summary>
+        [Test]
+        [TestCase("2050-01-01")]
+        [TestCase("2055-09-01")]
+        [TestCase("2055-12-31")]
+        public void TestAtBogføringslinjeCreateNewAsyncArgumentExceptionVedIllegalDato(string illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepositoryLocale.BogføringslinjeCreateNewAsync(fixture.Create<int>(), dato, fixture.Create<string>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dato"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync kaster en ArgumentNullException ved illegale kontonumre.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void TestAtBogføringslinjeCreateNewAsyncArgumentNullExceptionVedIllegalKontonummer(string illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepositoryLocale.BogføringslinjeCreateNewAsync(fixture.Create<int>(), fixture.Create<DateTime>(), illegalValue));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeCreateNewAsync danner og returnerer en ny bogføringslinje, der efterfølgende kan bogføres.
+        /// </summary>
+        [Test]
+        public async void TestAtBogføringslinjeCreateNewAsyncDannerBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var regnskabsnummer = fixture.Create<int>();
+            var dato = fixture.Create<DateTime>();
+            var kontonummer = fixture.Create<string>();
+            var bogføringslinjeModel = await finansstyringRepositoryLocale.BogføringslinjeCreateNewAsync(regnskabsnummer, dato, kontonummer);
+            Assert.That(bogføringslinjeModel, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
+            Assert.That(bogføringslinjeModel.Løbenummer, Is.EqualTo(int.MinValue));
+            Assert.That(bogføringslinjeModel.Dato, Is.EqualTo(dato));
+            Assert.That(bogføringslinjeModel.Bilag, Is.Null);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.Not.Empty);
+            Assert.That(bogføringslinjeModel.Kontonummer, Is.EqualTo(kontonummer));
+            Assert.That(bogføringslinjeModel.Tekst, Is.Not.Null);
+            Assert.That(bogføringslinjeModel.Tekst, Is.Empty);
+            Assert.That(bogføringslinjeModel.Budgetkontonummer, Is.Null);
+            Assert.That(bogføringslinjeModel.Debit, Is.EqualTo(0M));
+            Assert.That(bogføringslinjeModel.Kredit, Is.EqualTo(0M));
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogførAsync kaster en ArgumentException ved illegale regnskabsnumre.
+        /// </summary>
+        [Test]
+        [TestCase(-1024)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        public void TestAtBogførAsyncKasterArgumentExceptionVedIllegalRegnskabsnummer(int illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepositoryLocale.BogførAsync(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("regnskabsnummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogførAsync kaster en ArgumentException ved illegale datoer.
+        /// </summary>
+        [Test]
+        [TestCase("2050-01-01")]
+        [TestCase("2055-09-01")]
+        [TestCase("2055-12-31")]
+        public void TestAtBogførAsyncKasterArgumentExceptionVedIllegalDato(string illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepositoryLocale.BogførAsync(fixture.Create<int>(), dato, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dato"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogførAsync kaster en ArgumentNullException ved illegale kontonumre.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void TestAtBogførAsyncKasterArgumentNullExceptionVedIllegalKontonummer(string illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepositoryLocale.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), illegalValue, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogførAsync kaster en ArgumentNullException ved illegale tekster.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void TestAtBogførAsyncKasterArgumentNullExceptionVedIllegalTekst(string illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepositoryLocale.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("tekst"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogførAsync kaster en ArgumentException ved illegale debitbeløb.
+        /// </summary>
+        [Test]
+        [TestCase(-1024)]
+        [TestCase(-1)]
+        public void TestAtBogførAsyncKasterArgumentExceptionVedIllegalDebit(decimal illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepositoryLocale.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<decimal>(), fixture.Create<int>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "debit", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("debit"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogførAsync kaster en ArgumentException ved illegale kreditbeløb.
+        /// </summary>
+        [Test]
+        [TestCase(-1024)]
+        [TestCase(-1)]
+        public void TestAtBogførAsyncKasterArgumentExceptionVedIllegalKredit(decimal illegalValue)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Today));
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepositoryLocale.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), illegalValue, fixture.Create<int>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "kredit", illegalValue)));
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kredit"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            localeDataStorageMock.AssertWasNotCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
+        /// Tester, at BogførAsync bogfører værdier.
+        /// </summary>
+        [Test]
+        public async void TestAtBogførAsyncBogførerValues()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var bogføringsresultat = await finansstyringRepositoryLocale.BogførAsync(1, DateTime.Now.AddDays(-3), null, "KONTO01", "Test", "BUDGETKONTO01", 5000M, 0M, 101);
+            Assert.That(bogføringsresultat, Is.Not.Null);
+            Assert.That(bogføringsresultat.Bogføringslinje, Is.Not.Null);
+            Assert.That(bogføringsresultat.Bogføringsadvarsler, Is.Not.Null);
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IBogføringslinjeModel>.Is.TypeOf), opt => opt.Repeat.Times(1));
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IKontoModel>.Is.TypeOf), opt => opt.Repeat.Times(2));
         }
 
         /// <summary>

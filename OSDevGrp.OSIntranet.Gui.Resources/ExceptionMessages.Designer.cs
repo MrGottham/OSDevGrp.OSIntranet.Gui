@@ -70,6 +70,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The accounting with the unique number &apos;{0}&apos; could not be found..
+        /// </summary>
+        internal static string AccountingNotFound {
+            get {
+                return ResourceManager.GetString("AccountingNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The account with the account number &apos;{0}&apos; could not be found..
         /// </summary>
         internal static string AccountNotFound {

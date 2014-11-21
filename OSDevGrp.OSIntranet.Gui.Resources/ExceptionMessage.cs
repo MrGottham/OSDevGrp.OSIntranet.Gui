@@ -30,6 +30,7 @@
         EventHandlerNotDefined,
         AccountNotFound,
         BudgetAccountNotFound,
-        AddressAccountNotFound
+        AddressAccountNotFound,
+        AccountingNotFound
     }
 }

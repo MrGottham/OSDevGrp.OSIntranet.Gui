@@ -121,6 +121,10 @@
     <value>The account group with the unique number '{0}' could not be found.</value>
     <comment>{0} = Unique number for the missing account group.</comment>
   </data>
+  <data name="AccountingNotFound" xml:space="preserve">
+    <value>The accounting with the unique number '{0}' could not be found.</value>
+    <comment>{0} = Accounting number.</comment>
+  </data>
   <data name="AccountNotFound" xml:space="preserve">
     <value>The account with the account number '{0}' could not be found.</value>
     <comment>{0} = Account number.</comment>
