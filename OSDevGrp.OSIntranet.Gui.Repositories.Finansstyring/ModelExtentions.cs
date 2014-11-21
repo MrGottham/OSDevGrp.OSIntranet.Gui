@@ -242,14 +242,32 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 return;
             }
-            var bogføringslinjeElement = regnskabElement.Elements(XName.Get("Bogfoeringslinje", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+            var bogføringslinjeElement = regnskabElement.Elements(XName.Get("Bogfoeringslinje", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("loebenummer", string.Empty)).Value, bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
             if (bogføringslinjeElement == null)
             {
                 bogføringslinjeElement = new XElement(XName.Get("Bogfoeringslinje", regnskabElement.Name.NamespaceName));
                 bogføringslinjeElement.UpdateAttribute(XName.Get("loebenummer", string.Empty), bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture));
+                bogføringslinjeElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(bogføringslinjeModel.Dato));
+                bogføringslinjeElement.UpdateAttribute(XName.Get("bilag", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Bilag) ? null : bogføringslinjeModel.Bilag, false);
+                bogføringslinjeElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), bogføringslinjeModel.Kontonummer);
+                bogføringslinjeElement.UpdateAttribute(XName.Get("tekst", string.Empty), bogføringslinjeModel.Tekst);
+                bogføringslinjeElement.UpdateAttribute(XName.Get("budgetkontonummer", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Budgetkontonummer) ? null : bogføringslinjeModel.Budgetkontonummer, false);
+                bogføringslinjeElement.UpdateAttribute(XName.Get("debit", string.Empty), bogføringslinjeModel.Debit == 0M ? null : bogføringslinjeModel.Debit.ToString("#.00", CultureInfo.InvariantCulture), false);
+                bogføringslinjeElement.UpdateAttribute(XName.Get("kredit", string.Empty), bogføringslinjeModel.Kredit == 0M ? null : bogføringslinjeModel.Kredit.ToString("#.00", CultureInfo.InvariantCulture), false);
+                bogføringslinjeElement.UpdateAttribute(XName.Get("adressekonto", string.Empty), bogføringslinjeModel.Adressekonto == 0 ? null : bogføringslinjeModel.Adressekonto.ToString(CultureInfo.InvariantCulture), false);
+                bogføringslinjeElement.UpdateAttribute(XName.Get("synkroniseret", string.Empty), isStoringSynchronizedData ? "true" : "false");
                 regnskabElement.Add(bogføringslinjeElement);
                 return;
             }
+            bogføringslinjeElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(bogføringslinjeModel.Dato));
+            bogføringslinjeElement.UpdateAttribute(XName.Get("bilag", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Bilag) ? null : bogføringslinjeModel.Bilag, false);
+            bogføringslinjeElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), bogføringslinjeModel.Kontonummer);
+            bogføringslinjeElement.UpdateAttribute(XName.Get("tekst", string.Empty), bogføringslinjeModel.Tekst);
+            bogføringslinjeElement.UpdateAttribute(XName.Get("budgetkontonummer", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Budgetkontonummer) ? null : bogføringslinjeModel.Budgetkontonummer, false);
+            bogføringslinjeElement.UpdateAttribute(XName.Get("debit", string.Empty), bogføringslinjeModel.Debit == 0M ? null : bogføringslinjeModel.Debit.ToString("#.00", CultureInfo.InvariantCulture), false);
+            bogføringslinjeElement.UpdateAttribute(XName.Get("kredit", string.Empty), bogføringslinjeModel.Kredit == 0M ? null : bogføringslinjeModel.Kredit.ToString("#.00", CultureInfo.InvariantCulture), false);
+            bogføringslinjeElement.UpdateAttribute(XName.Get("adressekonto", string.Empty), bogføringslinjeModel.Adressekonto == 0 ? null : bogføringslinjeModel.Adressekonto.ToString(CultureInfo.InvariantCulture), false);
+            bogføringslinjeElement.UpdateAttribute(XName.Get("synkroniseret", string.Empty), isStoringSynchronizedData ? "true" : "false");
         }
 
         /// <summary>
@@ -348,13 +366,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 return new List<XElement>(0);
             }
             var historikElements = regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(kontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
-            var remoteElementUntil = DateTime.Now.AddYears(-1);
-            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+            var removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
+            removeElementUntil = removeElementUntil.AddDays((removeElementUntil.Day)*-1);
+            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
             while (elementToDelete != null)
             {
                 elementToDelete.Remove();
                 historikElements.Remove(elementToDelete);
-                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
             }
             return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
         }
@@ -381,13 +400,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 return new List<XElement>(0);
             }
             var historikElements = regnskabElement.Elements(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(budgetkontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
-            var remoteElementUntil = DateTime.Now.AddYears(-1);
-            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+            var removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
+            removeElementUntil = removeElementUntil.AddDays((removeElementUntil.Day)*-1);
+            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
             while (elementToDelete != null)
             {
                 elementToDelete.Remove();
                 historikElements.Remove(elementToDelete);
-                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
             }
             return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
         }
@@ -414,13 +434,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 return new List<XElement>(0);
             }
             var historikElements = regnskabElement.Elements(XName.Get("AdressekontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(adressekontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
-            var remoteElementUntil = DateTime.Now.AddYears(-1);
-            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+            var removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
+            removeElementUntil = removeElementUntil.AddDays((removeElementUntil.Day)*-1);
+            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
             while (elementToDelete != null)
             {
                 elementToDelete.Remove();
                 historikElements.Remove(elementToDelete);
-                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(remoteElementUntil), StringComparison.Ordinal) <= 0);
+                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
             }
             return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
         }

@@ -170,6 +170,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at BogføringslinjerGetAsync henter bogføringslinjer til et regnskab.
+        /// </summary>
+        [Test]
+        [TestCase(1, 50)]
+        [TestCase(2, 50)]
+        [TestCase(3, 50)]
+        [TestCase(4, 0)]
+        [TestCase(5, 0)]
+        public async void TestAtBogføringslinjerGetAsyncHenterBogføringslinjer(int regnskabsnummer, int expectedBogføringslinjer)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+            localeDataStorageMock.Stub(m => m.GetLocaleData())
+                .Return(GenerateTestData(fixture))
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var result = await finansstyringRepositoryLocale.BogføringslinjerGetAsync(regnskabsnummer, DateTime.Now, expectedBogføringslinjer);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(expectedBogføringslinjer));
+
+            localeDataStorageMock.AssertWasCalled(m => m.GetLocaleData());
+        }
+
+        /// <summary>
         /// Tester, at DebitorlisteGetAsync henter listen af debitorer i et regnskab.
         /// </summary>
         [Test]
@@ -339,6 +371,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     return _localeDataDocument;
                 }
                 // Create testdata.
+                var random = new Random(fixture.Create<int>());
                 var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
                 localeDataDocument.Add(new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace)));
                 for (var i = 0; i < 3; i++)
@@ -364,6 +397,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     {
                         var adressekontoModel = CreateAdressekontoModel(fixture, i + 1, 200 + j + 1, -1);
                         adressekontoModel.StoreInDocument(localeDataDocument);
+                    }
+                    for (var j = 0; j < 150; j++)
+                    {
+                        var bogføringslinje = CreateBogføringslinjeModel(fixture, i + 1, j + 1, random.Next(1, 365)*-1, string.Format("KONTO{0:00}", random.Next(1, 15)), string.Format("BUDGETKONTO{0:00}", random.Next(1, 30)), 100 + random.Next(1, 25));
+                        bogføringslinje.StoreInDocument(localeDataDocument, false);
                     }
                 }
                 for (var i = 0; i < 15; i++)
@@ -556,6 +594,65 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(Math.Abs(fixture.Create<decimal>())*saldoOffset)
                 .Repeat.Any();
             return adressekontoModelMock;
+        }
+
+        /// <summary>
+        /// Danner testdata til en bogføringslinje.
+        /// </summary>
+        /// <param name="fixture">Fixture, der kan generere random data.</param>
+        /// <param name="regnskabsnummer">Unik identifikation af regnskabet, som bogføringslinjen skal være tilknyttet.</param>
+        /// <param name="løbenummer">Løbenummeret på bogføringslinjen.</param>
+        /// <param name="datoOffset">Offset, som datoen skal adderes med.</param>
+        /// <param name="kontonummer">Kontonummer, som bogføringslinjen skal være tilknyttet.</param>
+        /// <param name="budgetkontonummer">Budgetkontonummer, som bogføringslinjen skal være tilknyttet.</param>
+        /// <param name="adressekonto">Adressekonto, som bogføringslinjen skal være tilknyttet.</param>
+        /// <returns>Testdata til en bogføringslinje.</returns>
+        private static IBogføringslinjeModel CreateBogføringslinjeModel(ISpecimenBuilder fixture, int regnskabsnummer, int løbenummer, int datoOffset, string kontonummer, string budgetkontonummer, int adressekonto)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException("fixture");
+            }
+            if (string.IsNullOrEmpty(kontonummer))
+            {
+                throw new ArgumentNullException("kontonummer");
+            }
+            if (string.IsNullOrEmpty(budgetkontonummer))
+            {
+                throw new ArgumentNullException("budgetkontonummer");
+            }
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Expect(m => m.Regnskabsnummer)
+                .Return(regnskabsnummer)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Løbenummer)
+                .Return(løbenummer)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Dato)
+                .Return(DateTime.Today.AddDays(datoOffset))
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Bilag)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kontonummer)
+                .Return(kontonummer)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Budgetkontonummer)
+                .Return(budgetkontonummer)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Debit)
+                .Return(Math.Abs(fixture.Create<decimal>()))
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Kredit)
+                .Return(Math.Abs(fixture.Create<decimal>()))
+                .Repeat.Any();
+            bogføringslinjeModelMock.Expect(m => m.Adressekonto)
+                .Return(adressekonto)
+                .Repeat.Any();
+            return bogføringslinjeModelMock;
         }
 
         /// <summary>

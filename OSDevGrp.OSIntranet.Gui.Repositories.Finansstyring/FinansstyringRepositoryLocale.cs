@@ -139,7 +139,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <returns>Bogføringslinjer til regnskabet.</returns>
         public virtual Task<IEnumerable<IBogføringslinjeModel>> BogføringslinjerGetAsync(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer)
         {
-            throw new NotImplementedException();
+            Func<IEnumerable<IBogføringslinjeModel>> func = () => BogføringslinjerGet(regnskabsnummer, statusDato, antalBogføringslinjer);
+            return Task.Run(func);
         }
 
         /// <summary>
@@ -394,6 +395,70 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontoplanGet", ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter et givent antal bogføringslinjer til et regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer, hvortil bogføringslinjer skal hentes.</param>
+        /// <param name="statusDato">Dato, hvorfra bogføringslinjer skal hentes.</param>
+        /// <param name="antalBogføringslinjer">Antal bogføringslinjer, der skal hentes.</param>
+        /// <returns>Bogføringslinjer til regnskabet.</returns>
+        private IEnumerable<IBogføringslinjeModel> BogføringslinjerGet(int regnskabsnummer, DateTime statusDato, int antalBogføringslinjer)
+        {
+            try
+            {
+                var localeDataDocument = _localeDataStorage.GetLocaleData();
+                var regnskabElement = localeDataDocument.GetRegnskabElement(regnskabsnummer);
+                if (regnskabElement == null)
+                {
+                    return new List<IBogføringslinjeModel>(0);
+                }
+                var kontoplan = KontoplanGet(regnskabsnummer, statusDato).ToList();
+                var budgetkontoplan = BudgetkontoplanGet(regnskabsnummer, statusDato).ToList();
+                var adressekontoliste = AdressekontolisteGet(regnskabsnummer, statusDato).ToList();
+                var bogføringslinjer = new List<IBogføringslinjeModel>();
+                foreach (var bogføringslinjeElement in regnskabElement.Elements(XName.Get("Bogfoeringslinje", Namespace)))
+                {
+                    try
+                    {
+                        var kontonummerAttribute = bogføringslinjeElement.Attribute(XName.Get("kontonummer", string.Empty));
+                        if (kontonummerAttribute == null || kontoplan.Select(m => m.Kontonummer).Contains(kontonummerAttribute.Value) == false)
+                        {
+                            continue;
+                        }
+                        var debitAttribute = bogføringslinjeElement.Attribute(XName.Get("debit", string.Empty));
+                        var kreditAttribute = bogføringslinjeElement.Attribute(XName.Get("kredit", string.Empty));
+                        var bogføringslinjeModel = new BogføringslinjeModel(int.Parse(regnskabElement.Attribute(XName.Get("nummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), int.Parse(bogføringslinjeElement.Attribute(XName.Get("loebenummer", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture), DateTime.ParseExact(bogføringslinjeElement.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture), kontonummerAttribute.Value, bogføringslinjeElement.Attribute(XName.Get("tekst", string.Empty)).Value, debitAttribute == null ? 0M : decimal.Parse(debitAttribute.Value, NumberStyles.Any, CultureInfo.InvariantCulture), kreditAttribute == null ? 0M : decimal.Parse(kreditAttribute.Value, NumberStyles.Any, CultureInfo.InvariantCulture));
+                        if (bogføringslinjeElement.Attribute(XName.Get("bilag", string.Empty)) != null)
+                        {
+                            bogføringslinjeModel.Bilag = bogføringslinjeElement.Attribute(XName.Get("bilag", string.Empty)).Value;
+                        }
+                        if (bogføringslinjeElement.Attribute(XName.Get("budgetkontonummer", string.Empty)) != null && budgetkontoplan.Select(m => m.Kontonummer).Contains(bogføringslinjeElement.Attribute(XName.Get("budgetkontonummer", string.Empty)).Value))
+                        {
+                            bogføringslinjeModel.Budgetkontonummer = bogføringslinjeElement.Attribute(XName.Get("budgetkontonummer", string.Empty)).Value;
+                        }
+                        if (bogføringslinjeElement.Attribute(XName.Get("adressekonto", string.Empty)) != null && adressekontoliste.Select(m => m.Nummer).Contains(int.Parse(bogføringslinjeElement.Attribute(XName.Get("adressekonto", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture)))
+                        {
+                            bogføringslinjeModel.Adressekonto = int.Parse(bogføringslinjeElement.Attribute(XName.Get("adressekonto", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                        }
+                        bogføringslinjer.Add(bogføringslinjeModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+                return bogføringslinjer.Where(m => m.Dato.Date <= statusDato.Date).OrderByDescending(m => m.Dato).ThenByDescending(m => m.Løbenummer).Take(antalBogføringslinjer).ToList();
+            }
+            catch (IntranetGuiRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BogføringslinjerGet", ex.Message), ex);
             }
         }
 

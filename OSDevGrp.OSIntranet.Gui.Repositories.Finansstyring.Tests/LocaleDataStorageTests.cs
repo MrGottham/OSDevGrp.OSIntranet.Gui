@@ -680,7 +680,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(Balancetype.Aktiver)
                 .Repeat.Any();
 
-            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100)*-1);
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365) * -1);
             var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
             kontoModelMock.Stub(m => m.Regnskabsnummer)
                 .Return(regnskabModelMock.Nummer)
@@ -765,7 +765,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(kontogruppeModel2Mock.Nummer)
                 .Repeat.Any();
             updatedSaldoOnKontoModelMock.Stub(m => m.StatusDato)
-                .Return(kontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Return(kontoModelMock.StatusDato.AddDays(rand.Next(1, 365)))
                 .Repeat.Any();
             updatedSaldoOnKontoModelMock.Stub(m => m.Kredit)
                 .Return(fixture.Create<decimal>())
@@ -869,7 +869,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
 
-            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
             var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
             budgetkontoModelMock.Stub(m => m.Regnskabsnummer)
                 .Return(regnskabModelMock.Nummer)
@@ -966,7 +966,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(budgetkontogruppeModel2Mock.Nummer)
                 .Repeat.Any();
             updatedSaldoOnBudgetkontoModelMock.Stub(m => m.StatusDato)
-                .Return(budgetkontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Return(budgetkontoModelMock.StatusDato.AddDays(rand.Next(1, 365)))
                 .Repeat.Any();
             updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Indtægter)
                 .Return(fixture.Create<decimal>())
@@ -1063,7 +1063,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
 
-            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
             var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
             adressekontoModelMock.Stub(m => m.Regnskabsnummer)
                 .Return(regnskabModelMock.Nummer)
@@ -1127,7 +1127,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
             updatedSaldoOnAdressekontoModelMock.Stub(m => m.StatusDato)
-                .Return(adressekontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Return(adressekontoModelMock.StatusDato.AddDays(rand.Next(1, 365)))
                 .Repeat.Any();
             updatedSaldoOnAdressekontoModelMock.Stub(m => m.Saldo)
                 .Return(fixture.Create<decimal>())
@@ -1173,6 +1173,148 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 localeDataStorage.StoreLocaleData(updatedSaldoOnAdressekontoModelMock);
                 var updatedSaldoOnAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, updatedSaldoOnAdressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), updatedSaldoOnAdressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData gemmer en bogføringslinje.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataGemmerBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Løbenummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Dato)
+                .Return(statusDato)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Bilag)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Budgetkontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Debit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Adressekonto)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var updatedBogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            updatedBogføringslinjeModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(bogføringslinjeModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Løbenummer)
+                .Return(bogføringslinjeModelMock.Løbenummer)
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Dato)
+                .Return(statusDato.AddDays(rand.Next(1, 365)))
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Bilag)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Budgetkontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Debit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Adressekonto)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(tempFile.FullName, fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreLocaleData(regnskabModelMock);
+
+                localeDataStorage.StoreLocaleData(bogføringslinjeModelMock);
+                var bogføringslinjeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Bogfoeringslinje[@loebenummer = '{1}']", regnskabModelMock.Nummer, bogføringslinjeModelMock.Løbenummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "dato", bogføringslinjeModelMock.Dato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "bilag", bogføringslinjeModelMock.Bilag));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kontonummer", bogføringslinjeModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "tekst", bogføringslinjeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "budgetkontonummer", bogføringslinjeModelMock.Budgetkontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "debit", bogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kredit", bogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "adressekonto", bogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "synkroniseret", "false"));
+
+                localeDataStorage.StoreLocaleData(updatedBogføringslinjeModelMock);
+                var updatedBogføringslinjeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Bogfoeringslinje[@loebenummer = '{1}']", regnskabModelMock.Nummer, bogføringslinjeModelMock.Løbenummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "dato", updatedBogføringslinjeModelMock.Dato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "bilag", updatedBogføringslinjeModelMock.Bilag));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kontonummer", updatedBogføringslinjeModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "tekst", updatedBogføringslinjeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "budgetkontonummer", updatedBogføringslinjeModelMock.Budgetkontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "debit", updatedBogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kredit", updatedBogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "adressekonto", updatedBogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "synkroniseret", "false"));
             }
             finally
             {
@@ -1605,7 +1747,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(Balancetype.Aktiver)
                 .Repeat.Any();
 
-            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
             var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
             kontoModelMock.Stub(m => m.Regnskabsnummer)
                 .Return(regnskabModelMock.Nummer)
@@ -1690,7 +1832,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(kontogruppeModel2Mock.Nummer)
                 .Repeat.Any();
             updatedSaldoOnKontoModelMock.Stub(m => m.StatusDato)
-                .Return(kontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Return(kontoModelMock.StatusDato.AddDays(rand.Next(1, 365)))
                 .Repeat.Any();
             updatedSaldoOnKontoModelMock.Stub(m => m.Kredit)
                 .Return(fixture.Create<decimal>())
@@ -1794,7 +1936,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
 
-            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
             var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
             budgetkontoModelMock.Stub(m => m.Regnskabsnummer)
                 .Return(regnskabModelMock.Nummer)
@@ -1891,7 +2033,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(budgetkontogruppeModel2Mock.Nummer)
                 .Repeat.Any();
             updatedSaldoOnBudgetkontoModelMock.Stub(m => m.StatusDato)
-                .Return(budgetkontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Return(budgetkontoModelMock.StatusDato.AddDays(rand.Next(1, 365)))
                 .Repeat.Any();
             updatedSaldoOnBudgetkontoModelMock.Stub(m => m.Indtægter)
                 .Return(fixture.Create<decimal>())
@@ -1988,7 +2130,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
 
-            var statusDato = DateTime.Today.AddDays(rand.Next(1, 100) * -1);
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
             var adressekontoModelMock = MockRepository.GenerateMock<IAdressekontoModel>();
             adressekontoModelMock.Stub(m => m.Regnskabsnummer)
                 .Return(regnskabModelMock.Nummer)
@@ -2052,7 +2194,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
             updatedSaldoOnAdressekontoModelMock.Stub(m => m.StatusDato)
-                .Return(adressekontoModelMock.StatusDato.AddDays(rand.Next(1, 100)))
+                .Return(adressekontoModelMock.StatusDato.AddDays(rand.Next(1, 365)))
                 .Repeat.Any();
             updatedSaldoOnAdressekontoModelMock.Stub(m => m.Saldo)
                 .Return(fixture.Create<decimal>())
@@ -2098,6 +2240,148 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 localeDataStorage.StoreSyncData(updatedSaldoOnAdressekontoModelMock);
                 var updatedSaldoOnAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, updatedSaldoOnAdressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), updatedSaldoOnAdressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+            }
+            finally
+            {
+                tempFile.Refresh();
+                while (tempFile.Exists)
+                {
+                    tempFile.Delete();
+                    tempFile.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData gemmer en bogføringslinje.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataGemmerBogføringslinjeModel()
+        {
+            var fixture = new Fixture();
+            var rand = new Random(fixture.Create<int>());
+
+            var regnskabModelMock = MockRepository.GenerateMock<IRegnskabModel>();
+            regnskabModelMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            regnskabModelMock.Stub(m => m.Navn)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
+            var bogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            bogføringslinjeModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(regnskabModelMock.Nummer)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Løbenummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Dato)
+                .Return(statusDato)
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Bilag)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Budgetkontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Debit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            bogføringslinjeModelMock.Stub(m => m.Adressekonto)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var updatedBogføringslinjeModelMock = MockRepository.GenerateMock<IBogføringslinjeModel>();
+            updatedBogføringslinjeModelMock.Stub(m => m.Regnskabsnummer)
+                .Return(bogføringslinjeModelMock.Regnskabsnummer)
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Løbenummer)
+                .Return(bogføringslinjeModelMock.Løbenummer)
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Dato)
+                .Return(statusDato.AddDays(rand.Next(1, 365)))
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Bilag)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Kontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Budgetkontonummer)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Debit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Kredit)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            updatedBogføringslinjeModelMock.Stub(m => m.Adressekonto)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            try
+            {
+                var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), tempFile.FullName, FinansstyringRepositoryLocale.XmlSchema);
+                Assert.That(localeDataStorage, Is.Not.Null);
+
+                localeDataStorage.OnCreateWriterStream += (s, e) =>
+                {
+                    tempFile.Refresh();
+                    if (tempFile.Exists)
+                    {
+                        e.Result = tempFile.Open(FileMode.Open, FileAccess.ReadWrite);
+                        return;
+                    }
+                    e.Result = tempFile.Create();
+                };
+
+                localeDataStorage.StoreSyncData(regnskabModelMock);
+
+                localeDataStorage.StoreSyncData(bogføringslinjeModelMock);
+                var bogføringslinjeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Bogfoeringslinje[@loebenummer = '{1}']", regnskabModelMock.Nummer, bogføringslinjeModelMock.Løbenummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "dato", bogføringslinjeModelMock.Dato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "bilag", bogføringslinjeModelMock.Bilag));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kontonummer", bogføringslinjeModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "tekst", bogføringslinjeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "budgetkontonummer", bogføringslinjeModelMock.Budgetkontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "debit", bogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kredit", bogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "adressekonto", bogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "synkroniseret", "true"));
+
+                localeDataStorage.StoreSyncData(updatedBogføringslinjeModelMock);
+                var updatedBogføringslinjeNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Bogfoeringslinje[@loebenummer = '{1}']", regnskabModelMock.Nummer, bogføringslinjeModelMock.Løbenummer.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "dato", updatedBogføringslinjeModelMock.Dato.ToString("yyyyMMdd")));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "bilag", updatedBogføringslinjeModelMock.Bilag));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kontonummer", updatedBogføringslinjeModelMock.Kontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "tekst", updatedBogføringslinjeModelMock.Tekst));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "budgetkontonummer", updatedBogføringslinjeModelMock.Budgetkontonummer));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "debit", updatedBogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kredit", updatedBogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "adressekonto", updatedBogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "synkroniseret", "true"));
             }
             finally
             {
