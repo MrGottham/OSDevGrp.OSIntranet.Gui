@@ -178,6 +178,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bank account ({0}).
+        /// </summary>
+        internal static string BankAccount {
+            get {
+                return ResourceManager.GetString("BankAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bank accounts.
+        /// </summary>
+        internal static string BankAccounts {
+            get {
+                return ResourceManager.GetString("BankAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bookkeeped.
         /// </summary>
         internal static string Bookkeeped {
@@ -219,6 +237,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string BudgetAccounts {
             get {
                 return ResourceManager.GetString("BudgetAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cash ({0}).
+        /// </summary>
+        internal static string CachAccount {
+            get {
+                return ResourceManager.GetString("CachAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cash.
+        /// </summary>
+        internal static string Cash {
+            get {
+                return ResourceManager.GetString("Cash", resourceCulture);
             }
         }
         
@@ -358,11 +394,38 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Experiences.
+        /// </summary>
+        internal static string Experiences {
+            get {
+                return ResourceManager.GetString("Experiences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hide.
         /// </summary>
         internal static string Hide {
             get {
                 return ResourceManager.GetString("Hide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Household.
+        /// </summary>
+        internal static string Household {
+            get {
+                return ResourceManager.GetString("Household", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Housing cont.
+        /// </summary>
+        internal static string HousingCost {
+            get {
+                return ResourceManager.GetString("HousingCost", resourceCulture);
             }
         }
         
@@ -385,11 +448,38 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Insurances.
+        /// </summary>
+        internal static string Insurances {
+            get {
+                return ResourceManager.GetString("Insurances", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a legal URI value..
         /// </summary>
         internal static string InvalidValueForUri {
             get {
                 return ResourceManager.GetString("InvalidValueForUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loan ({0}).
+        /// </summary>
+        internal static string LoanAccount {
+            get {
+                return ResourceManager.GetString("LoanAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loans.
+        /// </summary>
+        internal static string Loans {
+            get {
+                return ResourceManager.GetString("Loans", resourceCulture);
             }
         }
         
@@ -439,6 +529,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Other.
+        /// </summary>
+        internal static string Other {
+            get {
+                return ResourceManager.GetString("Other", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Phone.
         /// </summary>
         internal static string Phone {
@@ -466,6 +565,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Private accounting.
+        /// </summary>
+        internal static string PrivateAccounting {
+            get {
+                return ResourceManager.GetString("PrivateAccounting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Supporting endpoint for service.
         /// </summary>
         internal static string SupportingServiceUri {
@@ -489,6 +597,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string Text {
             get {
                 return ResourceManager.GetString("Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vacations, travels etc..
+        /// </summary>
+        internal static string Vacations {
+            get {
+                return ResourceManager.GetString("Vacations", resourceCulture);
             }
         }
         
@@ -525,6 +642,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string ValueOutsideInterval {
             get {
                 return ResourceManager.GetString("ValueOutsideInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vehicles, transport etc..
+        /// </summary>
+        internal static string Vehicles {
+            get {
+                return ResourceManager.GetString("Vehicles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wages.
+        /// </summary>
+        internal static string Wages {
+            get {
+                return ResourceManager.GetString("Wages", resourceCulture);
             }
         }
     }

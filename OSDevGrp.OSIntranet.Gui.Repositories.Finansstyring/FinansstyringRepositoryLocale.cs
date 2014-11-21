@@ -52,6 +52,42 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             _finansstyringKonfigurationRepository = finansstyringKonfigurationRepository;
             _localeDataStorage = localeDataStorage;
+            lock (SyncRoot)
+            {
+                if (!_localeDataStorage.HasLocaleData)
+                {
+                    return;
+                }
+                var currentDate = DateTime.Today;
+                _localeDataStorage.StoreLocaleData((IRegnskabModel) new RegnskabModel(1, Resource.GetText(Text.PrivateAccounting)));
+                _localeDataStorage.StoreLocaleData((IKontogruppeModel) new KontogruppeModel(1, Resource.GetText(Text.Cash), Balancetype.Aktiver));
+                _localeDataStorage.StoreLocaleData((IKontogruppeModel) new KontogruppeModel(2, Resource.GetText(Text.BankAccounts), Balancetype.Aktiver));
+                _localeDataStorage.StoreLocaleData((IKontogruppeModel) new KontogruppeModel(3, Resource.GetText(Text.Loans), Balancetype.Passiver));
+                _localeDataStorage.StoreLocaleData((IBudgetkontogruppeModel) new BudgetkontogruppeModel(1, Resource.GetText(Text.Income)));
+                _localeDataStorage.StoreLocaleData((IBudgetkontogruppeModel) new BudgetkontogruppeModel(2, Resource.GetText(Text.Expenses)));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10110", Resource.GetText(Text.CachAccount, "10110"), 1, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10120", Resource.GetText(Text.CachAccount, "10120"), 1, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10130", Resource.GetText(Text.CachAccount, "10130"), 1, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10210", Resource.GetText(Text.BankAccount, "10210"), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10220", Resource.GetText(Text.BankAccount, "10220"), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10230", Resource.GetText(Text.BankAccount, "10230"), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10240", Resource.GetText(Text.BankAccount, "10240"), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10250", Resource.GetText(Text.BankAccount, "10250"), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20110", Resource.GetText(Text.CachAccount, "20110"), 3, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20120", Resource.GetText(Text.LoanAccount, "20120"), 3, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20130", Resource.GetText(Text.LoanAccount, "20130"), 3, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20140", Resource.GetText(Text.LoanAccount, "20140"), 3, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20150", Resource.GetText(Text.LoanAccount, "20150"), 3, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "1010", Resource.GetText(Text.Wages), 1, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "1020", Resource.GetText(Text.Other), 1, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "2010", Resource.GetText(Text.Household), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "2020", Resource.GetText(Text.HousingCost), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "2030", Resource.GetText(Text.Insurances), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "2040", Resource.GetText(Text.Vehicles), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "2050", Resource.GetText(Text.Vacations), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "2060", Resource.GetText(Text.Experiences), 2, currentDate));
+                _localeDataStorage.StoreLocaleData((IBudgetkontoModel) new BudgetkontoModel(1, "2070", Resource.GetText(Text.Other), 2, currentDate));
+            }
         }
 
         #endregion

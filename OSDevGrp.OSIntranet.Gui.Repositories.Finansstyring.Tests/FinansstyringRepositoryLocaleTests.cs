@@ -45,6 +45,60 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at konstruktøren initierer repositoryet, der indeholdende lokale data.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorInitiererFinansstyringRepositoryLocaleMedLokaleData()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+           var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            localeDataStorageMock.AssertWasCalled(m => m.HasLocaleData, opt => opt.Repeat.Times(1));
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IRegnskabModel>.Is.NotNull), opt => opt.Repeat.Times(1));
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IKontogruppeModel>.Is.NotNull), opt => opt.Repeat.Times(3));
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IBudgetkontogruppeModel>.Is.NotNull), opt => opt.Repeat.Times(2));
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IKontoModel>.Is.NotNull), opt => opt.Repeat.Times(3 + 5 + 5));
+            localeDataStorageMock.AssertWasCalled(m => m.StoreLocaleData(Arg<IBudgetkontoModel>.Is.NotNull), opt => opt.Repeat.Times(2 + 7));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IAdressekontoModel>.Is.Anything));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IBogføringslinjeModel>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren initierer repositoryet, der ikke indeholdende lokale data.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorInitiererFinansstyringRepositoryLocaleUdenLokaleData()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(false)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            localeDataStorageMock.AssertWasCalled(m => m.HasLocaleData, opt => opt.Repeat.Times(1));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IRegnskabModel>.Is.Anything));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IKontogruppeModel>.Is.Anything));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IBudgetkontogruppeModel>.Is.Anything));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IKontoModel>.Is.Anything));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IBudgetkontoModel>.Is.Anything));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IAdressekontoModel>.Is.Anything));
+            localeDataStorageMock.AssertWasNotCalled(m => m.StoreLocaleData(Arg<IBogføringslinjeModel>.Is.Anything));
+        }
+
+        /// <summary>
         /// Tester, at konstruktøren kaster en ArgumentNullException, hvis konfigurationsrepository, der supporterer finansstyring, er null.
         /// </summary>
         [Test]

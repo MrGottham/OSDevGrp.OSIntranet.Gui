@@ -56,6 +56,21 @@
         AddBookkeeping,
         Ignore,
         LocaleDataFile,
-        SyncDataFile
+        SyncDataFile,
+        PrivateAccounting,
+        Cash,
+        CachAccount,
+        BankAccounts,
+        BankAccount,
+        Loans,
+        LoanAccount,
+        Wages,
+        Other,
+        Household,
+        HousingCost,
+        Insurances,
+        Vehicles,
+        Vacations,
+        Experiences
     }
 }

@@ -279,4 +279,52 @@
   <data name="SyncDataFile" xml:space="preserve">
     <value>Lokal datafil til synkronisering</value>
   </data>
+  <data name="BankAccount" xml:space="preserve">
+    <value>Bankkonto ({0})</value>
+    <comment>{0} = Kontonummer.</comment>
+  </data>
+  <data name="BankAccounts" xml:space="preserve">
+    <value>Bankkonti</value>
+  </data>
+  <data name="CachAccount" xml:space="preserve">
+    <value>Kontanter ({0})</value>
+    <comment>{0} = Kontonummer.</comment>
+  </data>
+  <data name="Cash" xml:space="preserve">
+    <value>Kontanter</value>
+  </data>
+  <data name="Experiences" xml:space="preserve">
+    <value>Experiences</value>
+  </data>
+  <data name="Household" xml:space="preserve">
+    <value>Husholding</value>
+  </data>
+  <data name="HousingCost" xml:space="preserve">
+    <value>Boligomkostninger</value>
+  </data>
+  <data name="Insurances" xml:space="preserve">
+    <value>Forsikringer</value>
+  </data>
+  <data name="LoanAccount" xml:space="preserve">
+    <value>Lån ({0})</value>
+    <comment>{0} = Kontonummer.</comment>
+  </data>
+  <data name="Loans" xml:space="preserve">
+    <value>Lån</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Andet</value>
+  </data>
+  <data name="PrivateAccounting" xml:space="preserve">
+    <value>Personligt regnskab</value>
+  </data>
+  <data name="Vacations" xml:space="preserve">
+    <value>Ferie, rejser m.m.</value>
+  </data>
+  <data name="Vehicles" xml:space="preserve">
+    <value>Køretøjer, transport m.m.</value>
+  </data>
+  <data name="Wages" xml:space="preserve">
+    <value>Lønninger</value>
+  </data>
 </root>
