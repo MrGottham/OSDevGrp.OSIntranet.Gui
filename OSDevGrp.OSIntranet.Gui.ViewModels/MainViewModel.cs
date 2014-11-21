@@ -49,6 +49,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
             {
                 return _regnskabslisteViewModel ?? (_regnskabslisteViewModel = new RegnskabslisteViewModel(new FinansstyringRepository(FinansstyringKonfigurationRepository), ExceptionHandler));
             }
+            private set
+            {
+                if (value == _regnskabslisteViewModel)
+                {
+                    return;
+                }
+                _regnskabslisteViewModel = value;
+                RaisePropertyChanged("Regnskabsliste");
+            }
         }
 
         /// <summary>
@@ -112,6 +121,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
             var finansstyringConfiguration = configurationSettings.Where(configuration => Repositories.Finansstyring.FinansstyringKonfigurationRepository.Keys.Contains(configuration.Key))
                                                                   .ToDictionary(m => m.Key, m => m.Value);
             FinansstyringKonfigurationRepository.KonfigurationerAdd(finansstyringConfiguration);
+        }
+
+        /// <summary>
+        /// Nulstiller denne ViewModel og skifter til det lokale datalager.
+        /// </summary>
+        /// <param name="finansstyringRepositoryLocale">Implementering af et lokale datalager til finansstyring.</param>
+        public virtual void SwitchToLocaleDataStorage(IFinansstyringRepository finansstyringRepositoryLocale)
+        {
+            if (finansstyringRepositoryLocale == null)
+            {
+                throw new ArgumentNullException("finansstyringRepositoryLocale");
+            }
+            Regnskabsliste = new RegnskabslisteViewModel(finansstyringRepositoryLocale, ExceptionHandler);
         }
 
         /// <summary>

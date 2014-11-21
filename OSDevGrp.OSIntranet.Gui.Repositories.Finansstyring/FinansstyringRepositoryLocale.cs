@@ -54,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             _localeDataStorage = localeDataStorage;
             lock (SyncRoot)
             {
-                if (!_localeDataStorage.HasLocaleData)
+                if (_localeDataStorage.HasLocaleData)
                 {
                     return;
                 }

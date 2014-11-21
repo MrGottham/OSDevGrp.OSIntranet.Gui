@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -39,6 +40,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
         /// </summary>
         /// <param name="configurationSettings">Dictionary indeholdende konfiguration.</param>
         void ApplyConfiguration(IDictionary<string, object> configurationSettings);
+
+        /// <summary>
+        /// Nulstiller denne ViewModel og skifter til det lokale datalager.
+        /// </summary>
+        /// <param name="finansstyringRepositoryLocale">Implementering af et lokale datalager til finansstyring.</param>
+        void SwitchToLocaleDataStorage(IFinansstyringRepository finansstyringRepositoryLocale);
 
         /// <summary>
         /// Tilmelder en subscriber, der kan vente på, at events publiseres.

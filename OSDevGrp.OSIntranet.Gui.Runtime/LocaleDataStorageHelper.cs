@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Windows.Storage;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -19,7 +18,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>
-        public static async void HasLocaleDataEventHandler(object sender, object eventArgs)
+        public static void HasLocaleDataEventHandler(object sender, object eventArgs)
         {
             if (sender == null)
             {
@@ -41,7 +40,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             }
             try
             {
-                var storageFile = await GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
+                var storageFile = GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
                 handleEvaluationEventArgs.Result = storageFile != null;
             }
             catch (FileNotFoundException)
@@ -55,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>
-        public static async void CreateReaderStreamEventHandler(object sender, object eventArgs)
+        public static void CreateReaderStreamEventHandler(object sender, object eventArgs)
         {
             if (sender == null)
             {
@@ -75,9 +74,21 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "eventArgs", eventArgs.GetType()));
             }
-            var storageFile = await GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
-            var storageFileStream = await storageFile.OpenAsync(FileAccessMode.Read).AsTask();
-            handleStreamCreationEventArgs.Result = storageFileStream.AsStream();
+            var storageFile = GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
+            try
+            {
+                var openTask = storageFile.OpenAsync(FileAccessMode.Read).AsTask();
+                openTask.Wait();
+                handleStreamCreationEventArgs.Result = openTask.Result.AsStream();
+            }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerException == null)
+                {
+                    throw;
+                }
+                throw ex.InnerException;
+            }
         }
 
         /// <summary>
@@ -85,7 +96,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
         /// <param name="eventArgs">Argumenter til eventet.</param>
-        public static async void CreateWriterStreamEventHandler(object sender, object eventArgs)
+        public static void CreateWriterStreamEventHandler(object sender, object eventArgs)
         {
             if (sender == null)
             {
@@ -110,26 +121,64 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 try
                 {
-                    storageFile = await GetStorageFile(localeDataStorage.SyncDataFileName);
+                    storageFile = GetStorageFile(localeDataStorage.SyncDataFileName);
                 }
                 catch (FileNotFoundException)
                 {
-                    storageFile = GetStorageFolder().CreateFileAsync(localeDataStorage.SyncDataFileName).AsTask().Result;
+                    try
+                    {
+                        var createFileTask = GetStorageFolder().CreateFileAsync(localeDataStorage.SyncDataFileName).AsTask();
+                        createFileTask.Wait();
+                        storageFile = createFileTask.Result;
+                    }
+                    catch (AggregateException ex)
+                    {
+                        if (ex.InnerException == null)
+                        {
+                            throw;
+                        }
+                        throw ex.InnerException;
+                    }
                 }
             }
             else
             {
                 try
                 {
-                    storageFile = await GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
+                    storageFile = GetLocaleDataFile(localeDataStorage.LocaleDataFileName, localeDataStorage.SyncDataFileName);
                 }
                 catch (FileNotFoundException)
                 {
-                    storageFile = GetStorageFolder().CreateFileAsync(localeDataStorage.LocaleDataFileName).AsTask().Result;
+                    try
+                    {
+                        var createFileTask = GetStorageFolder().CreateFileAsync(localeDataStorage.LocaleDataFileName).AsTask();
+                        createFileTask.Wait();
+                        storageFile = createFileTask.Result;
+                    }
+                    catch (AggregateException ex)
+                    {
+                        if (ex.InnerException == null)
+                        {
+                            throw;
+                        }
+                        throw ex.InnerException;
+                    }
                 }
             }
-            var storageFileStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite).AsTask();
-            handleStreamCreationEventArgs.Result = storageFileStream.AsStream();
+            try
+            {
+                var openFileTask = storageFile.OpenAsync(FileAccessMode.ReadWrite).AsTask();
+                openFileTask.Wait();
+                handleStreamCreationEventArgs.Result = openFileTask.Result.AsStream();
+            }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerException == null)
+                {
+                    throw;
+                }
+                throw ex.InnerException;
+            }
         }
 
         /// <summary>
@@ -146,13 +195,26 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="fileName">Navnet på filen, som indeholder data i det lokale datalager.</param>
         /// <returns>Fil indeholdende data i det lokale datalager.</returns>
-        private static Task<StorageFile> GetStorageFile(string fileName)
+        private static StorageFile GetStorageFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
                 throw new ArgumentNullException("fileName");
             }
-            return GetStorageFolder().GetFileAsync(fileName).AsTask();
+            try
+            {
+                var getFileTask = GetStorageFolder().GetFileAsync(fileName).AsTask();
+                getFileTask.Wait();
+                return getFileTask.Result;
+            }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerException == null)
+                {
+                    throw;
+                }
+                throw ex.InnerException;
+            }
         }
 
         /// <summary>
@@ -161,7 +223,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// <param name="localeDataFileName">Navnet på filen, som indeholde data i det lokale datalager.</param>
         /// <param name="syncDataFileName">Navnet på filen, som indeholder synkroniseringsdata i det lokale datalager.</param>
         /// <returns>Fil indeholdende data i det lokale datalager.</returns>
-        private static async Task<StorageFile> GetLocaleDataFile(string localeDataFileName, string syncDataFileName)
+        private static StorageFile GetLocaleDataFile(string localeDataFileName, string syncDataFileName)
         {
             if (string.IsNullOrEmpty(localeDataFileName))
             {
@@ -173,11 +235,11 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             }
             try
             {
-                return await GetStorageFile(syncDataFileName);
+                return GetStorageFile(syncDataFileName);
             }
             catch (FileNotFoundException)
             {
-                return GetStorageFile(localeDataFileName).Result;
+                return GetStorageFile(localeDataFileName);
             }
         }
     }

@@ -137,7 +137,11 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 localeDataStorage.OnCreateReaderStream += LocaleDataStorageHelper.CreateReaderStreamEventHandler;
                 localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;
                 eventArgs.IsHandled = true;
-                return;
+
+                MainViewModel.SwitchToLocaleDataStorage(new FinansstyringRepositoryLocale(finansstyringKonfigurationRepository, localeDataStorage));
+                MainViewModel.Regnskabsliste.RefreshCommand.Execute(MainViewModel.Regnskabsliste);
+
+                FinansstyringFrame.Navigate(typeof(RegnskabslistePage), null);
             }
 
             var repositoryException = eventArgs.Error as IntranetGuiRepositoryException;

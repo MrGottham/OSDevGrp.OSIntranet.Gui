@@ -88,6 +88,71 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         }
 
         /// <summary>
+        /// Tester, at SwitchToLocaleDataStorage kaster en ArgumentNullException, hvis det lokale datalager til finansstyring er null.
+        /// </summary>
+        [Test]
+        public void TestAtSwitchToLocaleDataStorageKasterArgumentNullExceptionHvisFinansstyringRepositoryLocaleErNull()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var regnskabslisteViewModel = mainViewModel.Regnskabsliste;
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => mainViewModel.SwitchToLocaleDataStorage(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("finansstyringRepositoryLocale"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at SwitchToLocaleDataStorage skifter til det lokale datalager.
+        /// </summary>
+        [Test]
+        public void TestAtSwitchToLocaleDataStorageSkifterTilLokaltDataLager()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var regnskabslisteViewModel = mainViewModel.Regnskabsliste;
+            Assert.That(regnskabslisteViewModel, Is.Not.Null);
+
+            mainViewModel.SwitchToLocaleDataStorage(MockRepository.GenerateMock<IFinansstyringRepository>());
+            Assert.That(mainViewModel.Regnskabsliste, Is.Not.SameAs(regnskabslisteViewModel));
+        }
+
+        /// <summary>
+        /// Tester, at SwitchToLocaleDataStorage rejser PropertyChanged.
+        /// </summary>
+        [Test]
+        [TestCase("Regnskabsliste")]
+        public void TestAtSwitchToLocaleDataStorageRejserPropertyChanged(string expectedPropertyName)
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            mainViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<MainViewModel>());
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, expectedPropertyName, StringComparison.InvariantCulture) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            mainViewModel.SwitchToLocaleDataStorage(MockRepository.GenerateMock<IFinansstyringRepository>());
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
         /// Tester, at ApplyConfiguration tilføjer konfiguration.
         /// </summary>
         [Test]

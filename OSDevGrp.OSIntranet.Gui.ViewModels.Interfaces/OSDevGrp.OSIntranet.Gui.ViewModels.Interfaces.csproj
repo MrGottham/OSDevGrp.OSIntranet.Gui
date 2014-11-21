@@ -79,6 +79,10 @@
       <Project>{85324394-8c83-4a51-9bf4-0deb776cf9ab}</Project>
       <Name>OSDevGrp.OSIntranet.Gui.Models.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Gui.Repositories.Interfaces\OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.csproj">
+      <Project>{5E8CBC9F-811C-423B-8AD7-3AFA33CC42D9}</Project>
+      <Name>OSDevGrp.OSIntranet.Gui.Repositories.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />

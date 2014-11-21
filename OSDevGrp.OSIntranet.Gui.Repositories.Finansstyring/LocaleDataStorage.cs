@@ -161,7 +161,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     OnCreateReaderStream.Invoke(this, handleStreamCreationEventArgs);
                     using (var readerStream = handleStreamCreationEventArgs.Result)
                     {
-                        return (ReadDocument(readerStream));
+                        if (readerStream == null)
+                        {
+                            throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "readerStream", null));
+                        }
+                        return ReadDocument(readerStream);
                     }
                 }
             }
