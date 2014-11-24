@@ -139,8 +139,16 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 eventArgs.IsHandled = true;
 
                 MainViewModel.SwitchToLocaleDataStorage(new FinansstyringRepositoryLocale(finansstyringKonfigurationRepository, localeDataStorage));
-                MainViewModel.Regnskabsliste.RefreshCommand.Execute(MainViewModel.Regnskabsliste);
 
+                var contentPage = FinansstyringFrame.Content as Page;
+                if (contentPage != null)
+                {
+                    while (contentPage.Frame.CanGoBack)
+                    {
+                        contentPage.Frame.GoBack();
+                    }
+                    return;
+                }
                 FinansstyringFrame.Navigate(typeof(RegnskabslistePage), null);
             }
 
@@ -220,6 +228,10 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 {
                     task.Value.Unregister(true);
                 }
+                if (task.Value.Name == "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringSyncDataBackgroundTask")
+                {
+                    task.Value.Unregister(true);
+                }
             }
 
             var backgoundTaskBuilder = new BackgroundTaskBuilder
@@ -227,6 +239,14 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                     Name = "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringsnyhederLoaderBackgroundTask",
                     TaskEntryPoint = "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringsnyhederLoaderBackgroundTask"
                 };
+            backgoundTaskBuilder.SetTrigger(new TimeTrigger(15, false));
+            backgoundTaskBuilder.Register();
+
+            backgoundTaskBuilder = new BackgroundTaskBuilder
+            {
+                Name = "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringSyncDataBackgroundTask",
+                TaskEntryPoint = "OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringSyncDataBackgroundTask"
+            };
             backgoundTaskBuilder.SetTrigger(new TimeTrigger(15, false));
             backgoundTaskBuilder.Register();
         }

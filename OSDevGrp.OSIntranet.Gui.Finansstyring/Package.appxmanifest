@@ -32,6 +32,11 @@
             <Task Type="timer" />
           </BackgroundTasks>
         </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="OSDevGrp.OSIntranet.Gui.Runtime.FinansstyringSyncDataBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="timer" />
+          </BackgroundTasks>
+        </Extension>
       </Extensions>
     </Application>
   </Applications>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
@@ -33,9 +34,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             _synchronizationContext = SynchronizationContext.Current;
 
             var mainViewModel = (IMainViewModel) Application.Current.Resources["MainViewModel"];
-            Regnskabsliste = mainViewModel.Regnskabsliste;
-            DataContext = Regnskabsliste;
-            CommandAppBar.DataContext = Regnskabsliste;
+            mainViewModel.PropertyChanged += PropertyChangedOnMainViewModelEventHandler;
+
+            InitializePage(mainViewModel.Regnskabsliste);
 
             SizeChanged += PageSizeChangedEventHandler;
         }
@@ -166,6 +167,69 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 return;
             }
             Frame.Navigate(typeof (RegnskabPage), regnskabViewModel.Nummer);
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når en property ændres på MainViewModel.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnMainViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            var mainViewModel = sender as IMainViewModel;
+            if (mainViewModel == null)
+            {
+                return;
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Regnskabsliste":
+                    InitializePage(mainViewModel.Regnskabsliste);
+                    var refreshCommand = Regnskabsliste.RefreshCommand as ITaskableCommand;
+                    if (refreshCommand == null || refreshCommand.CanExecute(Regnskabsliste) == false)
+                    {
+                        break;
+                    }
+                    refreshCommand.Execute(Regnskabsliste);
+                    var executeTask = refreshCommand.ExecuteTask;
+                    if (executeTask == null)
+                    {
+                        break;
+                    }
+                    executeTask.ContinueWith(t =>
+                    {
+                        if (_synchronizationContext == null)
+                        {
+                            ShowContent();
+                            return;
+                        }
+                        _synchronizationContext.Post(obj => ShowContent(), null);
+                    });
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Initialiserer siden.
+        /// </summary>
+        /// <param name="regnskabslisteViewModel">Implementering af regnskabslisten, som siden skal initieres med.</param>
+        private void InitializePage(IRegnskabslisteViewModel regnskabslisteViewModel)
+        {
+            if (regnskabslisteViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabslisteViewModel");
+            }
+            Regnskabsliste = regnskabslisteViewModel;
+            DataContext = Regnskabsliste;
+            CommandAppBar.DataContext = Regnskabsliste;
         }
 
         #endregion

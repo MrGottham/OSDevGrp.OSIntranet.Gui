@@ -73,7 +73,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10230", Resource.GetText(Text.BankAccount, "10230"), 2, currentDate));
                 _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10240", Resource.GetText(Text.BankAccount, "10240"), 2, currentDate));
                 _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "10250", Resource.GetText(Text.BankAccount, "10250"), 2, currentDate));
-                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20110", Resource.GetText(Text.CachAccount, "20110"), 3, currentDate));
+                _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20110", Resource.GetText(Text.LoanAccount, "20110"), 3, currentDate));
                 _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20120", Resource.GetText(Text.LoanAccount, "20120"), 3, currentDate));
                 _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20130", Resource.GetText(Text.LoanAccount, "20130"), 3, currentDate));
                 _localeDataStorage.StoreLocaleData((IKontoModel) new KontoModel(1, "20140", Resource.GetText(Text.LoanAccount, "20140"), 3, currentDate));
@@ -503,8 +503,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         if (historikElement != null)
                         {
                             budgetkontoModel.Indtægter = decimal.Parse(historikElement.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                            budgetkontoModel.Indtægter = decimal.Parse(historikElement.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                            budgetkontoModel.Indtægter = decimal.Parse(historikElement.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.Udgifter = decimal.Parse(historikElement.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.Bogført = decimal.Parse(historikElement.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
                         }
                         budgetkontoplan.Add(budgetkontoModel);
                     }
