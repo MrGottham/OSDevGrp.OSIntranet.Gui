@@ -71,6 +71,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.KontiHeader, Is.Not.Null);
             Assert.That(regnskabViewModel.KontiHeader, Is.Not.Empty);
             Assert.That(regnskabViewModel.KontiHeader, Is.EqualTo(Resource.GetText(Text.Accounts)));
+            Assert.That(regnskabViewModel.KontiColumns, Is.Not.Null);
+            Assert.That(regnskabViewModel.KontiColumns, Is.Not.Empty);
+            Assert.That(regnskabViewModel.KontiColumns.Count(), Is.EqualTo(1));
+            Assert.That(regnskabViewModel.KontiColumns.ElementAt(0), Is.Not.Null);
+            Assert.That(regnskabViewModel.KontiColumns.ElementAt(0), Is.Not.Empty);
+            Assert.That(regnskabViewModel.KontiColumns.ElementAt(0), Is.EqualTo(Resource.GetText(Text.AccountNumber)));
             Assert.That(regnskabViewModel.Budgetkonti, Is.Not.Null);
             Assert.That(regnskabViewModel.Budgetkonti, Is.Empty);
             Assert.That(regnskabViewModel.BudgetkontiGrouped, Is.Not.Null);

@@ -76,6 +76,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Kolonneoverskrifter til konti.
+        /// </summary>
+        IEnumerable<string> KontiColumns
+        {
+            get;
+        }
+
+        /// <summary>
         /// Budgetkonti.
         /// </summary>
         IEnumerable<IBudgetkontoViewModel> Budgetkonti
