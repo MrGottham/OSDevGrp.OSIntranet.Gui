@@ -304,7 +304,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             try
             {
                 var rootElement = syncDataDocument.Root;
-                var regnskabElement = syncDataDocument.Elements(XName.Get("Regnskab", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, regnskabModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+                var regnskabElement = rootElement.Elements(XName.Get("Regnskab", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, regnskabModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
                 if (regnskabElement == null)
                 {
                     return;
@@ -315,7 +315,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 {
                     var dato = DateTime.ParseExact(bogføringslinjeElementToSync.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
                     var bilag = bogføringslinjeElementToSync.Attribute(XName.Get("bilag", string.Empty)) == null ? null : bogføringslinjeElementToSync.Attribute(XName.Get("bilag", string.Empty)).Value;
-                    var kontonummer = bogføringslinjeElementToSync.Attribute(XName.Get("kontonummer", string.Empty)).Value; 
+                    var kontonummer = bogføringslinjeElementToSync.Attribute(XName.Get("kontonummer", string.Empty)).Value;
                     var tekst = bogføringslinjeElementToSync.Attribute(XName.Get("tekst", string.Empty)).Value;
                     var budgetkontonummer = bogføringslinjeElementToSync.Attribute(XName.Get("budgetkontonummer", string.Empty)) == null ? null : bogføringslinjeElementToSync.Attribute(XName.Get("budgetkontonummer", string.Empty)).Value;
                     var debit = bogføringslinjeElementToSync.Attribute(XName.Get("debit", string.Empty)) == null ? 0M : decimal.Parse(bogføringslinjeElementToSync.Attribute(XName.Get("debit", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
@@ -353,7 +353,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 throw new ArgumentNullException("regnskabElement");
             }
             return regnskabElement.Elements(XName.Get("Bogfoeringslinje", rootElement.Name.NamespaceName))
-                .Where(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && m.Attribute(XName.Get("dato", string.Empty)) != null && m.Attribute(XName.Get("synkroniseret", string.Empty)) != null && bool.Parse(m.Attribute(XName.Get("synkroniseret", string.Empty)).Value) == false)
+                .Where(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && m.Attribute(XName.Get("dato", string.Empty)) != null && m.Attribute(XName.Get("synkroniseret", string.Empty)) != null && Convert.ToBoolean(m.Attribute(XName.Get("synkroniseret", string.Empty)).Value) == false)
                 .OrderBy(m => DateTime.ParseExact(m.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture))
                 .ThenBy(m => int.Parse(m.Attribute(XName.Get("loebenummer")).Value, NumberStyles.Integer, CultureInfo.InvariantCulture))
                 .FirstOrDefault();
