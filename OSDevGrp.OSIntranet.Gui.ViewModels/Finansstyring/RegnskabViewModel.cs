@@ -39,6 +39,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly ObservableCollection<IAdressekontoViewModel> _kreditorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>();
 
+        private static ObservableCollection<string> _kontoColumns; 
         private static ObservableCollection<string> _bogføringslinjeColumns;
         private static readonly ObservableCollection<IKontogruppeViewModel> KontogruppeViewModels = new ObservableCollection<IKontogruppeViewModel>();
         private static readonly ObservableCollection<IBudgetkontogruppeViewModel> BudgetkontogruppeViewModels = new ObservableCollection<IBudgetkontogruppeViewModel>(); 
@@ -214,7 +215,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                lock (SyncRoot)
+                {
+                    return _kontoColumns ?? (_kontoColumns = new ObservableCollection<string>(new Collection<string>(new List<string> {Resource.GetText(Text.AccountNumber), Resource.GetText(Text.AccountName), Resource.GetText(Text.Credit), Resource.GetText(Text.Balance), Resource.GetText(Text.Available)})));
+                }
             }
         }
 

@@ -121,6 +121,10 @@
             <Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,10" Style="{StaticResource BackButtonStyle}" Click="BackButtonClickEventHandler"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
+            <ListView Name="DefaultNavigationContent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed" Margin="0,0,0,0" Style="{StaticResource AccountListViewStyle}">
+                
+            </ListView>
+            <!--
             <ListView Name="DefaultNavigationContent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed" ItemsSource="{Binding Path=KontiGrouped}" ItemTemplate="{StaticResource KontogruppeViewModelDefaultNavigationDataTemplate}" ItemContainerStyle="{StaticResource UnHighlightedListBoxItemStyle}" SelectionMode="None" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -128,6 +132,7 @@
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
+            -->
             <ProgressBar Name="DefaultNavigationProgressBar" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center"/>
         </Grid>
 
