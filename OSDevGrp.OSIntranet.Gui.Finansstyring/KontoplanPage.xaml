@@ -9,7 +9,24 @@
     mc:Ignorable="d">
     
     <Page.Resources>
+        <converters:CollectionItemToStringConverter x:Key="CollectionItemToStringConverter"/>
         <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+        <DataTemplate x:Key="KontoViewModelHeaderDefaultNavigationDataTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
+                <TextBlock Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=KontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
+                <TextBlock Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=2}"/>
+                <TextBlock Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=3}"/>
+                <TextBlock Grid.Column="4" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=4}"/>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="KontoViewModelDefaultNavigationDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
@@ -60,6 +77,11 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=Key.DisplayName}"/>
+                <ListView Grid.Row="1" Margin="0,0,0,5" Style="{StaticResource AccountListViewStyle}" ItemsSource="{Binding Path=Value}" HeaderTemplate="{StaticResource KontoViewModelHeaderDefaultNavigationDataTemplate}" SelectionMode="None">
+                    <!--ItemTemplate="{StaticResource BookkeepingLineDefaultNavigationDataTemplate}"-->
+
+                </ListView>
+                <!--
                 <GridView Grid.Row="1" ItemsSource="{Binding Path=Value}" ItemTemplate="{StaticResource KontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                     <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -67,6 +89,7 @@
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
                 </GridView>
+                -->
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="KontogruppeViewModelMinimalNavigationDataTemplate">
@@ -121,10 +144,6 @@
             <Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,10" Style="{StaticResource BackButtonStyle}" Click="BackButtonClickEventHandler"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
-            <ListView Name="DefaultNavigationContent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed" Margin="0,0,0,0" Style="{StaticResource AccountListViewStyle}">
-                
-            </ListView>
-            <!--
             <ListView Name="DefaultNavigationContent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed" ItemsSource="{Binding Path=KontiGrouped}" ItemTemplate="{StaticResource KontogruppeViewModelDefaultNavigationDataTemplate}" ItemContainerStyle="{StaticResource UnHighlightedListBoxItemStyle}" SelectionMode="None" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -132,7 +151,6 @@
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
-            -->
             <ProgressBar Name="DefaultNavigationProgressBar" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center"/>
         </Grid>
 
