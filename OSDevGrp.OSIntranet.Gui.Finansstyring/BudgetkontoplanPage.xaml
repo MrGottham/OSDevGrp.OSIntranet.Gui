@@ -9,7 +9,28 @@
     mc:Ignorable="d">
 
     <Page.Resources>
+        <converters:ObjectToRegnskabViewModelConverter x:Key="ObjectToRegnskabViewModelConverter"/>
+        <converters:CollectionItemToStringConverter x:Key="CollectionItemToStringConverter"/>
         <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
+        <DataTemplate x:Key="BudgetkontoViewModelHeaderDefaultNavigationDataTemplate">
+            <Grid DataContext="{Binding Path=Value, Converter={StaticResource ObjectToRegnskabViewModelConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="250" MinWidth="250" MaxWidth="250"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Center" Text="{Binding Path=StatusDatoAsMonthText}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=2}"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=3}"/>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="BudgetkontoViewModelDefaultNavigationDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
@@ -60,6 +81,15 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=Key.DisplayName}"/>
+                <ListView Grid.Row="1" Margin="0,0,0,5" Style="{StaticResource BudgetAccountListViewStyle}" ItemsSource="{Binding Path=Value}" HeaderTemplate="{StaticResource BudgetkontoViewModelHeaderDefaultNavigationDataTemplate}" SelectionMode="None">
+                    <!--ItemTemplate="{StaticResource KontoViewModelDefaultNavigationDataTemplate}"-->
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
+                <!-- 
                 <GridView Grid.Row="1" ItemsSource="{Binding Path=Value}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                     <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -67,6 +97,7 @@
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
                 </GridView>
+                -->
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BudgetkontogruppeViewModelMinimalNavigationDataTemplate">
