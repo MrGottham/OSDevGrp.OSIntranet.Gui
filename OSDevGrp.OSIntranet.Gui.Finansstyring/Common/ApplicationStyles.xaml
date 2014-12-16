@@ -47,4 +47,5 @@
     </Style>
     <Style x:Key="BookkeepingListViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>
     <Style x:Key="AccountListViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>
+    <Style x:Key="BudgetAccountListViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>
 </ResourceDictionary>

@@ -50,6 +50,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var regnskabModelMock = fixture.Create<IRegnskabModel>();
             var statusDato = fixture.Create<DateTime>();
+            var statusDatoAsMonthText = statusDato.ToString("MMMM yyyy");
             var regnskabViewModel = new RegnskabViewModel(regnskabModelMock, statusDato, fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
             Assert.That(regnskabViewModel.Nummer, Is.EqualTo(regnskabModelMock.Nummer));
@@ -60,6 +61,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.DisplayName, Is.Not.Empty);
             Assert.That(regnskabViewModel.DisplayName, Is.EqualTo(regnskabModelMock.Navn));
             Assert.That(regnskabViewModel.StatusDato, Is.EqualTo(statusDato));
+            Assert.That(regnskabViewModel.StatusDatoAsMonthText, Is.Not.Null);
+            Assert.That(regnskabViewModel.StatusDatoAsMonthText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.StatusDatoAsMonthText, Is.EqualTo(string.Format("{0}{1}", statusDatoAsMonthText.Substring(0, 1).ToUpper(), statusDatoAsMonthText.Substring(1).ToLower())));
             Assert.That(regnskabViewModel.Konti, Is.Not.Null);
             Assert.That(regnskabViewModel.Konti, Is.Empty);
             Assert.That(regnskabViewModel.KontiGrouped, Is.Not.Null);
@@ -100,6 +104,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.BudgetkontiHeader, Is.Not.Null);
             Assert.That(regnskabViewModel.BudgetkontiHeader, Is.Not.Empty);
             Assert.That(regnskabViewModel.BudgetkontiHeader, Is.EqualTo(Resource.GetText(Text.BudgetAccounts)));
+            Assert.That(regnskabViewModel.BudgetkontiColumns, Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiColumns, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.Count(), Is.EqualTo(4));
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(0), Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(0), Is.Not.Empty);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(0), Is.EqualTo(Resource.GetText(Text.AccountNumber)));
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(1), Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(1), Is.Not.Empty);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(1), Is.EqualTo(Resource.GetText(Text.AccountName)));
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(2), Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(2), Is.Not.Empty);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(2), Is.EqualTo(Resource.GetText(Text.Budget)));
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(3), Is.Not.Null);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(3), Is.Not.Empty);
+            Assert.That(regnskabViewModel.BudgetkontiColumns.ElementAt(3), Is.EqualTo(Resource.GetText(Text.Bookkeeped)));
             Assert.That(regnskabViewModel.Bogføringslinjer, Is.Not.Null);
             Assert.That(regnskabViewModel.Bogføringslinjer, Is.Empty);
             Assert.That(regnskabViewModel.BogføringslinjerHeader, Is.Not.Null);
@@ -280,6 +299,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("2013-01-01T12:00:00", "2013-01-01T12:00:01", "StatusDato")]
         [TestCase("2013-01-01T12:00:00", "2013-06-30T12:00:00", "StatusDato")]
         [TestCase("2013-01-01T12:00:00", "2013-12-31T00:00:00", "StatusDato")]
+        [TestCase("2013-01-01T12:00:00", "2013-01-01T12:00:01", "StatusDatoAsMonthText")]
+        [TestCase("2013-01-01T12:00:00", "2013-06-30T12:00:00", "StatusDatoAsMonthText")]
+        [TestCase("2013-01-01T12:00:00", "2013-12-31T00:00:00", "StatusDatoAsMonthText")]
         public void TestAtStatusDatoSetterRejserPropertyChangedVedVedOpdateringAfStatusDato(string originalDateTime, string newDateTime, string expectPropertyName)
         {
             var fixture = new Fixture();

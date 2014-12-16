@@ -39,7 +39,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly ObservableCollection<IAdressekontoViewModel> _kreditorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>();
 
-        private static ObservableCollection<string> _kontoColumns; 
+        private static ObservableCollection<string> _kontoColumns;
+        private static ObservableCollection<string> _budgetkontoColumns;
         private static ObservableCollection<string> _bogføringslinjeColumns;
         private static readonly ObservableCollection<IKontogruppeViewModel> KontogruppeViewModels = new ObservableCollection<IKontogruppeViewModel>();
         private static readonly ObservableCollection<IBudgetkontogruppeViewModel> BudgetkontogruppeViewModels = new ObservableCollection<IBudgetkontogruppeViewModel>(); 
@@ -148,6 +149,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 _statusDato = value;
                 RaisePropertyChanged("StatusDato");
+                RaisePropertyChanged("StatusDatoAsMonthText");
+            }
+        }
+
+        /// <summary>
+        ///  Månedstekst for statusdatoen.
+        /// </summary>
+        public virtual string StatusDatoAsMonthText
+        {
+            get
+            {
+                return GetMonthTextForStatusDato(StatusDato);
             }
         }
 
@@ -276,6 +289,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return Resource.GetText(Text.BudgetAccounts);
+            }
+        }
+
+        /// <summary>
+        /// Kolonneoverskrifter til budgetkonti.
+        /// </summary>
+        public virtual IEnumerable<string> BudgetkontiColumns
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return _budgetkontoColumns ?? (_budgetkontoColumns = new ObservableCollection<string>(new Collection<string>(new List<string> { Resource.GetText(Text.AccountNumber), Resource.GetText(Text.AccountName), Resource.GetText(Text.Budget), Resource.GetText(Text.Bookkeeped) })));
+                }
             }
         }
 
@@ -680,6 +707,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 budgetkontogruppeViewModel.PropertyChanged += PropertyChangedOnBudgetkontogruppeViewModelEventHandler;
                 BudgetkontogruppeViewModels.Add(budgetkontogruppeViewModel);
             }
+        }
+
+        /// <summary>
+        /// Danner og returnerer månedsteksten til en given statusdato.
+        /// </summary>
+        /// <param name="statusDato">Statusdato.</param>
+        /// <returns>Månedsteksten til den givne statusdato.</returns>
+        private string GetMonthTextForStatusDato(DateTime statusDato)
+        {
+            var monthText = statusDato.ToString("MMMM yyyy");
+            return string.Format("{0}{1}", monthText.Substring(0, 1).ToUpper(), monthText.Substring(1).ToLower());
         }
 
         /// <summary>

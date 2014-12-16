@@ -36,6 +36,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Månedstekst for statusdatoen.
+        /// </summary>
+        string StatusDatoAsMonthText
+        {
+            get;
+        }
+
+        /// <summary>
         /// Konti.
         /// </summary>
         IEnumerable<IKontoViewModel> Konti
@@ -122,7 +130,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
-        
+
+        /// <summary>
+        /// Kolonneoverskrifter til budgetkonti.
+        /// </summary>
+        IEnumerable<string> BudgetkontiColumns
+        {
+            get;
+        }
+
         /// <summary>
         /// Bogføringslinjer.
         /// </summary>
