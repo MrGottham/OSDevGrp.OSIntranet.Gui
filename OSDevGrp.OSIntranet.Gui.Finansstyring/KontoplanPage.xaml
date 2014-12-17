@@ -59,7 +59,7 @@
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="KontogruppeViewModelDefaultNavigationDataTemplate">
-            <Grid>
+            <Grid Margin="0,0,40,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -126,13 +126,13 @@
             <Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,10" Style="{StaticResource BackButtonStyle}" Click="BackButtonClickEventHandler"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=DisplayName}"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=KontiHeader}"/>
-            <ListView Name="DefaultNavigationContent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed" ItemsSource="{Binding Path=KontiGrouped}" ItemTemplate="{StaticResource KontogruppeViewModelDefaultNavigationDataTemplate}" ItemContainerStyle="{StaticResource UnHighlightedListBoxItemStyle}" SelectionMode="None" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                <ListView.ItemsPanel>
+            <GridView Name="DefaultNavigationContent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Collapsed" ItemsSource="{Binding Path=KontiGrouped}" ItemTemplate="{StaticResource KontogruppeViewModelDefaultNavigationDataTemplate}" ItemContainerStyle="{StaticResource UnHighlightedGridViewItemStyle}" SelectionMode="None" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
+                        <StackPanel Orientation="Horizontal" IsDoubleTapEnabled="False" IsHitTestVisible="True" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                     </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
-            </ListView>
+                </GridView.ItemsPanel>
+            </GridView>
             <ProgressBar Name="DefaultNavigationProgressBar" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Visibility="Visible" IsIndeterminate="True" VerticalAlignment="Center"/>
         </Grid>
 
@@ -144,7 +144,7 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource PageSubheaderTextStyle}" Text="{Binding Path=DisplayName}"/>
             <TextBlock Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=KontiHeader}"/>
-            <ListView Name="MinimalNavigationContent" Grid.Row="2" Visibility="Collapsed" ItemsSource="{Binding Path=KontiGrouped}" ItemTemplate="{StaticResource KontogruppeViewModelMinimalNavigationDataTemplate}"  ItemContainerStyle="{StaticResource UnHighlightedListBoxItemStyle}" SelectionMode="None" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView Name="MinimalNavigationContent" Grid.Row="2" Visibility="Collapsed" ItemsSource="{Binding Path=KontiGrouped}" ItemTemplate="{StaticResource KontogruppeViewModelMinimalNavigationDataTemplate}" ItemContainerStyle="{StaticResource UnHighlightedListViewItemStyle}" SelectionMode="None" ScrollViewer.IsVerticalRailEnabled="True" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>

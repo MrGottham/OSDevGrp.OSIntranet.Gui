@@ -13,10 +13,21 @@
     <Style x:Key="HighlightedGridStyle" TargetType="Grid" BasedOn="{StaticResource LayoutRootStyle}">
         <Setter Property="Background" Value="CornflowerBlue"/>
     </Style>
-    <Style x:Key="UnHighlightedListBoxItemStyle" TargetType="ListViewItem">
+    <Style x:Key="UnHighlightedListViewItemStyle" TargetType="ListViewItem">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
+                    <Grid Background="Transparent">
+                        <ContentPresenter/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="UnHighlightedGridViewItemStyle" TargetType="GridViewItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GridViewItem">
                     <Grid Background="Transparent">
                         <ContentPresenter/>
                     </Grid>
