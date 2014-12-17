@@ -11,7 +11,6 @@
     <Page.Resources>
         <converters:ObjectToRegnskabViewModelConverter x:Key="ObjectToRegnskabViewModelConverter"/>
         <converters:CollectionItemToStringConverter x:Key="CollectionItemToStringConverter"/>
-        <converters:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
         <DataTemplate x:Key="BudgetkontoViewModelHeaderDefaultNavigationDataTemplate">
             <Grid DataContext="{Binding Path=Value, Converter={StaticResource ObjectToRegnskabViewModelConverter}}">
                 <Grid.RowDefinitions>
@@ -21,8 +20,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                     <ColumnDefinition Width="250" MinWidth="250" MaxWidth="250"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Center" Text="{Binding Path=StatusDatoAsMonthText}"/>
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
@@ -32,31 +31,17 @@
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BudgetkontoViewModelDefaultNavigationDataTemplate">
-            <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="250" MinWidth="250" MaxWidth="250"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Margin="20,10,10,10" Source="{Binding Path=Image, Converter={StaticResource ByteArrayToImageConverter}}"/>
-                <Grid Grid.Column="1" Margin="10,10,20,10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="Wrap" Text="{Binding Path=Kontonavn}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=BudgetLabel}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetAsText}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=BogførtLabel}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtAsText}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,5,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=DisponibelLabel}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,0,0,5" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=DisponibelAsText}"/>
-                </Grid>
+                <TextBlock Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Kontonummer}"/>
+                <TextBlock Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=Kontonavn}"/>
+                <TextBlock Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetAsText}"/>
+                <TextBlock Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtAsText}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BudgetkontoViewModelMinimalNavigationDataTemplate">
@@ -81,23 +66,13 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=Key.DisplayName}"/>
-                <ListView Grid.Row="1" Margin="0,0,0,5" Style="{StaticResource BudgetAccountListViewStyle}" ItemsSource="{Binding Path=Value}" HeaderTemplate="{StaticResource BudgetkontoViewModelHeaderDefaultNavigationDataTemplate}" SelectionMode="None">
-                    <!--ItemTemplate="{StaticResource KontoViewModelDefaultNavigationDataTemplate}"-->
+                <ListView Grid.Row="1" Margin="0,0,0,5" Style="{StaticResource BudgetAccountListViewStyle}" ItemsSource="{Binding Path=Value}" HeaderTemplate="{StaticResource BudgetkontoViewModelHeaderDefaultNavigationDataTemplate}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
                 </ListView>
-                <!-- 
-                <GridView Grid.Row="1" ItemsSource="{Binding Path=Value}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapGrid Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                </GridView>
-                -->
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BudgetkontogruppeViewModelMinimalNavigationDataTemplate">

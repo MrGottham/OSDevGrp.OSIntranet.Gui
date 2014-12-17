@@ -16,9 +16,9 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                     <ColumnDefinition Width="250" MinWidth="250" MaxWidth="250"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=KontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
                 <TextBlock Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=KontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
@@ -32,9 +32,9 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                     <ColumnDefinition Width="250" MinWidth="250" MaxWidth="250"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
-                    <ColumnDefinition Width="100" MinWidth="100" MaxWidth="100"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Kontonummer}"/>
                 <TextBlock Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource ItemTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=Kontonavn}"/>
