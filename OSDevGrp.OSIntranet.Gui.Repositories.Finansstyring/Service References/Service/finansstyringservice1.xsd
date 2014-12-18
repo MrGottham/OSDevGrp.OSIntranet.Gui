@@ -206,8 +206,14 @@
       <xs:extension base="tns:KontoBase">
         <xs:sequence>
           <xs:element minOccurs="0" name="Bogført" type="xs:decimal" />
+          <xs:element minOccurs="0" name="BogførtSidsteMåned" type="xs:decimal" />
+          <xs:element minOccurs="0" name="BogførtSidsteÅr" type="xs:decimal" />
+          <xs:element minOccurs="0" name="BogførtÅrTilDato" type="xs:decimal" />
           <xs:element minOccurs="0" name="Budget" type="xs:decimal" />
+          <xs:element minOccurs="0" name="BudgetSidsteMåned" type="xs:decimal" />
+          <xs:element minOccurs="0" name="BudgetSidsteÅr" type="xs:decimal" />
           <xs:element name="Budgetkontogruppe" nillable="true" type="tns:Budgetkontogruppe" />
+          <xs:element minOccurs="0" name="BudgetÅrTilDato" type="xs:decimal" />
           <xs:element minOccurs="0" name="Disponibel" type="xs:decimal" />
         </xs:sequence>
       </xs:extension>
