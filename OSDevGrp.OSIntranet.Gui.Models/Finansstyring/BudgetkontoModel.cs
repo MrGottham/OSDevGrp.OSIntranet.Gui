@@ -15,6 +15,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         private decimal _udgifter;
         private decimal _budgetSidsteMåned;
         private decimal _bogført;
+        private decimal _bogførtSidsteMåned;
 
         #endregion
 
@@ -159,11 +160,16 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _bogførtSidsteMåned;
             }
             set
             {
-                throw new NotImplementedException();
+                if (_bogførtSidsteMåned == value)
+                {
+                    return;
+                }
+                _bogførtSidsteMåned = value;
+                RaisePropertyChanged("BogførtSidsteMåned");
             }
         }
 
