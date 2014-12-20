@@ -13,6 +13,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
 
         private decimal _indtægter;
         private decimal _udgifter;
+        private decimal _budgetSidsteMåned;
         private decimal _bogført;
 
         #endregion
@@ -111,6 +112,26 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         }
 
         /// <summary>
+        /// Budgetteret beløb for sidste måned.
+        /// </summary>
+        public virtual decimal BudgetSidsteMåned
+        {
+            get
+            {
+                return _budgetSidsteMåned;
+            }
+            set
+            {
+                if (_budgetSidsteMåned == value)
+                {
+                    return;
+                }
+                _budgetSidsteMåned = value;
+                RaisePropertyChanged("BudgetSidsteMåned");
+            }
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         public virtual decimal Bogført
@@ -128,6 +149,21 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 _bogført = value;
                 RaisePropertyChanged("Bogført");
                 RaisePropertyChanged("Disponibel");
+            }
+        }
+
+        /// <summary>
+        /// Bogført beløb for sidste måned.
+        /// </summary>
+        public virtual decimal BogførtSidsteMåned
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
             }
         }
 

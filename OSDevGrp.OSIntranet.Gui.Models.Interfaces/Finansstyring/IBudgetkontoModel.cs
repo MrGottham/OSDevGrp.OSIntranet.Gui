@@ -32,12 +32,30 @@
         }
 
         /// <summary>
+        /// Budgetteret beløb for sidste måned.
+        /// </summary>
+        decimal BudgetSidsteMåned
+        {
+            get; 
+            set;
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         decimal Bogført
         {
             get; 
             set; 
+        }
+
+        /// <summary>
+        /// Bogført beløb for sidste måned.
+        /// </summary>
+        decimal BogførtSidsteMåned
+        {
+            get;
+            set;
         }
 
         /// <summary>

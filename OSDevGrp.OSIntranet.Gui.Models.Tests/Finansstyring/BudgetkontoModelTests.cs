@@ -42,7 +42,9 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Budget, Is.EqualTo(0M));
+            Assert.That(budgetkontoModel.BudgetSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(0M));
+            Assert.That(budgetkontoModel.BogførtSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(0M));
         }
 
@@ -77,7 +79,9 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(budget));
             Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Budget, Is.EqualTo(budget));
+            Assert.That(budgetkontoModel.BudgetSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(0M));
+            Assert.That(budgetkontoModel.BogførtSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(0M));
         }
 
@@ -112,7 +116,9 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(Math.Abs(budget)));
             Assert.That(budgetkontoModel.Budget, Is.EqualTo(budget));
+            Assert.That(budgetkontoModel.BudgetSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(0M));
+            Assert.That(budgetkontoModel.BogførtSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(Math.Abs(budget) - 0M));
         }
 
@@ -147,7 +153,9 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Budget, Is.EqualTo(0M));
+            Assert.That(budgetkontoModel.BudgetSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(bogført));
+            Assert.That(budgetkontoModel.BogførtSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(0M));
         }
 
@@ -193,7 +201,9 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             Assert.That(budgetkontoModel.Indtægter, Is.EqualTo(budget > 0M ? Math.Abs(budget) : 0M));
             Assert.That(budgetkontoModel.Udgifter, Is.EqualTo(budget > 0M ? 0M : Math.Abs(budget)));
             Assert.That(budgetkontoModel.Budget, Is.EqualTo(budget));
+            Assert.That(budgetkontoModel.BudgetSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Bogført, Is.EqualTo(bogført));
+            Assert.That(budgetkontoModel.BogførtSidsteMåned, Is.EqualTo(0M));
             Assert.That(budgetkontoModel.Disponibel, Is.EqualTo(expectedDisponibel));
         }
 
@@ -459,6 +469,56 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til BudgetSidsteMåned opdaterer det budgetterede beløb for sidste måned.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetSidsteMånedSetterOpdatererBudgetSidsteMåned()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var budgetkontoModel = new BudgetkontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>(), Math.Abs(fixture.Create<decimal>()) * -1, Math.Abs(fixture.Create<decimal>()) * -1);
+            Assert.That(budgetkontoModel, Is.Not.Null);
+            Assert.That(budgetkontoModel.BudgetSidsteMåned, Is.EqualTo(0M));
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoModel.BudgetSidsteMåned = newValue;
+            Assert.That(budgetkontoModel.BudgetSidsteMåned, Is.EqualTo(newValue));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til BudgetSidsteMåned rejser PropertyChanged ved opdatering af det budgetterede beløb for sidste måned.
+        /// </summary>
+        [TestCase("BudgetSidsteMåned")]
+        public void TestAtBudgetSidsteMånedSetterRejserPropertyChangedVedOpdateringAfBudgetSidsteMåned(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var budgetkontoModel = new BudgetkontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>(), Math.Abs(fixture.Create<decimal>()) * -1, Math.Abs(fixture.Create<decimal>()) * -1);
+            Assert.That(budgetkontoModel, Is.Not.Null);
+
+            var eventCalled = false;
+            budgetkontoModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, propertyNameToRaise, StringComparison.Ordinal) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            budgetkontoModel.BudgetSidsteMåned = budgetkontoModel.BudgetSidsteMåned;
+            Assert.That(eventCalled, Is.False);
+            budgetkontoModel.BudgetSidsteMåned = Math.Abs(fixture.Create<decimal>());
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
         /// Tester, at sætteren til Bogført opdaterer det bogførte beløb.
         /// </summary>
         [Test]
@@ -518,6 +578,56 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
             budgetkontoModel.Bogført = budgetkontoModel.Bogført;
             Assert.That(eventCalled, Is.False);
             budgetkontoModel.Bogført = Math.Abs(fixture.Create<decimal>());
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til BogførtSidsteMåned opdaterer det bogførte beløb for sidste måned.
+        /// </summary>
+        [Test]
+        public void TestAtBogførtSidsteMånedSetterOpdatererBogførtSidsteMåned()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var budgetkontoModel = new BudgetkontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>(), Math.Abs(fixture.Create<decimal>()) * -1, Math.Abs(fixture.Create<decimal>()) * -1);
+            Assert.That(budgetkontoModel, Is.Not.Null);
+            Assert.That(budgetkontoModel.BogførtSidsteMåned, Is.EqualTo(0M));
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoModel.BogførtSidsteMåned = newValue;
+            Assert.That(budgetkontoModel.BogførtSidsteMåned, Is.EqualTo(newValue));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til BogførtSidsteMåned rejser PropertyChanged ved opdatering af det bogført beløb for sidste måned.
+        /// </summary>
+        [TestCase("BogførtSidsteMåned")]
+        public void TestAtBogførtSidsteMånedSetterRejserPropertyChangedVedOpdateringAfBogførtSidsteMåned(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+
+            var budgetkontoModel = new BudgetkontoModel(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<int>(), fixture.Create<DateTime>(), Math.Abs(fixture.Create<decimal>()) * -1, Math.Abs(fixture.Create<decimal>()) * -1);
+            Assert.That(budgetkontoModel, Is.Not.Null);
+
+            var eventCalled = false;
+            budgetkontoModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, propertyNameToRaise, StringComparison.Ordinal) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            budgetkontoModel.BogførtSidsteMåned = budgetkontoModel.BogførtSidsteMåned;
+            Assert.That(eventCalled, Is.False);
+            budgetkontoModel.BogførtSidsteMåned = Math.Abs(fixture.Create<decimal>());
             Assert.That(eventCalled, Is.True);
         }
     }
