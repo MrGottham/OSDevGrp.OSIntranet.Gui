@@ -14,8 +14,10 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         private decimal _indtægter;
         private decimal _udgifter;
         private decimal _budgetSidsteMåned;
+        private decimal _budgetÅrTilDato;
         private decimal _bogført;
         private decimal _bogførtSidsteMåned;
+        private decimal _bogførtÅrTilDato;
 
         #endregion
 
@@ -133,6 +135,41 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         }
 
         /// <summary>
+        /// Budgetteret beløb for år til dato.
+        /// </summary>
+        public virtual decimal BudgetÅrTilDato
+        {
+            get
+            {
+                return _budgetÅrTilDato;
+            }
+            set
+            {
+                if (_budgetÅrTilDato == value)
+                {
+                    return;
+                }
+                _budgetÅrTilDato = value;
+                RaisePropertyChanged("BudgetÅrTilDato");
+            }
+        }
+
+        /// <summary>
+        /// Budgetteret beløb for sidste år.
+        /// </summary>
+        public virtual decimal BudgetSidsteÅr
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         public virtual decimal Bogført
@@ -170,6 +207,26 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 }
                 _bogførtSidsteMåned = value;
                 RaisePropertyChanged("BogførtSidsteMåned");
+            }
+        }
+
+        /// <summary>
+        /// Bogført beløb for år til dato.
+        /// </summary>
+        public virtual decimal BogførtÅrTilDato
+        {
+            get
+            {
+                return _bogførtÅrTilDato;
+            }
+            set
+            {
+                if (_bogførtÅrTilDato == value)
+                {
+                    return;
+                }
+                _bogførtÅrTilDato = value;
+                RaisePropertyChanged("BogførtÅrTilDato");
             }
         }
 

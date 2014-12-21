@@ -41,6 +41,24 @@
         }
 
         /// <summary>
+        /// Budgetteret beløb for år til dato.
+        /// </summary>
+        decimal BudgetÅrTilDato
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Budgetteret beløb for sidste år.
+        /// </summary>
+        decimal BudgetSidsteÅr
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         decimal Bogført
@@ -53,6 +71,15 @@
         /// Bogført beløb for sidste måned.
         /// </summary>
         decimal BogførtSidsteMåned
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Bogført beløb for år til dato.
+        /// </summary>
+        decimal BogførtÅrTilDato
         {
             get;
             set;
