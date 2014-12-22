@@ -15,9 +15,11 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         private decimal _udgifter;
         private decimal _budgetSidsteMåned;
         private decimal _budgetÅrTilDato;
+        private decimal _budgetSidsteÅr;
         private decimal _bogført;
         private decimal _bogførtSidsteMåned;
         private decimal _bogførtÅrTilDato;
+        private decimal _bogførtSidsteÅr;
 
         #endregion
 
@@ -161,11 +163,16 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _budgetSidsteÅr;
             }
             set
             {
-                throw new NotImplementedException();
+                if (_budgetSidsteÅr == value)
+                {
+                    return;
+                }
+                _budgetSidsteÅr = value;
+                RaisePropertyChanged("BudgetSidsteÅr");
             }
         }
 
@@ -227,6 +234,26 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
                 }
                 _bogførtÅrTilDato = value;
                 RaisePropertyChanged("BogførtÅrTilDato");
+            }
+        }
+
+        /// <summary>
+        /// Bogført beløb for sidste år.
+        /// </summary>
+        public virtual decimal BogførtSidsteÅr
+        {
+            get
+            {
+                return _bogførtSidsteÅr;
+            }
+            set
+            {
+                if (_bogførtSidsteÅr == value)
+                {
+                    return;
+                }
+                _bogførtSidsteÅr = value;
+                RaisePropertyChanged("BogførtSidsteÅr");
             }
         }
 

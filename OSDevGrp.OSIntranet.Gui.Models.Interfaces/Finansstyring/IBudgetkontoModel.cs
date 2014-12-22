@@ -86,6 +86,15 @@
         }
 
         /// <summary>
+        /// Bogført beløb for sidste år.
+        /// </summary>
+        decimal BogførtSidsteÅr
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Disponibel beløb.
         /// </summary>
         decimal Disponibel
