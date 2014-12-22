@@ -692,6 +692,62 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til BogførtÅrTilDato opdaterer BogførtÅrTilDato på modellen til budgetkontoen.
+        /// </summary>
+        [Test]
+        public void TestAtBogførtÅrTilDatoSetterOpdatererBogførtÅrTilDatoOnBudgetkontoModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.BogførtÅrTilDato = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.BogførtÅrTilDato = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til BogførtÅrTilDato kalder HandleException på exceptionhandleren ved exceptions.
+        /// </summary>
+        [Test]
+        public void TestAtBogførtÅrTilDatoSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var exception = fixture.Create<Exception>();
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Expect(m => m.BogførtÅrTilDato = Arg<decimal>.Is.GreaterThan(0M))
+                                .Throw(exception)
+                                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.BogførtÅrTilDato = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.BogførtÅrTilDato = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
+
+        /// <summary>
         /// Tester, at PropertyChangedOnKontoModelEventHandler rejser PropertyChanged, når modellen for budgetkontoen opdateres.
         /// </summary>
         [Test]

@@ -387,7 +387,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Model.BogførtÅrTilDato;
             }
             set
             {
@@ -402,7 +402,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return BogførtÅrTilDato.ToString("C");
             }
         }
 
@@ -413,7 +413,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return Resource.GetText(Text.BookkeepedYearToDate);
             }
         }
 
