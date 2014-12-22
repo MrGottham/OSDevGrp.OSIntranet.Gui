@@ -105,6 +105,56 @@
         }
 
         /// <summary>
+        /// Budgetteret beløb for år til dato.
+        /// </summary>
+        decimal BudgetÅrTilDato
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for år til dato.
+        /// </summary>
+        string BudgetÅrTilDatoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label af budgetteret beløb for år til dato.
+        /// </summary>
+        string BudgetÅrTilDatoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Budgetteret beløb for sidste år.
+        /// </summary>
+        decimal BudgetSidsteÅr
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for sidste år.
+        /// </summary>
+        string BudgetSidsteÅrAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label af budgetteret beløb for sidste år.
+        /// </summary>
+        string BudgetSidsteÅrLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         decimal Bogført
@@ -125,6 +175,56 @@
         /// Label til bogført beløb.
         /// </summary>
         string BogførtLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Bogført beløb for sidste måned.
+        /// </summary>
+        decimal BogførtSidsteMåned
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for sidste måned.
+        /// </summary>
+        string BogførtSidsteMånedAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label af bogført beløb for sidste måned.
+        /// </summary>
+        string BogførtSidsteMånedLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Bogført beløb for år til dato.
+        /// </summary>
+        decimal BogførtÅrTilDato
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for år til dato.
+        /// </summary>
+        string BogførtÅrTilDatoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label af bogført beløb for år til dato.
+        /// </summary>
+        string BogførtÅrTilDatoLabel
         {
             get;
         }

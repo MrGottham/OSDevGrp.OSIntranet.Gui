@@ -330,4 +330,19 @@
   <data name="BudgetLastMonth" xml:space="preserve">
     <value>Budget last month</value>
   </data>
+  <data name="BudgetYearToDate" xml:space="preserve">
+    <value>Budget year to date</value>
+  </data>
+  <data name="BudgetLastYear" xml:space="preserve">
+    <value>Budget last year</value>
+  </data>
+  <data name="BookkeepedLastMonth" xml:space="preserve">
+    <value>Bookkeeped last month</value>
+  </data>
+  <data name="BookkeepedLastYear" xml:space="preserve">
+    <value>Bookkeeped last year</value>
+  </data>
+  <data name="BookkeepedYearToDate" xml:space="preserve">
+    <value>Bookkeeped year to date</value>
+  </data>
 </root>

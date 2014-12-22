@@ -205,6 +205,94 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Budgetteret beløb for år til dato.
+        /// </summary>
+        public virtual decimal BudgetÅrTilDato
+        {
+            get
+            {
+                return Model.BudgetÅrTilDato;
+            }
+            set
+            {
+                try
+                {
+                    Model.BudgetÅrTilDato = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for år til dato.
+        /// </summary>
+        public virtual string BudgetÅrTilDatoAsText
+        {
+            get
+            {
+                return BudgetÅrTilDato.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label af budgetteret beløb for år til dato.
+        /// </summary>
+        public virtual string BudgetÅrTilDatoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetYearToDate);
+            }
+        }
+
+        /// <summary>
+        /// Budgetteret beløb for sidste år.
+        /// </summary>
+        public virtual decimal BudgetSidsteÅr
+        {
+            get
+            {
+                return Model.BudgetSidsteÅr;
+            }
+            set
+            {
+                try
+                {
+                    Model.BudgetSidsteÅr = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for sidste år.
+        /// </summary>
+        public virtual string BudgetSidsteÅrAsText
+        {
+            get
+            {
+                return BudgetSidsteÅr.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label af budgetteret beløb for sidste år.
+        /// </summary>
+        public virtual string BudgetSidsteÅrLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetLastYear);
+            }
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         public virtual decimal Bogført
@@ -245,6 +333,87 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return Resource.GetText(Text.Bookkeeped);
+            }
+        }
+
+        /// <summary>
+        /// Bogført beløb for sidste måned.
+        /// </summary>
+        public virtual decimal BogførtSidsteMåned
+        {
+            get
+            {
+                return Model.BogførtSidsteMåned;
+            }
+            set
+            {
+                try
+                {
+                    Model.BogførtSidsteMåned = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for sidste måned.
+        /// </summary>
+        public virtual string BogførtSidsteMånedAsText
+        {
+            get
+            {
+                return BogførtSidsteMåned.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label af bogført beløb for sidste måned.
+        /// </summary>
+        public virtual string BogførtSidsteMånedLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BookkeepedLastMonth);
+            }
+        }
+
+        /// <summary>
+        /// Bogført beløb for år til dato.
+        /// </summary>
+        public virtual decimal BogførtÅrTilDato
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for år til dato.
+        /// </summary>
+        public virtual string BogførtÅrTilDatoAsText
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Label af bogført beløb for år til dato.
+        /// </summary>
+        public virtual string BogførtÅrTilDatoLabel
+        {
+            get
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -328,13 +497,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     break;
 
                 case "BudgetSidsteMåned":
-                    RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    break;
+
+                case "BudgetÅrTilDato":
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    break;
+
+                case "BudgetSidsteÅr":
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
                     break;
 
                 case "Bogført":
                     RaisePropertyChanged("BogførtAsText");
                     RaisePropertyChanged("Kontoværdi");
+                    break;
+
+                case "BogførtSidsteMåned":
+                    RaisePropertyChanged("BogførtSidsteMånedAsText");
                     break;
 
                 case "Disponibel":

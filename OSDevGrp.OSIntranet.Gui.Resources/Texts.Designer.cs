@@ -205,6 +205,33 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bookkeeped last month.
+        /// </summary>
+        internal static string BookkeepedLastMonth {
+            get {
+                return ResourceManager.GetString("BookkeepedLastMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookkeeped last year.
+        /// </summary>
+        internal static string BookkeepedLastYear {
+            get {
+                return ResourceManager.GetString("BookkeepedLastYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookkeeped year to date.
+        /// </summary>
+        internal static string BookkeepedYearToDate {
+            get {
+                return ResourceManager.GetString("BookkeepedYearToDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bookkeeping.
         /// </summary>
         internal static string Bookkeeping {
@@ -246,6 +273,24 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string BudgetLastMonth {
             get {
                 return ResourceManager.GetString("BudgetLastMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Budget last year.
+        /// </summary>
+        internal static string BudgetLastYear {
+            get {
+                return ResourceManager.GetString("BudgetLastYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Budget year to date.
+        /// </summary>
+        internal static string BudgetYearToDate {
+            get {
+                return ResourceManager.GetString("BudgetYearToDate", resourceCulture);
             }
         }
         
