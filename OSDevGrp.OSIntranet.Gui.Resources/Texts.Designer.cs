@@ -241,6 +241,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Budget last month.
+        /// </summary>
+        internal static string BudgetLastMonth {
+            get {
+                return ResourceManager.GetString("BudgetLastMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cash ({0}).
         /// </summary>
         internal static string CachAccount {

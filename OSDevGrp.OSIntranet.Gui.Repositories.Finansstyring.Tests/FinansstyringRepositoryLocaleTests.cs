@@ -1273,7 +1273,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             budgetkontoModelMock.Expect(m => m.Udgifter)
                 .Return(fixture.Create<decimal>())
                 .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.BudgetSidsteMåned)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
             budgetkontoModelMock.Expect(m => m.Bogført)
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.BogførtSidsteMåned)
                 .Return(fixture.Create<decimal>())
                 .Repeat.Any();
             return budgetkontoModelMock;

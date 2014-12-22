@@ -327,4 +327,7 @@
   <data name="Wages" xml:space="preserve">
     <value>Wages</value>
   </data>
+  <data name="BudgetLastMonth" xml:space="preserve">
+    <value>Budget last month</value>
+  </data>
 </root>

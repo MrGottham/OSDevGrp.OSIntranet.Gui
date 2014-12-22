@@ -499,12 +499,47 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         {
                             budgetkontoModel.Notat = budgetkontoElement.Attribute(XName.Get("note", string.Empty)).Value;
                         }
-                        var historikElement = localeDataDocument.GetHistorikElements(budgetkontoModel).FirstOrDefault();
-                        if (historikElement != null)
+                        var historikElementArray = localeDataDocument.GetHistorikElements(budgetkontoModel).ToArray();
+                        var historikElementForStatusDato = historikElementArray.FirstOrDefault();
+                        if (historikElementForStatusDato != null)
                         {
-                            budgetkontoModel.Indtægter = decimal.Parse(historikElement.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                            budgetkontoModel.Udgifter = decimal.Parse(historikElement.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                            budgetkontoModel.Bogført = decimal.Parse(historikElement.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.Indtægter = decimal.Parse(historikElementForStatusDato.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.Udgifter = decimal.Parse(historikElementForStatusDato.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.Bogført = decimal.Parse(historikElementForStatusDato.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        }
+                        var historikDato = new DateTime(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month));
+                        var historikElementForDato = historikElementArray.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, ModelExtentions.GetHistorikDato(historikDato), StringComparison.Ordinal) <= 0);
+                        if (historikElementForDato != null)
+                        {
+                            budgetkontoModel.BudgetSidsteMåned += decimal.Parse(historikElementForDato.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.BudgetSidsteMåned -= decimal.Parse(historikElementForDato.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            budgetkontoModel.BogførtSidsteMåned = decimal.Parse(historikElementForDato.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        }
+                        budgetkontoModel.BudgetÅrTilDato = budgetkontoModel.Budget;
+                        budgetkontoModel.BogførtÅrTilDato = budgetkontoModel.Bogført;
+                        for (var month = budgetkontoModel.StatusDato.Month - 1; month > 0; month--)
+                        {
+                            historikDato = new DateTime(budgetkontoModel.StatusDato.Year, month, DateTime.DaysInMonth(budgetkontoModel.StatusDato.Year, month));
+                            historikElementForDato = historikElementArray.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, ModelExtentions.GetHistorikDato(historikDato), StringComparison.Ordinal) <= 0);
+                            if (historikElementForDato != null)
+                            {
+                                budgetkontoModel.BudgetÅrTilDato += decimal.Parse(historikElementForDato.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                                budgetkontoModel.BudgetÅrTilDato -= decimal.Parse(historikElementForDato.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                                budgetkontoModel.BogførtÅrTilDato += decimal.Parse(historikElementForDato.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            }
+                        }
+                        budgetkontoModel.BudgetSidsteÅr = 0M;
+                        budgetkontoModel.BogførtSidsteÅr = 0M;
+                        for (var month = 12; month > 0; month--)
+                        {
+                            historikDato = new DateTime(budgetkontoModel.StatusDato.AddYears(-1).Year, month, DateTime.DaysInMonth(budgetkontoModel.StatusDato.AddYears(-1).Year, month));
+                            historikElementForDato = historikElementArray.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, ModelExtentions.GetHistorikDato(historikDato), StringComparison.Ordinal) <= 0);
+                            if (historikElementForDato != null)
+                            {
+                                budgetkontoModel.BudgetSidsteÅr += decimal.Parse(historikElementForDato.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                                budgetkontoModel.BudgetSidsteÅr -= decimal.Parse(historikElementForDato.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                                budgetkontoModel.BogførtSidsteÅr += decimal.Parse(historikElementForDato.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            }
                         }
                         budgetkontoplan.Add(budgetkontoModel);
                     }

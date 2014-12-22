@@ -161,6 +161,50 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Budgetteret beløb for sidste måned.
+        /// </summary>
+        public virtual decimal BudgetSidsteMåned
+        {
+            get
+            {
+                return Model.BudgetSidsteMåned;
+            }
+            set
+            {
+                try
+                {
+                    Model.BudgetSidsteMåned = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for sidste måned.
+        /// </summary>
+        public virtual string BudgetSidsteMånedAsText
+        {
+            get
+            {
+                return BudgetSidsteMåned.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label af budgetteret beløb for sidste måned.
+        /// </summary>
+        public virtual string BudgetSidsteMånedLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetLastMonth);
+            }
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         public virtual decimal Bogført
@@ -281,6 +325,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case "Budget":
                     RaisePropertyChanged("BudgetAsText");
+                    break;
+
+                case "BudgetSidsteMåned":
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
                     break;
 
                 case "Bogført":

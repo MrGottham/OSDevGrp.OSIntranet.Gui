@@ -530,6 +530,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             {
                                 budgetkontoModel.Notat = budgetkontoView.Notat;
                             }
+                            budgetkontoModel.BudgetSidsteMåned = budgetkontoView.BudgetSidsteMåned;
+                            budgetkontoModel.BudgetÅrTilDato = budgetkontoView.BudgetÅrTilDato;
+                            budgetkontoModel.BudgetSidsteÅr = budgetkontoView.BudgetSidsteÅr;
+                            budgetkontoModel.BogførtSidsteMåned = budgetkontoView.BogførtSidsteMåned;
+                            budgetkontoModel.BogførtÅrTilDato = budgetkontoView.BogførtÅrTilDato;
+                            budgetkontoModel.BogførtSidsteÅr = budgetkontoView.BogførtSidsteÅr;
                             result.Add(budgetkontoModel);
                         }
                         catch (ArgumentNullException)
@@ -612,6 +618,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     {
                         budgetkontoModel.Notat = budgetkontoView.Notat;
                     }
+                    budgetkontoModel.BudgetSidsteMåned = budgetkontoView.BudgetSidsteMåned;
+                    budgetkontoModel.BudgetÅrTilDato = budgetkontoView.BudgetÅrTilDato;
+                    budgetkontoModel.BudgetSidsteÅr = budgetkontoView.BudgetSidsteÅr;
+                    budgetkontoModel.BogførtSidsteMåned = budgetkontoView.BogførtSidsteMåned;
+                    budgetkontoModel.BogførtÅrTilDato = budgetkontoView.BogførtÅrTilDato;
+                    budgetkontoModel.BogførtSidsteÅr = budgetkontoView.BogførtSidsteÅr;
 
                     client.CloseAsync();
                 }

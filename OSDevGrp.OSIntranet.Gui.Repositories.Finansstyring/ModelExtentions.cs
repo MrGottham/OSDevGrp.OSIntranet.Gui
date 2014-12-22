@@ -121,6 +121,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 return;
             }
+            var sidsteMånedStatusDato = new DateTime(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month));
+            var sidsteMånedIndtægter = budgetkontoModel.BudgetSidsteMåned > 0 ? budgetkontoModel.BudgetSidsteMåned : 0M;
+            var sidsteMånedUdgifter = budgetkontoModel.BudgetSidsteMåned < 0 ? budgetkontoModel.BudgetSidsteMåned : 0M;
             XElement budgetkontoHistorikElement;
             var budgetkontoElement = regnskabElement.Elements(XName.Get("Budgetkonto", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0);
             if (budgetkontoElement == null)
@@ -140,6 +143,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.00", CultureInfo.InvariantCulture));
                 budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.00", CultureInfo.InvariantCulture));
                 regnskabElement.Add(budgetkontoHistorikElement);
+
+                budgetkontoHistorikElement = new XElement(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), budgetkontoModel.Kontonummer);
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(sidsteMånedStatusDato));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), sidsteMånedIndtægter.ToString("#.00", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), sidsteMånedUdgifter.ToString("#.00", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture));
+                regnskabElement.Add(budgetkontoHistorikElement);
                 return;
             }
             budgetkontoElement.UpdateAttribute(XName.Get("kontonavn", string.Empty), budgetkontoModel.Kontonavn);
@@ -147,22 +158,40 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             budgetkontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), budgetkontoModel.Beskrivelse, false);
             budgetkontoElement.UpdateAttribute(XName.Get("note", string.Empty), budgetkontoModel.Notat, false);
 
-            var budgetkontoHistorikDato = GetHistorikDato(budgetkontoModel.StatusDato);
-            budgetkontoHistorikElement = localeDataDocument.GetHistorikElements(budgetkontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, budgetkontoHistorikDato, StringComparison.Ordinal) == 0);
-            if (budgetkontoHistorikElement == null)
+            for (var i = 0; i < 2; i++)
             {
-                budgetkontoHistorikElement = new XElement(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName));
-                budgetkontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), budgetkontoModel.Kontonummer);
-                budgetkontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), budgetkontoHistorikDato);
-                budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.00", CultureInfo.InvariantCulture));
-                budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.00", CultureInfo.InvariantCulture));
-                budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.00", CultureInfo.InvariantCulture));
-                regnskabElement.Add(budgetkontoHistorikElement);
-                return;
+                var budgetkontoHistorikDato = i == 0 ? GetHistorikDato(budgetkontoModel.StatusDato) : GetHistorikDato(sidsteMånedStatusDato);
+                budgetkontoHistorikElement = localeDataDocument.GetHistorikElements(budgetkontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, budgetkontoHistorikDato, StringComparison.Ordinal) == 0);
+                if (budgetkontoHistorikElement == null)
+                {
+                    budgetkontoHistorikElement = new XElement(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName));
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), budgetkontoModel.Kontonummer);
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), budgetkontoHistorikDato);
+                    if (i == 0)
+                    {
+                        budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.00", CultureInfo.InvariantCulture));
+                        budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.00", CultureInfo.InvariantCulture));
+                        budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.00", CultureInfo.InvariantCulture));
+                        regnskabElement.Add(budgetkontoHistorikElement);
+                        continue;
+                    }
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), sidsteMånedIndtægter.ToString("#.00", CultureInfo.InvariantCulture));
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), sidsteMånedUdgifter.ToString("#.00", CultureInfo.InvariantCulture));
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture));
+                    regnskabElement.Add(budgetkontoHistorikElement);
+                    continue;
+                }
+                if (i == 0)
+                {
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.00", CultureInfo.InvariantCulture));
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.00", CultureInfo.InvariantCulture));
+                    budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.00", CultureInfo.InvariantCulture));
+                    continue;
+                }
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), sidsteMånedIndtægter.ToString("#.00", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), sidsteMånedUdgifter.ToString("#.00", CultureInfo.InvariantCulture));
+                budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture));
             }
-            budgetkontoHistorikElement.UpdateAttribute(XName.Get("indtaegter", string.Empty), budgetkontoModel.Indtægter.ToString("#.00", CultureInfo.InvariantCulture));
-            budgetkontoHistorikElement.UpdateAttribute(XName.Get("udgifter", string.Empty), budgetkontoModel.Udgifter.ToString("#.00", CultureInfo.InvariantCulture));
-            budgetkontoHistorikElement.UpdateAttribute(XName.Get("bogfoert", string.Empty), budgetkontoModel.Bogført.ToString("#.00", CultureInfo.InvariantCulture));
         }
 
         /// <summary>

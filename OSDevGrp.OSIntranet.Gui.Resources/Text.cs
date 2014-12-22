@@ -39,6 +39,7 @@
         Income,
         Expenses,
         Budget,
+        BudgetLastMonth,
         Bookkeeped,
         PostingWarning,
         PostingWarnings,

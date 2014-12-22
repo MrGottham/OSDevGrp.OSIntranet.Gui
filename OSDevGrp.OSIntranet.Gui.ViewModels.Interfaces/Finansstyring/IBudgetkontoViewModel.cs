@@ -80,6 +80,31 @@
         }
 
         /// <summary>
+        /// Budgetteret beløb for sidste måned.
+        /// </summary>
+        decimal BudgetSidsteMåned
+        {
+            get; 
+            set;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for sidste måned.
+        /// </summary>
+        string BudgetSidsteMånedAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label af budgetteret beløb for sidste måned.
+        /// </summary>
+        string BudgetSidsteMånedLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Bogført beløb.
         /// </summary>
         decimal Bogført
