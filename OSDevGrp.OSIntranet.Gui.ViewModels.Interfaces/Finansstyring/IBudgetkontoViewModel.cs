@@ -230,6 +230,31 @@
         }
 
         /// <summary>
+        /// Bogført beløb for sidste år.
+        /// </summary>
+        decimal BogførtSidsteÅr
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for sidste år.
+        /// </summary>
+        string BogførtSidsteÅrAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label af bogført beløb for sidste år.
+        /// </summary>
+        string BogførtSidsteÅrLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Disponibel beløb.
         /// </summary>
         decimal Disponibel

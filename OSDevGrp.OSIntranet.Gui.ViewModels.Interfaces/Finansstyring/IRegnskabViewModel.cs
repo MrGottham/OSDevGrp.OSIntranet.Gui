@@ -44,6 +44,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Månedstekst for forrige måned i forhold til statusdato.
+        /// </summary>
+        string StatusDatoAsLastMonthText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekst for år til dato i forhold til statusdato.
+        /// </summary>
+        string StatusDatoAsYearToDateText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekst for sidste år i forhold til statusdato.
+        /// </summary>
+        string StatusDatoAsLastYearText
+        {
+            get;
+        }
+
+        /// <summary>
         /// Konti.
         /// </summary>
         IEnumerable<IKontoViewModel> Konti

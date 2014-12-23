@@ -51,6 +51,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var regnskabModelMock = fixture.Create<IRegnskabModel>();
             var statusDato = fixture.Create<DateTime>();
             var statusDatoAsMonthText = statusDato.ToString("MMMM yyyy");
+            var statusDatoAsLastMonthText = statusDato.AddMonths(-1).ToString("MMMM yyyy");
             var regnskabViewModel = new RegnskabViewModel(regnskabModelMock, statusDato, fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
             Assert.That(regnskabViewModel.Nummer, Is.EqualTo(regnskabModelMock.Nummer));
@@ -64,6 +65,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.StatusDatoAsMonthText, Is.Not.Null);
             Assert.That(regnskabViewModel.StatusDatoAsMonthText, Is.Not.Empty);
             Assert.That(regnskabViewModel.StatusDatoAsMonthText, Is.EqualTo(string.Format("{0}{1}", statusDatoAsMonthText.Substring(0, 1).ToUpper(), statusDatoAsMonthText.Substring(1).ToLower())));
+            Assert.That(regnskabViewModel.StatusDatoAsLastMonthText, Is.Not.Null);
+            Assert.That(regnskabViewModel.StatusDatoAsLastMonthText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.StatusDatoAsLastMonthText, Is.EqualTo(string.Format("{0}{1}", statusDatoAsLastMonthText.Substring(0, 1).ToUpper(), statusDatoAsLastMonthText.Substring(1).ToLower())));
+            Assert.That(regnskabViewModel.StatusDatoAsYearToDateText, Is.Not.Null);
+            Assert.That(regnskabViewModel.StatusDatoAsYearToDateText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.StatusDatoAsYearToDateText, Is.EqualTo(Resource.GetText(Text.YearToDate, statusDato.Year)));
+            Assert.That(regnskabViewModel.StatusDatoAsLastYearText, Is.Not.Null);
+            Assert.That(regnskabViewModel.StatusDatoAsLastYearText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.StatusDatoAsLastYearText, Is.EqualTo(Resource.GetText(Text.LastYear, statusDato.AddYears(-1).Year)));
             Assert.That(regnskabViewModel.Konti, Is.Not.Null);
             Assert.That(regnskabViewModel.Konti, Is.Empty);
             Assert.That(regnskabViewModel.KontiGrouped, Is.Not.Null);
@@ -302,6 +312,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("2013-01-01T12:00:00", "2013-01-01T12:00:01", "StatusDatoAsMonthText")]
         [TestCase("2013-01-01T12:00:00", "2013-06-30T12:00:00", "StatusDatoAsMonthText")]
         [TestCase("2013-01-01T12:00:00", "2013-12-31T00:00:00", "StatusDatoAsMonthText")]
+        [TestCase("2013-01-01T12:00:00", "2013-01-01T12:00:01", "StatusDatoAsLastMonthText")]
+        [TestCase("2013-01-01T12:00:00", "2013-06-30T12:00:00", "StatusDatoAsLastMonthText")]
+        [TestCase("2013-01-01T12:00:00", "2013-12-31T00:00:00", "StatusDatoAsLastMonthText")]
+        [TestCase("2013-01-01T12:00:00", "2013-01-01T12:00:01", "StatusDatoAsYearToDateText")]
+        [TestCase("2013-01-01T12:00:00", "2013-06-30T12:00:00", "StatusDatoAsYearToDateText")]
+        [TestCase("2013-01-01T12:00:00", "2013-12-31T00:00:00", "StatusDatoAsYearToDateText")]
+        [TestCase("2013-01-01T12:00:00", "2013-01-01T12:00:01", "StatusDatoAsLastYearText")]
+        [TestCase("2013-01-01T12:00:00", "2013-06-30T12:00:00", "StatusDatoAsLastYearText")]
+        [TestCase("2013-01-01T12:00:00", "2013-12-31T00:00:00", "StatusDatoAsLastYearText")]
         public void TestAtStatusDatoSetterRejserPropertyChangedVedVedOpdateringAfStatusDato(string originalDateTime, string newDateTime, string expectPropertyName)
         {
             var fixture = new Fixture();

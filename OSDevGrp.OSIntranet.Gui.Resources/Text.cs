@@ -77,6 +77,8 @@
         Insurances,
         Vehicles,
         Vacations,
-        Experiences
+        Experiences,
+        YearToDate,
+        LastYear
     }
 }

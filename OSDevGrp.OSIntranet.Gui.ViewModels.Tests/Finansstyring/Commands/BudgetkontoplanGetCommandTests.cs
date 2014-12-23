@@ -453,7 +453,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             budgetkontoViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).StatusDato));
             budgetkontoViewModelMock.AssertWasCalled(m => m.Indtægter = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).Indtægter));
             budgetkontoViewModelMock.AssertWasCalled(m => m.Udgifter = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).Udgifter));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BudgetSidsteMåned = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).BudgetSidsteMåned));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BudgetÅrTilDato = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).BudgetÅrTilDato));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BudgetSidsteÅr = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).BudgetSidsteÅr));
             budgetkontoViewModelMock.AssertWasCalled(m => m.Bogført = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).Bogført));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BogførtSidsteMåned = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).BogførtSidsteMåned));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BogførtÅrTilDato = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).BogførtÅrTilDato));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BogførtSidsteÅr = Arg<decimal>.Is.Equal(budgetkontoModelMockCollection.ElementAt(0).BogførtSidsteÅr));
             exceptionHandlerMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
@@ -643,32 +649,50 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             {
                 var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
                 budgetkontoModelMock.Expect(m => m.Kontonummer)
-                                    .Return(fixture.Create<string>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.Kontonavn)
-                                    .Return(fixture.Create<string>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.Beskrivelse)
-                                    .Return(fixture.Create<string>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.Notat)
-                                    .Return(fixture.Create<string>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.Kontogruppe)
-                                    .Return(budgetkontogruppeArray.Length == 0 ? -1 : budgetkontogruppeArray.ElementAt(random.Next(budgetkontogruppeArray.Length - 1)).Nummer)
-                                    .Repeat.Any();
+                    .Return(budgetkontogruppeArray.Length == 0 ? -1 : budgetkontogruppeArray.ElementAt(random.Next(budgetkontogruppeArray.Length - 1)).Nummer)
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.StatusDato)
-                                    .Return(fixture.Create<DateTime>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<DateTime>())
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.Indtægter)
-                                    .Return(fixture.Create<decimal>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.Udgifter)
-                                    .Return(fixture.Create<decimal>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoModelMock.Expect(m => m.BudgetSidsteMåned)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoModelMock.Expect(m => m.BudgetÅrTilDato)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoModelMock.Expect(m => m.BudgetSidsteÅr)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
                 budgetkontoModelMock.Expect(m => m.Bogført)
-                                    .Return(fixture.Create<decimal>())
-                                    .Repeat.Any();
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoModelMock.Expect(m => m.BogførtSidsteMåned)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoModelMock.Expect(m => m.BogførtÅrTilDato)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoModelMock.Expect(m => m.BogførtSidsteÅr)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
                 result.Add(budgetkontoModelMock);
             }
             return result;

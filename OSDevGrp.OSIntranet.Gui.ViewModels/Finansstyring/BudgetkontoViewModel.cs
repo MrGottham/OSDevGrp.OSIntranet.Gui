@@ -391,7 +391,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             set
             {
-                throw new NotImplementedException();
+                try
+                {
+                    Model.BogførtÅrTilDato = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
             }
         }
 
@@ -414,6 +421,50 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return Resource.GetText(Text.BookkeepedYearToDate);
+            }
+        }
+
+        /// <summary>
+        /// Bogført beløb for sidste år.
+        /// </summary>
+        public virtual decimal BogførtSidsteÅr
+        {
+            get
+            {
+                return Model.BogførtSidsteÅr;
+            }
+            set
+            {
+                try
+                {
+                    Model.BogførtSidsteÅr = value;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.HandleException(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for sidste år.
+        /// </summary>
+        public virtual string BogførtSidsteÅrAsText
+        {
+            get
+            {
+                return BogførtSidsteÅr.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label af bogført beløb for sidste år.
+        /// </summary>
+        public virtual string BogførtSidsteÅrLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BookkeepedLastYear);
             }
         }
 
@@ -515,6 +566,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case "BogførtSidsteMåned":
                     RaisePropertyChanged("BogførtSidsteMånedAsText");
+                    break;
+
+                case "BogførtÅrTilDato":
+                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                    break;
+
+                case "BogførtSidsteÅr":
+                    RaisePropertyChanged("BogførtSidsteÅrAsText");
                     break;
 
                 case "Disponibel":

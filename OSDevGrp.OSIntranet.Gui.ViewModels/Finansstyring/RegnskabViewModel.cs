@@ -150,6 +150,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 _statusDato = value;
                 RaisePropertyChanged("StatusDato");
                 RaisePropertyChanged("StatusDatoAsMonthText");
+                RaisePropertyChanged("StatusDatoAsLastMonthText");
+                RaisePropertyChanged("StatusDatoAsYearToDateText");
+                RaisePropertyChanged("StatusDatoAsLastYearText");
             }
         }
 
@@ -161,6 +164,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return GetMonthTextForStatusDato(StatusDato);
+            }
+        }
+
+        /// <summary>
+        /// Månedstekst for forrige måned i forhold til statusdato.
+        /// </summary>
+        public virtual string StatusDatoAsLastMonthText
+        {
+            get
+            {
+                var lastMonth = new DateTime(StatusDato.AddMonths(-1).Year, StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(StatusDato.AddMonths(-1).Year, StatusDato.AddMonths(-1).Month));
+                return GetMonthTextForStatusDato(lastMonth);
+            }
+        }
+
+        /// <summary>
+        /// Tekst for år til dato i forhold til statusdato.
+        /// </summary>
+        public virtual string StatusDatoAsYearToDateText
+        {
+            get
+            {
+                return Resource.GetText(Text.YearToDate, StatusDato.Year);
+            }
+        }
+
+        /// <summary>
+        /// Tekst for sidste år i forhold til statusdato.
+        /// </summary>
+        public virtual string StatusDatoAsLastYearText
+        {
+            get
+            {
+                var lastYear = new DateTime(StatusDato.AddYears(-1).Year, 12, DateTime.DaysInMonth(StatusDato.AddYears(-1).Year, 12));
+                return Resource.GetText(Text.LastYear, lastYear.Year);
             }
         }
 

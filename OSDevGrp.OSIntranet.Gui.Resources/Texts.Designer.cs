@@ -520,6 +520,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Last year ({0}).
+        /// </summary>
+        internal static string LastYear {
+            get {
+                return ResourceManager.GetString("LastYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loan ({0}).
         /// </summary>
         internal static string LoanAccount {
@@ -714,6 +723,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string Wages {
             get {
                 return ResourceManager.GetString("Wages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Year to date ({0}).
+        /// </summary>
+        internal static string YearToDate {
+            get {
+                return ResourceManager.GetString("YearToDate", resourceCulture);
             }
         }
     }

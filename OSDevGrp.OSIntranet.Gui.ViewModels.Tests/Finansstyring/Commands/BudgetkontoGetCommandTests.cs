@@ -274,7 +274,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
                     mock.Expect(m => m.Udgifter)
                         .Return(fixture.Create<decimal>())
                         .Repeat.Any();
+                    mock.Expect(m => m.BudgetSidsteMåned)
+                        .Return(fixture.Create<decimal>())
+                        .Repeat.Any();
+                    mock.Expect(m => m.BudgetÅrTilDato)
+                        .Return(fixture.Create<decimal>())
+                        .Repeat.Any();
+                    mock.Expect(m => m.BudgetSidsteÅr)
+                        .Return(fixture.Create<decimal>())
+                        .Repeat.Any();
                     mock.Expect(m => m.Bogført)
+                        .Return(fixture.Create<decimal>())
+                        .Repeat.Any();
+                    mock.Expect(m => m.BogførtSidsteMåned)
+                        .Return(fixture.Create<decimal>())
+                        .Repeat.Any();
+                    mock.Expect(m => m.BogførtÅrTilDato)
+                        .Return(fixture.Create<decimal>())
+                        .Repeat.Any();
+                    mock.Expect(m => m.BogførtSidsteÅr)
                         .Return(fixture.Create<decimal>())
                         .Repeat.Any();
                     return mock;
@@ -355,7 +373,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             budgetkontoViewModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.Equal(budgetkontoModelMock.StatusDato));
             budgetkontoViewModelMock.AssertWasCalled(m => m.Indtægter = Arg<decimal>.Is.Equal(budgetkontoModelMock.Indtægter));
             budgetkontoViewModelMock.AssertWasCalled(m => m.Udgifter = Arg<decimal>.Is.Equal(budgetkontoModelMock.Udgifter));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BudgetSidsteMåned = Arg<decimal>.Is.Equal(budgetkontoModelMock.BudgetSidsteMåned));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BudgetÅrTilDato = Arg<decimal>.Is.Equal(budgetkontoModelMock.BudgetÅrTilDato));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BudgetSidsteÅr = Arg<decimal>.Is.Equal(budgetkontoModelMock.BudgetSidsteÅr));
             budgetkontoViewModelMock.AssertWasCalled(m => m.Bogført = Arg<decimal>.Is.Equal(budgetkontoModelMock.Bogført));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BogførtSidsteMåned = Arg<decimal>.Is.Equal(budgetkontoModelMock.BogførtSidsteMåned));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BogførtÅrTilDato = Arg<decimal>.Is.Equal(budgetkontoModelMock.BogførtÅrTilDato));
+            budgetkontoViewModelMock.AssertWasCalled(m => m.BogførtSidsteÅr = Arg<decimal>.Is.Equal(budgetkontoModelMock.BogførtSidsteÅr));
             exceptionHandlerMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 
@@ -457,7 +481,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             budgetkontoViewModelMock.AssertWasNotCalled(m => m.StatusDato = Arg<DateTime>.Is.Anything);
             budgetkontoViewModelMock.AssertWasNotCalled(m => m.Indtægter = Arg<decimal>.Is.Anything);
             budgetkontoViewModelMock.AssertWasNotCalled(m => m.Udgifter = Arg<decimal>.Is.Anything);
+            budgetkontoViewModelMock.AssertWasNotCalled(m => m.BudgetSidsteMåned = Arg<decimal>.Is.Anything);
+            budgetkontoViewModelMock.AssertWasNotCalled(m => m.BudgetÅrTilDato = Arg<decimal>.Is.Anything);
+            budgetkontoViewModelMock.AssertWasNotCalled(m => m.BudgetSidsteÅr = Arg<decimal>.Is.Anything);
             budgetkontoViewModelMock.AssertWasNotCalled(m => m.Bogført = Arg<decimal>.Is.Anything);
+            budgetkontoViewModelMock.AssertWasNotCalled(m => m.BogførtSidsteMåned = Arg<decimal>.Is.Anything);
+            budgetkontoViewModelMock.AssertWasNotCalled(m => m.BogførtÅrTilDato = Arg<decimal>.Is.Anything);
+            budgetkontoViewModelMock.AssertWasNotCalled(m => m.BogførtSidsteÅr = Arg<decimal>.Is.Anything);
             exceptionHandlerMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
         }
 

@@ -345,4 +345,12 @@
   <data name="BookkeepedYearToDate" xml:space="preserve">
     <value>Bogført år til dato</value>
   </data>
+  <data name="LastYear" xml:space="preserve">
+    <value>Sidste år ({0})</value>
+    <comment>{0} = Årstal.</comment>
+  </data>
+  <data name="YearToDate" xml:space="preserve">
+    <value>År til dato ({0})</value>
+    <comment>{0} = Årstal.</comment>
+  </data>
 </root>

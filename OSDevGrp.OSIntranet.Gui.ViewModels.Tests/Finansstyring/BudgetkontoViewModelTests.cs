@@ -77,6 +77,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             budgetkontoModelMock.Expect(m => m.BogførtÅrTilDato)
                 .Return(Math.Abs(fixture.Create<decimal>())*-1)
                 .Repeat.Any();
+            budgetkontoModelMock.Expect(m => m.BogførtSidsteÅr)
+                .Return(Math.Abs(fixture.Create<decimal>())*-1)
+                .Repeat.Any();
             budgetkontoModelMock.Expect(m => m.Disponibel)
                 .Return(fixture.Create<decimal>())
                 .Repeat.Any();
@@ -163,6 +166,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(budgetkontoViewModel.BogførtÅrTilDatoLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtÅrTilDatoLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.BogførtÅrTilDatoLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedYearToDate)));
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅr, Is.EqualTo(budgetkontoModelMock.BogførtSidsteÅr));
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrAsText, Is.Not.Null);
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrAsText, Is.Not.Empty);
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrAsText, Is.EqualTo(budgetkontoModelMock.BogførtSidsteÅr.ToString("C")));
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrLabel, Is.Not.Null);
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrLabel, Is.Not.Empty);
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedLastYear)));
             Assert.That(budgetkontoViewModel.Disponibel, Is.EqualTo(budgetkontoModelMock.Disponibel));
             Assert.That(budgetkontoViewModel.DisponibelAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.DisponibelAsText, Is.Not.Empty);
@@ -196,6 +206,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             budgetkontoModelMock.AssertWasCalled(m => m.Bogført);
             budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteMåned);
             budgetkontoModelMock.AssertWasCalled(m => m.BogførtÅrTilDato);
+            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteÅr);
             budgetkontoModelMock.AssertWasCalled(m => m.Disponibel);
         }
 
@@ -748,6 +759,62 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at sætteren til BogførtSidsteÅr opdaterer BogførtSidsteÅr på modellen til budgetkontoen.
+        /// </summary>
+        [Test]
+        public void TestAtBogførtSidsteÅrSetterOpdatererBogførtSidsteÅrOnBudgetkontoModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.BogførtSidsteÅr = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteÅr = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til BogførtSidsteÅr kalder HandleException på exceptionhandleren ved exceptions.
+        /// </summary>
+        [Test]
+        public void TestAtBogførtSidsteÅrSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var exception = fixture.Create<Exception>();
+            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
+            budgetkontoModelMock.Expect(m => m.BogførtSidsteÅr = Arg<decimal>.Is.GreaterThan(0M))
+                                .Throw(exception)
+                                .Repeat.Any();
+
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(budgetkontoViewModel, Is.Not.Null);
+
+            var newValue = fixture.Create<decimal>();
+            budgetkontoViewModel.BogførtSidsteÅr = newValue;
+
+            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteÅr = Arg<decimal>.Is.Equal(newValue));
+            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
+
+        /// <summary>
         /// Tester, at PropertyChangedOnKontoModelEventHandler rejser PropertyChanged, når modellen for budgetkontoen opdateres.
         /// </summary>
         [Test]
@@ -774,6 +841,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Bogført", "BogførtAsText")]
         [TestCase("BogførtSidsteMåned", "BogførtSidsteMåned")]
         [TestCase("BogførtSidsteMåned", "BogførtSidsteMånedAsText")]
+        [TestCase("BogførtÅrTilDato", "BogførtÅrTilDato")]
+        [TestCase("BogførtÅrTilDato", "BogførtÅrTilDatoAsText")]
+        [TestCase("BogførtSidsteÅr", "BogførtSidsteÅr")]
+        [TestCase("BogførtSidsteÅr", "BogførtSidsteÅrAsText")]
         [TestCase("Disponibel", "Disponibel")]
         [TestCase("Disponibel", "DisponibelAsText")]
         [TestCase("Bogført", "Kontoværdi")]

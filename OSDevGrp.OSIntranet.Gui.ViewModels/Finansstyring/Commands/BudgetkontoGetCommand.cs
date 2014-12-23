@@ -126,7 +126,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             budgetkontoViewModel.StatusDato = budgetkontoModel.StatusDato;
             budgetkontoViewModel.Indtægter = budgetkontoModel.Indtægter;
             budgetkontoViewModel.Udgifter = budgetkontoModel.Udgifter;
+            budgetkontoViewModel.BudgetSidsteMåned = budgetkontoModel.BudgetSidsteMåned;
+            budgetkontoViewModel.BudgetÅrTilDato = budgetkontoModel.BudgetÅrTilDato;
+            budgetkontoViewModel.BudgetSidsteÅr = budgetkontoModel.BudgetSidsteÅr;
             budgetkontoViewModel.Bogført = budgetkontoModel.Bogført;
+            budgetkontoViewModel.BogførtSidsteMåned = budgetkontoModel.BogførtSidsteMåned;
+            budgetkontoViewModel.BogførtÅrTilDato = budgetkontoModel.BogførtÅrTilDato;
+            budgetkontoViewModel.BogførtSidsteÅr = budgetkontoModel.BogførtSidsteÅr;
         }
 
         #endregion
