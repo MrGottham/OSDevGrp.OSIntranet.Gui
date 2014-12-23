@@ -565,7 +565,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 .Return(budgetkontogruppeViewModelMock)
                 .Repeat.Any();
             budgetkontoViewModelMock.Expect(m => m.ErRegistreret)
-                .Return(true)
+                .Return(false)
                 .Repeat.Any();
 
             var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
@@ -575,6 +575,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(opgørelseViewModel, Is.Not.Null);
+
+            opgørelseViewModel.Register(budgetkontoViewModelMock);
 
             var exception = Assert.Throws<ArgumentNullException>(() => budgetkontoViewModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
             Assert.That(exception, Is.Not.Null);
@@ -607,7 +609,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 .Return(budgetkontogruppeViewModelMock)
                 .Repeat.Any();
             budgetkontoViewModelMock.Expect(m => m.ErRegistreret)
-                .Return(true)
+                .Return(false)
                 .Repeat.Any();
 
             var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
@@ -617,6 +619,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(opgørelseViewModel, Is.Not.Null);
+
+            opgørelseViewModel.Register(budgetkontoViewModelMock);
 
             var exception = Assert.Throws<ArgumentNullException>(() => budgetkontoViewModelMock.Raise(m => m.PropertyChanged += null, fixture.Create<object>(), null));
             Assert.That(exception, Is.Not.Null);

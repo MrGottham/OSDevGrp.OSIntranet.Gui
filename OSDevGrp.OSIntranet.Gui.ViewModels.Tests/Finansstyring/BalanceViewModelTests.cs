@@ -635,6 +635,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var balanceViewModel = new BalanceViewModel(regnskabViewModelMock, kontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(balanceViewModel, Is.Not.Null);
 
+            balanceViewModel.Register(kontoViewModelMock);
+
             var exception = Assert.Throws<ArgumentNullException>(() => kontoViewModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
@@ -676,6 +678,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var balanceViewModel = new BalanceViewModel(regnskabViewModelMock, kontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(balanceViewModel, Is.Not.Null);
+
+            balanceViewModel.Register(kontoViewModelMock);
 
             var exception = Assert.Throws<ArgumentNullException>(() => kontoViewModelMock.Raise(m => m.PropertyChanged += null, fixture.Create<object>(), null));
             Assert.That(exception, Is.Not.Null);

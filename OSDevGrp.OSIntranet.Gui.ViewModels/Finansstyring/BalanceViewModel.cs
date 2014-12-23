@@ -74,6 +74,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 return;
             }
             kontoViewModel.ErRegistreret = true;
+            kontoViewModel.PropertyChanged += PropertyChangedOnKontoViewModelEventHandler;
         }
 
         /// <summary>
@@ -97,6 +98,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("Konti");
                     break;
             }
+        }
+
+        /// <summary>
+        /// Event, der rejses, når en property ændres på ViewModel for en konto, der er registreret til brug i denne balancelinje.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnKontoViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            /*
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+             */
+            throw new NotImplementedException();
         }
 
         #endregion
