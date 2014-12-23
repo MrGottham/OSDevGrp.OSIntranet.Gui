@@ -22,12 +22,17 @@
                     <ColumnDefinition Width="250" MinWidth="250" MaxWidth="250"/>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Center" Text="{Binding Path=StatusDatoAsMonthText}"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Center" Text="{Binding Path=StatusDatoAsLastMonthText}"/>
+                <TextBlock Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Center" Text="{Binding Path=StatusDatoAsMonthText}"/>
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
                 <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=2}"/>
                 <TextBlock Grid.Row="1" Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=3}"/>
+                <TextBlock Grid.Row="1" Grid.Column="4" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=2}"/>
+                <TextBlock Grid.Row="1" Grid.Column="5" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=3}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BudgetkontoViewModelDefaultNavigationDataTemplate">
@@ -37,11 +42,15 @@
                     <ColumnDefinition Width="250" MinWidth="250" MaxWidth="250"/>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
+                    <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=Kontonummer}"/>
                 <TextBlock Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=Kontonavn}"/>
-                <TextBlock Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetAsText}"/>
-                <TextBlock Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtAsText}"/>
+                <TextBlock Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetSidsteMånedAsText}"/>
+                <TextBlock Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtSidsteMånedAsText}"/>
+                <TextBlock Grid.Column="4" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetAsText}"/>
+                <TextBlock Grid.Column="5" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtAsText}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="BudgetkontoViewModelMinimalNavigationDataTemplate">
