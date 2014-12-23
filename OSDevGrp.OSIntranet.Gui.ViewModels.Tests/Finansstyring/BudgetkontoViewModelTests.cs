@@ -187,6 +187,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(budgetkontoViewModel.Image, Is.Not.Null);
             Assert.That(budgetkontoViewModel.Image, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.Image, Is.EqualTo(Resource.GetEmbeddedResource("Images.Budgetkonto.png")));
+            Assert.That(budgetkontoViewModel.ErRegistreret, Is.False);
             Assert.That(budgetkontoViewModel.RefreshCommand, Is.Not.Null);
             Assert.That(budgetkontoViewModel.RefreshCommand, Is.TypeOf<BudgetkontoGetCommand>());
 

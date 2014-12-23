@@ -216,6 +216,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(kontoViewModel.Image, Is.Not.Null);
             Assert.That(kontoViewModel.Image, Is.Not.Empty);
             Assert.That(kontoViewModel.Image, Is.EqualTo(image));
+            Assert.That(kontoViewModel.ErRegistreret, Is.False);
             Assert.That(kontoViewModel.RefreshCommand, Is.Not.Null);
             Assert.That(kontoViewModel.Model, Is.Not.Null);
             Assert.That(kontoViewModel.Model, Is.EqualTo(kontoModelMock));
@@ -738,6 +739,70 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             kontoModelMock.AssertWasCalled(m => m.StatusDato = Arg<DateTime>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til ErRegistreret opdaterer angivelsen af, om kontoen er registreret i forhold til opgørelsen og/eller balancen.
+        /// </summary>
+        [Test]
+        public void TestAtErRegistreretSetterOpdatererErRegistreret()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
+            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IKontoModelBase>(), fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(kontoViewModel, Is.Not.Null);
+            Assert.That(kontoViewModel.ErRegistreret, Is.False);
+
+            kontoViewModel.ErRegistreret = true;
+            Assert.That(kontoViewModel.ErRegistreret, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at sætteren til ErRegistreret rejser PropertyChanged, når angivelsen af, om kontoen er registreret i forhold til opgørelsen og/eller balancen, opdateres.
+        /// </summary>
+        [Test]
+        [TestCase("ErRegistreret")]
+        public void TestAtErRegistreretSetterRejserPropertyChangedVedOpdateringAfErRegistreret(string expectedPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
+            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IKontoModelBase>(), fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            Assert.That(kontoViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            kontoViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, expectedPropertyName, StringComparison.Ordinal) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            kontoViewModel.ErRegistreret = kontoViewModel.ErRegistreret;
+            Assert.That(eventCalled, Is.False);
+            kontoViewModel.ErRegistreret = !kontoViewModel.ErRegistreret;
+            Assert.That(eventCalled, Is.True);
         }
 
         /// <summary>

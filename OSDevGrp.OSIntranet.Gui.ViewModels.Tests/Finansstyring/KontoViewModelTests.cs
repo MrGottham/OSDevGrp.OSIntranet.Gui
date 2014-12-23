@@ -36,29 +36,29 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
             var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
             kontoModelMock.Expect(m => m.Kontonummer)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
             kontoModelMock.Expect(m => m.Kontonavn)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
             kontoModelMock.Expect(m => m.Beskrivelse)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
             kontoModelMock.Expect(m => m.Notat)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
             kontoModelMock.Expect(m => m.StatusDato)
-                          .Return(fixture.Create<DateTime>())
-                          .Repeat.Any();
+                .Return(fixture.Create<DateTime>())
+                .Repeat.Any();
             kontoModelMock.Expect(m => m.Kredit)
-                          .Return(fixture.Create<decimal>())
-                          .Repeat.Any();
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
             kontoModelMock.Expect(m => m.Saldo)
-                          .Return(fixture.Create<decimal>())
-                          .Repeat.Any();
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
             kontoModelMock.Expect(m => m.Disponibel)
-                          .Return(fixture.Create<decimal>())
-                          .Repeat.Any();
+                .Return(fixture.Create<decimal>())
+                .Repeat.Any();
             var kontogruppeViewModelMock = fixture.Create<IKontogruppeViewModel>();
             var kontoViewModel = new KontoViewModel(regnskabViewModelMock, kontoModelMock, kontogruppeViewModelMock, fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(kontoViewModel, Is.Not.Null);
@@ -107,6 +107,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(kontoViewModel.Image, Is.Not.Null);
             Assert.That(kontoViewModel.Image, Is.Not.Empty);
             Assert.That(kontoViewModel.Image, Is.EqualTo(Resource.GetEmbeddedResource("Images.Konto.png")));
+            Assert.That(kontoViewModel.ErRegistreret, Is.False);
             Assert.That(kontoViewModel.RefreshCommand, Is.Not.Null);
             Assert.That(kontoViewModel.RefreshCommand, Is.TypeOf<KontoGetCommand>());
 

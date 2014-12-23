@@ -100,5 +100,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
+
+        /// <summary>
+        /// Angivelse af, om kontoen er registreret i forhold til opgørelsen og/eller balancen.
+        /// </summary>
+        bool ErRegistreret
+        {
+            get; 
+            set;
+        }
     }
 }

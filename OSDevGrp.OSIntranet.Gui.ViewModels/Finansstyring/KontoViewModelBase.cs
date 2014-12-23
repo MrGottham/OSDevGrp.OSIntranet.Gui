@@ -23,6 +23,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private TKontogruppeViewModel _kontogruppeViewModel;
         private readonly string _displayName;
         private readonly byte[] _image;
+        private bool _erRegistreret;
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
 
@@ -76,6 +77,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _kontogruppeViewModel = kontogruppeViewModel;
             _displayName = displayName;
             _image = image;
+            _erRegistreret = false;
             _finansstyringRepository = finansstyringRepository;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
         }
@@ -274,6 +276,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return _image;
+            }
+        }
+
+        /// <summary>
+        /// Angivelse af, om kontoen er registreret i forhold til opgørelsen og/eller balancen.
+        /// </summary>
+        public virtual bool ErRegistreret
+        {
+            get
+            {
+                return _erRegistreret;
+            }
+            set
+            {
+                if (_erRegistreret == value)
+                {
+                    return;
+                }
+                _erRegistreret = value;
+                RaisePropertyChanged("ErRegistreret");
             }
         }
 

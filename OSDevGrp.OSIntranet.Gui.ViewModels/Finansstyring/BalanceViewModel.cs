@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -33,6 +35,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 throw new ArgumentNullException("regnskabViewModel");
             }
             _regnskabViewModel = regnskabViewModel;
+            _regnskabViewModel.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
         }
 
         #endregion
@@ -46,10 +49,56 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return _regnskabViewModel.Konti
+                    .Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret)
+                    .OrderBy(m => m.Kontonummer);
             }
         }
         
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Registrerer en konto til at indgå i balancelinjen.
+        /// </summary>
+        /// <param name="kontoViewModel">ViewModel for kontoen, der skal indgå i balancelinjen.</param>
+        public virtual void Register(IKontoViewModel kontoViewModel)
+        {
+            if (kontoViewModel == null)
+            {
+                throw new ArgumentNullException("kontoViewModel");
+            }
+            if (_regnskabViewModel.Konti.Contains(kontoViewModel) == false || kontoViewModel.Kontogruppe == null || kontoViewModel.Kontogruppe.Nummer != Nummer || kontoViewModel.ErRegistreret)
+            {
+                return;
+            }
+            kontoViewModel.ErRegistreret = true;
+        }
+
+        /// <summary>
+        /// Event, der rejses, når en property ændres på ViewModel for regnskabet, som balancelinjen er tilknyttet.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private void PropertyChangedOnRegnskabViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            switch (eventArgs.PropertyName)
+            {
+                case "Konti":
+                    RaisePropertyChanged("Konti");
+                    break;
+            }
+        }
+
         #endregion
     }
 }

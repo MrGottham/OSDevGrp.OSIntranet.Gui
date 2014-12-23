@@ -14,5 +14,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
+
+        /// <summary>
+        /// Registrerer en konto til at indgå i balancelinjen.
+        /// </summary>
+        /// <param name="kontoViewModel">ViewModel for kontoen, der skal indgå i balancelinjen.</param>
+        void Register(IKontoViewModel kontoViewModel);
     }
 }
