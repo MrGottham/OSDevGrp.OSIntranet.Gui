@@ -68,6 +68,7 @@
     <Compile Include="Core\TabelViewModelBaseTests.cs" />
     <Compile Include="Core\Validators\ValidationTests.cs" />
     <Compile Include="Finansstyring\AdressekontoViewModelTests.cs" />
+    <Compile Include="Finansstyring\BalanceViewModelTests.cs" />
     <Compile Include="Finansstyring\BogføringsadvarselViewModelTests.cs" />
     <Compile Include="Finansstyring\BogføringslinjeViewModelTests.cs" />
     <Compile Include="Finansstyring\BogføringViewModelTests.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Finansstyring\KontogruppeViewModelTests.cs" />
     <Compile Include="Finansstyring\KontoViewModelTests.cs" />
     <Compile Include="Finansstyring\KontoViewModelBaseTests.cs" />
+    <Compile Include="Finansstyring\OpgørelseViewModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabslisteViewModelTests.cs" />
     <Compile Include="Finansstyring\RegnskabViewModelTests.cs" />
     <Compile Include="MainViewModelTests.cs" />
