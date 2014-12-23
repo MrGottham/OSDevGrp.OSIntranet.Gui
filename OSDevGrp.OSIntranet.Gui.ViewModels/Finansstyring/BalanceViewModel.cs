@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -34,6 +35,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _regnskabViewModel = regnskabViewModel;
         }
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Registrerede konti, som indgår i balancelinjen.
+        /// </summary>
+        public virtual IEnumerable<IKontoViewModel> Konti
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
         #endregion
     }
 }
