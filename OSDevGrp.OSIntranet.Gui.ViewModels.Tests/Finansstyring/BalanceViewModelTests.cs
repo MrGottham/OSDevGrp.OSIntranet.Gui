@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
@@ -564,6 +566,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         [TestCase("Id", "Id")]
         [TestCase("Nummer", "Nummer")]
+        [TestCase("Nummer", "Konti")]
         [TestCase("Tekst", "Tekst")]
         [TestCase("Tekst", "DisplayName")]
         [TestCase("Balancetype", "Balancetype")]
@@ -598,6 +601,64 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(eventCalled, Is.True);
 
             exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnKontoViewModelEventHandler rejser PropertyChanged, når ViewModel for en registreret konto opdateres.
+        /// </summary>
+        [Test]
+        [TestCase("Kontonummer", "Konti")]
+        [TestCase("Kontogruppe", "Konti")]
+        [TestCase("ErRegistreret", "Konti")]
+        public void TestAtPropertyChangedOnKontoViewModelEventHandlerRejserPropertyChangedVedOpdateringAfKontoViewModel(string propertyNameToRaise, string expectPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+            kontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(kontogruppeModelMock.Nummer)
+                .Repeat.Any();
+
+            var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+            kontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(kontogruppeViewModelMock)
+                .Repeat.Any();
+            kontoViewModelMock.Expect(m => m.ErRegistreret)
+                .Return(false)
+                .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                .Return(new List<IKontoViewModel> { kontoViewModelMock })
+                .Repeat.Any();
+
+            var balanceViewModel = new BalanceViewModel(regnskabViewModelMock, kontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(balanceViewModel, Is.Not.Null);
+
+            balanceViewModel.Register(kontoViewModelMock);
+
+            var eventCalled = false;
+            balanceViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            kontoViewModelMock.Raise(m => m.PropertyChanged += null, kontoViewModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+            Assert.That(eventCalled, Is.True);
         }
 
         /// <summary>
@@ -688,5 +749,49 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(exception.ParamName, Is.EqualTo("eventArgs"));
         }
 
+        /// <summary>
+        /// Tester, at PropertyChangedOnKontoViewModelEventHandler kaster en IntranetGuiSystemException, hvis objektet, der rejser eventet, ikke er en ViewModel for en konto.
+        /// </summary>
+        [Test]
+        public void TestAtPropertyChangedOnKontoViewModelEventHandlerKasterIntranetGuiSystemExceptionHvisSenderIkkeErKontoViewModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+            kontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(kontogruppeModelMock.Nummer)
+                .Repeat.Any();
+
+            var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+            kontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(kontogruppeViewModelMock)
+                .Repeat.Any();
+            kontoViewModelMock.Expect(m => m.ErRegistreret)
+                .Return(false)
+                .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                .Return(new List<IKontoViewModel> { kontoViewModelMock })
+                .Repeat.Any();
+
+            var balanceViewModel = new BalanceViewModel(regnskabViewModelMock, kontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(balanceViewModel, Is.Not.Null);
+
+            balanceViewModel.Register(kontoViewModelMock);
+
+            var sender = fixture.Create<object>();
+            var exception = Assert.Throws<IntranetGuiSystemException>(() => kontoViewModelMock.Raise(m => m.PropertyChanged += null, sender, fixture.Create<PropertyChangedEventArgs>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "sender", sender.GetType().Name)));
+        }
     }
 }

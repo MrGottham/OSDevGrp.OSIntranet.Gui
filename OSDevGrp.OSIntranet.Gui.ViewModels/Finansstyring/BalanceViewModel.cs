@@ -78,6 +78,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Metode, der kaldes, når den underlæggende model ændres.
+        /// </summary>
+        /// <param name="propertyName">Navn på property, som er blevet ændret.</param>
+        protected override void ModelChanged(string propertyName)
+        {
+            base.ModelChanged(propertyName);
+            switch (propertyName)
+            {
+                case "Nummer":
+                    RaisePropertyChanged("Konti");
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Event, der rejses, når en property ændres på ViewModel for regnskabet, som balancelinjen er tilknyttet.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -107,7 +122,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <param name="eventArgs">Argumenter til eventet.</param>
         private void PropertyChangedOnKontoViewModelEventHandler(object sender, PropertyChangedEventArgs eventArgs)
         {
-            /*
             if (sender == null)
             {
                 throw new ArgumentNullException("sender");
@@ -116,8 +130,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("eventArgs");
             }
-             */
-            throw new NotImplementedException();
+            switch (eventArgs.PropertyName)
+            {
+                case "Kontonummer":
+                    RaisePropertyChanged("Konti");
+                    break;
+
+                case "Kontogruppe":
+                    RaisePropertyChanged("Konti");
+                    break;
+
+                case "ErRegistreret":
+                    RaisePropertyChanged("Konti");
+                    break;
+            }
+
         }
 
         #endregion
