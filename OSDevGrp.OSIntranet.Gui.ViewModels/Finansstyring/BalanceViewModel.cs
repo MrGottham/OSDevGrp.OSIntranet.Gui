@@ -80,13 +80,79 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// Label til samlet kreditbeløb for kreditbeløb for balancelinjen.
+        /// Label til samlet kreditbeløb for balancelinjen.
         /// </summary>
         public virtual string KreditLabel
         {
             get
             {
                 return Resource.GetText(Text.Credit);
+            }
+        }
+
+        /// <summary>
+        /// Samlet saldo for balancelinjen.
+        /// </summary>
+        public virtual decimal Saldo
+        {
+            get
+            {
+                return Konti.Sum(m => m.Saldo);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet saldo for balancelinjen.
+        /// </summary>
+        public virtual string SaldoAsText
+        {
+            get
+            {
+                return Saldo.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet saldo for balancelinjen.
+        /// </summary>
+        public virtual string SaldoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Balance);
+            }
+        }
+
+        /// <summary>
+        /// Samlet disponibel beløb for balancelinjen.
+        /// </summary>
+        public virtual decimal Disponibel
+        {
+            get
+            {
+                return Konti.Sum(m => m.Disponibel);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet disponibel beløb for balancelinjen.
+        /// </summary>
+        public virtual string DisponibelAsText
+        {
+            get
+            {
+                return Disponibel.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet disponibel beløb for balancelinjen.
+        /// </summary>
+        public virtual string DisponibelLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Available);
             }
         }
 
@@ -113,6 +179,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             RaisePropertyChanged("Konti");
             RaisePropertyChanged("Kredit");
             RaisePropertyChanged("KreditAsText");
+            RaisePropertyChanged("Saldo");
+            RaisePropertyChanged("SaldoAsText");
+            RaisePropertyChanged("Disponibel");
+            RaisePropertyChanged("DisponibelAsText");
         }
 
         /// <summary>
@@ -136,6 +206,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("Konti");
                     RaisePropertyChanged("Kredit");
                     RaisePropertyChanged("KreditAsText");
+                    RaisePropertyChanged("Saldo");
+                    RaisePropertyChanged("SaldoAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
             }
         }
@@ -161,6 +235,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("Konti");
                     RaisePropertyChanged("Kredit");
                     RaisePropertyChanged("KreditAsText");
+                    RaisePropertyChanged("Saldo");
+                    RaisePropertyChanged("SaldoAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
             }
         }
@@ -200,11 +278,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("Konti");
                     RaisePropertyChanged("Kredit");
                     RaisePropertyChanged("KreditAsText");
+                    RaisePropertyChanged("Saldo");
+                    RaisePropertyChanged("SaldoAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
 
                 case "Kredit":
                     RaisePropertyChanged("Kredit");
                     RaisePropertyChanged("KreditAsText");
+                    break;
+
+                case "Saldo":
+                    RaisePropertyChanged("Saldo");
+                    RaisePropertyChanged("SaldoAsText");
+                    break;
+
+                case "Disponibel":
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
 
                 case "ErRegistreret":
@@ -216,6 +308,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("Konti");
                     RaisePropertyChanged("Kredit");
                     RaisePropertyChanged("KreditAsText");
+                    RaisePropertyChanged("Saldo");
+                    RaisePropertyChanged("SaldoAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
             }
         }

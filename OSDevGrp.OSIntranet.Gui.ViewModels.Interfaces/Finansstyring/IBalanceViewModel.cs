@@ -32,9 +32,57 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
-        /// Label til samlet kreditbeløb for kreditbeløb for balancelinjen.
+        /// Label til samlet kreditbeløb for balancelinjen.
         /// </summary>
         string KreditLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet saldo for balancelinjen.
+        /// </summary>
+        decimal Saldo
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet saldo for balancelinjen.
+        /// </summary>
+        string SaldoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet saldo for balancelinjen.
+        /// </summary>
+        string SaldoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet disponibel beløb for balancelinjen.
+        /// </summary>
+        decimal Disponibel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet disponibel beløb for balancelinjen.
+        /// </summary>
+        string DisponibelAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet disponibel beløb for balancelinjen.
+        /// </summary>
+        string DisponibelLabel
         {
             get;
         }

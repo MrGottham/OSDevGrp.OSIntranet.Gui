@@ -57,6 +57,105 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
         }
 
+        /// <summary>
+        /// Samlet budgetteret beløb for opgørelseslinjen.
+        /// </summary>
+        public virtual decimal Budget
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.Budget);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet budgetteret beløb for opgørelseslinjen.
+        /// </summary>
+        public virtual string BudgetAsText
+        {
+            get
+            {
+                return Budget.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet budgetteret beløb for opgørelseslinjen.
+        /// </summary>
+        public virtual string BudgetLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Budget);
+            }
+        }
+
+        /// <summary>
+        /// Samlet budgetteret beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal BudgetSidsteMåned
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.BudgetSidsteMåned);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet budgetteret beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        public virtual string BudgetSidsteMånedAsText
+        {
+            get
+            {
+                return BudgetSidsteMåned.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label af samlet budgetteret beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        public virtual string BudgetSidsteMånedLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetLastMonth);
+            }
+        }
+
+        /// <summary>
+        /// Samlet Budgetteret beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal BudgetÅrTilDato
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet budgetteret beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        public virtual string BudgetÅrTilDatoAsText
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Label af samlet budgetteret beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        public virtual string BudgetÅrTilDatoLabel
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -78,6 +177,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             budgetkontoViewModel.ErRegistreret = true;
             budgetkontoViewModel.PropertyChanged += PropertyChangedOnBudgetkontoViewModelEventHandler;
             RaisePropertyChanged("Budgetkonti");
+            RaisePropertyChanged("Budget");
+            RaisePropertyChanged("BudgetAsText");
+            RaisePropertyChanged("BudgetSidsteMåned");
+            RaisePropertyChanged("BudgetSidsteMånedAsText");
         }
 
         /// <summary>
@@ -99,6 +202,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         Register(budgetkontoViewModel);
                     }
                     RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("Budget");
+                    RaisePropertyChanged("BudgetAsText");
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
                     break;
             }
         }
@@ -122,6 +229,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case "Budgetkonti":
                     RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("Budget");
+                    RaisePropertyChanged("BudgetAsText");
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
                     break;
             }
         }
@@ -159,6 +270,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         budgetkontoViewModel.ErRegistreret = false;
                     }
                     RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("Budget");
+                    RaisePropertyChanged("BudgetAsText");
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    break;
+
+                case "Budget":
+                    RaisePropertyChanged("Budget");
+                    RaisePropertyChanged("BudgetAsText");
+                    break;
+
+                case "BudgetSidsteMåned":
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
                     break;
 
                 case "ErRegistreret":
@@ -168,6 +293,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         budgetkontoViewModel.ErRegistreret = false;
                     }
                     RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged("Budget");
+                    RaisePropertyChanged("BudgetAsText");
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
                     break;
             }
         }

@@ -11,6 +11,7 @@ using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using Text=OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 {
@@ -54,6 +55,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 budgetkontoViewModelMock.Expect(m => m.Kontogruppe)
                     .Return(budgetkontogruppeViewModelMock)
                     .Repeat.Any();
+                budgetkontoViewModelMock.Expect(m => m.Budget)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoViewModelMock.Expect(m => m.BudgetSidsteMåned)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                budgetkontoViewModelMock.Expect(m => m.BudgetÅrTilDato)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
                 budgetkontoViewModelMock.Expect(m => m.ErRegistreret)
                     .Return(true)
                     .Repeat.Any();
@@ -81,6 +91,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(opgørelseViewModel.Budgetkonti, Is.Not.Null);
             Assert.That(opgørelseViewModel.Budgetkonti, Is.Not.Empty);
             Assert.That(opgørelseViewModel.Budgetkonti.Count(), Is.EqualTo(budgetkontoViewModelCollection.Count));
+            Assert.That(opgørelseViewModel.Budget, Is.EqualTo(budgetkontoViewModelCollection.Sum(m => m.Budget)));
+            Assert.That(opgørelseViewModel.BudgetAsText, Is.Not.Null);
+            Assert.That(opgørelseViewModel.BudgetAsText, Is.Not.Empty);
+            Assert.That(opgørelseViewModel.BudgetAsText, Is.EqualTo(budgetkontoViewModelCollection.Sum(m => m.Budget).ToString("C")));
+            Assert.That(opgørelseViewModel.BudgetLabel, Is.Not.Null);
+            Assert.That(opgørelseViewModel.BudgetLabel, Is.Not.Empty);
+            Assert.That(opgørelseViewModel.BudgetLabel, Is.EqualTo(Resource.GetText(Text.Budget)));
+            Assert.That(opgørelseViewModel.BudgetSidsteMåned, Is.EqualTo(budgetkontoViewModelCollection.Sum(m => m.BudgetSidsteMåned)));
+            Assert.That(opgørelseViewModel.BudgetSidsteMånedAsText, Is.Not.Null);
+            Assert.That(opgørelseViewModel.BudgetSidsteMånedAsText, Is.Not.Empty);
+            Assert.That(opgørelseViewModel.BudgetSidsteMånedAsText, Is.EqualTo(budgetkontoViewModelCollection.Sum(m => m.BudgetSidsteMåned).ToString("C")));
+            Assert.That(opgørelseViewModel.BudgetSidsteMånedLabel, Is.Not.Null);
+            Assert.That(opgørelseViewModel.BudgetSidsteMånedLabel, Is.Not.Empty);
+            Assert.That(opgørelseViewModel.BudgetSidsteMånedLabel, Is.EqualTo(Resource.GetText(Text.BudgetLastMonth)));
+            Assert.That(opgørelseViewModel.BudgetÅrTilDato, Is.EqualTo(budgetkontoViewModelCollection.Sum(m => m.BudgetÅrTilDato)));
+            Assert.That(opgørelseViewModel.BudgetÅrTilDatoAsText, Is.Not.Null);
+            Assert.That(opgørelseViewModel.BudgetÅrTilDatoAsText, Is.Not.Empty);
+            Assert.That(opgørelseViewModel.BudgetÅrTilDatoAsText, Is.EqualTo(budgetkontoViewModelCollection.Sum(m => m.BudgetÅrTilDato).ToString("C")));
+            Assert.That(opgørelseViewModel.BudgetÅrTilDatoLabel, Is.Not.Null);
+            Assert.That(opgørelseViewModel.BudgetÅrTilDatoLabel, Is.Not.Empty);
+            Assert.That(opgørelseViewModel.BudgetÅrTilDatoLabel, Is.EqualTo(Resource.GetText(Text.BudgetYearToDate)));
 
             budgetkontogruppeModelMock.AssertWasCalled(m => m.Id);
             budgetkontogruppeModelMock.AssertWasCalled(m => m.Nummer);
@@ -429,6 +460,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Budgetkonti")]
+        [TestCase("Budget")]
+        [TestCase("BudgetAsText")]
+        [TestCase("BudgetSidsteMåned")]
+        [TestCase("BudgetSidsteMånedAsText")]
         public void TestAtRegisterRejserPropertyChangedVedRegistreringAfBudgetkontoViewModelTilBrugForOpgørelseViewModel(string expectPropertyName)
         {
             var fixture = new Fixture();
@@ -487,6 +522,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         [Test]
         [TestCase("Budgetkonti", "Budgetkonti")]
+        [TestCase("Budgetkonti", "Budget")]
+        [TestCase("Budgetkonti", "BudgetAsText")]
+        [TestCase("Budgetkonti", "BudgetSidsteMåned")]
+        [TestCase("Budgetkonti", "BudgetSidsteMånedAsText")]
         public void TestAtPropertyChangedOnRegnskabViewModelEventHandlerRejserPropertyChangedVedOpdateringAfRegnskabViewModel(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();
@@ -567,6 +606,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Id", "Id")]
         [TestCase("Nummer", "Nummer")]
         [TestCase("Nummer", "Budgetkonti")]
+        [TestCase("Nummer", "Budget")]
+        [TestCase("Nummer", "BudgetAsText")]
+        [TestCase("Nummer", "BudgetSidsteMåned")]
+        [TestCase("Nummer", "BudgetSidsteMånedAsText")]
         [TestCase("Tekst", "Tekst")]
         [TestCase("Tekst", "DisplayName")]
         public void TestAtPropertyChangedOnTabelModelEventHandlerRejserPropertyChangedOnBudgetkontogruppeModelUpdate(string propertyNameToRaise, string expectPropertyName)
@@ -687,7 +730,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         [TestCase("Kontonummer", "Budgetkonti")]
         [TestCase("Kontogruppe", "Budgetkonti")]
+        [TestCase("Kontogruppe", "Budget")]
+        [TestCase("Kontogruppe", "BudgetAsText")]
+        [TestCase("Kontogruppe", "BudgetSidsteMåned")]
+        [TestCase("Kontogruppe", "BudgetSidsteMånedAsText")]
+        [TestCase("Budget", "Budget")]
+        [TestCase("Budget", "BudgetAsText")]
+        [TestCase("BudgetSidsteMåned", "BudgetSidsteMåned")]
+        [TestCase("BudgetSidsteMåned", "BudgetSidsteMånedAsText")]
         [TestCase("ErRegistreret", "Budgetkonti")]
+        [TestCase("ErRegistreret", "Budget")]
+        [TestCase("ErRegistreret", "BudgetAsText")]
+        [TestCase("ErRegistreret", "BudgetSidsteMåned")]
+        [TestCase("ErRegistreret", "BudgetSidsteMånedAsText")]
         public void TestAtPropertyChangedOnBudgetkontoViewModelEventHandlerRejserPropertyChangedVedOpdateringAfBudgetkontoViewModel(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();

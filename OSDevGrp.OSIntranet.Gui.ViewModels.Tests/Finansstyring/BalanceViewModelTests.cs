@@ -61,6 +61,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 kontoViewModelMock.Expect(m => m.Kredit)
                     .Return(fixture.Create<decimal>())
                     .Repeat.Any();
+                kontoViewModelMock.Expect(m => m.Saldo)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                kontoViewModelMock.Expect(m => m.Disponibel)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
                 kontoViewModelMock.Expect(m => m.ErRegistreret)
                     .Return(true)
                     .Repeat.Any();
@@ -96,6 +102,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(balanceViewModel.KreditLabel, Is.Not.Null);
             Assert.That(balanceViewModel.KreditLabel, Is.Not.Null);
             Assert.That(balanceViewModel.KreditLabel, Is.EqualTo(Resource.GetText(Text.Credit)));
+            Assert.That(balanceViewModel.Saldo, Is.EqualTo(kontoViewModelCollection.Sum(m => m.Saldo)));
+            Assert.That(balanceViewModel.SaldoAsText, Is.Not.Null);
+            Assert.That(balanceViewModel.SaldoAsText, Is.Not.Null);
+            Assert.That(balanceViewModel.SaldoAsText, Is.EqualTo(kontoViewModelCollection.Sum(m => m.Saldo).ToString("C")));
+            Assert.That(balanceViewModel.SaldoLabel, Is.Not.Null);
+            Assert.That(balanceViewModel.SaldoLabel, Is.Not.Null);
+            Assert.That(balanceViewModel.SaldoLabel, Is.EqualTo(Resource.GetText(Text.Balance)));
+            Assert.That(balanceViewModel.Disponibel, Is.EqualTo(kontoViewModelCollection.Sum(m => m.Disponibel)));
+            Assert.That(balanceViewModel.DisponibelAsText, Is.Not.Null);
+            Assert.That(balanceViewModel.DisponibelAsText, Is.Not.Null);
+            Assert.That(balanceViewModel.DisponibelAsText, Is.EqualTo(kontoViewModelCollection.Sum(m => m.Disponibel).ToString("C")));
+            Assert.That(balanceViewModel.DisponibelLabel, Is.Not.Null);
+            Assert.That(balanceViewModel.DisponibelLabel, Is.Not.Null);
+            Assert.That(balanceViewModel.DisponibelLabel, Is.EqualTo(Resource.GetText(Text.Available)));
 
             kontogruppeModelMock.AssertWasCalled(m => m.Id);
             kontogruppeModelMock.AssertWasCalled(m => m.Nummer);
@@ -500,6 +520,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Konti")]
         [TestCase("Kredit")]
         [TestCase("KreditAsText")]
+        [TestCase("Saldo")]
+        [TestCase("SaldoAsText")]
+        [TestCase("Disponibel")]
+        [TestCase("DisponibelAsText")]
         public void TestAtRegisterRejserPropertyChangedVedRegistreringAfKontoViewModelTilBrugForBalanceViewModel(string expectPropertyName)
         {
             var fixture = new Fixture();
@@ -557,6 +581,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Konti", "Konti")]
         [TestCase("Konti", "Kredit")]
         [TestCase("Konti", "KreditAsText")]
+        [TestCase("Konti", "Saldo")]
+        [TestCase("Konti", "SaldoAsText")]
+        [TestCase("Konti", "Disponibel")]
+        [TestCase("Konti", "DisponibelAsText")]
         public void TestAtPropertyChangedOnRegnskabViewModelEventHandlerRejserPropertyChangedVedOpdateringAfRegnskabViewModel(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();
@@ -639,6 +667,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Nummer", "Konti")]
         [TestCase("Nummer", "Kredit")]
         [TestCase("Nummer", "KreditAsText")]
+        [TestCase("Nummer", "Saldo")]
+        [TestCase("Nummer", "SaldoAsText")]
+        [TestCase("Nummer", "Disponibel")]
+        [TestCase("Nummer", "DisponibelAsText")]
         [TestCase("Tekst", "Tekst")]
         [TestCase("Tekst", "DisplayName")]
         [TestCase("Balancetype", "Balancetype")]
@@ -762,11 +794,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Kontogruppe", "Konti")]
         [TestCase("Kontogruppe", "Kredit")]
         [TestCase("Kontogruppe", "KreditAsText")]
+        [TestCase("Kontogruppe", "Saldo")]
+        [TestCase("Kontogruppe", "SaldoAsText")]
+        [TestCase("Kontogruppe", "Disponibel")]
+        [TestCase("Kontogruppe", "DisponibelAsText")]
         [TestCase("Kredit", "Kredit")]
         [TestCase("Kredit", "KreditAsText")]
+        [TestCase("Saldo", "Saldo")]
+        [TestCase("Saldo", "SaldoAsText")]
+        [TestCase("Disponibel", "Disponibel")]
+        [TestCase("Disponibel", "DisponibelAsText")]
         [TestCase("ErRegistreret", "Konti")]
         [TestCase("ErRegistreret", "Kredit")]
         [TestCase("ErRegistreret", "KreditAsText")]
+        [TestCase("ErRegistreret", "Saldo")]
+        [TestCase("ErRegistreret", "SaldoAsText")]
+        [TestCase("ErRegistreret", "Disponibel")]
+        [TestCase("ErRegistreret", "DisponibelAsText")]
         public void TestAtPropertyChangedOnKontoViewModelEventHandlerRejserPropertyChangedVedOpdateringAfKontoViewModel(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();
