@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -87,6 +89,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             switch (propertyName)
             {
                 case "Nummer":
+                    foreach (var budgetkontoViewModel in _regnskabViewModel.Budgetkonti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret))
+                    {
+                        budgetkontoViewModel.ErRegistreret = false;
+                    }
+                    foreach (var budgetkontoViewModel in _regnskabViewModel.Budgetkonti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret == false))
+                    {
+                        Register(budgetkontoViewModel);
+                    }
                     RaisePropertyChanged("Budgetkonti");
                     break;
             }
@@ -130,6 +140,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("eventArgs");
             }
+            var budgetkontoViewModel = sender as IBudgetkontoViewModel;
+            if (budgetkontoViewModel == null)
+            {
+                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "sender", sender.GetType().Name));
+            }
             switch (eventArgs.PropertyName)
             {
                 case "Kontonummer":
@@ -137,10 +152,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     break;
 
                 case "Kontogruppe":
+                    if ((budgetkontoViewModel.Kontogruppe == null || budgetkontoViewModel.Kontogruppe.Nummer != Nummer) && budgetkontoViewModel.ErRegistreret)
+                    {
+                        budgetkontoViewModel.PropertyChanged -= PropertyChangedOnBudgetkontoViewModelEventHandler;
+                        budgetkontoViewModel.ErRegistreret = false;
+                    }
                     RaisePropertyChanged("Budgetkonti");
                     break;
 
                 case "ErRegistreret":
+                    if (budgetkontoViewModel.ErRegistreret)
+                    {
+                        budgetkontoViewModel.PropertyChanged -= PropertyChangedOnBudgetkontoViewModelEventHandler;
+                        budgetkontoViewModel.ErRegistreret = false;
+                    }
                     RaisePropertyChanged("Budgetkonti");
                     break;
             }

@@ -573,7 +573,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         public void TestAtPropertyChangedOnTabelModelEventHandlerRejserPropertyChangedOnKontogruppeModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
+            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() =>
+            {
+                var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+                regnskabViewModelMock.Expect(m => m.Konti)
+                    .Return(new List<IKontoViewModel>())
+                    .Repeat.Any();
+                return regnskabViewModelMock;
+            }));
             fixture.Customize<IKontogruppeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeModel>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
 
@@ -599,6 +606,78 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(eventCalled, Is.False);
             kontogruppeModelMock.Raise(m => m.PropertyChanged += null, kontogruppeModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(eventCalled, Is.True);
+
+            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnTabelModelEventHandler behandler registreringer af konti i forhold til brug i den aktuelle balancelinje.
+        /// </summary>
+        [Test]
+        [TestCase("Nummer")]
+        public void TestAtPropertyChangedOnTabelModelEventHandlerBehandlerKontoViewModelCollectionForBalanceViewModel(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+            kontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(kontogruppeModelMock.Nummer)
+                .Repeat.Any();
+
+            var kontoViewModelMockCollection1 = new List<IKontoViewModel>(15);
+            while (kontoViewModelMockCollection1.Count < kontoViewModelMockCollection1.Capacity)
+            {
+                var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+                kontoViewModelMock.Expect(m => m.Kontogruppe)
+                    .Return(kontogruppeViewModelMock)
+                    .Repeat.Any();
+                kontoViewModelMock.Expect(m => m.ErRegistreret)
+                    .Return(true)
+                    .Repeat.Any();
+                kontoViewModelMockCollection1.Add(kontoViewModelMock);
+            }
+
+            var kontoViewModelMockCollection2 = new List<IKontoViewModel>(10);
+            while (kontoViewModelMockCollection2.Count < kontoViewModelMockCollection2.Capacity)
+            {
+                var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+                kontoViewModelMock.Expect(m => m.Kontogruppe)
+                    .Return(kontogruppeViewModelMock)
+                    .Repeat.Any();
+                kontoViewModelMock.Expect(m => m.ErRegistreret)
+                    .Return(false)
+                    .Repeat.Any();
+                kontoViewModelMockCollection2.Add(kontoViewModelMock);
+            }
+
+            var kontoViewModelMockCollection = new List<IKontoViewModel>(kontoViewModelMockCollection1);
+            kontoViewModelMockCollection.AddRange(kontoViewModelMockCollection2);
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                .Return(kontoViewModelMockCollection)
+                .Repeat.Any();
+
+            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var balanceViewModel = new BalanceViewModel(regnskabViewModelMock, kontogruppeModelMock, exceptionHandleViewModelMock);
+            Assert.That(balanceViewModel, Is.Not.Null);
+
+            kontogruppeModelMock.Raise(m => m.PropertyChanged += null, kontogruppeModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+
+            foreach (var kontoViewModelMock in kontoViewModelMockCollection1)
+            {
+                kontoViewModelMock.AssertWasCalled(m => m.ErRegistreret = Arg<bool>.Is.Equal(false));
+            }
+            foreach (var kontoViewModelMock in kontoViewModelMockCollection2)
+            {
+                kontoViewModelMock.AssertWasCalled(m => m.ErRegistreret = Arg<bool>.Is.Equal(true));
+            }
 
             exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
@@ -659,6 +738,68 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(eventCalled, Is.False);
             kontoViewModelMock.Raise(m => m.PropertyChanged += null, kontoViewModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at PropertyChangedOnKontoViewModelEventHandler afregistrerer kontoen fra brug i den aktuelle balancelinje.
+        /// </summary>
+        [Test]
+        [TestCase("Kontogruppe")]
+        [TestCase("ErRegistreret")]
+        public void TestAtPropertyChangedOnKontoViewModelEventHandlerAfregistrererKontoViewModelFraBrugForBalanceViewModel(string propertyNameToRaise)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+            kontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(kontogruppeModelMock.Nummer)
+                .Repeat.Any();
+
+            var erRegistreret = false;
+            var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+            // ReSharper disable AccessToModifiedClosure
+            kontoViewModelMock.Expect(m => m.Kontogruppe)
+                .WhenCalled(e => e.ReturnValue = kontogruppeViewModelMock)
+                .Return(null)
+                .Repeat.Any();
+            // ReSharper restore AccessToModifiedClosure
+            kontoViewModelMock.Expect(m => m.ErRegistreret)
+                .WhenCalled(e => e.ReturnValue = erRegistreret)
+                .Return(false)
+                .Repeat.Any();
+            kontoViewModelMock.Expect(m => m.ErRegistreret = Arg<bool>.Is.Anything)
+                .WhenCalled(e => erRegistreret = (bool) e.Arguments.ElementAt(0))
+                .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                .Return(new List<IKontoViewModel> {kontoViewModelMock})
+                .Repeat.Any();
+
+            var balanceViewModel = new BalanceViewModel(regnskabViewModelMock, kontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(balanceViewModel, Is.Not.Null);
+
+            balanceViewModel.Register(kontoViewModelMock);
+
+            switch (propertyNameToRaise)
+            {
+                case "Kontogruppe":
+                    var nummer = fixture.Create<Generator<int>>().First(m => m != kontogruppeViewModelMock.Nummer);
+                    kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+                    kontogruppeViewModelMock.Expect(m => m.Nummer)
+                        .Return(nummer)
+                        .Repeat.Any();
+                    break;
+            }
+            kontoViewModelMock.Raise(m => m.PropertyChanged += null, kontoViewModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
+
+            kontoViewModelMock.AssertWasCalled(m => m.ErRegistreret = Arg<bool>.Is.Equal(false), opt => opt.Repeat.Times(1));
         }
 
         /// <summary>

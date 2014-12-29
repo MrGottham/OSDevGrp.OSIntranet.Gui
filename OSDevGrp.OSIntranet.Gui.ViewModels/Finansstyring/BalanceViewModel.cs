@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -87,6 +89,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             switch (propertyName)
             {
                 case "Nummer":
+                    foreach (var kontoViewModel in _regnskabViewModel.Konti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret))
+                    {
+                        kontoViewModel.ErRegistreret = false;
+                    }
+                    foreach (var kontoViewModel in _regnskabViewModel.Konti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret == false))
+                    {
+                        Register(kontoViewModel);
+                    }
                     RaisePropertyChanged("Konti");
                     break;
             }
@@ -130,6 +140,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("eventArgs");
             }
+            var kontoViewModel = sender as IKontoViewModel;
+            if (kontoViewModel == null)
+            {
+                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "sender", sender.GetType().Name));
+            }
             switch (eventArgs.PropertyName)
             {
                 case "Kontonummer":
@@ -137,14 +152,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     break;
 
                 case "Kontogruppe":
+                    if ((kontoViewModel.Kontogruppe == null || kontoViewModel.Kontogruppe.Nummer != Nummer) && kontoViewModel.ErRegistreret)
+                    {
+                        kontoViewModel.PropertyChanged -= PropertyChangedOnKontoViewModelEventHandler;
+                        kontoViewModel.ErRegistreret = false;
+                    }
                     RaisePropertyChanged("Konti");
                     break;
 
                 case "ErRegistreret":
+                    if (kontoViewModel.ErRegistreret)
+                    {
+                        kontoViewModel.PropertyChanged -= PropertyChangedOnKontoViewModelEventHandler;
+                        kontoViewModel.ErRegistreret = false;
+                    }
                     RaisePropertyChanged("Konti");
                     break;
             }
-
         }
 
         #endregion
