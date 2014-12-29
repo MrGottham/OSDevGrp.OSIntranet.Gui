@@ -56,7 +56,40 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     .OrderBy(m => m.Kontonummer);
             }
         }
-        
+
+        /// <summary>
+        /// Samlet kreditbeløb for balancelinjen.
+        /// </summary>
+        public virtual decimal Kredit
+        {
+            get
+            {
+                return Konti.Sum(m => m.Kredit);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet kreditbeløb for balancelinjen.
+        /// </summary>
+        public virtual string KreditAsText
+        {
+            get
+            {
+                return Kredit.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet kreditbeløb for kreditbeløb for balancelinjen.
+        /// </summary>
+        public virtual string KreditLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Credit);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -77,6 +110,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             kontoViewModel.ErRegistreret = true;
             kontoViewModel.PropertyChanged += PropertyChangedOnKontoViewModelEventHandler;
+            RaisePropertyChanged("Konti");
+            RaisePropertyChanged("Kredit");
+            RaisePropertyChanged("KreditAsText");
         }
 
         /// <summary>
@@ -98,6 +134,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         Register(kontoViewModel);
                     }
                     RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("Kredit");
+                    RaisePropertyChanged("KreditAsText");
                     break;
             }
         }
@@ -121,6 +159,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case "Konti":
                     RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("Kredit");
+                    RaisePropertyChanged("KreditAsText");
                     break;
             }
         }
@@ -158,6 +198,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         kontoViewModel.ErRegistreret = false;
                     }
                     RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("Kredit");
+                    RaisePropertyChanged("KreditAsText");
+                    break;
+
+                case "Kredit":
+                    RaisePropertyChanged("Kredit");
+                    RaisePropertyChanged("KreditAsText");
                     break;
 
                 case "ErRegistreret":
@@ -167,6 +214,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         kontoViewModel.ErRegistreret = false;
                     }
                     RaisePropertyChanged("Konti");
+                    RaisePropertyChanged("Kredit");
+                    RaisePropertyChanged("KreditAsText");
                     break;
             }
         }

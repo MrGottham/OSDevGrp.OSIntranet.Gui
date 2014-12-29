@@ -248,7 +248,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var exceptionHandlerViewModel = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, exceptionHandlerViewModel);
             Assert.That(opgørelseViewModel, Is.Not.Null);
 
             opgørelseViewModel.Register(budgetkontoViewModel);
@@ -286,7 +286,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var exceptionHandlerViewModel = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, exceptionHandlerViewModel);
             Assert.That(opgørelseViewModel, Is.Not.Null);
 
             opgørelseViewModel.Register(budgetkontoViewModel);
@@ -329,7 +329,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var exceptionHandlerViewModel = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, exceptionHandlerViewModel);
             Assert.That(opgørelseViewModel, Is.Not.Null);
 
             opgørelseViewModel.Register(budgetkontoViewModel);
@@ -372,7 +372,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var exceptionHandlerViewModel = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, exceptionHandlerViewModel);
             Assert.That(opgørelseViewModel, Is.Not.Null);
 
             opgørelseViewModel.Register(budgetkontoViewModel);
@@ -415,12 +415,70 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var exceptionHandlerViewModel = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
-            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, fixture.Create<IExceptionHandlerViewModel>());
+            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, exceptionHandlerViewModel);
             Assert.That(opgørelseViewModel, Is.Not.Null);
 
             opgørelseViewModel.Register(budgetkontoViewModel);
 
             budgetkontoViewModel.AssertWasCalled(m => m.ErRegistreret = Arg<bool>.Is.Equal(true));
+            exceptionHandlerViewModel.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at Register rejser PropertyChanged ved registrering af en budgetkonto til brug i den aktuelle opgørelseslinje.
+        /// </summary>
+        [Test]
+        [TestCase("Budgetkonti")]
+        public void TestAtRegisterRejserPropertyChangedVedRegistreringAfBudgetkontoViewModelTilBrugForOpgørelseViewModel(string expectPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontogruppeModelMock = MockRepository.GenerateMock<IBudgetkontogruppeModel>();
+            budgetkontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+            budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(budgetkontogruppeModelMock.Nummer)
+                .Repeat.Any();
+
+            var budgetkontoViewModelMock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+            budgetkontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(budgetkontogruppeViewModelMock)
+                .Repeat.Any();
+            budgetkontoViewModelMock.Expect(m => m.ErRegistreret)
+                .Return(false)
+                .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Budgetkonti)
+                .Return(new List<IBudgetkontoViewModel> {budgetkontoViewModelMock})
+                .Repeat.Any();
+
+            var exceptionHandlerViewModel = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var opgørelseViewModel = new OpgørelseViewModel(regnskabViewModelMock, budgetkontogruppeModelMock, exceptionHandlerViewModel);
+            Assert.That(opgørelseViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            opgørelseViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            opgørelseViewModel.Register(budgetkontoViewModelMock);
+            Assert.That(eventCalled, Is.True);
+
             exceptionHandlerViewModel.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
 

@@ -77,6 +77,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             }
             budgetkontoViewModel.ErRegistreret = true;
             budgetkontoViewModel.PropertyChanged += PropertyChangedOnBudgetkontoViewModelEventHandler;
+            RaisePropertyChanged("Budgetkonti");
         }
 
         /// <summary>

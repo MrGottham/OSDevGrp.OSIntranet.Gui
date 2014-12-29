@@ -11,6 +11,7 @@ using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using Text=OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 {
@@ -57,6 +58,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 kontoViewModelMock.Expect(m => m.Kontogruppe)
                     .Return(kontogruppeViewModelMock)
                     .Repeat.Any();
+                kontoViewModelMock.Expect(m => m.Kredit)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
                 kontoViewModelMock.Expect(m => m.ErRegistreret)
                     .Return(true)
                     .Repeat.Any();
@@ -85,6 +89,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(balanceViewModel.Konti, Is.Not.Null);
             Assert.That(balanceViewModel.Konti, Is.Not.Empty);
             Assert.That(balanceViewModel.Konti.Count(), Is.EqualTo(kontoViewModelCollection.Count));
+            Assert.That(balanceViewModel.Kredit, Is.EqualTo(kontoViewModelCollection.Sum(m => m.Kredit)));
+            Assert.That(balanceViewModel.KreditAsText, Is.Not.Null);
+            Assert.That(balanceViewModel.KreditAsText, Is.Not.Null);
+            Assert.That(balanceViewModel.KreditAsText, Is.EqualTo(kontoViewModelCollection.Sum(m => m.Kredit).ToString("C")));
+            Assert.That(balanceViewModel.KreditLabel, Is.Not.Null);
+            Assert.That(balanceViewModel.KreditLabel, Is.Not.Null);
+            Assert.That(balanceViewModel.KreditLabel, Is.EqualTo(Resource.GetText(Text.Credit)));
 
             kontogruppeModelMock.AssertWasCalled(m => m.Id);
             kontogruppeModelMock.AssertWasCalled(m => m.Nummer);
@@ -483,10 +494,69 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at Register rejser PropertyChanged ved registrering af en konto til brug i den aktuelle balancelinje.
+        /// </summary>
+        [Test]
+        [TestCase("Konti")]
+        [TestCase("Kredit")]
+        [TestCase("KreditAsText")]
+        public void TestAtRegisterRejserPropertyChangedVedRegistreringAfKontoViewModelTilBrugForBalanceViewModel(string expectPropertyName)
+        {
+            var fixture = new Fixture();
+
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+            kontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(kontogruppeModelMock.Nummer)
+                .Repeat.Any();
+
+            var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
+            kontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(kontogruppeViewModelMock)
+                .Repeat.Any();
+            kontoViewModelMock.Expect(m => m.ErRegistreret)
+                .Return(false)
+                .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+            regnskabViewModelMock.Expect(m => m.Konti)
+                .Return(new List<IKontoViewModel> {kontoViewModelMock})
+                .Repeat.Any();
+
+            var exceptionHandlerViewModel = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+
+            var balanceViewModel = new BalanceViewModel(regnskabViewModelMock, kontogruppeModelMock, exceptionHandlerViewModel);
+            Assert.That(balanceViewModel, Is.Not.Null);
+
+            var eventCalled = false;
+            balanceViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            balanceViewModel.Register(kontoViewModelMock);
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
         /// Tester, at PropertyChangedOnRegnskabViewModelEventHandler rejser PropertyChanged, når ViewModel for regnskabet opdateres.
         /// </summary>
         [Test]
         [TestCase("Konti", "Konti")]
+        [TestCase("Konti", "Kredit")]
+        [TestCase("Konti", "KreditAsText")]
         public void TestAtPropertyChangedOnRegnskabViewModelEventHandlerRejserPropertyChangedVedOpdateringAfRegnskabViewModel(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();
@@ -567,6 +637,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Id", "Id")]
         [TestCase("Nummer", "Nummer")]
         [TestCase("Nummer", "Konti")]
+        [TestCase("Nummer", "Kredit")]
+        [TestCase("Nummer", "KreditAsText")]
         [TestCase("Tekst", "Tekst")]
         [TestCase("Tekst", "DisplayName")]
         [TestCase("Balancetype", "Balancetype")]
@@ -688,7 +760,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         [TestCase("Kontonummer", "Konti")]
         [TestCase("Kontogruppe", "Konti")]
+        [TestCase("Kontogruppe", "Kredit")]
+        [TestCase("Kontogruppe", "KreditAsText")]
+        [TestCase("Kredit", "Kredit")]
+        [TestCase("Kredit", "KreditAsText")]
         [TestCase("ErRegistreret", "Konti")]
+        [TestCase("ErRegistreret", "Kredit")]
+        [TestCase("ErRegistreret", "KreditAsText")]
         public void TestAtPropertyChangedOnKontoViewModelEventHandlerRejserPropertyChangedVedOpdateringAfKontoViewModel(string propertyNameToRaise, string expectPropertyName)
         {
             var fixture = new Fixture();

@@ -16,6 +16,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Samlet kreditbeløb for balancelinjen.
+        /// </summary>
+        decimal Kredit
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet kreditbeløb for balancelinjen.
+        /// </summary>
+        string KreditAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet kreditbeløb for kreditbeløb for balancelinjen.
+        /// </summary>
+        string KreditLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Registrerer en konto til at indgå i balancelinjen.
         /// </summary>
         /// <param name="kontoViewModel">ViewModel for kontoen, der skal indgå i balancelinjen.</param>
