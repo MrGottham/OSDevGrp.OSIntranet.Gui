@@ -1014,13 +1014,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.PassiverIAltAsText, Is.Not.Empty);
             Assert.That(regnskabViewModel.PassiverIAltAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
 
-            regnskabViewModel.BogføringSet(fixture.Create<IBogføringViewModel>());
-            Assert.That(regnskabViewModel.Bogføring, Is.Not.Null);
-
             var expectedValue = kontogruppeViewModelMockCollection
                 .Where(m => kontogrupperInUse.Contains(m.Nummer))
                 .Select(m => m.CreateBalancelinje(regnskabViewModel))
                 .Sum(m => m.Saldo);
+
+            regnskabViewModel.BogføringSet(fixture.Create<IBogføringViewModel>());
+            Assert.That(regnskabViewModel.Bogføring, Is.Not.Null);
 
             kontogruppeViewModelMockCollection.ForEach(regnskabViewModel.KontogruppeAdd);
             kontoViewModelMockCollection.ForEach(regnskabViewModel.KontoAdd);
