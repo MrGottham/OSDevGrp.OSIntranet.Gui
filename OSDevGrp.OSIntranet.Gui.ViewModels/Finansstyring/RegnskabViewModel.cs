@@ -495,6 +495,72 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Budgetteret beløb fra årsopgørelsen.
+        /// </summary>
+        public virtual decimal Budget
+        {
+            get
+            {
+                return Opgørelseslinjer.Sum(m => m.Budget);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetAsText
+        {
+            get
+            {
+                return Budget.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til budgetteret beløb fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Budget);
+            }
+        }
+
+        /// <summary>
+        /// Budgetteret beløb for sidste måned fra årsopgørelsen.
+        /// </summary>
+        public virtual decimal BudgetSidsteMåned
+        {
+            get
+            {
+                return Opgørelseslinjer.Sum(m => m.BudgetSidsteMåned);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for sidste måned fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetSidsteMånedAsText
+        {
+            get
+            {
+                return BudgetSidsteMåned.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til budgetteret beløb for sidste måned fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetSidsteMånedLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetLastMonth);
+}
+        }
+
+        /// <summary>
         /// Overskrift til balancen.
         /// </summary>
         public virtual string BalanceHeader
@@ -1138,6 +1204,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 case "Nummer":
                     RaisePropertyChanged("Opgørelseslinjer");
                     break;
+
+                case "Budget":
+                    RaisePropertyChanged("Budget");
+                    RaisePropertyChanged("BudgetAsText");
+                    break;
+
+                case "BudgetSidsteMåned":
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    break;
             }
         }
 
@@ -1459,6 +1535,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 case NotifyCollectionChangedAction.Add:
                     RaisePropertyChanged("Opgørelseslinjer");
+                    RaisePropertyChanged("Budget");
+                    RaisePropertyChanged("BudgetAsText");
+                    RaisePropertyChanged("BudgetSidsteMåned");
+                    RaisePropertyChanged("BudgetSidsteMånedAsText");
                     break;
             }
         }
