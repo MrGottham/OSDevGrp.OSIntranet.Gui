@@ -365,4 +365,10 @@
   <data name="Liabilities" xml:space="preserve">
     <value>Passiver</value>
   </data>
+  <data name="AssertsTotal" xml:space="preserve">
+    <value>Aktiver i alt</value>
+  </data>
+  <data name="LiabilitiesTotal" xml:space="preserve">
+    <value>Passiver i alt</value>
+  </data>
 </root>

@@ -187,6 +187,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Asserts total.
+        /// </summary>
+        internal static string AssertsTotal {
+            get {
+                return ResourceManager.GetString("AssertsTotal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Available.
         /// </summary>
         internal static string Available {
@@ -561,6 +570,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string Liabilities {
             get {
                 return ResourceManager.GetString("Liabilities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Liabilities total.
+        /// </summary>
+        internal static string LiabilitiesTotal {
+            get {
+                return ResourceManager.GetString("LiabilitiesTotal", resourceCulture);
             }
         }
         

@@ -74,8 +74,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Margin="0,0,0,5" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=Key.DisplayName}"/>
-                <ListView Grid.Row="1" Margin="0,0,0,5" Style="{StaticResource BudgetAccountListViewStyle}" ItemsSource="{Binding Path=Value}" HeaderTemplate="{StaticResource BudgetkontoViewModelHeaderDefaultNavigationDataTemplate}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
+                <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=Key.DisplayName}"/>
+                <ListView Grid.Row="1" Margin="0,0,0,0" Style="{StaticResource BudgetAccountListViewStyle}" ItemsSource="{Binding Path=Value}" HeaderTemplate="{StaticResource BudgetkontoViewModelHeaderDefaultNavigationDataTemplate}" ItemTemplate="{StaticResource BudgetkontoViewModelDefaultNavigationDataTemplate}" SelectionMode="None">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Vertical" IsDoubleTapEnabled="False" IsHitTestVisible="False" IsHoldingEnabled="False" IsRightTapEnabled="False" IsTapEnabled="False"/>

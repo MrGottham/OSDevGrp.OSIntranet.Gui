@@ -17,6 +17,7 @@ using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Kernel;
 using Rhino.Mocks;
+using Is = NUnit.Framework.Is;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
@@ -200,6 +201,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.AktiverColumns.ElementAt(1), Is.Not.Null);
             Assert.That(regnskabViewModel.AktiverColumns.ElementAt(1), Is.Not.Empty);
             Assert.That(regnskabViewModel.AktiverColumns.ElementAt(1), Is.EqualTo(Resource.GetText(Text.Balance)));
+            Assert.That(regnskabViewModel.AktiverIAlt, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+            Assert.That(regnskabViewModel.AktiverIAltLabel, Is.Not.Null);
+            Assert.That(regnskabViewModel.AktiverIAltLabel, Is.Not.Empty);
+            Assert.That(regnskabViewModel.AktiverIAltLabel, Is.EqualTo(Resource.GetText(Text.AssertsTotal)));
             Assert.That(regnskabViewModel.Passiver, Is.Not.Null);
             Assert.That(regnskabViewModel.Passiver, Is.Empty);
             Assert.That(regnskabViewModel.PassiverHeader, Is.Not.Null);
@@ -211,6 +219,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.PassiverColumns.ElementAt(1), Is.Not.Null);
             Assert.That(regnskabViewModel.PassiverColumns.ElementAt(1), Is.Not.Empty);
             Assert.That(regnskabViewModel.PassiverColumns.ElementAt(1), Is.EqualTo(Resource.GetText(Text.Balance)));
+            Assert.That(regnskabViewModel.PassiverIAlt, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+            Assert.That(regnskabViewModel.PassiverIAltLabel, Is.Not.Null);
+            Assert.That(regnskabViewModel.PassiverIAltLabel, Is.Not.Empty);
+            Assert.That(regnskabViewModel.PassiverIAltLabel, Is.EqualTo(Resource.GetText(Text.LiabilitiesTotal)));
             Assert.That(regnskabViewModel.Debitorer, Is.Not.Null);
             Assert.That(regnskabViewModel.Debitorer, Is.Empty);
             Assert.That(regnskabViewModel.DebitorerHeader, Is.Not.Null);
@@ -885,6 +900,125 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at getteren til AktiverIAlt returnerer aktiver i alt.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtAktiverIAltGetterReturnererAktiverIAlt(int[] kontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IBogføringViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringViewModel>()));
+
+            var kontogruppeViewModelMockCollection = new List<IKontogruppeViewModel>(kontogrupper.Length);
+            foreach (var id in kontogrupper)
+            {
+                var balanceViewModelMock = MockRepository.GenerateMock<IBalanceViewModel>();
+                balanceViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                balanceViewModelMock.Expect(m => m.Balancetype)
+                    .Return(Balancetype.Aktiver)
+                    .Repeat.Any();
+                balanceViewModelMock.Expect(m => m.Saldo)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+                kontogruppeViewModelMock.Expect(m => m.Nummer)
+                    .Return(balanceViewModelMock.Nummer)
+                    .Repeat.Any();
+                kontogruppeViewModelMock.Expect(m => m.CreateBalancelinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(balanceViewModelMock)
+                    .Repeat.Any();
+                kontogruppeViewModelMockCollection.Add(kontogruppeViewModelMock);
+            }
+
+            var kontoViewModelMockCollection = CreateKontoViewModels(fixture, kontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            //var expectedValue = kontoViewModelMockCollection.Distinct()
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.AktiverIAlt, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+            Assert.That(regnskabViewModel.Bogføring, Is.Null);
+
+            regnskabViewModel.BogføringSet(fixture.Create<IBogføringViewModel>());
+            Assert.That(regnskabViewModel.Bogføring, Is.Not.Null);
+
+            kontogruppeViewModelMockCollection.ForEach(regnskabViewModel.KontogruppeAdd);
+            kontoViewModelMockCollection.ForEach(regnskabViewModel.KontoAdd);
+
+            Assert.That(regnskabViewModel.AktiverIAlt, Is.EqualTo(kontogruppeViewModelMockCollection.Sum(m => m.CreateBalancelinje(regnskabViewModel).Saldo)));
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.AktiverIAltAsText, Is.EqualTo(kontogruppeViewModelMockCollection.Sum(m => m.CreateBalancelinje(regnskabViewModel).Saldo).ToString("C")));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til PassiverIAlt returnerer passiver i alt.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtPassiverIAltGetterReturnererPassiverIAlt(int[] kontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IBogføringViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringViewModel>()));
+
+            var kontogruppeViewModelMockCollection = new List<IKontogruppeViewModel>(kontogrupper.Length);
+            foreach (var id in kontogrupper)
+            {
+                var balanceViewModelMock = MockRepository.GenerateMock<IBalanceViewModel>();
+                balanceViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                balanceViewModelMock.Expect(m => m.Balancetype)
+                    .Return(Balancetype.Passiver)
+                    .Repeat.Any();
+                balanceViewModelMock.Expect(m => m.Saldo)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModel>();
+                kontogruppeViewModelMock.Expect(m => m.Nummer)
+                    .Return(balanceViewModelMock.Nummer)
+                    .Repeat.Any();
+                kontogruppeViewModelMock.Expect(m => m.CreateBalancelinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(balanceViewModelMock)
+                    .Repeat.Any();
+                kontogruppeViewModelMockCollection.Add(kontogruppeViewModelMock);
+            }
+
+            var kontoViewModelMockCollection = CreateKontoViewModels(fixture, kontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.PassiverIAlt, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+
+            regnskabViewModel.BogføringSet(fixture.Create<IBogføringViewModel>());
+            Assert.That(regnskabViewModel.Bogføring, Is.Not.Null);
+
+            kontogruppeViewModelMockCollection.ForEach(regnskabViewModel.KontogruppeAdd);
+            kontoViewModelMockCollection.ForEach(regnskabViewModel.KontoAdd);
+            
+            Assert.That(regnskabViewModel.PassiverIAlt, Is.EqualTo(kontogruppeViewModelMockCollection.Sum(m => m.CreateBalancelinje(regnskabViewModel).Saldo)));
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.PassiverIAltAsText, Is.EqualTo(kontogruppeViewModelMockCollection.Sum(m => m.CreateBalancelinje(regnskabViewModel).Saldo).ToString("C")));
+        }
+
+        /// <summary>
         /// Tester, at KontoAdd kaster en ArgumentNullException, hvis ViewModel for kontoen er null.
         /// </summary>
         [Test]
@@ -1230,11 +1364,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("KontiTop", "Aktiver")]
         [TestCase("KontiTopGrouped", "Aktiver")]
         [TestCase("Aktiver", "Aktiver")]
+        [TestCase("AktiverIAlt", "Aktiver")]
+        [TestCase("AktiverIAltAsText", "Aktiver")]
         [TestCase("Konti", "Passiver")]
         [TestCase("KontiGrouped", "Passiver")]
         [TestCase("KontiTop", "Passiver")]
         [TestCase("KontiTopGrouped", "Passiver")]
         [TestCase("Passiver", "Passiver")]
+        [TestCase("PassiverIAlt", "Passiver")]
+        [TestCase("PassiverIAltAsText", "Passiver")]
         public void TestAtKontoAddRejserPropertyChangedVedAddAfKontoViewModel(string expectedPropertyName, string balanceType)
         {
             var fixture = new Fixture();
@@ -3311,8 +3449,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Nummer", "Passiver", "Passiver")]
         [TestCase("Balancetype", "Aktiver", "Aktiver")]
         [TestCase("Balancetype", "Aktiver", "Passiver")]
+        [TestCase("Balancetype", "AktiverIAlt", "Aktiver")]
+        [TestCase("Balancetype", "AktiverIAlt", "Passiver")]
+        [TestCase("Balancetype", "AktiverIAltAsText", "Aktiver")]
+        [TestCase("Balancetype", "AktiverIAltAsText", "Passiver")]
         [TestCase("Balancetype", "Passiver", "Aktiver")]
         [TestCase("Balancetype", "Passiver", "Passiver")]
+        [TestCase("Balancetype", "PassiverIAlt", "Aktiver")]
+        [TestCase("Balancetype", "PassiverIAlt", "Passiver")]
+        [TestCase("Balancetype", "PassiverIAltAsText", "Aktiver")]
+        [TestCase("Balancetype", "PassiverIAltAsText", "Passiver")]
+        [TestCase("Saldo", "AktiverIAlt", "Aktiver")]
+        [TestCase("Saldo", "AktiverIAltAsText", "Aktiver")]
+        [TestCase("Saldo", "PassiverIAlt", "Passiver")]
+        [TestCase("Saldo", "PassiverIAltAsText", "Passiver")]
         public void TestAtPropertyChangedOnBalanceViewModelEventHandlerRejserPropertyChangedOnBalanceViewModelUpdate(string propertyName, string expectedPropertyName, string balanceType)
         {
             var fixture = new Fixture();
@@ -4133,14 +4283,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             {
                 var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
                 kontoViewModelMock.Expect(m => m.Kontonummer)
-                                  .Return(fixture.Create<string>())
-                                  .Repeat.Any();
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
                 kontoViewModelMock.Expect(m => m.Kontogruppe)
-                                  .Return(kontogruppeArray.ElementAt(random.Next(kontogruppeArray.Length - 1)))
-                                  .Repeat.Any();
+                    .Return(kontogruppeArray.ElementAt(random.Next(kontogruppeArray.Length - 1)))
+                    .Repeat.Any();
                 kontoViewModelMock.Expect(m => m.Kontoværdi)
-                                  .Return(fixture.Create<decimal>())
-                                  .Repeat.Any();
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
                 result.Add(kontoViewModelMock);
             }
             return result;

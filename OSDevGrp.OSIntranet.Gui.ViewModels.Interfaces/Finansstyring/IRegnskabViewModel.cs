@@ -284,6 +284,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Aktiver i alt.
+        /// </summary>
+        decimal AktiverIAlt
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af aktiver i alt.
+        /// </summary>
+        string AktiverIAltAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til aktiver i alt.
+        /// </summary>
+        string AktiverIAltLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Linjer, der indgår i balancens passiver.
         /// </summary>
         IEnumerable<IBalanceViewModel> Passiver
@@ -303,6 +327,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// Kolonneoverskrifter til linjer, der indgår i balancens aktiver.
         /// </summary>
         IEnumerable<string> PassiverColumns
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Passiver i alt.
+        /// </summary>
+        decimal PassiverIAlt
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af passiver i alt.
+        /// </summary>
+        string PassiverIAltAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til passiver i alt.
+        /// </summary>
+        string PassiverIAltLabel
         {
             get;
         }

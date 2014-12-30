@@ -83,6 +83,8 @@
         AnnualStatement,
         AccountingBalance,
         Asserts,
-        Liabilities
+        AssertsTotal,
+        Liabilities,
+        LiabilitiesTotal
     }
 }

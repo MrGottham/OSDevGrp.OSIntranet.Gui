@@ -542,6 +542,39 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Aktiver i alt.
+        /// </summary>
+        public virtual decimal AktiverIAlt
+        {
+            get
+            {
+                return Aktiver.Sum(m => m.Saldo);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af aktiver i alt.
+        /// </summary>
+        public virtual string AktiverIAltAsText
+        {
+            get
+            {
+                return AktiverIAlt.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til aktiver i alt.
+        /// </summary>
+        public virtual string AktiverIAltLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.AssertsTotal);
+            }
+        }
+
+        /// <summary>
         /// Linjer, der indgår i balancens passiver.
         /// </summary>
         public virtual IEnumerable<IBalanceViewModel> Passiver
@@ -571,6 +604,39 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             get
             {
                 return AktiverColumns;
+            }
+        }
+
+        /// <summary>
+        /// Passiver i alt.
+        /// </summary>
+        public virtual decimal PassiverIAlt
+        {
+            get
+            {
+                return Passiver.Sum(m => m.Saldo);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af passiver i alt.
+        /// </summary>
+        public virtual string PassiverIAltAsText
+        {
+            get
+            {
+                return PassiverIAlt.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til passiver i alt.
+        /// </summary>
+        public virtual string PassiverIAltLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.LiabilitiesTotal);
             }
         }
 
@@ -1108,7 +1174,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case "Balancetype":
                     RaisePropertyChanged("Aktiver");
+                    RaisePropertyChanged("AktiverIAlt");
+                    RaisePropertyChanged("AktiverIAltAsText");
                     RaisePropertyChanged("Passiver");
+                    RaisePropertyChanged("PassiverIAlt");
+                    RaisePropertyChanged("PassiverIAltAsText");
+                    break;
+
+                case "Saldo":
+                    if (balanceViewModel.Balancetype == Balancetype.Aktiver)
+                    {
+                        RaisePropertyChanged("AktiverIAlt");
+                        RaisePropertyChanged("AktiverIAltAsText");
+                        break;
+                    }
+                    RaisePropertyChanged("PassiverIAlt");
+                    RaisePropertyChanged("PassiverIAltAsText");
                     break;
             }
         }
@@ -1407,10 +1488,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     if (e.NewItems.OfType<IBalanceViewModel>().Any(m => m.Balancetype == Balancetype.Aktiver))
                     {
                         RaisePropertyChanged("Aktiver");
+                        RaisePropertyChanged("AktiverIAlt");
+                        RaisePropertyChanged("AktiverIAltAsText");
                     }
                     if (e.NewItems.OfType<IBalanceViewModel>().Any(m => m.Balancetype == Balancetype.Passiver))
                     {
                         RaisePropertyChanged("Passiver");
+                        RaisePropertyChanged("PassiverIAlt");
+                        RaisePropertyChanged("PassiverIAltAsText");
                     }
                     break;
             }
