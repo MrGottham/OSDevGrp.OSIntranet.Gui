@@ -49,5 +49,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Danner en ViewModel for en linje, der kan indgå i balancen til et givent regnskab og som er baseret på kontogruppen.
+        /// </summary>
+        /// <param name="regnskabViewModel">ViewModel for regnskabet, hvori linjen skal indgå i balancen.</param>
+        /// <returns>ViewModel for en linje, der kan indgå i balancen i det givne regnskab.</returns>
+        public virtual IBalanceViewModel CreateBalancelinje(IRegnskabViewModel regnskabViewModel)
+        {
+            if (regnskabViewModel == null)
+            {
+                throw new ArgumentNullException("regnskabViewModel");
+            }
+            return new BalanceViewModel(regnskabViewModel, Model, ExceptionHandler);
+        }
+
+        #endregion
     }
 }

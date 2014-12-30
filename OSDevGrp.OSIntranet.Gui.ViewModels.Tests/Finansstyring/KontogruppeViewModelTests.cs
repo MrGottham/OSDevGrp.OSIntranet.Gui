@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 {
@@ -181,6 +182,70 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(eventCalled, Is.False);
             kontogruppeModelMock.Raise(m => m.PropertyChanged += null, kontogruppeModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(eventCalled, Is.True);
+
+            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at CreateBalancelinje kaster en ArgumentNullException, hvis ViewModel for regnskabet, hvori linjen skal indgå i balancen, er null.
+        /// </summary>
+        [Test]
+        public void TestAtCreateBalancelinjeKasterArgumentNullExceptionHvisRegnskabViewModelErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IKontogruppeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeModel>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeModelMock = fixture.Create<IKontogruppeModel>();
+            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var kontogruppeViewModel = new KontogruppeViewModel(kontogruppeModelMock, exceptionHandleViewModelMock);
+            Assert.That(kontogruppeViewModel, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => kontogruppeViewModel.CreateBalancelinje(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("regnskabViewModel"));
+            Assert.That(exception.InnerException, Is.Null);
+
+            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at CreateBalancelinje danner en ViewModel for en linje, der kan indgå i balancen i det givne regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtCreateBalancelinjeCreatesBalanceViewModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var kontogruppeModelMock = MockRepository.GenerateMock<IKontogruppeModel>();
+            kontogruppeModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            kontogruppeModelMock.Expect(m => m.Tekst)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            kontogruppeModelMock.Expect(m => m.Balancetype)
+                .Return(Balancetype.Aktiver)
+                .Repeat.Any();
+
+            var regnskabViewModelMock = MockRepository.GenerateMock<IRegnskabViewModel>();
+
+            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+
+            var kontogruppeViewModel = new KontogruppeViewModel(kontogruppeModelMock, exceptionHandleViewModelMock);
+            Assert.That(kontogruppeViewModel, Is.Not.Null);
+
+            var opgørelseViewModel = kontogruppeViewModel.CreateBalancelinje(regnskabViewModelMock);
+            Assert.That(opgørelseViewModel, Is.Not.Null);
+            Assert.That(opgørelseViewModel.Nummer, Is.EqualTo(kontogruppeModelMock.Nummer));
+            Assert.That(opgørelseViewModel.Tekst, Is.Not.Null);
+            Assert.That(opgørelseViewModel.Tekst, Is.Not.Empty);
+            Assert.That(opgørelseViewModel.Tekst, Is.EqualTo(kontogruppeModelMock.Tekst));
+            Assert.That(opgørelseViewModel.Balancetype, Is.EqualTo(kontogruppeModelMock.Balancetype));
 
             exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }

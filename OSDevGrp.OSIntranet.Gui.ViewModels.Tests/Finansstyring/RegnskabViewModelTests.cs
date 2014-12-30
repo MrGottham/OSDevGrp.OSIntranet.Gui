@@ -169,6 +169,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.BogføringsadvarslerHeader, Is.Not.Null);
             Assert.That(regnskabViewModel.BogføringsadvarslerHeader, Is.Not.Empty);
             Assert.That(regnskabViewModel.BogføringsadvarslerHeader, Is.EqualTo(Resource.GetText(Text.PostingWarnings)));
+            Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Not.Null);
+            Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeader, Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeader, Is.Not.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeader, Is.EqualTo(Resource.GetText(Text.AnnualStatement)));
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns, Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns, Is.Not.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.Count(), Is.EqualTo(3));
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(0), Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(0), Is.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(1), Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(1), Is.Not.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(1), Is.EqualTo(Resource.GetText(Text.Budget)));
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(2), Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(2), Is.Not.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerColumns.ElementAt(2), Is.EqualTo(Resource.GetText(Text.Bookkeeped)));
             Assert.That(regnskabViewModel.Debitorer, Is.Not.Null);
             Assert.That(regnskabViewModel.Debitorer, Is.Empty);
             Assert.That(regnskabViewModel.DebitorerHeader, Is.Not.Null);
@@ -575,10 +591,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
             foreach (var id in budgetkontogrupper)
             {
+                var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                opgørelseViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
                 var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
                 budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
-                                              .Return(id)
-                                              .Repeat.Any();
+                    .Return(id)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
                 budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
             }
 
@@ -613,28 +636,40 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
             fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
-                    mock.Expect(m => m.Nummer)
-                        .Return(fixture.Create<int>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
             fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
-                    mock.Expect(m => m.Kontonummer)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontogruppe)
-                        .Return(fixture.Create<IBudgetkontogruppeViewModel>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontoværdi)
-                        .Return(0M)
-                        .Repeat.Any();
-                    return mock;
-                }));
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontonummer)
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                mock.Expect(m => m.Kontoværdi)
+                    .Return(0M)
+                    .Repeat.Any();
+                return mock;
+            }));
 
             var budgetkontoViewModelMockCollection = fixture.CreateMany<IBudgetkontoViewModel>(250).ToList();
 
@@ -664,28 +699,40 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
             fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
-                    mock.Expect(m => m.Nummer)
-                        .Return(fixture.Create<int>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
             fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
-                    mock.Expect(m => m.Kontonummer)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontogruppe)
-                        .Return(fixture.Create<IBudgetkontogruppeViewModel>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontoværdi)
-                        .Return(fixture.Create<decimal>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontonummer)
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                mock.Expect(m => m.Kontoværdi)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                return mock;
+            }));
 
             var budgetkontoViewModelMockCollection = fixture.CreateMany<IBudgetkontoViewModel>(250).ToList();
 
@@ -721,10 +768,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
             foreach (var id in budgetkontogrupper)
             {
+                var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                opgørelseViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
                 var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
                 budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
-                                              .Return(id)
-                                              .Repeat.Any();
+                    .Return(id)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
                 budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
             }
 
@@ -979,28 +1033,40 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
             fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
-                    mock.Expect(m => m.Nummer)
-                        .Return(fixture.Create<int>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
             fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
-                    mock.Expect(m => m.Kontonummer)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontogruppe)
-                        .Return(fixture.Create<IBudgetkontogruppeViewModel>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontoværdi)
-                        .Return(fixture.Create<decimal>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontonummer)
+                    .Return(fixture.Create<string>())
+                    .Repeat.Any();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                mock.Expect(m => m.Kontoværdi)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                return mock;
+            }));
 
             var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
@@ -1017,6 +1083,94 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at BudgetkontoAdd tilføjer en opgørelseslinje til regnskabet.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoAddAddsOpgørelseViewModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                return mock;
+            }));
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Not.Null);
+            Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Empty);
+
+            regnskabViewModel.BudgetkontoAdd(fixture.Create<IBudgetkontoViewModel>());
+            Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Not.Null);
+            Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Not.Empty);
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoAdd registreret budgetkontoen til brug i opgørelseslinjen til regnskabet.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoAddKalderRegisterOnOpgørelseViewModel()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+            opgørelseViewModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+            budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(opgørelseViewModelMock.Nummer)
+                .Repeat.Any();
+            budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                .Return(opgørelseViewModelMock)
+                .Repeat.Any();
+
+            var budgetkontoViewModelMock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+            budgetkontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(budgetkontogruppeViewModelMock)
+                .Repeat.Any();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+
+            regnskabViewModel.BudgetkontoAdd(budgetkontoViewModelMock);
+
+            opgørelseViewModelMock.AssertWasCalled(m => m.Register(Arg<IBudgetkontoViewModel>.Is.Equal(budgetkontoViewModelMock)));
+        }
+
+        /// <summary>
         /// Tester, at BudgetkontoAdd rejser PropertyChanged, når en budgetkonto tilføjes regnskabet.
         /// </summary>
         [Test]
@@ -1024,6 +1178,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("BudgetkontiGrouped")]
         [TestCase("BudgetkontiTop")]
         [TestCase("BudgetkontiTopGrouped")]
+        [TestCase("Opgørelseslinjer")]
         public void TestAtBudgetkontoAddRejserPropertyChangedVedAddAfBudgetkontoViewModel(string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -1031,8 +1186,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                return mock;
+            }));
 
             var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
@@ -2210,8 +2391,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                return mock;
+            }));
 
             var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
@@ -2248,8 +2455,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                return mock;
+            }));
 
             var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
@@ -2276,8 +2509,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
             fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoViewModel>()));
+            fixture.Customize<IOpgørelseViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(fixture.Create<int>())
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() =>
+            {
+                var opgørelseViewModelMock = fixture.Create<IOpgørelseViewModel>();
+                var mock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                mock.Expect(m => m.Nummer)
+                    .Return(opgørelseViewModelMock.Nummer)
+                    .Repeat.Any();
+                mock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                return mock;
+            }));
+            fixture.Customize<IBudgetkontoViewModel>(e => e.FromFactory(() =>
+            {
+                var mock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+                mock.Expect(m => m.Kontogruppe)
+                    .Return(fixture.Create<IBudgetkontogruppeViewModel>())
+                    .Repeat.Any();
+                return mock;
+            }));
 
             var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
@@ -2486,6 +2745,146 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             regnskabViewModel.BogføringsadvarselAdd(bogføringsadvarselViewModelMock);
 
             var exception = Assert.Throws<ArgumentNullException>(() => bogføringsadvarselViewModelMock.Raise(m => m.PropertyChanged += null, bogføringsadvarselViewModelMock, null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("e"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at ProeprtyChangedOnOpgørelseViewModelEventHandler rejser PropertyChanged, når ViewModel for en linje til årsopgørelsen opdateres.
+        /// </summary>
+        [Test]
+        [TestCase("Nummer", "Opgørelseslinjer")]
+        public void TestAtProeprtyChangedOnOpgørelseViewModelEventHandlerRejserPropertyChangedOnOpgørelseViewModelUpdate(string propertyName, string expectedPropertyName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+            opgørelseViewModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+            budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(opgørelseViewModelMock.Nummer)
+                .Repeat.Any();
+            budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                .Return(opgørelseViewModelMock)
+                .Repeat.Any();
+
+            var budgetkontoViewModelMock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+            budgetkontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(budgetkontogruppeViewModelMock)
+                .Repeat.Any();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+
+            regnskabViewModel.BudgetkontoAdd(budgetkontoViewModelMock);
+
+            var eventCalled = false;
+            regnskabViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.Compare(e.PropertyName, expectedPropertyName, StringComparison.Ordinal) == 0)
+                {
+                    eventCalled = true;
+                }
+            };
+
+            Assert.That(eventCalled, Is.False);
+            opgørelseViewModelMock.Raise(m => m.PropertyChanged += null, opgørelseViewModelMock, new PropertyChangedEventArgs(propertyName));
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at ProeprtyChangedOnOpgørelseViewModelEventHandler kaster en ArgumentNullException, hvis objektet, der rejser eventet, er null.
+        /// </summary>
+        [Test]
+        public void TestAtProeprtyChangedOnOpgørelseViewModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+            opgørelseViewModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+            budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(opgørelseViewModelMock.Nummer)
+                .Repeat.Any();
+            budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                .Return(opgørelseViewModelMock)
+                .Repeat.Any();
+
+            var budgetkontoViewModelMock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+            budgetkontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(budgetkontogruppeViewModelMock)
+                .Repeat.Any();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+
+            regnskabViewModel.BudgetkontoAdd(budgetkontoViewModelMock);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => opgørelseViewModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("sender"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at ProeprtyChangedOnOpgørelseViewModelEventHandler kaster en ArgumentNullException, hvis argumenter til eventet er null.
+        /// </summary>
+        [Test]
+        public void TestAtProeprtyChangedOnOpgørelseViewModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+            opgørelseViewModelMock.Expect(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+            budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                .Return(opgørelseViewModelMock.Nummer)
+                .Repeat.Any();
+            budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                .Return(opgørelseViewModelMock)
+                .Repeat.Any();
+
+            var budgetkontoViewModelMock = MockRepository.GenerateMock<IBudgetkontoViewModel>();
+            budgetkontoViewModelMock.Expect(m => m.Kontogruppe)
+                .Return(budgetkontogruppeViewModelMock)
+                .Repeat.Any();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+
+            regnskabViewModel.BudgetkontoAdd(budgetkontoViewModelMock);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => opgørelseViewModelMock.Raise(m => m.PropertyChanged += null, opgørelseViewModelMock, null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);

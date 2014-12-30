@@ -353,4 +353,7 @@
     <value>År til dato ({0})</value>
     <comment>{0} = Årstal.</comment>
   </data>
+  <data name="AnnualStatement" xml:space="preserve">
+    <value>Årsopgørelse</value>
+  </data>
 </root>

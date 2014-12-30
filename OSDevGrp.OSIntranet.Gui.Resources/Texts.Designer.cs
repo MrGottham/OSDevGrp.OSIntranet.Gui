@@ -160,6 +160,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Annual statement.
+        /// </summary>
+        internal static string AnnualStatement {
+            get {
+                return ResourceManager.GetString("AnnualStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Available.
         /// </summary>
         internal static string Available {

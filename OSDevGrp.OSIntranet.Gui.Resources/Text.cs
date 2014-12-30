@@ -79,6 +79,7 @@
         Vacations,
         Experiences,
         YearToDate,
-        LastYear
+        LastYear,
+        AnnualStatement
     }
 }

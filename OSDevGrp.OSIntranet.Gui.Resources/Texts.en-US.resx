@@ -353,4 +353,7 @@
     <value>Year to date ({0})</value>
     <comment>{0} = Year.</comment>
   </data>
+  <data name="AnnualStatement" xml:space="preserve">
+    <value>Annual statement</value>
+  </data>
 </root>

@@ -35,6 +35,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private readonly ObservableCollection<IBudgetkontoViewModel> _budgetkontoViewModels = new ObservableCollection<IBudgetkontoViewModel>();
         private readonly ObservableCollection<IReadOnlyBogføringslinjeViewModel> _bogføringslinjeViewModels = new ObservableCollection<IReadOnlyBogføringslinjeViewModel>();
         private readonly ObservableCollection<IBogføringsadvarselViewModel> _bogføringsadvarselViewModels = new ObservableCollection<IBogføringsadvarselViewModel>(); 
+        private readonly ObservableCollection<IOpgørelseViewModel> _opgørelseViewModels = new ObservableCollection<IOpgørelseViewModel>();
         private readonly ObservableCollection<IAdressekontoViewModel> _debitorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<IAdressekontoViewModel> _kreditorerViewModels = new ObservableCollection<IAdressekontoViewModel>();
         private readonly ObservableCollection<INyhedViewModel> _nyhedViewModels = new ObservableCollection<INyhedViewModel>();
@@ -42,6 +43,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private static ObservableCollection<string> _kontoColumns;
         private static ObservableCollection<string> _budgetkontoColumns;
         private static ObservableCollection<string> _bogføringslinjeColumns;
+        private static ObservableCollection<string> _opgørelseColumns;
         private static readonly ObservableCollection<IKontogruppeViewModel> KontogruppeViewModels = new ObservableCollection<IKontogruppeViewModel>();
         private static readonly ObservableCollection<IBudgetkontogruppeViewModel> BudgetkontogruppeViewModels = new ObservableCollection<IBudgetkontogruppeViewModel>(); 
         private static readonly object SyncRoot = new object();
@@ -80,6 +82,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             _budgetkontoViewModels.CollectionChanged += CollectionChangedOnBudgetkontoViewModelsEventHandler;
             _bogføringslinjeViewModels.CollectionChanged += CollectionChangedOnBogføringslinjeViewModelsEventHandler;
             _bogføringsadvarselViewModels.CollectionChanged += CollectionChangedOnBogføringsadvarselViewModelsEventHandler;
+            _opgørelseViewModels.CollectionChanged += CollectionChangedOnOpgørelseViewModelsEventHandler;
             _debitorerViewModels.CollectionChanged += CollectionChangedOnDebitorViewModelsEventHandler;
             _kreditorerViewModels.CollectionChanged += CollectionChangedOnKreditorerViewModelsEventHandler;
             _nyhedViewModels.CollectionChanged += CollectionChangedOnNyhedViewModelsEventHandler;
@@ -450,7 +453,43 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 return Resource.GetText(Text.PostingWarnings);
             }
         }
-        
+
+        /// <summary>
+        /// Linjer, der indgår i årsopgørelsen.
+        /// </summary>
+        public virtual IEnumerable<IOpgørelseViewModel> Opgørelseslinjer
+        {
+            get
+            {
+                return _opgørelseViewModels.OrderBy(m => m.Nummer);
+            }
+        }
+
+        /// <summary>
+        /// Overskrift til linjer, der indgår i årsopgørelsen.
+        /// </summary>
+        public virtual string OpgørelseslinjerHeader
+        {
+            get
+            {
+                return Resource.GetText(Text.AnnualStatement);
+            }
+        }
+
+        /// <summary>
+        /// Kolonneoverskrifter til linjer, der indgår i årsopgørelsen.
+        /// </summary>
+        public virtual IEnumerable<string> OpgørelseslinjerColumns
+        {
+            get
+            {
+                lock (SyncRoot)
+                {
+                    return _opgørelseColumns ?? (_opgørelseColumns = new ObservableCollection<string>(new Collection<string>(new List<string> {string.Empty, Resource.GetText(Text.Budget), Resource.GetText(Text.Bookkeeped)})));
+                }
+            }
+        }
+
         /// <summary>
         /// Debitorer.
         /// </summary>
@@ -601,8 +640,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 throw new ArgumentNullException("budgetkontoViewModel");
             }
+            // Tilføj budgetkontoen til regnskabet.
             budgetkontoViewModel.PropertyChanged += PropertyChangedOnBudgetkontoViewModelEventHandler;
             _budgetkontoViewModels.Add(budgetkontoViewModel);
+            // Registér budgetkontoen til at indgå i årsopgørelsen.
+            var opgørelseViewModel = _opgørelseViewModels.SingleOrDefault(m => m.Nummer == budgetkontoViewModel.Kontogruppe.Nummer);
+            if (opgørelseViewModel == null)
+            {
+                opgørelseViewModel = budgetkontoViewModel.Kontogruppe.CreateOpgørelseslinje(this);
+                opgørelseViewModel.PropertyChanged += ProeprtyChangedOnOpgørelseViewModelEventHandler;
+                _opgørelseViewModels.Add(opgørelseViewModel);
+            }
+            opgørelseViewModel.Register(budgetkontoViewModel);
         }
 
         /// <summary>
@@ -910,6 +959,29 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Eventhandler, der kaldes, når en property ændres på en ViewModel til en linje, der indgår i årsopgørelsen.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void ProeprtyChangedOnOpgørelseViewModelEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.PropertyName)
+            {
+                case "Nummer":
+                    RaisePropertyChanged("Opgørelseslinjer");
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Eventhandler, der kaldes, når en property ændres på en ViewModel for adressekontoen til en debitor.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -1151,6 +1223,29 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case NotifyCollectionChangedAction.Remove:
                     RaisePropertyChanged("Bogføringsadvarsler");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Eventhandler, der kaldes, når collection af ViewModels, der indgår i årsopgørelsen, ændres.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="e">Argumenter til eventet.</param>
+        private void CollectionChangedOnOpgørelseViewModelsEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    RaisePropertyChanged("Opgørelseslinjer");
                     break;
             }
         }

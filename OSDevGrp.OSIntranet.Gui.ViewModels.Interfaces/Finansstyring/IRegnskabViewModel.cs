@@ -226,7 +226,31 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         {
             get;
         }
-        
+
+        /// <summary>
+        /// Linjer, der indgår i årsopgørelsen.
+        /// </summary>
+        IEnumerable<IOpgørelseViewModel> Opgørelseslinjer
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til linjer, der indgår i årsopgørelsen.
+        /// </summary>
+        string OpgørelseslinjerHeader
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kolonneoverskrifter til linjer, der indgår i årsopgørelsen.
+        /// </summary>
+        IEnumerable<string> OpgørelseslinjerColumns
+        {
+            get;
+        }
+
         /// <summary>
         /// Debitorer.
         /// </summary>
