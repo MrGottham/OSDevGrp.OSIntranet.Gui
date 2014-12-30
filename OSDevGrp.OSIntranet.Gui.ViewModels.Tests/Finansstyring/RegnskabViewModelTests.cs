@@ -938,7 +938,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var kontoViewModelMockCollection = CreateKontoViewModels(fixture, kontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
 
-            //var expectedValue = kontoViewModelMockCollection.Distinct()
+            var kontogrupperInUse = kontoViewModelMockCollection
+                .GroupBy(m => m.Kontogruppe.Nummer)
+                .Select(m => m.Key)
+                .ToList();
 
             var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
@@ -999,6 +1002,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             var kontoViewModelMockCollection = CreateKontoViewModels(fixture, kontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
 
+            var kontogrupperInUse = kontoViewModelMockCollection
+                .GroupBy(m => m.Kontogruppe.Nummer)
+                .Select(m => m.Key)
+                .ToList();
+
             var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
             Assert.That(regnskabViewModel, Is.Not.Null);
             Assert.That(regnskabViewModel.PassiverIAlt, Is.EqualTo(0M));
@@ -1008,6 +1016,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             regnskabViewModel.BogføringSet(fixture.Create<IBogføringViewModel>());
             Assert.That(regnskabViewModel.Bogføring, Is.Not.Null);
+
+            var expectedValue = kontogruppeViewModelMockCollection
+                .Where(m => kontogrupperInUse.Contains(m.Nummer))
+                .Select(m => m.CreateBalancelinje(regnskabViewModel))
+                .Sum(m => m.Saldo);
 
             kontogruppeViewModelMockCollection.ForEach(regnskabViewModel.KontogruppeAdd);
             kontoViewModelMockCollection.ForEach(regnskabViewModel.KontoAdd);
