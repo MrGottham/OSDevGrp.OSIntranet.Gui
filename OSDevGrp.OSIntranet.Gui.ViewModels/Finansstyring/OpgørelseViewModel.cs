@@ -113,7 +113,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// Label af samlet budgetteret beløb for sidste måned til opgørelseslinjen.
+        /// Label til samlet budgetteret beløb for sidste måned til opgørelseslinjen.
         /// </summary>
         public virtual string BudgetSidsteMånedLabel
         {
@@ -124,13 +124,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// Samlet Budgetteret beløb for år til dato til opgørelseslinjen.
+        /// Samlet budgetteret beløb for år til dato til opgørelseslinjen.
         /// </summary>
         public virtual decimal BudgetÅrTilDato
         {
             get
             {
-                throw new NotImplementedException();
+                return Budgetkonti.Sum(m => m.BudgetÅrTilDato);
             }
         }
 
@@ -141,18 +141,216 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                throw new NotImplementedException();
+                return BudgetÅrTilDato.ToString("C");
             }
         }
 
         /// <summary>
-        /// Label af samlet budgetteret beløb for år til dato til opgørelseslinjen.
+        /// Label til samlet budgetteret beløb for år til dato til opgørelseslinjen.
         /// </summary>
         public virtual string BudgetÅrTilDatoLabel
         {
             get
             {
-                throw new NotImplementedException();
+                return Resource.GetText(Text.BudgetYearToDate);
+            }
+        }
+
+        /// <summary>
+        /// Samlet budgetteret beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal BudgetSidsteÅr
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.BudgetSidsteÅr);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet budgetteret beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        public virtual string BudgetSidsteÅrAsText
+        {
+            get
+            {
+                return BudgetSidsteÅr.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet budgetteret beløb for sidste år til opgørelseslinjen..
+        /// </summary>
+        public virtual string BudgetSidsteÅrLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetLastYear);
+            }
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal Bogført
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.Bogført);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtAsText
+        {
+            get
+            {
+                return Bogført.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Bookkeeped);
+            }
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal BogførtSidsteMåned
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.BogførtSidsteMåned);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtSidsteMånedAsText
+        {
+            get
+            {
+                return BogførtSidsteMåned.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtSidsteMånedLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BookkeepedLastMonth);
+            }
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal BogførtÅrTilDato
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.BogførtÅrTilDato);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtÅrTilDatoAsText
+        {
+            get
+            {
+                return BogførtÅrTilDato.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtÅrTilDatoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BookkeepedYearToDate);
+            }
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal BogførtSidsteÅr
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.BogførtSidsteÅr);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtSidsteÅrAsText
+        {
+            get
+            {
+                return BogførtSidsteÅr.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        public virtual string BogførtSidsteÅrLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BookkeepedLastYear);
+            }
+        }
+
+        /// <summary>
+        /// Samlet disponibel beløb til opgørelseslinjen.
+        /// </summary>
+        public virtual decimal Disponibel
+        {
+            get
+            {
+                return Budgetkonti.Sum(m => m.Disponibel);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet disponibel beløb til opgørelseslinjen.
+        /// </summary>
+        public virtual string DisponibelAsText
+        {
+            get
+            {
+                return Disponibel.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til samlet disponibel beløb til opgørelseslinjen.
+        /// </summary>
+        public virtual string DisponibelLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.Available);
             }
         }
 
@@ -181,6 +379,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             RaisePropertyChanged("BudgetAsText");
             RaisePropertyChanged("BudgetSidsteMåned");
             RaisePropertyChanged("BudgetSidsteMånedAsText");
+            RaisePropertyChanged("BudgetÅrTilDato");
+            RaisePropertyChanged("BudgetÅrTilDatoAsText");
+            RaisePropertyChanged("BudgetSidsteÅr");
+            RaisePropertyChanged("BudgetSidsteÅrAsText");
+            RaisePropertyChanged("Bogført");
+            RaisePropertyChanged("BogførtAsText");
+            RaisePropertyChanged("BogførtSidsteMåned");
+            RaisePropertyChanged("BogførtSidsteMånedAsText");
+            RaisePropertyChanged("BogførtÅrTilDato");
+            RaisePropertyChanged("BogførtÅrTilDatoAsText");
+            RaisePropertyChanged("BogførtSidsteÅr");
+            RaisePropertyChanged("BogførtSidsteÅrAsText");
+            RaisePropertyChanged("Disponibel");
+            RaisePropertyChanged("DisponibelAsText");
         }
 
         /// <summary>
@@ -206,6 +418,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("BudgetAsText");
                     RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    RaisePropertyChanged("BudgetÅrTilDato");
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    RaisePropertyChanged("BudgetSidsteÅr");
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                    RaisePropertyChanged("Bogført");
+                    RaisePropertyChanged("BogførtAsText");
+                    RaisePropertyChanged("BogførtSidsteMåned");
+                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                    RaisePropertyChanged("BogførtÅrTilDato");
+                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                    RaisePropertyChanged("BogførtSidsteÅr");
+                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
             }
         }
@@ -233,6 +459,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("BudgetAsText");
                     RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    RaisePropertyChanged("BudgetÅrTilDato");
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    RaisePropertyChanged("BudgetSidsteÅr");
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                    RaisePropertyChanged("Bogført");
+                    RaisePropertyChanged("BogførtAsText");
+                    RaisePropertyChanged("BogførtSidsteMåned");
+                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                    RaisePropertyChanged("BogførtÅrTilDato");
+                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                    RaisePropertyChanged("BogførtSidsteÅr");
+                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
             }
         }
@@ -274,6 +514,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("BudgetAsText");
                     RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    RaisePropertyChanged("BudgetÅrTilDato");
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    RaisePropertyChanged("BudgetSidsteÅr");
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                    RaisePropertyChanged("Bogført");
+                    RaisePropertyChanged("BogførtAsText");
+                    RaisePropertyChanged("BogførtSidsteMåned");
+                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                    RaisePropertyChanged("BogførtÅrTilDato");
+                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                    RaisePropertyChanged("BogførtSidsteÅr");
+                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
 
                 case "Budget":
@@ -284,6 +538,41 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 case "BudgetSidsteMåned":
                     RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    break;
+
+                case "BudgetÅrTilDato":
+                    RaisePropertyChanged("BudgetÅrTilDato");
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    break;
+
+                case "BudgetSidsteÅr":
+                    RaisePropertyChanged("BudgetSidsteÅr");
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                    break;
+
+                case "Bogført":
+                    RaisePropertyChanged("Bogført");
+                    RaisePropertyChanged("BogførtAsText");
+                    break;
+
+                case "BogførtSidsteMåned":
+                    RaisePropertyChanged("BogførtSidsteMåned");
+                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                    break;
+
+                case "BogførtÅrTilDato":
+                    RaisePropertyChanged("BogførtÅrTilDato");
+                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                    break;
+
+                case "BogførtSidsteÅr":
+                    RaisePropertyChanged("BogførtSidsteÅr");
+                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                    break;
+
+                case "Disponibel":
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
 
                 case "ErRegistreret":
@@ -297,6 +586,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("BudgetAsText");
                     RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    RaisePropertyChanged("BudgetÅrTilDato");
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    RaisePropertyChanged("BudgetSidsteÅr");
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                    RaisePropertyChanged("Bogført");
+                    RaisePropertyChanged("BogførtAsText");
+                    RaisePropertyChanged("BogførtSidsteMåned");
+                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                    RaisePropertyChanged("BogførtÅrTilDato");
+                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                    RaisePropertyChanged("BogførtSidsteÅr");
+                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                    RaisePropertyChanged("Disponibel");
+                    RaisePropertyChanged("DisponibelAsText");
                     break;
             }
         }

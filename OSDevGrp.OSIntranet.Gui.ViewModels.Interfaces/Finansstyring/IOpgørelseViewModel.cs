@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
-        /// Label af samlet budgetteret beløb for sidste måned til opgørelseslinjen.
+        /// Label til samlet budgetteret beløb for sidste måned til opgørelseslinjen.
         /// </summary>
         string BudgetSidsteMånedLabel
         {
@@ -64,7 +64,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
-        /// Samlet Budgetteret beløb for år til dato til opgørelseslinjen.
+        /// Samlet budgetteret beløb for år til dato til opgørelseslinjen.
         /// </summary>
         decimal BudgetÅrTilDato
         {
@@ -80,9 +80,153 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
-        /// Label af samlet budgetteret beløb for år til dato til opgørelseslinjen.
+        /// Label til samlet budgetteret beløb for år til dato til opgørelseslinjen.
         /// </summary>
         string BudgetÅrTilDatoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet budgetteret beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        decimal BudgetSidsteÅr
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet budgetteret beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        string BudgetSidsteÅrAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet budgetteret beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        string BudgetSidsteÅrLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb til opgørelseslinjen.
+        /// </summary>
+        decimal Bogført
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb til opgørelseslinjen.
+        /// </summary>
+        string BogførtAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb til opgørelseslinjen.
+        /// </summary>
+        string BogførtLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        decimal BogførtSidsteMåned
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        string BogførtSidsteMånedAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb for sidste måned til opgørelseslinjen.
+        /// </summary>
+        string BogførtSidsteMånedLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        decimal BogførtÅrTilDato
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        string BogførtÅrTilDatoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb for år til dato til opgørelseslinjen.
+        /// </summary>
+        string BogførtÅrTilDatoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet bogført beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        decimal BogførtSidsteÅr
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet bogført beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        string BogførtSidsteÅrAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet bogført beløb for sidste år til opgørelseslinjen.
+        /// </summary>
+        string BogførtSidsteÅrLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Samlet disponibel beløb til opgørelseslinjen.
+        /// </summary>
+        decimal Disponibel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af samlet disponibel beløb til opgørelseslinjen.
+        /// </summary>
+        string DisponibelAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til samlet disponibel beløb til opgørelseslinjen.
+        /// </summary>
+        string DisponibelLabel
         {
             get;
         }
