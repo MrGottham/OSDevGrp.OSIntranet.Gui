@@ -80,6 +80,9 @@
         Experiences,
         YearToDate,
         LastYear,
-        AnnualStatement
+        AnnualStatement,
+        AccountingBalance,
+        Asserts,
+        Liabilities
     }
 }

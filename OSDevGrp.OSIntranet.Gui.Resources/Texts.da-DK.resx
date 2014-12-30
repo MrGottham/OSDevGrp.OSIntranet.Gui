@@ -356,4 +356,13 @@
   <data name="AnnualStatement" xml:space="preserve">
     <value>Årsopgørelse</value>
   </data>
+  <data name="AccountingBalance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="Asserts" xml:space="preserve">
+    <value>Aktiver</value>
+  </data>
+  <data name="Liabilities" xml:space="preserve">
+    <value>Passiver</value>
+  </data>
 </root>

@@ -356,4 +356,13 @@
   <data name="AnnualStatement" xml:space="preserve">
     <value>Annual statement</value>
   </data>
+  <data name="AccountingBalance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="Asserts" xml:space="preserve">
+    <value>Asserts</value>
+  </data>
+  <data name="Liabilities" xml:space="preserve">
+    <value>Liabilities</value>
+  </data>
 </root>

@@ -70,6 +70,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Balance.
+        /// </summary>
+        internal static string AccountingBalance {
+            get {
+                return ResourceManager.GetString("AccountingBalance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Accountings.
         /// </summary>
         internal static string Accountings {
@@ -165,6 +174,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string AnnualStatement {
             get {
                 return ResourceManager.GetString("AnnualStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asserts.
+        /// </summary>
+        internal static string Asserts {
+            get {
+                return ResourceManager.GetString("Asserts", resourceCulture);
             }
         }
         
@@ -534,6 +552,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         internal static string LastYear {
             get {
                 return ResourceManager.GetString("LastYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Liabilities.
+        /// </summary>
+        internal static string Liabilities {
+            get {
+                return ResourceManager.GetString("Liabilities", resourceCulture);
             }
         }
         

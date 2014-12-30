@@ -252,6 +252,62 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Overskrift til balancen.
+        /// </summary>
+        string BalanceHeader
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Linjer, der indgår i balancens aktiver.
+        /// </summary>
+        IEnumerable<IBalanceViewModel> Aktiver
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til linjer, der indgår i balancens aktiver.
+        /// </summary>
+        string AktiverHeader
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kolonneoverskrifter til linjer, der indgår i balancens aktiver.
+        /// </summary>
+        IEnumerable<string> AktiverColumns
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Linjer, der indgår i balancens passiver.
+        /// </summary>
+        IEnumerable<IBalanceViewModel> Passiver
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Overskrift til linjer, der indgår i balancens passiver.
+        /// </summary>
+        string PassiverHeader
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Kolonneoverskrifter til linjer, der indgår i balancens aktiver.
+        /// </summary>
+        IEnumerable<string> PassiverColumns
+        {
+            get;
+        }
+
+        /// <summary>
         /// Debitorer.
         /// </summary>
         IEnumerable<IAdressekontoViewModel> Debitorer
