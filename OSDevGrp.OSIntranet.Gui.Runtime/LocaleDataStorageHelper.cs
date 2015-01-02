@@ -187,7 +187,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// <returns>Mappen til det lokale datalager.</returns>
         private static StorageFolder GetStorageFolder()
         {
-            return ApplicationData.Current.RoamingFolder;
+            return ApplicationData.Current.LocalFolder;
         }
 
         /// <summary>
