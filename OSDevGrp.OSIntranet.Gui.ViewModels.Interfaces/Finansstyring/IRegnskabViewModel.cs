@@ -300,6 +300,78 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Budgetteret beløb for år til dato fra årsopgørelsen.
+        /// </summary>
+        decimal BudgetÅrTilDato
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for år til dato fra årsopgørelsen.
+        /// </summary>
+        string BudgetÅrTilDatoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til budgetteret beløb for år til dato fra årsopgørelsen.
+        /// </summary>
+        string BudgetÅrTilDatoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Budgetteret beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        decimal BudgetSidsteÅr
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        string BudgetSidsteÅrAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til budgetteret beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        string BudgetSidsteÅrLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Bogført beløb fra årsopgørelsen.
+        /// </summary>
+        decimal Bogført
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb fra årsopgørelsen.
+        ///  </summary>
+        string BogførtAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til bogført beløb fra årsopgørelsen.
+        /// </summary>
+        string BogførtLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Overskrift til balancen.
         /// </summary>
         string BalanceHeader

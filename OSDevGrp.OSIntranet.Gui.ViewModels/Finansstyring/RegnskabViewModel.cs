@@ -561,6 +561,105 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
+        /// Budgetteret beløb for år til dato fra årsopgørelsen.
+        /// </summary>
+        public virtual decimal BudgetÅrTilDato
+        {
+            get
+            {
+                return Opgørelseslinjer.Sum(m => m.BudgetÅrTilDato);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for år til dato fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetÅrTilDatoAsText
+        {
+            get
+            {
+                return BudgetÅrTilDato.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til budgetteret beløb for år til dato fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetÅrTilDatoLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetYearToDate);
+            }
+        }
+
+        /// <summary>
+        /// Budgetteret beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        public virtual decimal BudgetSidsteÅr
+        {
+            get
+            {
+                return Opgørelseslinjer.Sum(m => m.BudgetSidsteÅr);
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af budgetteret beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetSidsteÅrAsText
+        {
+            get
+            {
+                return BudgetSidsteÅr.ToString("C");
+            }
+        }
+
+        /// <summary>
+        /// Label til budgetteret beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        public virtual string BudgetSidsteÅrLabel
+        {
+            get
+            {
+                return Resource.GetText(Text.BudgetLastYear);
+}
+        }
+
+        /// <summary>
+        /// Bogført beløb fra årsopgørelsen.
+        /// </summary>
+        public virtual decimal Bogført
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb fra årsopgørelsen.
+        ///  </summary>
+        public virtual string BogførtAsText
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Label til bogført beløb fra årsopgørelsen.
+        /// </summary>
+        public virtual string BogførtLabel
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Overskrift til balancen.
         /// </summary>
         public virtual string BalanceHeader
@@ -1214,6 +1313,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
                     break;
+
+                case "BudgetÅrTilDato":
+                    RaisePropertyChanged("BudgetÅrTilDato");
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    break;
+
+                case "BudgetSidsteÅr":
+                    RaisePropertyChanged("BudgetSidsteÅr");
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                    break;
             }
         }
 
@@ -1539,6 +1648,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     RaisePropertyChanged("BudgetAsText");
                     RaisePropertyChanged("BudgetSidsteMåned");
                     RaisePropertyChanged("BudgetSidsteMånedAsText");
+                    RaisePropertyChanged("BudgetÅrTilDato");
+                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                    RaisePropertyChanged("BudgetSidsteÅr");
+                    RaisePropertyChanged("BudgetSidsteÅrAsText");
                     break;
             }
         }
