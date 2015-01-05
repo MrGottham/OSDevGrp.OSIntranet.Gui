@@ -8,6 +8,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
     public interface IOpgørelseViewModel : IBudgetkontogruppeViewModel
     {
         /// <summary>
+        /// Regnskabet, som opgørelseslinjen er tilkyttet.
+        /// </summary>
+        IRegnskabViewModel Regnskab
+        {
+            get;
+        }
+
+        /// <summary>
         /// Registrerede budgetkonti, som indgår i opgørelseslinjen.
         /// </summary>
         IEnumerable<IBudgetkontoViewModel> Budgetkonti

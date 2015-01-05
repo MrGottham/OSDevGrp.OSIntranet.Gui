@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 .Return(kontogruppeModelMock.Nummer)
                 .Repeat.Any();
 
-            var kontoViewModelCollection =new List<IKontoViewModel>(fixture.Create<Generator<int>>().First(m => m >= 25 && m <= 100));
+            var kontoViewModelCollection = new List<IKontoViewModel>(fixture.Create<Generator<int>>().First(m => m >= 25 && m <= 100));
             while (kontoViewModelCollection.Count < kontoViewModelCollection.Capacity)
             {
                 var kontoViewModelMock = MockRepository.GenerateMock<IKontoViewModel>();
@@ -92,7 +92,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(balanceViewModel.DisplayName, Is.Not.Empty);
             Assert.That(balanceViewModel.DisplayName, Is.EqualTo(kontogruppeModelMock.Tekst));
             Assert.That(balanceViewModel.Balancetype, Is.EqualTo(kontogruppeModelMock.Balancetype));
-            Assert.That(balanceViewModel.Konti, Is.Not.Null);
+            Assert.That(balanceViewModel.Regnskab, Is.Not.Null);
+            Assert.That(balanceViewModel.Regnskab, Is.EqualTo(regnskabViewModelMock));
             Assert.That(balanceViewModel.Konti, Is.Not.Empty);
             Assert.That(balanceViewModel.Konti.Count(), Is.EqualTo(kontoViewModelCollection.Count));
             Assert.That(balanceViewModel.Kredit, Is.EqualTo(kontoViewModelCollection.Sum(m => m.Kredit)));

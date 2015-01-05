@@ -8,6 +8,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
     public interface IBalanceViewModel : IKontogruppeViewModel
     {
         /// <summary>
+        /// Regnskabet, som linjen i balancen er tilkyttet.
+        /// </summary>
+        IRegnskabViewModel Regnskab
+        {
+            get;
+        }
+
+        /// <summary>
         /// Registrerede konti, som indgår i balancelinjen.
         /// </summary>
         IEnumerable<IKontoViewModel> Konti

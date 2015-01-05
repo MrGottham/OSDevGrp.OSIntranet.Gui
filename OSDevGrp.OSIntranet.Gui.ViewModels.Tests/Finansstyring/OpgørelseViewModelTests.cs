@@ -106,6 +106,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(opgørelseViewModel.DisplayName, Is.Not.Null);
             Assert.That(opgørelseViewModel.DisplayName, Is.Not.Empty);
             Assert.That(opgørelseViewModel.DisplayName, Is.EqualTo(budgetkontogruppeModelMock.Tekst));
+            Assert.That(opgørelseViewModel.Regnskab, Is.Not.Null);
+            Assert.That(opgørelseViewModel.Regnskab, Is.EqualTo(regnskabViewModelMock));
             Assert.That(opgørelseViewModel.Budgetkonti, Is.Not.Null);
             Assert.That(opgørelseViewModel.Budgetkonti, Is.Not.Empty);
             Assert.That(opgørelseViewModel.Budgetkonti.Count(), Is.EqualTo(budgetkontoViewModelCollection.Count));

@@ -45,6 +45,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Properties
 
         /// <summary>
+        /// Regnskabet, som opgørelseslinjen er tilkyttet.
+        /// </summary>
+        public virtual IRegnskabViewModel Regnskab
+        {
+            get
+            {
+                return _regnskabViewModel;
+            }
+        }
+
+        /// <summary>
         /// Registrerede budgetkonti, som indgår i opgørelseslinjen.
         /// </summary>
         public virtual IEnumerable<IBudgetkontoViewModel> Budgetkonti

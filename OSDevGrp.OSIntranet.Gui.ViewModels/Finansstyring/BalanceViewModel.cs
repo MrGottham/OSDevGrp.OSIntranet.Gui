@@ -45,6 +45,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Properties
 
         /// <summary>
+        /// Regnskabet, som linjen i balancen er tilkyttet.
+        /// </summary>
+        public virtual IRegnskabViewModel Regnskab
+        {
+            get
+            {
+                return _regnskabViewModel;
+            }
+        }
+
+        /// <summary>
         /// Registrerede konti, som indgår i balancelinjen.
         /// </summary>
         public virtual IEnumerable<IKontoViewModel> Konti
