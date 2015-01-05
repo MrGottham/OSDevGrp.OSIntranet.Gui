@@ -372,6 +372,78 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
+        /// Bogført beløb for sidste måned fra årsopgørelsen.
+        /// </summary>
+        decimal BogførtSidsteMåned
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for sidste måned fra årsopgørelsen.
+        /// </summary>
+        string BogførtSidsteMånedAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til bogført beløb for sidste måned fra årsopgørelsen.
+        /// </summary>
+        string BogførtSidsteMånedLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Bogført beløb for år til dato til fra årsopgørelsen.
+        /// </summary>
+        decimal BogførtÅrTilDato
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for år til dato til fra årsopgørelsen.
+        /// </summary>
+        string BogførtÅrTilDatoAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til bogført beløb for år til dato til fra årsopgørelsen.
+        /// </summary>
+        string BogførtÅrTilDatoLabel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Bogført beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        decimal BogførtSidsteÅr
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Tekstangivelse af bogført beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        string BogførtSidsteÅrAsText
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Label til bogført beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        string BogførtSidsteÅrLabel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Overskrift til balancen.
         /// </summary>
         string BalanceHeader

@@ -214,6 +214,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.BudgetSidsteÅrLabel, Is.Not.Null);
             Assert.That(regnskabViewModel.BudgetSidsteÅrLabel, Is.Not.Empty);
             Assert.That(regnskabViewModel.BudgetSidsteÅrLabel, Is.EqualTo(Resource.GetText(Text.BudgetLastYear)));
+            Assert.That(regnskabViewModel.Bogført, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+            Assert.That(regnskabViewModel.BogførtLabel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtLabel, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtLabel, Is.EqualTo(Resource.GetText(Text.Bookkeeped)));
+            Assert.That(regnskabViewModel.BogførtSidsteMåned, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+            Assert.That(regnskabViewModel.BogførtSidsteMånedLabel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedLabel, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedLastMonth)));
+            Assert.That(regnskabViewModel.BogførtÅrTilDato, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoLabel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoLabel, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedYearToDate)));
+            Assert.That(regnskabViewModel.BogførtSidsteÅr, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+            Assert.That(regnskabViewModel.BogførtSidsteÅrLabel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrLabel, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedLastYear)));
             Assert.That(regnskabViewModel.BalanceHeader, Is.Not.Null);
             Assert.That(regnskabViewModel.BalanceHeader, Is.Not.Empty);
             Assert.That(regnskabViewModel.BalanceHeader, Is.EqualTo(Resource.GetText(Text.AccountingBalance)));
@@ -1308,6 +1336,250 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         }
 
         /// <summary>
+        /// Tester, at getteren til Bogført returnerer bogført beløb fra årsopgørelsen.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtBogførtGetterReturnererBogført(int[] budgetkontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
+            foreach (var id in budgetkontogrupper)
+            {
+                var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                opgørelseViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                opgørelseViewModelMock.Expect(m => m.Bogført)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
+            }
+
+            var budgetkontoViewModelMockCollection = CreateBudgetkontoViewModels(fixture, budgetkontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var budgetkontogrupperInUse = budgetkontoViewModelMockCollection
+                .GroupBy(m => m.Kontogruppe.Nummer)
+                .Select(m => m.Key)
+                .ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.Bogført, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+
+            var expectedValue = budgetkontogruppeViewModelMockCollection
+                .Where(m => budgetkontogrupperInUse.Contains(m.Nummer))
+                .Select(m => m.CreateOpgørelseslinje(regnskabViewModel))
+                .Sum(m => m.Bogført);
+
+            budgetkontogruppeViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontogruppeAdd);
+            budgetkontoViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontoAdd);
+
+            Assert.That(regnskabViewModel.Bogført, Is.EqualTo(expectedValue));
+            Assert.That(regnskabViewModel.BogførtAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtAsText, Is.EqualTo(expectedValue.ToString("C")));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til BogførtSidsteMåned returnerer bogført beløb for sidste måned fra årsopgørelsen.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtBogførtSidsteMånedGetterReturnererBogførtSidsteMåned(int[] budgetkontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
+            foreach (var id in budgetkontogrupper)
+            {
+                var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                opgørelseViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                opgørelseViewModelMock.Expect(m => m.BogførtSidsteMåned)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
+            }
+
+            var budgetkontoViewModelMockCollection = CreateBudgetkontoViewModels(fixture, budgetkontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var budgetkontogrupperInUse = budgetkontoViewModelMockCollection
+                .GroupBy(m => m.Kontogruppe.Nummer)
+                .Select(m => m.Key)
+                .ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteMåned, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+
+            var expectedValue = budgetkontogruppeViewModelMockCollection
+                .Where(m => budgetkontogrupperInUse.Contains(m.Nummer))
+                .Select(m => m.CreateOpgørelseslinje(regnskabViewModel))
+                .Sum(m => m.BogførtSidsteMåned);
+
+            budgetkontogruppeViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontogruppeAdd);
+            budgetkontoViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontoAdd);
+
+            Assert.That(regnskabViewModel.BogførtSidsteMåned, Is.EqualTo(expectedValue));
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteMånedAsText, Is.EqualTo(expectedValue.ToString("C")));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til BogførtÅrTilDato returnerer bogført beløb for år til dato fra årsopgørelsen.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtBogførtÅrTilDatoGetterReturnererBogførtÅrTilDato(int[] budgetkontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
+            foreach (var id in budgetkontogrupper)
+            {
+                var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                opgørelseViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                opgørelseViewModelMock.Expect(m => m.BogførtÅrTilDato)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
+            }
+
+            var budgetkontoViewModelMockCollection = CreateBudgetkontoViewModels(fixture, budgetkontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var budgetkontogrupperInUse = budgetkontoViewModelMockCollection
+                .GroupBy(m => m.Kontogruppe.Nummer)
+                .Select(m => m.Key)
+                .ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtÅrTilDato, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+
+            var expectedValue = budgetkontogruppeViewModelMockCollection
+                .Where(m => budgetkontogrupperInUse.Contains(m.Nummer))
+                .Select(m => m.CreateOpgørelseslinje(regnskabViewModel))
+                .Sum(m => m.BogførtÅrTilDato);
+
+            budgetkontogruppeViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontogruppeAdd);
+            budgetkontoViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontoAdd);
+
+            Assert.That(regnskabViewModel.BogførtÅrTilDato, Is.EqualTo(expectedValue));
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtÅrTilDatoAsText, Is.EqualTo(expectedValue.ToString("C")));
+        }
+
+        /// <summary>
+        /// Tester, at getteren til BogførtSidsteÅr returnerer bogført beløb for sidste år fra årsopgørelsen.
+        /// </summary>
+        [Test]
+        [TestCase(new[] {5, 6, 7, 8, 9})]
+        public void TestAtBogførtSidsteÅrGetterReturnererBogførtSidsteÅr(int[] budgetkontogrupper)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            fixture.Customize<IRegnskabModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabModel>()));
+            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+
+            var budgetkontogruppeViewModelMockCollection = new List<IBudgetkontogruppeViewModel>(budgetkontogrupper.Length);
+            foreach (var id in budgetkontogrupper)
+            {
+                var opgørelseViewModelMock = MockRepository.GenerateMock<IOpgørelseViewModel>();
+                opgørelseViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                opgørelseViewModelMock.Expect(m => m.BogførtSidsteÅr)
+                    .Return(fixture.Create<decimal>())
+                    .Repeat.Any();
+                var budgetkontogruppeViewModelMock = MockRepository.GenerateMock<IBudgetkontogruppeViewModel>();
+                budgetkontogruppeViewModelMock.Expect(m => m.Nummer)
+                    .Return(id)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMock.Expect(m => m.CreateOpgørelseslinje(Arg<IRegnskabViewModel>.Is.NotNull))
+                    .Return(opgørelseViewModelMock)
+                    .Repeat.Any();
+                budgetkontogruppeViewModelMockCollection.Add(budgetkontogruppeViewModelMock);
+            }
+
+            var budgetkontoViewModelMockCollection = CreateBudgetkontoViewModels(fixture, budgetkontogruppeViewModelMockCollection, new Random(DateTime.Now.Second), 250).ToList();
+
+            var budgetkontogrupperInUse = budgetkontoViewModelMockCollection
+                .GroupBy(m => m.Kontogruppe.Nummer)
+                .Select(m => m.Key)
+                .ToList();
+
+            var regnskabViewModel = new RegnskabViewModel(fixture.Create<IRegnskabModel>(), fixture.Create<DateTime>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            Assert.That(regnskabViewModel, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteÅr, Is.EqualTo(0M));
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.EqualTo(Convert.ToDecimal(0M).ToString("C")));
+
+            var expectedValue = budgetkontogruppeViewModelMockCollection
+                .Where(m => budgetkontogrupperInUse.Contains(m.Nummer))
+                .Select(m => m.CreateOpgørelseslinje(regnskabViewModel))
+                .Sum(m => m.BogførtSidsteÅr);
+
+            budgetkontogruppeViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontogruppeAdd);
+            budgetkontoViewModelMockCollection.ForEach(regnskabViewModel.BudgetkontoAdd);
+
+            Assert.That(regnskabViewModel.BogførtSidsteÅr, Is.EqualTo(expectedValue));
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.Not.Null);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.Not.Empty);
+            Assert.That(regnskabViewModel.BogførtSidsteÅrAsText, Is.EqualTo(expectedValue.ToString("C")));
+        }
+
+        /// <summary>
         /// Tester, at KontoAdd kaster en ArgumentNullException, hvis ViewModel for kontoen er null.
         /// </summary>
         [Test]
@@ -1924,6 +2196,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("BudgetÅrTilDatoAsText")]
         [TestCase("BudgetSidsteÅr")]
         [TestCase("BudgetSidsteÅrAsText")]
+        [TestCase("Bogført")]
+        [TestCase("BogførtAsText")]
+        [TestCase("BogførtSidsteMåned")]
+        [TestCase("BogførtSidsteMånedAsText")]
+        [TestCase("BogførtÅrTilDato")]
+        [TestCase("BogførtÅrTilDatoAsText")]
+        [TestCase("BogførtSidsteÅr")]
+        [TestCase("BogførtSidsteÅrAsText")]
         public void TestAtBudgetkontoAddRejserPropertyChangedVedAddAfBudgetkontoViewModel(string expectedPropertyName)
         {
             var fixture = new Fixture();
@@ -3611,6 +3891,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("BudgetÅrTilDato", "BudgetÅrTilDatoAsText")]
         [TestCase("BudgetSidsteÅr", "BudgetSidsteÅr")]
         [TestCase("BudgetSidsteÅr", "BudgetSidsteÅrAsText")]
+        [TestCase("Bogført", "Bogført")]
+        [TestCase("Bogført", "BogførtAsText")]
+        [TestCase("BogførtSidsteMåned", "BogførtSidsteMåned")]
+        [TestCase("BogførtSidsteMåned", "BogførtSidsteMånedAsText")]
+        [TestCase("BogførtÅrTilDato", "BogførtÅrTilDato")]
+        [TestCase("BogførtÅrTilDato", "BogførtÅrTilDatoAsText")]
+        [TestCase("BogførtSidsteÅr", "BogførtSidsteÅr")]
+        [TestCase("BogførtSidsteÅr", "BogførtSidsteÅrAsText")]
         public void TestAtPropertyChangedOnOpgørelseViewModelEventHandlerRejserPropertyChangedOnOpgørelseViewModelUpdate(string propertyName, string expectedPropertyName)
         {
             var fixture = new Fixture();

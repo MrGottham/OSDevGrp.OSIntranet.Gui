@@ -65,9 +65,8 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af finansstyringsrepositoryet, hvorfra data skal synkroniseres til og fra det lokale datalager.</param>
         /// <param name="finansstyringKonfigurationRepository">Implementering af konfiguration til finansstyringsrepositoryet.</param>
-        /// <param name="localeDataStorage">Implementering af det lokale datalger.</param>
-        /// <returns>Task, der udfører asynkron synkronisering.</returns>
-        private static Task SyncData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage)
+        /// <param name="localeDataStorage">Implementering af det lokale datalager.</param>
+        private static async Task SyncData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage)
         {
             if (finansstyringRepository == null)
             {
@@ -81,100 +80,77 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 throw new ArgumentNullException("localeDataStorage");
             }
-            Action func = async () =>
+            try
             {
-                try
+                XDocument syncDataDocument = null;
+
+                var kontogruppeliste = await finansstyringRepository.KontogruppelisteGetAsync();
+                foreach (var kontogruppe in kontogruppeliste)
                 {
-                    XDocument syncDataDocument = null;
-
-                    var kontogruppeliste = await finansstyringRepository.KontogruppelisteGetAsync();
-                    foreach (var kontogruppe in kontogruppeliste)
-                    {
-                        lock (SyncRoot)
-                        {
-                            if (syncDataDocument == null)
-                            {
-                                localeDataStorage.StoreSyncData(kontogruppe);
-                                syncDataDocument = localeDataStorage.GetLocaleData();
-                            }
-                            else
-                            {
-                                kontogruppe.StoreInDocument(syncDataDocument);
-                            }
-                        }
-                    }
-
-                    var budgetkontogruppeliste = await finansstyringRepository.BudgetkontogruppelisteGetAsync();
-                    foreach (var budgetkontogruppe in budgetkontogruppeliste)
-                    {
-                        lock (SyncRoot)
-                        {
-                            if (syncDataDocument == null)
-                            {
-                                localeDataStorage.StoreSyncData(budgetkontogruppe);
-                                syncDataDocument = localeDataStorage.GetLocaleData();
-                            }
-                            else
-                            {
-                                budgetkontogruppe.StoreInDocument(syncDataDocument);
-                            }
-                        }
-                    }
-
-                    var regnskabsliste = await finansstyringRepository.RegnskabslisteGetAsync();
-                    var syncDataTasks = new List<Task>();
-                    foreach (var regnskab in regnskabsliste)
-                    {
-                        lock (SyncRoot)
-                        {
-                            if (syncDataDocument == null)
-                            {
-                                localeDataStorage.StoreSyncData(regnskab);
-                                syncDataDocument = localeDataStorage.GetLocaleData();
-                            }
-                            else
-                            {
-                                regnskab.StoreInDocument(syncDataDocument);
-                            }
-                        }
-                        syncDataTasks.Add(SyncData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskab));
-                    }
-                    Task.WaitAll(syncDataTasks.ToArray());
-
                     lock (SyncRoot)
                     {
                         if (syncDataDocument == null)
                         {
-                            return;
+                            localeDataStorage.StoreSyncData(kontogruppe);
+                            syncDataDocument = localeDataStorage.GetLocaleData();
                         }
-                        localeDataStorage.StoreSyncDocument(syncDataDocument);
+                        else
+                        {
+                            kontogruppe.StoreInDocument(syncDataDocument);
+                        }
                     }
                 }
-                catch (IntranetGuiOfflineRepositoryException)
+
+                var budgetkontogruppeliste = await finansstyringRepository.BudgetkontogruppelisteGetAsync();
+                foreach (var budgetkontogruppe in budgetkontogruppeliste)
                 {
-                    // We are currently offline.
-                    // Don't rethrow the exception.
-                }
-                catch (AggregateException ex)
-                {
-                    if (ex.InnerException != null)
+                    lock (SyncRoot)
                     {
-                        throw ex.InnerException;
+                        if (syncDataDocument == null)
+                        {
+                            localeDataStorage.StoreSyncData(budgetkontogruppe);
+                            syncDataDocument = localeDataStorage.GetLocaleData();
+                        }
+                        else
+                        {
+                            budgetkontogruppe.StoreInDocument(syncDataDocument);
+                        }
                     }
-                    throw;
                 }
-            };
-            try
-            {
-                return Task.Run(func);
-            }
-            catch (AggregateException ex)
-            {
-                if (ex.InnerException != null)
+
+                var regnskabSyncTasks = new List<Task>();
+                var regnskabsliste = await finansstyringRepository.RegnskabslisteGetAsync();
+                foreach (var regnskab in regnskabsliste)
                 {
-                    throw ex.InnerException;
+                    lock (SyncRoot)
+                    {
+                        if (syncDataDocument == null)
+                        {
+                            localeDataStorage.StoreSyncData(regnskab);
+                            syncDataDocument = localeDataStorage.GetLocaleData();
+                        }
+                        else
+                        {
+                            regnskab.StoreInDocument(syncDataDocument);
+                        }
+                    }
+                    regnskabSyncTasks.Add(SyncData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskab));
                 }
-                throw;
+                Task.WaitAll(regnskabSyncTasks.ToArray());
+
+                lock (SyncRoot)
+                {
+                    if (syncDataDocument == null)
+                    {
+                        return;
+                    }
+                    localeDataStorage.StoreSyncDocument(syncDataDocument);
+                }
+            }
+            catch (IntranetGuiOfflineRepositoryException)
+            {
+                // We are currently offline.
+                // Don't rethrow the exception.
             }
         }
 
@@ -183,11 +159,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af finansstyringsrepositoryet, hvorfra data skal synkroniseres til og fra det lokale datalager.</param>
         /// <param name="finansstyringKonfigurationRepository">Implementering af konfiguration til finansstyringsrepositoryet.</param>
-        /// <param name="localeDataStorage">Implementering af det lokale datalger.</param>
-        /// <param name="syncDataDocument">XML dokument indeholdende de synkroniserede data.</param>
-        /// <param name="regnskabModel">Model for regnskabet, hvor data skal synkroniseres til og fra.</param>
-        /// <returns>Task, der udfører asynkron synkronisering.</returns>
-        private static Task SyncData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel regnskabModel)
+        /// <param name="localeDataStorage">Implementering af det lokale datalager.</param>
+        /// <param name="syncDataDocument">Model for regnskabet, hvor data skal synkroniseres til og fra.</param>
+        /// <param name="regnskabModel"></param>
+        private static async Task SyncData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel regnskabModel)
         {
             if (finansstyringRepository == null)
             {
@@ -209,65 +184,49 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 throw new ArgumentNullException("regnskabModel");
             }
-            Action func = async () =>
-            {
-                try
-                {
-                    var currentDate = DateTime.Today;
-                    lock (SyncRoot)
-                    {
-                        SyncLocaleData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskabModel);
-                    }
-                    foreach (var kontoModel in await finansstyringRepository.KontoplanGetAsync(regnskabModel.Nummer, currentDate))
-                    {
-                        lock (SyncRoot)
-                        {
-                            kontoModel.StoreInDocument(syncDataDocument);
-                        }
-                    }
-                    foreach (var budgetkontoModel in await finansstyringRepository.BudgetkontoplanGetAsync(regnskabModel.Nummer, currentDate))
-                    {
-                        lock (SyncRoot)
-                        {
-                            budgetkontoModel.StoreInDocument(syncDataDocument);
-                        }
-                    }
-                    foreach (var adressekontoModel in await finansstyringRepository.AdressekontolisteGetAsync(regnskabModel.Nummer, currentDate))
-                    {
-                        lock (SyncRoot)
-                        {
-                            adressekontoModel.StoreInDocument(syncDataDocument);
-                        }
-                    }
-                    foreach (var bogføringslinjeModel in await finansstyringRepository.BogføringslinjerGetAsync(regnskabModel.Nummer, currentDate, finansstyringKonfigurationRepository.AntalBogføringslinjer))
-                    {
-                        lock (SyncRoot)
-                        {
-                            bogføringslinjeModel.StoreInDocument(syncDataDocument, true);
-                        }
-                    }
-                    lock (SyncRoot)
-                    {
-                        localeDataStorage.StoreSyncDocument(syncDataDocument);
-                    }
-                }
-                catch (IntranetGuiOfflineRepositoryException)
-                {
-                    // We are currently offline.
-                    // Don't rethrow the exception.
-                }
-            };
             try
             {
-                return Task.Run(func);
-            }
-            catch (AggregateException ex)
-            {
-                if (ex.InnerException != null)
+                // Synkronisér regnskabsdata fra det lokale datalager til det online finansstyringsrepository.
+                await SyncLocaleData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskabModel);
+                // Synkronisér regnskabsdata fra det online finansstyringsrepository til det lokale datalager.
+                var currentDate = DateTime.Today;
+                foreach (var kontoModel in await finansstyringRepository.KontoplanGetAsync(regnskabModel.Nummer, currentDate))
                 {
-                    throw ex.InnerException;
+                    lock (SyncRoot)
+                    {
+                        kontoModel.StoreInDocument(syncDataDocument);
+                    }
                 }
-                throw;
+                foreach (var budgetkontoModel in await finansstyringRepository.BudgetkontoplanGetAsync(regnskabModel.Nummer, currentDate))
+                {
+                    lock (SyncRoot)
+                    {
+                        budgetkontoModel.StoreInDocument(syncDataDocument);
+                    }
+                }
+                foreach (var adressekontoModel in await finansstyringRepository.AdressekontolisteGetAsync(regnskabModel.Nummer, currentDate))
+                {
+                    lock (SyncRoot)
+                    {
+                        adressekontoModel.StoreInDocument(syncDataDocument);
+                    }
+                }
+                foreach (var bogføringslinjeModel in await finansstyringRepository.BogføringslinjerGetAsync(regnskabModel.Nummer, currentDate, finansstyringKonfigurationRepository.AntalBogføringslinjer))
+                {
+                    lock (SyncRoot)
+                    {
+                        bogføringslinjeModel.StoreInDocument(syncDataDocument, true);
+                    }
+                }
+                lock (SyncRoot)
+                {
+                    localeDataStorage.StoreSyncDocument(syncDataDocument);
+                }
+            }
+            catch (IntranetGuiOfflineRepositoryException)
+            {
+                // We are currently offline.
+                // Don't rethrow the exception.
             }
         }
 
@@ -276,10 +235,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af finansstyringsrepositoryet, hvorfra data skal synkroniseres til og fra det lokale datalager.</param>
         /// <param name="finansstyringKonfigurationRepository">Implementering af konfiguration til finansstyringsrepositoryet.</param>
-        /// <param name="localeDataStorage">Implementering af det lokale datalger.</param>
+        /// <param name="localeDataStorage">Implementering af det lokale datalager.</param>
         /// <param name="syncDataDocument">XML dokument indeholdende de synkroniserede data.</param>
         /// <param name="regnskabModel">Model for regnskabet, hvor data skal synkroniseres til og fra.</param>
-        private static async void SyncLocaleData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel regnskabModel)
+        private static async Task SyncLocaleData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel regnskabModel)
         {
             if (finansstyringRepository == null)
             {
@@ -310,7 +269,11 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     return;
                 }
 
-                var bogføringslinjeElementToSync = GetBogføringslinjeElementToSync(rootElement, regnskabElement);
+                XElement bogføringslinjeElementToSync;
+                lock (SyncRoot)
+                {
+                    bogføringslinjeElementToSync = GetBogføringslinjeElementToSync(rootElement, regnskabElement);
+                }
                 while (bogføringslinjeElementToSync != null)
                 {
                     var dato = DateTime.ParseExact(bogføringslinjeElementToSync.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
@@ -323,10 +286,13 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     var adressekonto = bogføringslinjeElementToSync.Attribute(XName.Get("adressekonto", string.Empty)) == null ? 0 : int.Parse(bogføringslinjeElementToSync.Attribute(XName.Get("adressekonto", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
                     await finansstyringRepository.BogførAsync(regnskabModel.Nummer, dato, bilag, kontonummer, tekst, budgetkontonummer, debit, kredit, adressekonto);
 
-                    bogføringslinjeElementToSync.Remove();
-                    localeDataStorage.StoreSyncDocument(syncDataDocument);
+                    lock (SyncRoot)
+                    {
+                        bogføringslinjeElementToSync.Remove();
+                        localeDataStorage.StoreSyncDocument(syncDataDocument);
 
-                    bogføringslinjeElementToSync = GetBogføringslinjeElementToSync(rootElement, regnskabElement);
+                        bogføringslinjeElementToSync = GetBogføringslinjeElementToSync(rootElement, regnskabElement);
+                    }
                 }
             }
             catch (IntranetGuiOfflineRepositoryException)
