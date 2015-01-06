@@ -610,6 +610,15 @@ namespace OSDevGrp.OSIntranet.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Monthly statement.
+        /// </summary>
+        internal static string MonthlyStatement {
+            get {
+                return ResourceManager.GetString("MonthlyStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         internal static string Name {

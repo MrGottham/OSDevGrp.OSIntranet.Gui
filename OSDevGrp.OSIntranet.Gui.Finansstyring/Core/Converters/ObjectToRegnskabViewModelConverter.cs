@@ -59,6 +59,28 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring.Core.Converters
                 var budgetkontoViewModelArray = budgetkontoViewModelCollection.ToArray();
                 return budgetkontoViewModelArray.Any() ? budgetkontoViewModelArray.First().Regnskab : null;
             }
+            var balanceViewModel = value as IBalanceViewModel;
+            if (balanceViewModel != null)
+            {
+                return balanceViewModel.Regnskab;
+            }
+            var balanceModelCollection = value as IEnumerable<IBalanceViewModel>;
+            if (balanceModelCollection != null)
+            {
+                var balanceViewModelArray = balanceModelCollection.ToArray();
+                return balanceViewModelArray.Any() ? balanceViewModelArray.First().Regnskab : null;
+            }
+            var opgørelseViewModel = value as IOpgørelseViewModel;
+            if (opgørelseViewModel != null)
+            {
+                return opgørelseViewModel.Regnskab;
+            }
+            var opgørelseModelCollection = value as IEnumerable<IOpgørelseViewModel>;
+            if (opgørelseModelCollection != null)
+            {
+                var opgørelseViewModelArray = opgørelseModelCollection.ToArray();
+                return opgørelseViewModelArray.Any() ? opgørelseViewModelArray.First().Regnskab : null;
+            }
             return null;
         }
 

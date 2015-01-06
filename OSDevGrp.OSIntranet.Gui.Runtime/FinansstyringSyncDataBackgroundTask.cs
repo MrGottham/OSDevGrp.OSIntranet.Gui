@@ -189,7 +189,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 // Synkronisér regnskabsdata fra det lokale datalager til det online finansstyringsrepository.
                 await SyncLocaleData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskabModel);
                 // Synkronisér regnskabsdata fra det online finansstyringsrepository til det lokale datalager.
-                var currentDate = DateTime.Today;
+                var currentDate = DateTime.Now;
                 foreach (var kontoModel in await finansstyringRepository.KontoplanGetAsync(regnskabModel.Nummer, currentDate))
                 {
                     lock (SyncRoot)

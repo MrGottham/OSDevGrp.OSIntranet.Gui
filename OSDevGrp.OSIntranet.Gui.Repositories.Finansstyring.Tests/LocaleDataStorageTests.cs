@@ -22,6 +22,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
     [TestFixture]
     public class LocaleDataStorageTests
     {
+        #region Private constants
+
+        private const string DecimalFormat = "#0.00";
+
+        #endregion
+
         /// <summary>
         /// Tester, at konstruktøren initierer det lokale datalager.
         /// </summary>
@@ -775,7 +781,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 .Return(Balancetype.Aktiver)
                 .Repeat.Any();
 
-            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365) * -1);
+            var statusDato = DateTime.Today.AddDays(rand.Next(1, 365)*-1);
             var kontoModelMock = MockRepository.GenerateMock<IKontoModel>();
             kontoModelMock.Stub(m => m.Regnskabsnummer)
                 .Return(regnskabModelMock.Nummer)
@@ -901,8 +907,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "kontogruppe", kontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var kontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "kredit", kontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "saldo", kontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "kredit", kontoModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "saldo", kontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreLocaleData(updatedKontoModelMock);
                 var updatedKontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Konto[@kontonummer = '{1}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer));
@@ -912,13 +918,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "kontogruppe", updatedKontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var updatedKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "kredit", updatedKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "saldo", updatedKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "kredit", updatedKontoModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "saldo", updatedKontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreLocaleData(updatedSaldoOnKontoModelMock);
                 var updatedSaldoOnKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, updatedSaldoOnKontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "kredit", updatedSaldoOnKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "saldo", updatedSaldoOnKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "kredit", updatedSaldoOnKontoModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "saldo", updatedSaldoOnKontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
             }
             finally
             {
@@ -1126,17 +1132,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "kontogruppe", budgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var budgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "indtaegter", budgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "udgifter", budgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "indtaegter", budgetkontoModelMock.Indtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "udgifter", budgetkontoModelMock.Udgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.Bogført.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 var lastMonthStatusDato = new DateTime(budgetkontoModelMock.StatusDato.AddMonths(-1).Year, budgetkontoModelMock.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(budgetkontoModelMock.StatusDato.AddMonths(-1).Year, budgetkontoModelMock.StatusDato.AddMonths(-1).Month));
-                var lastMonthIndtægter = budgetkontoModelMock.BudgetSidsteMåned > 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M;
-                var lastMonthUdgifter = budgetkontoModelMock.BudgetSidsteMåned < 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M;
+                var lastMonthIndtægter = Math.Abs(budgetkontoModelMock.BudgetSidsteMåned > 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M);
+                var lastMonthUdgifter = Math.Abs(budgetkontoModelMock.BudgetSidsteMåned < 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M);
                 var lastMonthBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, lastMonthStatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.BogførtSidsteMåned.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreLocaleData(updatedBudgetkontoModelMock);
                 var updatedBudgetkontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Budgetkonto[@kontonummer = '{1}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer));
@@ -1146,31 +1152,31 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "kontogruppe", updatedBudgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var updatedBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "indtaegter", updatedBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "udgifter", updatedBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "indtaegter", updatedBudgetkontoModelMock.Indtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "udgifter", updatedBudgetkontoModelMock.Udgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.Bogført.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 lastMonthStatusDato = new DateTime(updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Month));
-                lastMonthIndtægter = updatedBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M;
-                lastMonthUdgifter = updatedBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M;
+                lastMonthIndtægter = Math.Abs(updatedBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M);
+                lastMonthUdgifter = Math.Abs(updatedBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M);
                 var lastMonthUpdatedBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, lastMonthStatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.BogførtSidsteMåned.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreLocaleData(updatedSaldoOnBudgetkontoModelMock);
                 var updatedSaldoOnBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, updatedSaldoOnBudgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "indtaegter", updatedSaldoOnBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "udgifter", updatedSaldoOnBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "indtaegter", updatedSaldoOnBudgetkontoModelMock.Indtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "udgifter", updatedSaldoOnBudgetkontoModelMock.Udgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.Bogført.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 lastMonthStatusDato = new DateTime(updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Month));
-                lastMonthIndtægter = updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M;
-                lastMonthUdgifter = updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M;
+                lastMonthIndtægter = Math.Abs(updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M);
+                lastMonthUdgifter = Math.Abs(updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M);
                 var lastMonthUpdatedSaldoOnBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, lastMonthStatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.BogførtSidsteMåned.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
             }
             finally
             {
@@ -1296,7 +1302,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "sekundaerTelefon", adressekontoModelMock.SekundærTelefon));
 
                 var adressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoHistorikNode, "saldo", adressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoHistorikNode, "saldo", adressekontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreLocaleData(updatedAdressekontoModelMock);
                 var updatedAdressekontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Adressekonto[@nummer = '{1}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture)));
@@ -1305,11 +1311,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "sekundaerTelefon", updatedAdressekontoModelMock.SekundærTelefon));
 
                 var updatedAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoHistorikNode, "saldo", updatedAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoHistorikNode, "saldo", updatedAdressekontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreLocaleData(updatedSaldoOnAdressekontoModelMock);
                 var updatedSaldoOnAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, updatedSaldoOnAdressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), updatedSaldoOnAdressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
             }
             finally
             {
@@ -1436,8 +1442,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kontonummer", bogføringslinjeModelMock.Kontonummer));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "tekst", bogføringslinjeModelMock.Tekst));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "budgetkontonummer", bogføringslinjeModelMock.Budgetkontonummer));
-                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "debit", bogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kredit", bogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "debit", bogføringslinjeModelMock.Debit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kredit", bogføringslinjeModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "adressekonto", bogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "synkroniseret", "false"));
 
@@ -1448,8 +1454,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kontonummer", updatedBogføringslinjeModelMock.Kontonummer));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "tekst", updatedBogføringslinjeModelMock.Tekst));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "budgetkontonummer", updatedBogføringslinjeModelMock.Budgetkontonummer));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "debit", updatedBogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kredit", updatedBogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "debit", updatedBogføringslinjeModelMock.Debit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kredit", updatedBogføringslinjeModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "adressekonto", updatedBogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "synkroniseret", "false"));
             }
@@ -2104,8 +2110,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(kontoNode, "kontogruppe", kontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var kontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "kredit", kontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "saldo", kontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "kredit", kontoModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(kontoHistorikNode, "saldo", kontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreSyncData(updatedKontoModelMock);
                 var updatedKontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Konto[@kontonummer = '{1}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer));
@@ -2115,13 +2121,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoNode, "kontogruppe", updatedKontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var updatedKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, kontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "kredit", updatedKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "saldo", updatedKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "kredit", updatedKontoModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedKontoHistorikNode, "saldo", updatedKontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreSyncData(updatedSaldoOnKontoModelMock);
                 var updatedSaldoOnKontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:KontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, kontoModelMock.Kontonummer, updatedSaldoOnKontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "kredit", updatedSaldoOnKontoModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "saldo", updatedSaldoOnKontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "kredit", updatedSaldoOnKontoModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnKontoHistorikNode, "saldo", updatedSaldoOnKontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
             }
             finally
             {
@@ -2329,17 +2335,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoNode, "kontogruppe", budgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var budgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "indtaegter", budgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "udgifter", budgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "indtaegter", budgetkontoModelMock.Indtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "udgifter", budgetkontoModelMock.Udgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(budgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.Bogført.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 var lastMonthStatusDato = new DateTime(budgetkontoModelMock.StatusDato.AddMonths(-1).Year, budgetkontoModelMock.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(budgetkontoModelMock.StatusDato.AddMonths(-1).Year, budgetkontoModelMock.StatusDato.AddMonths(-1).Month));
-                var lastMonthIndtægter = budgetkontoModelMock.BudgetSidsteMåned > 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M;
-                var lastMonthUdgifter = budgetkontoModelMock.BudgetSidsteMåned < 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M;
+                var lastMonthIndtægter = Math.Abs(budgetkontoModelMock.BudgetSidsteMåned > 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M);
+                var lastMonthUdgifter = Math.Abs(budgetkontoModelMock.BudgetSidsteMåned < 0 ? budgetkontoModelMock.BudgetSidsteMåned : 0M);
                 var lastMonthBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, lastMonthStatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthBudgetkontoHistorikNode, "bogfoert", budgetkontoModelMock.BogførtSidsteMåned.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreSyncData(updatedBudgetkontoModelMock);
                 var updatedBudgetkontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Budgetkonto[@kontonummer = '{1}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer));
@@ -2349,31 +2355,31 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoNode, "kontogruppe", updatedBudgetkontoModelMock.Kontogruppe.ToString(CultureInfo.InvariantCulture)));
 
                 var updatedBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, budgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "indtaegter", updatedBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "udgifter", updatedBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "indtaegter", updatedBudgetkontoModelMock.Indtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "udgifter", updatedBudgetkontoModelMock.Udgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.Bogført.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 lastMonthStatusDato = new DateTime(updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedBudgetkontoModelMock.StatusDato.AddMonths(-1).Month));
-                lastMonthIndtægter = updatedBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M;
-                lastMonthUdgifter = updatedBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M;
+                lastMonthIndtægter = Math.Abs(updatedBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M);
+                lastMonthUdgifter = Math.Abs(updatedBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedBudgetkontoModelMock.BudgetSidsteMåned : 0M);
                 var lastMonthUpdatedBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, lastMonthStatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedBudgetkontoHistorikNode, "bogfoert", updatedBudgetkontoModelMock.BogførtSidsteMåned.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreSyncData(updatedSaldoOnBudgetkontoModelMock);
                 var updatedSaldoOnBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, updatedSaldoOnBudgetkontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "indtaegter", updatedSaldoOnBudgetkontoModelMock.Indtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "udgifter", updatedSaldoOnBudgetkontoModelMock.Udgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.Bogført.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "indtaegter", updatedSaldoOnBudgetkontoModelMock.Indtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "udgifter", updatedSaldoOnBudgetkontoModelMock.Udgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.Bogført.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 lastMonthStatusDato = new DateTime(updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Year, updatedSaldoOnBudgetkontoModelMock.StatusDato.AddMonths(-1).Month));
-                lastMonthIndtægter = updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M;
-                lastMonthUdgifter = updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M;
+                lastMonthIndtægter = Math.Abs(updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned > 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M);
+                lastMonthUdgifter = Math.Abs(updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned < 0 ? updatedSaldoOnBudgetkontoModelMock.BudgetSidsteMåned : 0M);
                 var lastMonthUpdatedSaldoOnBudgetkontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:BudgetkontoHistorik[@kontonummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, budgetkontoModelMock.Kontonummer, lastMonthStatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.BogførtSidsteMåned.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "indtaegter", lastMonthIndtægter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "udgifter", lastMonthUdgifter.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(lastMonthUpdatedSaldoOnBudgetkontoHistorikNode, "bogfoert", updatedSaldoOnBudgetkontoModelMock.BogførtSidsteMåned.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
             }
             finally
             {
@@ -2499,7 +2505,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoNode, "sekundaerTelefon", adressekontoModelMock.SekundærTelefon));
 
                 var adressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoHistorikNode, "saldo", adressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(adressekontoHistorikNode, "saldo", adressekontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreSyncData(updatedAdressekontoModelMock);
                 var updatedAdressekontoNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:Adressekonto[@nummer = '{1}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture)));
@@ -2508,11 +2514,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoNode, "sekundaerTelefon", updatedAdressekontoModelMock.SekundærTelefon));
 
                 var updatedAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, adressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), adressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoHistorikNode, "saldo", updatedAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedAdressekontoHistorikNode, "saldo", updatedAdressekontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
 
                 localeDataStorage.StoreSyncData(updatedSaldoOnAdressekontoModelMock);
                 var updatedSaldoOnAdressekontoHistorikNode = GetNodeFromXPath(tempFile.FullName, string.Format("/ns:FinansstyringRepository/ns:Regnskab[@nummer = '{0}']/ns:AdressekontoHistorik[@nummer = '{1}' and @dato='{2}']", regnskabModelMock.Nummer, updatedSaldoOnAdressekontoModelMock.Nummer.ToString(CultureInfo.InvariantCulture), updatedSaldoOnAdressekontoModelMock.StatusDato.ToString("yyyyMMdd")));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedSaldoOnAdressekontoHistorikNode, "saldo", updatedSaldoOnAdressekontoModelMock.Saldo.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
             }
             finally
             {
@@ -2639,8 +2645,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kontonummer", bogføringslinjeModelMock.Kontonummer));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "tekst", bogføringslinjeModelMock.Tekst));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "budgetkontonummer", bogføringslinjeModelMock.Budgetkontonummer));
-                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "debit", bogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kredit", bogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "debit", bogføringslinjeModelMock.Debit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "kredit", bogføringslinjeModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "adressekonto", bogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(bogføringslinjeNode, "synkroniseret", "true"));
 
@@ -2651,8 +2657,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kontonummer", updatedBogføringslinjeModelMock.Kontonummer));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "tekst", updatedBogføringslinjeModelMock.Tekst));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "budgetkontonummer", updatedBogføringslinjeModelMock.Budgetkontonummer));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "debit", updatedBogføringslinjeModelMock.Debit.ToString("#.00", CultureInfo.InvariantCulture)));
-                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kredit", updatedBogføringslinjeModelMock.Kredit.ToString("#.00", CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "debit", updatedBogføringslinjeModelMock.Debit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
+                Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "kredit", updatedBogføringslinjeModelMock.Kredit.ToString(DecimalFormat, CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "adressekonto", updatedBogføringslinjeModelMock.Adressekonto.ToString(CultureInfo.InvariantCulture)));
                 Assert.IsTrue(HasAttributeWhichMatchValue(updatedBogføringslinjeNode, "synkroniseret", "true"));
             }

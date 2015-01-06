@@ -57,6 +57,7 @@
         <Setter Property="Background" Value="CornflowerBlue"/>
     </Style>
     <Style x:Key="BookkeepingListViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>
+    <Style x:Key="MonthStatementViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>
     <Style x:Key="AnnualStatementViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>
     <Style x:Key="AssertListViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>
     <Style x:Key="LiabilityListViewStyle" TargetType="ListView" BasedOn="{StaticResource HighlightedListViewStyle}"/>

@@ -172,9 +172,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabViewModel.BogføringsadvarslerHeader, Is.EqualTo(Resource.GetText(Text.PostingWarnings)));
             Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Not.Null);
             Assert.That(regnskabViewModel.Opgørelseslinjer, Is.Empty);
-            Assert.That(regnskabViewModel.OpgørelseslinjerHeader, Is.Not.Null);
-            Assert.That(regnskabViewModel.OpgørelseslinjerHeader, Is.Not.Empty);
-            Assert.That(regnskabViewModel.OpgørelseslinjerHeader, Is.EqualTo(Resource.GetText(Text.AnnualStatement)));
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders, Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders, Is.Not.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders.Count(), Is.EqualTo(2));
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders.ElementAt(0), Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders.ElementAt(0), Is.Not.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders.ElementAt(0), Is.EqualTo(Resource.GetText(Text.MonthlyStatement)));
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders.ElementAt(1), Is.Not.Null);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders.ElementAt(1), Is.Not.Empty);
+            Assert.That(regnskabViewModel.OpgørelseslinjerHeaders.ElementAt(1), Is.EqualTo(Resource.GetText(Text.AnnualStatement)));
             Assert.That(regnskabViewModel.OpgørelseslinjerColumns, Is.Not.Null);
             Assert.That(regnskabViewModel.OpgørelseslinjerColumns, Is.Not.Empty);
             Assert.That(regnskabViewModel.OpgørelseslinjerColumns.Count(), Is.EqualTo(3));

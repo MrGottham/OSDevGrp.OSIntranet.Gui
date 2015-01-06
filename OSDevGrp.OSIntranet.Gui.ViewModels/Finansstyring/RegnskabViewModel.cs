@@ -45,6 +45,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         private static ObservableCollection<string> _kontoColumns;
         private static ObservableCollection<string> _budgetkontoColumns;
         private static ObservableCollection<string> _bogføringslinjeColumns;
+        private static ObservableCollection<string> _opgørelseHeaders; 
         private static ObservableCollection<string> _opgørelseColumns;
         private static ObservableCollection<string> _balanceColumns;
         private static readonly ObservableCollection<IKontogruppeViewModel> KontogruppeViewModels = new ObservableCollection<IKontogruppeViewModel>();
@@ -470,13 +471,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         }
 
         /// <summary>
-        /// Overskrift til linjer, der indgår i årsopgørelsen.
+        /// Overskrifter til linjer, der indgår i årsopgørelsen.
         /// </summary>
-        public virtual string OpgørelseslinjerHeader
+        public virtual IEnumerable<string> OpgørelseslinjerHeaders
         {
             get
             {
-                return Resource.GetText(Text.AnnualStatement);
+                lock (SyncRoot)
+                {
+                    return _opgørelseHeaders ?? (_opgørelseHeaders = new ObservableCollection<string>(new Collection<string>(new List<string> {Resource.GetText(Text.MonthlyStatement), Resource.GetText(Text.AnnualStatement)})));
+                }
             }
         }
 

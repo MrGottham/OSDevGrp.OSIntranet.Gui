@@ -236,9 +236,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         }
 
         /// <summary>
-        /// Overskrift til linjer, der indgår i årsopgørelsen.
+        /// Overskrifter til linjer, der indgår i årsopgørelsen.
         /// </summary>
-        string OpgørelseslinjerHeader
+        IEnumerable<string> OpgørelseslinjerHeaders
         {
             get;
         }
