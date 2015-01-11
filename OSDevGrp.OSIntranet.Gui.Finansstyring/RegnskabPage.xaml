@@ -74,6 +74,56 @@
                 </HyperlinkButton>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="MonthlyStatementHeaderDefaultNavigationDataTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="310"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="AnnualStatementHeaderDefaultNavigationDataTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="310"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="AssertsHeaderDefaultNavigationDataTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="290"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=AktiverHeader}"/>
+                <TextBlock Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=AktiverColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"></TextBlock>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="LiabilitiesHeaderDefaultNavigationDataTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="290"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=PassiverHeader}"/>
+                <TextBlock Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=PassiverColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"></TextBlock>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="KontoViewModelDefaultNavigationDataTemplate">
             <Grid Width="460" MinWidth="460" MaxWidth="460" Height="Auto" MinHeight="125" Style="{StaticResource HighlightedGridStyle}">
                 <Grid.ColumnDefinitions>
@@ -327,7 +377,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=OpgørelseslinjerHeaders, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
-                        <ListView Grid.Row="1" Grid.Column="0" Margin="0,0,0,10" Style="{StaticResource MonthStatementViewStyle}" ItemsSource="{Binding Path=Opgørelseslinjer}" SelectionMode="None">
+                        <ListView Grid.Row="1" Grid.Column="0" Margin="0,0,0,10" Style="{StaticResource MonthStatementViewStyle}" ItemsSource="{Binding Path=Opgørelseslinjer}" HeaderTemplate="{StaticResource MonthlyStatementHeaderDefaultNavigationDataTemplate}" SelectionMode="None">
                             
                         </ListView>
                         <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,0,0" Style="{StaticResource HighlightedGridStyle}">
@@ -338,10 +388,10 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="150"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetSidsteMånedAsText}"/>
-                            <TextBlock Grid.Column="2" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BogførtSidsteMånedAsText}"/>
-                            <TextBlock Grid.Column="3" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetAsText}"/>
-                            <TextBlock Grid.Column="4" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BogførtAsText}"/>
+                            <TextBlock Grid.Column="1" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetSidsteMånedAsText}"/>
+                            <TextBlock Grid.Column="2" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtSidsteMånedAsText}"/>
+                            <TextBlock Grid.Column="3" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetAsText}"/>
+                            <TextBlock Grid.Column="4" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtAsText}"/>
                         </Grid>
                     </Grid>
                     <Grid Grid.Column="2" Margin="0,0,40,20">
@@ -351,7 +401,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=OpgørelseslinjerHeaders, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
-                        <ListView Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource AnnualStatementViewStyle}" ItemsSource="{Binding Path=Opgørelseslinjer}" SelectionMode="None">
+                        <ListView Grid.Row="1" Margin="0,0,0,10" Style="{StaticResource AnnualStatementViewStyle}" ItemsSource="{Binding Path=Opgørelseslinjer}" HeaderTemplate="{StaticResource AnnualStatementHeaderDefaultNavigationDataTemplate}" SelectionMode="None">
 
                         </ListView>
                         <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,0,0" Style="{StaticResource HighlightedGridStyle}">
@@ -362,10 +412,10 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="150"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetSidsteÅrAsText}"/>
-                            <TextBlock Grid.Column="2" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BogførtSidsteÅrAsText}"/>
-                            <TextBlock Grid.Column="3" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BudgetÅrTilDatoAsText}"/>
-                            <TextBlock Grid.Column="4" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=BogførtÅrTilDatoAsText}"/>
+                            <TextBlock Grid.Column="1" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetSidsteÅrAsText}"/>
+                            <TextBlock Grid.Column="2" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtSidsteÅrAsText}"/>
+                            <TextBlock Grid.Column="3" Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetÅrTilDatoAsText}"/>
+                            <TextBlock Grid.Column="4" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BogførtÅrTilDatoAsText}"/>
                         </Grid>
                     </Grid>
                     <Grid Grid.Column="3" Margin="0,0,40,20">
@@ -375,34 +425,31 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,10" Style="{StaticResource GroupHeaderTextStyle}" Text="{Binding Path=BalanceHeader}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=AktiverHeader}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=PassiverHeader}"/>
-                        <ListView Grid.Row="2" Grid.Column="0" Margin="0,0,10,10" Style="{StaticResource AssertListViewStyle}" ItemsSource="{Binding Path=Aktiver}" SelectionMode="None">
+                        <ListView Grid.Row="1" Grid.Column="0" Margin="0,0,10,10" Style="{StaticResource AssertListViewStyle}" ItemsSource="{Binding Path=Aktiver}" HeaderTemplate="{StaticResource AssertsHeaderDefaultNavigationDataTemplate}" SelectionMode="None">
 
                         </ListView>
-                        <ListView Grid.Row="2" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource LiabilityListViewStyle}" ItemsSource="{Binding Path=Passiver}" SelectionMode="None">
+                        <ListView Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Style="{StaticResource LiabilityListViewStyle}" ItemsSource="{Binding Path=Passiver}" HeaderTemplate="{StaticResource LiabilitiesHeaderDefaultNavigationDataTemplate}" SelectionMode="None">
 
                         </ListView>
-                        <Grid Grid.Row="3" Grid.Column="0" Margin="0,0,10,0" Style="{StaticResource HighlightedGridStyle}">
+                        <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,10,0" Style="{StaticResource HighlightedGridStyle}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="290"/>
                                 <ColumnDefinition Width="150"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Margin="10,10,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=AktiverIAltLabel}"/>
-                            <TextBlock Grid.Column="1" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=AktiverIAltAsText}"/>
+                            <TextBlock Grid.Column="0" Margin="10,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=AktiverIAltLabel}"/>
+                            <TextBlock Grid.Column="1" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=AktiverIAltAsText}"/>
                         </Grid>
-                        <Grid Grid.Row="3" Grid.Column="1" Margin="0,0,0,0" Style="{StaticResource HighlightedGridStyle}">
+                        <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,0,0" Style="{StaticResource HighlightedGridStyle}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="290"/>
                                 <ColumnDefinition Width="150"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Margin="10,10,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=PassiverIAltLabel}"/>
-                            <TextBlock Grid.Column="1" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextAlignment="Right" Text="{Binding Path=PassiverIAltAsText}"/>
+                            <TextBlock Grid.Column="0" Margin="10,10,0,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" Text="{Binding Path=PassiverIAltLabel}"/>
+                            <TextBlock Grid.Column="1" Margin="0,10,10,10" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=PassiverIAltAsText}"/>
                         </Grid>
                     </Grid>
                     <Grid Grid.Column="4" Margin="0,0,40,20">
