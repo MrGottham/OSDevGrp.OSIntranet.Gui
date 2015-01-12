@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
@@ -47,6 +48,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 localeDataStorage.OnHasLocaleData += LocaleDataStorageHelper.HasLocaleDataEventHandler;
                 localeDataStorage.OnCreateReaderStream += LocaleDataStorageHelper.CreateReaderStreamEventHandler;
                 localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;
+                localeDataStorage.PrepareLocaleData += PrepareLocaleDataEventHandler;
 
                 await SyncData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage);
             }
@@ -323,6 +325,31 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 .OrderBy(m => DateTime.ParseExact(m.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture))
                 .ThenBy(m => int.Parse(m.Attribute(XName.Get("loebenummer")).Value, NumberStyles.Integer, CultureInfo.InvariantCulture))
                 .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når data i det lokale datalager skal forberedes til læsning eller skrivning.
+        /// </summary>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
+        private static void PrepareLocaleDataEventHandler(object sender, IPrepareLocaleDataEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            if (eventArgs.ReadingContext == false && eventArgs.WritingContext == false)
+            {
+                return;
+            }
+            lock (SyncRoot)
+            {
+                eventArgs.LocaleDataDocument.StoreVersionNumberInDocument(FinansstyringRepositoryLocale.RepositoryVersion);
+            }
         }
     }
 }

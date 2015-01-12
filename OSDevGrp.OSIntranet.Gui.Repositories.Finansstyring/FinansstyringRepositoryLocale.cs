@@ -970,8 +970,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <summary>
         /// Eventhandler, der rejses, når data i det lokale datalager skal forberedes til læsning eller skrivning.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="eventArgs"></param>
+        /// <param name="sender">Objekt, der rejser eventet.</param>
+        /// <param name="eventArgs">Argumenter til eventet.</param>
         private static void PrepareLocaleDataEventHandler(object sender, IPrepareLocaleDataEventArgs eventArgs)
         {
             if (sender == null)
