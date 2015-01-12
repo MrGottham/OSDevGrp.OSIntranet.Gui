@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
@@ -1076,6 +1077,244 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at PrepareLocaleDataEventHandler returnerer, hvis der ikke er dannet et rodelement.
+        /// </summary>
+        [Test]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public void TestAtPrepareLocaleDataEventHandlerReturnererHvisRootElementIkkeErDannet(bool readingContext, bool writingContext)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            Assert.That(localeDataDocument.Root, Is.Null);
+            localeDataStorageMock.Raise(m => m.PrepareLocaleData += null, localeDataStorageMock, new PrepareLocaleDataEventArgs(localeDataDocument, readingContext, writingContext, fixture.Create<bool>()));
+            Assert.That(localeDataDocument.Root, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at PrepareLocaleDataEventHandler ikke danner attribute med versionsnummer, hvis attributten allerede er dannet.
+        /// </summary>
+        [Test]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public void TestAtPrepareLocaleDataEventHandlerIkkeDannerVersionAttributeHvisDenneErDannet(bool readingContext, bool writingContext)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            var versionAttribute = new XAttribute(XName.Get("version", string.Empty), fixture.Create<string>());
+            var rootElement = new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace));
+            rootElement.Add(versionAttribute);
+            localeDataDocument.Add(rootElement);
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Not.Null);
+            // ReSharper restore PossibleNullReferenceException
+
+            localeDataStorageMock.Raise(m => m.PrepareLocaleData += null, localeDataStorageMock, new PrepareLocaleDataEventArgs(localeDataDocument, readingContext, writingContext, fixture.Create<bool>()));
+            
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Not.Null);
+            // ReSharper restore PossibleNullReferenceException
+        }
+
+        /// <summary>
+        /// Tester, at PrepareLocaleDataEventHandler ikke opdaterer versionsnummer på attributten til versionsnummer, hvis attributten allerede er dannet.
+        /// </summary>
+        [Test]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public void TestAtPrepareLocaleDataEventHandlerIkkeOpdatererVersionAttributeHvisDenneErDannet(bool readingContext, bool writingContext)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            var versionValue = fixture.Create<string>();
+            var versionAttribute = new XAttribute(XName.Get("version", string.Empty), versionValue);
+            var rootElement = new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace));
+            rootElement.Add(versionAttribute);
+            localeDataDocument.Add(rootElement);
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Not.Null);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.Not.Null);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.Not.Empty);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.EqualTo(versionValue));
+            // ReSharper restore PossibleNullReferenceException
+
+            localeDataStorageMock.Raise(m => m.PrepareLocaleData += null, localeDataStorageMock, new PrepareLocaleDataEventArgs(localeDataDocument, readingContext, writingContext, fixture.Create<bool>()));
+
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Not.Null);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.Not.Null);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.Not.Empty);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.EqualTo(versionValue));
+            // ReSharper restore PossibleNullReferenceException
+        }
+
+        /// <summary>
+        /// Tester, at PrepareLocaleDataEventHandler danner attributten med versionsnummer, hvis attributten ikke er dannet og man samtidig enten er i læse- eller skrivekontekst.
+        /// </summary>
+        [Test]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public void TestAtPrepareLocaleDataEventHandlerDannerVersionAttributeHvisDenneIkkeErDannetOgReadingContextEllerWritingContextErTrue(bool readingContext, bool writingContext)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            var rootElement = new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace));
+            localeDataDocument.Add(rootElement);
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Null);
+            // ReSharper restore PossibleNullReferenceException
+
+            localeDataStorageMock.Raise(m => m.PrepareLocaleData += null, localeDataStorageMock, new PrepareLocaleDataEventArgs(localeDataDocument, readingContext, writingContext, fixture.Create<bool>()));
+
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Not.Null);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.Not.Null);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.Not.Empty);
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)).Value, Is.EqualTo("1.0"));
+            // ReSharper restore PossibleNullReferenceException
+        }
+
+        /// <summary>
+        /// Tester, at PrepareLocaleDataEventHandler ikke danner attributten med versionsnummer, hvis attributten ikke er dannet og man samtidig ikke er i læse- eller skrivekontekst.
+        /// </summary>
+        [Test]
+        public void TestAtPrepareLocaleDataEventHandlerIkkeDannerVersionAttributeHvisDenneIkkeErDannetOgReadingContextOgWritingContextErFalse()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            var rootElement = new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace));
+            localeDataDocument.Add(rootElement);
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Null);
+            // ReSharper restore PossibleNullReferenceException
+
+            localeDataStorageMock.Raise(m => m.PrepareLocaleData += null, localeDataStorageMock, new PrepareLocaleDataEventArgs(localeDataDocument, false, false, fixture.Create<bool>()));
+
+            Assert.That(localeDataDocument.Root, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
+            Assert.That(localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)), Is.Null);
+            // ReSharper restore PossibleNullReferenceException
+        }
+
+        /// <summary>
+        /// Tester, at PrepareLocaleDataEventHandler kaster en ArgumentNullException, hvis objektet, der rejser eventet, er null
+        /// </summary>
+        [Test]
+        public void TestAtPrepareLocaleDataEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            localeDataDocument.Add(new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace)));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => localeDataStorageMock.Raise(m => m.PrepareLocaleData += null, null, new PrepareLocaleDataEventArgs(localeDataDocument, fixture.Create<bool>(), fixture.Create<bool>(), fixture.Create<bool>())));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("sender"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at PrepareLocaleDataEventHandler kaster en ArgumentNullException, hvis argumenter eventet, er null
+        /// </summary>
+        [Test]
+        public void TestAtPrepareLocaleDataEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IFinansstyringKonfigurationRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>()));
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            localeDataDocument.Add(new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace)));
+
+            var localeDataStorageMock = MockRepository.GenerateMock<ILocaleDataStorage>();
+            localeDataStorageMock.Stub(m => m.HasLocaleData)
+                .Return(true)
+                .Repeat.Any();
+
+            var finansstyringRepositoryLocale = new FinansstyringRepositoryLocale(fixture.Create<IFinansstyringKonfigurationRepository>(), localeDataStorageMock);
+            Assert.That(finansstyringRepositoryLocale, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => localeDataStorageMock.Raise(m => m.PrepareLocaleData += null, localeDataStorageMock, null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("eventArgs"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
         /// Danner testdata.
         /// </summary>
         /// <param name="fixture">Fixture, der kan generere random data.</param>
@@ -1095,7 +1334,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                 // Create testdata.
                 var random = new Random(fixture.Create<int>());
                 var localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
-                localeDataDocument.Add(new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace)));
+                var rootElement = new XElement(XName.Get("FinansstyringRepository", FinansstyringRepositoryLocale.Namespace));
+                rootElement.Add(new XAttribute(XName.Get("version", string.Empty), "1.0"));
+                localeDataDocument.Add(rootElement);
                 for (var i = 0; i < 3; i++)
                 {
                     var regnskabModel = CreateRegnskab(fixture, i + 1);

@@ -341,6 +341,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
+        /// Tester, at GetLocaleData rejser eventet, der skal forberede data i det lokale datalager for læsning eller skrivning.
+        /// </summary>
+        [Test]
+        public void TestAtGetLocaleDataRejserPrepareLocaleDataEvent()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateReaderStream += (s, e) => e.Result = CreateMemoryStreamWithXmlContent();
+
+            var eventCalled = false;
+            localeDataStorage.PrepareLocaleData += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.TypeOf<XDocument>());
+                Assert.That(e.ReadingContext, Is.True);
+                Assert.That(e.WritingContext, Is.False);
+                Assert.That(e.SynchronizationContext, Is.False);
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            Assert.That(localeDataStorage.GetLocaleData(), Is.Not.Null);
+            Assert.That(eventCalled, Is.True);
+        }
+
+        /// <summary>
         /// Tester, at GetLocaleData kaster en IntranetGuiRepositoryException ved IntranetGuiRepositoryException.
         /// </summary>
         [Test]
@@ -483,6 +515,42 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             localeDataDocument.Add(new XElement(XName.Get("Test")));
 
             localeDataStorage.StoreLocaleDocument(localeDataDocument);
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleDocument rejser eventet, der skal forberede data i det lokale datalager for læsning eller skrivning.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDocumentRejserPrepareLocaleDataEvent()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateWriterStream += (s, e) => e.Result = CreateMemoryStreamWithoutXmlContext();
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", Encoding.UTF8.BodyName, null));
+            localeDataDocument.Add(new XElement(XName.Get("Test")));
+
+            var eventCalled = false;
+            localeDataStorage.PrepareLocaleData += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.TypeOf<XDocument>());
+                Assert.That(e.LocaleDataDocument, Is.EqualTo(localeDataDocument));
+                Assert.That(e.ReadingContext, Is.False);
+                Assert.That(e.WritingContext, Is.True);
+                Assert.That(e.SynchronizationContext, Is.False);
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreLocaleDocument(localeDataDocument);
+            Assert.That(eventCalled, Is.True);
         }
 
         /// <summary>
@@ -629,6 +697,39 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     tempFile.Refresh();
                 }
             }
+        }
+
+        /// <summary>
+        /// Tester, at StoreLocaleData rejser eventet, der skal forberede data i det lokale datalager for læsning eller skrivning.
+        /// </summary>
+        [Test]
+        public void TestAtStoreLocaleDataRejserPrepareLocaleDataEvent()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateWriterStream += (s, e) => e.Result = CreateMemoryStreamWithoutXmlContext();
+
+            var eventCalled = false;
+            localeDataStorage.PrepareLocaleData += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.TypeOf<XDocument>());
+                Assert.That(e.ReadingContext, Is.False);
+                Assert.That(e.WritingContext, Is.True);
+                Assert.That(e.SynchronizationContext, Is.False);
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreLocaleData(fixture.Create<IModel>());
+            Assert.That(eventCalled, Is.True);
         }
 
         /// <summary>
@@ -1669,7 +1770,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         }
 
         /// <summary>
-        /// Tester, at StoreLocaleDocument gemmer XML dokumentet.
+        /// Tester, at StoreSyncDocument gemmer XML dokumentet.
         /// </summary>
         [Test]
         public void TestAtStoreSyncDocumentGemmerLocalDataDocument()
@@ -1686,6 +1787,42 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             localeDataDocument.Add(new XElement(XName.Get("Test")));
 
             localeDataStorage.StoreSyncDocument(localeDataDocument);
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncDocument rejser eventet, der skal forberede data i det lokale datalager for læsning eller skrivning.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDocumentRejserPrepareLocaleDataEvent()
+        {
+            var fixture = new Fixture();
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateWriterStream += (s, e) => e.Result = CreateMemoryStreamWithoutXmlContext();
+
+            var localeDataDocument = new XDocument(new XDeclaration("1.0", Encoding.UTF8.BodyName, null));
+            localeDataDocument.Add(new XElement(XName.Get("Test")));
+
+            var eventCalled = false;
+            localeDataStorage.PrepareLocaleData += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.TypeOf<XDocument>());
+                Assert.That(e.LocaleDataDocument, Is.EqualTo(localeDataDocument));
+                Assert.That(e.ReadingContext, Is.False);
+                Assert.That(e.WritingContext, Is.True);
+                Assert.That(e.SynchronizationContext, Is.True);
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreSyncDocument(localeDataDocument);
+            Assert.That(eventCalled, Is.True);
         }
 
         /// <summary>
@@ -1832,6 +1969,39 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
                     tempFile.Refresh();
                 }
             }
+        }
+
+        /// <summary>
+        /// Tester, at StoreSyncData rejser eventet, der skal forberede data i det lokale datalager for læsning eller skrivning.
+        /// </summary>
+        [Test]
+        public void TestAtStoreSyncDataRejserPrepareLocaleDataEvent()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IModel>()));
+
+            var localeDataStorage = new LocaleDataStorage(fixture.Create<string>(), fixture.Create<string>(), FinansstyringRepositoryLocale.XmlSchema);
+            Assert.That(localeDataStorage, Is.Not.Null);
+
+            localeDataStorage.OnCreateWriterStream += (s, e) => e.Result = CreateMemoryStreamWithoutXmlContext();
+
+            var eventCalled = false;
+            localeDataStorage.PrepareLocaleData += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(s, Is.TypeOf<LocaleDataStorage>());
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.Not.Null);
+                Assert.That(e.LocaleDataDocument, Is.TypeOf<XDocument>());
+                Assert.That(e.ReadingContext, Is.False);
+                Assert.That(e.WritingContext, Is.True);
+                Assert.That(e.SynchronizationContext, Is.True);
+                eventCalled = true;
+            };
+
+            Assert.That(eventCalled, Is.False);
+            localeDataStorage.StoreSyncData(fixture.Create<IModel>());
+            Assert.That(eventCalled, Is.True);
         }
 
         /// <summary>
@@ -2804,7 +2974,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         {
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
-            streamWriter.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?><FinansstyringRepository xmlns=\"{0}\"/>", FinansstyringRepositoryLocale.Namespace);
+            streamWriter.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?><FinansstyringRepository xmlns=\"{0}\" version=\"1.0\"/>", FinansstyringRepositoryLocale.Namespace);
             streamWriter.Flush();
             memoryStream.Seek(0, SeekOrigin.Begin);
             return memoryStream;

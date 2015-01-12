@@ -74,6 +74,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         public virtual event IntranetGuiEventHandler<IHandleStreamCreationEventArgs> OnCreateWriterStream;
 
+        /// <summary>
+        /// Event, der rejses, når data i det lokale datalager skal forberedes for læsning og skrivning.
+        /// </summary>
+        public virtual event IntranetGuiEventHandler<IPrepareLocaleDataEventArgs> PrepareLocaleData;
+
         #endregion
 
         #region Properties
@@ -165,7 +170,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         {
                             throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "readerStream", null));
                         }
-                        return ReadDocument(readerStream);
+                        var localeDataDocument = ReadDocument(readerStream);
+                        if (PrepareLocaleData != null)
+                        {
+                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, true, false, false));
+                        }
+                        return localeDataDocument;
                     }
                 }
             }
@@ -201,6 +211,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
                     using (var writerStream = handleStreamCreationEventArgs.Result)
                     {
+                        if (PrepareLocaleData != null)
+                        {
+                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, false));
+                        }
                         WriteDocument(localeDataDocument, writerStream);
                     }
                 }
@@ -252,6 +266,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             localeDataDocument = ReadDocument(writerStream);
                         }
                         StoreInDocument(model, localeDataDocument, false);
+                        if (PrepareLocaleData != null)
+                        {
+                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, false));
+                        }
                         WriteDocument(localeDataDocument, writerStream);
                     }
                 }
@@ -288,6 +306,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
                     using (var writerStream = handleStreamCreationEventArgs.Result)
                     {
+                        if (PrepareLocaleData != null)
+                        {
+                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, true));
+                        }
                         WriteDocument(localeDataDocument, writerStream);
                     }
                 }
@@ -339,6 +361,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             localeDataDocument = ReadDocument(writerStream);
                         }
                         StoreInDocument(model, localeDataDocument, true);
+                        if (PrepareLocaleData != null)
+                        {
+                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, true));
+                        }
                         WriteDocument(localeDataDocument, writerStream);
                     }
                 }

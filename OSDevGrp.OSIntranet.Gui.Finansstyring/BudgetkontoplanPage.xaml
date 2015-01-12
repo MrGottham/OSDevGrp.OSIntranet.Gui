@@ -25,8 +25,10 @@
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                     <ColumnDefinition Width="150" MinWidth="150" MaxWidth="150"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Center" Text="{Binding Path=StatusDatoAsLastMonthText}"/>
-                <TextBlock Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Center" Text="{Binding Path=StatusDatoAsMonthText}"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=StatusDatoAsLastMonthText}"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=StatusDatoAsLastMonthText}"/>
+                <TextBlock Grid.Row="0" Grid.Column="4" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=StatusDatoAsMonthText}"/>
+                <TextBlock Grid.Row="0" Grid.Column="5" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=StatusDatoAsMonthText}"/>
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=0}"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Left" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=1}"/>
                 <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,0,15,0" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap" TextAlignment="Right" Text="{Binding Path=BudgetkontiColumns, Converter={StaticResource CollectionItemToStringConverter}, ConverterParameter=2}"/>

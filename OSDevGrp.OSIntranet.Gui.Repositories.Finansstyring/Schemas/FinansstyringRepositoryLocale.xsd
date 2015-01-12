@@ -190,6 +190,13 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:complexType>
+
+  <!-- RepositoryVersionVersion -->
+  <xs:simpleType name="RepositoryVersionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1.0"/>
+    </xs:restriction>
+  </xs:simpleType>
     
   <xs:element name="FinansstyringRepository">
     <xs:complexType>
@@ -200,6 +207,7 @@
           <xs:element name="Budgetkontogruppe" type="BudgetkontogruppeModelType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:choice>
       </xs:sequence>
+      <xs:attribute name="version" type="RepositoryVersionType" use="required"/>
     </xs:complexType>
   </xs:element>
 </xs:schema>

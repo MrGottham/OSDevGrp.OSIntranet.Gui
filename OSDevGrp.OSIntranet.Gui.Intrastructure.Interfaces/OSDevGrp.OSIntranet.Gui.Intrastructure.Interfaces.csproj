@@ -53,6 +53,8 @@
     <Compile Include="Events\IHandleExceptionEventArgs.cs" />
     <Compile Include="Events\IHandleStreamCreationEventArgs.cs" />
     <Compile Include="Events\IIntranetGuiEventArgs.cs" />
+    <Compile Include="Events\IPrepareLocaleDataEventArgs.cs" />
+    <Compile Include="Events\PrepareLocaleDataEventArgs.cs" />
     <Compile Include="Exceptions\IntranetGuiBusinessException.cs" />
     <Compile Include="Exceptions\IntranetGuiCommandException.cs" />
     <Compile Include="Exceptions\IntranetGuiExceptionBase.cs" />

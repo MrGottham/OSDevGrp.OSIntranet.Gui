@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -20,6 +21,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
     {
         #region Constants
 
+        public const decimal RepositoryVersion = 1.0M;
         public const string XmlSchema = "Schemas.FinansstyringRepositoryLocale.xsd";
         public const string Namespace = "urn:osdevgrp:osintranet:finansstyringrepository:locale:1.0.0";
 
@@ -54,6 +56,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             _localeDataStorage = localeDataStorage;
             lock (SyncRoot)
             {
+                _localeDataStorage.PrepareLocaleData += PrepareLocaleDataEventHandler;
                 if (_localeDataStorage.HasLocaleData)
                 {
                     return;
@@ -962,6 +965,28 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontogruppelisteGet", ex.Message), ex);
             }
+        }
+
+        /// <summary>
+        /// Eventhandler, der rejses, når data i det lokale datalager skal forberedes til læsning eller skrivning.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
+        private static void PrepareLocaleDataEventHandler(object sender, IPrepareLocaleDataEventArgs eventArgs)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException("sender");
+            }
+            if (eventArgs == null)
+            {
+                throw new ArgumentNullException("eventArgs");
+            }
+            if (eventArgs.ReadingContext == false && eventArgs.WritingContext == false)
+            {
+                return;
+            }
+            eventArgs.LocaleDataDocument.StoreVersionNumberInDocument(RepositoryVersion);
         }
 
         #endregion
