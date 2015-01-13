@@ -544,8 +544,9 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 textBox.SelectionStart = 0;
                 return;
             }
+            var oldSelectionStart = textBox.SelectionStart;
             textBox.Text = value.ToUpper();
-            textBox.SelectionStart = value.Length;
+            textBox.SelectionStart = oldSelectionStart > value.Length ? value.Length : oldSelectionStart;
         }
 
         /// <summary>
