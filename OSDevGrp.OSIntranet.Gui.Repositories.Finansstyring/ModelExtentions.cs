@@ -459,6 +459,53 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Gemmer datoen for sidste fulde synkronisering i det lokale datalager.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokument, hvori datoen for sidste fulde synkronisering skal gemmes.</param>
+        /// <param name="sidsteFuldeSynkronisering">Datoen for sidste fulde synkronisering.</param>
+        public static void StoreSidsteFuldeSynkroniseringInDocument(this XDocument localeDataDocument, DateTime sidsteFuldeSynkronisering)
+        {
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            if (localeDataDocument.Root == null)
+            {
+                return;
+            }
+            localeDataDocument.Root.UpdateAttribute("sidsteFuldeSynkronisering", GetHistorikDato(sidsteFuldeSynkronisering), false);
+        }
+
+        /// <summary>
+        /// Finder og returnerer datoen for sidste fulde synkronisering.
+        /// </summary>
+        /// <param name="localeDataDocument">XML dokument, hvorfra datoen for sidste fulde synkronisering skal returneres.</param>
+        /// <returns>Datoen for sidste fulde synkronisering.</returns>
+        public static DateTime? GetSidsteFuldeSynkronisering(this XDocument localeDataDocument)
+        {
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException("localeDataDocument");
+            }
+            try
+            {
+                if (localeDataDocument.Root == null || localeDataDocument.Root.Attribute(XName.Get("sidsteFuldeSynkronisering", string.Empty)) == null)
+                {
+                    return null;
+                }
+                return DateTime.ParseExact(localeDataDocument.Root.Attribute(XName.Get("sidsteFuldeSynkronisering", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
+            }
+            catch (ArgumentNullException)
+            {
+                return null;
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Finder og returnerer elementet til et givent regnskab.
         /// </summary>
         /// <param name="localeDataDocument">XML dokument, hvorfra elementet skal returneres.</param>

@@ -120,6 +120,16 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     }
                 }
 
+                var makeFullSync = true;
+                lock (SyncRoot)
+                {
+                    if (syncDataDocument != null)
+                    {
+                        var lastFullSync = syncDataDocument.GetSidsteFuldeSynkronisering();
+                        makeFullSync = lastFullSync.HasValue == false || lastFullSync.Value.Date < DateTime.Now.AddDays(-30).Date;
+                    }
+                }
+
                 var regnskabSyncTasks = new List<Task>();
                 var regnskabsliste = await finansstyringRepository.RegnskabslisteGetAsync();
                 foreach (var regnskab in regnskabsliste)
@@ -136,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                             regnskab.StoreInDocument(syncDataDocument);
                         }
                     }
-                    regnskabSyncTasks.Add(SyncData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskab));
+                    regnskabSyncTasks.Add(SyncData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskab, makeFullSync));
                 }
                 Task.WaitAll(regnskabSyncTasks.ToArray());
 
@@ -145,6 +155,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     if (syncDataDocument == null)
                     {
                         return;
+                    }
+                    if (makeFullSync)
+                    {
+                        syncDataDocument.StoreSidsteFuldeSynkroniseringInDocument(DateTime.Now);
                     }
                     localeDataStorage.StoreSyncDocument(syncDataDocument);
                 }
@@ -162,9 +176,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// <param name="finansstyringRepository">Implementering af finansstyringsrepositoryet, hvorfra data skal synkroniseres til og fra det lokale datalager.</param>
         /// <param name="finansstyringKonfigurationRepository">Implementering af konfiguration til finansstyringsrepositoryet.</param>
         /// <param name="localeDataStorage">Implementering af det lokale datalager.</param>
-        /// <param name="syncDataDocument">Model for regnskabet, hvor data skal synkroniseres til og fra.</param>
-        /// <param name="regnskabModel"></param>
-        private static async Task SyncData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel regnskabModel)
+        /// <param name="syncDataDocument">XML dokument indeholdende de synkroniserede data.</param>
+        /// <param name="regnskabModel">Model for regnskabet, hvor data skal synkroniseres til og fra.</param>
+        /// <param name="makeFullSync">Angivelse af, om der skal foretages en fuld synkronisering.</param>
+        private static async Task SyncData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel regnskabModel, bool makeFullSync)
         {
             if (finansstyringRepository == null)
             {
@@ -204,6 +219,22 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     lock (SyncRoot)
                     {
                         budgetkontoModel.StoreInDocument(syncDataDocument);
+                    }
+                }
+                if (makeFullSync)
+                {
+                    var historicStatusDate = currentDate.AddMonths(-2);
+                    while (historicStatusDate.Year >= currentDate.AddYears(-1).Year)
+                    {
+                        historicStatusDate = new DateTime(historicStatusDate.Year, historicStatusDate.Month, DateTime.DaysInMonth(historicStatusDate.Year, historicStatusDate.Month), 23, 59, 59);
+                        foreach (var budgetkontoModel in await finansstyringRepository.BudgetkontoplanGetAsync(regnskabModel.Nummer, historicStatusDate))
+                        {
+                            lock (SyncRoot)
+                            {
+                                budgetkontoModel.StoreInDocument(syncDataDocument);
+                            }
+                        }
+                        historicStatusDate = historicStatusDate.AddMonths(-2);
                     }
                 }
                 foreach (var adressekontoModel in await finansstyringRepository.AdressekontolisteGetAsync(regnskabModel.Nummer, currentDate))
