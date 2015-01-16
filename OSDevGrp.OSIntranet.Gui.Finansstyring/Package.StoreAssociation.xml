@@ -357,16 +357,8 @@
   <AccountPackageIdentityNames />
   <PackageInfoList LandingUrl="https://appdev.microsoft.com:443/StorePortals/Developer/Catalog/ReleaseAnchor/d1c4e958-9223-4858-b224-b0a1652f0a8b">
     <PackageInfo>
-      <PackageArchitecture>x86</PackageArchitecture>
-      <PackageMaxArchitectureVersion>1.0.0.0</PackageMaxArchitectureVersion>
-    </PackageInfo>
-    <PackageInfo>
-      <PackageArchitecture>x64</PackageArchitecture>
-      <PackageMaxArchitectureVersion>1.0.0.0</PackageMaxArchitectureVersion>
-    </PackageInfo>
-    <PackageInfo>
-      <PackageArchitecture>arm</PackageArchitecture>
-      <PackageMaxArchitectureVersion>1.0.0.0</PackageMaxArchitectureVersion>
+      <PackageArchitecture>neutral</PackageArchitecture>
+      <PackageMaxArchitectureVersion>1.0.1.0</PackageMaxArchitectureVersion>
     </PackageInfo>
   </PackageInfoList>
 </StoreAssociation>
