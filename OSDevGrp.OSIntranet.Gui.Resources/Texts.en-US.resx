@@ -374,4 +374,10 @@
   <data name="MonthlyStatement" xml:space="preserve">
     <value>Monthly statement</value>
   </data>
+  <data name="PrivacyPolicyHeader" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="PrivacyPolicyText" xml:space="preserve">
+    <value>This application does not collect or transmit any user’s personal information, with the exception of technical information included in HTTP requests (such as your IP address). No personal information is used, stored, secured or disclosed by services this application works with.</value>
+  </data>
 </root>

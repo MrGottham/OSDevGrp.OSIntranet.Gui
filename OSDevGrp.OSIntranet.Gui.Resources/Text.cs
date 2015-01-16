@@ -86,6 +86,8 @@
         Asserts,
         AssertsTotal,
         Liabilities,
-        LiabilitiesTotal
+        LiabilitiesTotal,
+        PrivacyPolicyHeader,
+        PrivacyPolicyText
     }
 }

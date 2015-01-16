@@ -173,6 +173,9 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PrivacyPolicyUserControl.xaml.cs">
+      <DependentUpon>PrivacyPolicyUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegnskabPage.xaml.cs">
       <DependentUpon>RegnskabPage.xaml</DependentUpon>
@@ -250,6 +253,10 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PrivacyPolicyUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RegnskabPage.xaml">
       <SubType>Designer</SubType>

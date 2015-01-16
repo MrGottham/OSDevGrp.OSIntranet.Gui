@@ -76,6 +76,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         }
 
         /// <summary>
+        /// Tester, at getteren til PrivacyPolicy returnerer ViewModel for Privacy Policy.
+        /// </summary>
+        [Test]
+        public void TestAtPrivacyPolicyGetterReturnererPrivacyPolicyViewModel()
+        {
+            var mainViewModel = new MainViewModel();
+            Assert.That(mainViewModel, Is.Not.Null);
+
+            var privacyPolicyViewModel = mainViewModel.PrivacyPolicy;
+            Assert.That(privacyPolicyViewModel, Is.Not.Null);
+            Assert.That(privacyPolicyViewModel, Is.TypeOf<PrivacyPolicyViewModel>());
+        }
+
+        /// <summary>
         /// Tester, at ApplyConfiguration kaster ArgumentNullException, hvis dictionaryet indeholdende konfiguration, er null.
         /// </summary>
         [Test]

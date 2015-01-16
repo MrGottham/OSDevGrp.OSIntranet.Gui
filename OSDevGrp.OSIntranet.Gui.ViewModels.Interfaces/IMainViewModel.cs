@@ -36,6 +36,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces
         }
 
         /// <summary>
+        /// ViewModel for Privacy Policy.
+        /// </summary>
+        IPrivacyPolicyViewModel PrivacyPolicy
+        {
+            get;
+        }
+
+        /// <summary>
         /// Tilføjer konfiguration.
         /// </summary>
         /// <param name="configurationSettings">Dictionary indeholdende konfiguration.</param>

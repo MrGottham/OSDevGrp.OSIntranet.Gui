@@ -54,6 +54,7 @@
     <Compile Include="Core\ExceptionHandlerViewModel.cs" />
     <Compile Include="Core\ExceptionViewModel.cs" />
     <Compile Include="Core\NyhedViewModel.cs" />
+    <Compile Include="Core\PrivacyPolicyViewModel.cs" />
     <Compile Include="Core\TabelViewModelBase.cs" />
     <Compile Include="Core\Validators\Validation.cs" />
     <Compile Include="Finansstyring\AdressekontoViewModel.cs" />

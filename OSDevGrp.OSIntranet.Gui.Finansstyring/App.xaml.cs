@@ -224,18 +224,34 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
                 throw new ArgumentNullException("eventArgs");
             }
             var configurationCommand = new SettingsCommand("configuration", Resource.GetText(Text.Configuration), eventHandler =>
+            {
+                var settingsFlyout = new SettingsFlyout
                 {
-                    var settingsFlyout = new SettingsFlyout
-                        {
-                            FlyoutWidth = SettingsFlyout.SettingsFlyoutWidth.Narrow,
-                            HeaderText = Resource.GetText(Text.Configuration), 
-                            HeaderBrush = new SolidColorBrush(Colors.DarkBlue),
-                            Content = new ConfigurationUserControl(),
-                            IsOpen = true
-                        };
-                    settingsFlyout.IsOpen = true;
-                });
+                    FlyoutWidth = SettingsFlyout.SettingsFlyoutWidth.Narrow,
+                    HeaderText = Resource.GetText(Text.Configuration),
+                    HeaderBrush = new SolidColorBrush(Colors.DarkBlue),
+                    Content = new ConfigurationUserControl(),
+                    IsOpen = true
+                };
+                settingsFlyout.IsOpen = true;
+            });
+            var privacyPolicyCommand = new SettingsCommand("privacyPolicy", Resource.GetText(Text.PrivacyPolicyHeader), eventHandler =>
+            {
+                var settingsFlyout = new SettingsFlyout
+                {
+                    FlyoutWidth = SettingsFlyout.SettingsFlyoutWidth.Narrow,
+                    HeaderText = Resource.GetText(Text.PrivacyPolicyHeader),
+                    HeaderBrush = new SolidColorBrush(Colors.DarkBlue),
+                    Content = new PrivacyPolicyUserControl(),
+                    IsOpen = true
+                };
+                settingsFlyout.IsOpen = true;
+            });
             eventArgs.Request.ApplicationCommands.Add(configurationCommand);
+            eventArgs.Request.ApplicationCommands.Add(privacyPolicyCommand);
+
+            // TODO: This application does not collect or transmit any user’s personal information, with the exception of technical information included in HTTP requests (such as your IP address). No personal information is used, stored, secured or disclosed by services this application works with. If you would like to report any violations of this policy, please contact us using the contact form.
+            // TODO: https://gyorgybalassy.wordpress.com/2012/10/22/your-app-needs-a-privacy-policy-in-the-windows-store/
         }
 
         #endregion

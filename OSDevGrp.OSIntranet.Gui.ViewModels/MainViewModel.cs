@@ -22,6 +22,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
 
         private IRegnskabslisteViewModel _regnskabslisteViewModel;
         private IExceptionHandlerViewModel _exceptionHandlerViewModel;
+        private IPrivacyPolicyViewModel _privacyPolicyViewModel;
         private readonly List<IConfigurationViewModel> _configurationViewModels = new List<IConfigurationViewModel>();
         private readonly List<object> _eventSubscribers = new List<object>();
 
@@ -90,6 +91,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels
                     _exceptionHandlerViewModel.OnHandleException += HandleExceptionEventHandler;
                 }
                 return _exceptionHandlerViewModel;
+            }
+        }
+
+        /// <summary>
+        /// ViewModel for Privacy Policy.
+        /// </summary>
+        public virtual IPrivacyPolicyViewModel PrivacyPolicy
+        {
+            get
+            {
+                return _privacyPolicyViewModel ?? (_privacyPolicyViewModel = new PrivacyPolicyViewModel());
             }
         }
 
