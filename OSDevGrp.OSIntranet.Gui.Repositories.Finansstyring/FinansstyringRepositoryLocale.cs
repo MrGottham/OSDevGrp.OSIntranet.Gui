@@ -506,9 +506,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         var historikElementForStatusDato = historikElementArray.FirstOrDefault();
                         if (historikElementForStatusDato != null)
                         {
+                            var datoForHistorikElement = DateTime.ParseExact(historikElementForStatusDato.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
                             budgetkontoModel.Indtægter = decimal.Parse(historikElementForStatusDato.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
                             budgetkontoModel.Udgifter = decimal.Parse(historikElementForStatusDato.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                            budgetkontoModel.Bogført = decimal.Parse(historikElementForStatusDato.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            if (datoForHistorikElement.Year == budgetkontoModel.StatusDato.Year && datoForHistorikElement.Month == budgetkontoModel.StatusDato.Month)
+                            {
+                                budgetkontoModel.Bogført = decimal.Parse(historikElementForStatusDato.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                budgetkontoModel.Bogført = 0M;
+                            }
                         }
                         var historikDato = new DateTime(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month));
                         var historikElementForDato = historikElementArray.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, ModelExtentions.GetHistorikDato(historikDato), StringComparison.Ordinal) <= 0);
