@@ -132,8 +132,8 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 foreach (var nyhed in nyhedsgruppe.OrderByDescending(m => m.Nyhedsaktualitet))
                 {
-                    tileUpdater.Update(UpdateTile(nyhed, TileTemplateType.TileSquareText04));
-                    tileUpdater.Update(UpdateTile(nyhed, TileTemplateType.TileWideBlockAndText02));
+                    tileUpdater.Update(UpdateTile(nyhed, TileTemplateType.TileSquare150x150Text04));
+                    tileUpdater.Update(UpdateTile(nyhed, TileTemplateType.TileWide310x150BlockAndText02));
                 }
             }
         }
