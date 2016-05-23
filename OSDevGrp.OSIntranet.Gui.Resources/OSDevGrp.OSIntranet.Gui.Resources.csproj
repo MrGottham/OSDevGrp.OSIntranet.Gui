@@ -50,18 +50,38 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ExceptionMessage.cs" />
+    <Compile Include="ExceptionMessages.da-DK.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExceptionMessages.da-DK.resx</DependentUpon>
+    </Compile>
     <Compile Include="ExceptionMessages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ExceptionMessages.resx</DependentUpon>
     </Compile>
+    <Compile Include="ExceptionMessages.en-US.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExceptionMessages.en-US.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="Text.cs" />
+    <Compile Include="Texts.da-DK.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Texts.da-DK.resx</DependentUpon>
+    </Compile>
     <Compile Include="Texts.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Texts.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Texts.en-US.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Texts.en-US.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -70,14 +90,26 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ExceptionMessages.da-DK.resx" />
-    <EmbeddedResource Include="ExceptionMessages.en-US.resx" />
+    <EmbeddedResource Include="ExceptionMessages.da-DK.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionMessages.da-DK.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExceptionMessages.en-US.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionMessages.en-US.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="ExceptionMessages.resx">
       <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Texts.da-DK.resx" />
-    <EmbeddedResource Include="Texts.en-US.resx" />
+    <EmbeddedResource Include="Texts.da-DK.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Texts.da-DK.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Texts.en-US.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Texts.en-US.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Texts.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Texts.Designer.cs</LastGenOutput>

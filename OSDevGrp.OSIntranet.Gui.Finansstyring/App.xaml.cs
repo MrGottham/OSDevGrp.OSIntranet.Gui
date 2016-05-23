@@ -37,6 +37,8 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
         /// </summary>
         public App()
         {
+            WindowsRuntimeResourceManager.PatchResourceManagersInAssembly(typeof(Resource));
+
             InitializeComponent();
             Suspending += OnSuspending;
 
