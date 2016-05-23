@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at RegnskabslisteGetAsync henter regnskaber.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabslisteGetAsyncHenterRegnskaber()
+        public void TestAtRegnskabslisteGetAsyncHenterRegnskaber()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -58,10 +58,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var regnskaber = await finansstyringRepository.RegnskabslisteGetAsync();
-            Assert.That(regnskaber, Is.Not.Null);
-            Assert.That(regnskaber, Is.Not.Empty);
-            Assert.That(regnskaber.Count(), Is.GreaterThan(0));
+            var task = finansstyringRepository.RegnskabslisteGetAsync();
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result, Is.Not.Empty);
+            Assert.That(task.Result.Count(), Is.GreaterThan(0));
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -70,7 +72,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at KontoplanGetAsync henter kontoplanen til et regnskab.
         /// </summary>
         [Test]
-        public async void TestAtKontoplanGetAsyncHenterKontoplan()
+        public void TestAtKontoplanGetAsyncHenterKontoplan()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -80,9 +82,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var kontoplan = await finansstyringRepository.KontoplanGetAsync(1, DateTime.Now);
-            Assert.That(kontoplan, Is.Not.Null);
-            Assert.That(kontoplan, Is.Not.Empty);
+            var task = finansstyringRepository.KontoplanGetAsync(1, DateTime.Now);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result, Is.Not.Empty);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -100,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepository.KontoGetAsync(1, illegalKontonummer, DateTime.Now));
+            var exception = Assert.Throws<ArgumentNullException>(() => finansstyringRepository.KontoGetAsync(1, illegalKontonummer, DateTime.Now).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -114,7 +118,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at KontoGetAsync henter en given konto.
         /// </summary>
         [Test]
-        public async void TestAtKontoGetAsyncHenterKonto()
+        public void TestAtKontoGetAsyncHenterKonto()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -125,7 +129,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(finansstyringRepository, Is.Not.Null);
 
             var statusDato = DateTime.Now;
-            var konto = await finansstyringRepository.KontoGetAsync(1, "DANKORT", statusDato);
+            var task = finansstyringRepository.KontoGetAsync(1, "DANKORT", statusDato);
+            task.Wait();
+
+            var konto = task.Result;
             Assert.That(konto, Is.Not.Null);
             Assert.That(konto.Regnskabsnummer, Is.EqualTo(1));
             Assert.That(konto.Kontonummer, Is.Not.Null);
@@ -140,7 +147,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at BudgetkontoplanGetAsync henter budgetkontoplanen til et regnskab.
         /// </summary>
         [Test]
-        public async void TestAtBudgetkontoplanGetAsyncHenterBudgetkontoplan()
+        public void TestAtBudgetkontoplanGetAsyncHenterBudgetkontoplan()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -150,9 +157,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var budgetkontoplan = await finansstyringRepository.BudgetkontoplanGetAsync(1, DateTime.Now);
-            Assert.That(budgetkontoplan, Is.Not.Null);
-            Assert.That(budgetkontoplan, Is.Not.Empty);
+            var task = finansstyringRepository.BudgetkontoplanGetAsync(1, DateTime.Now);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result, Is.Not.Empty);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -170,7 +179,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepository.BudgetkontoGetAsync(1, illegalKontonummer, DateTime.Now));
+            var exception = Assert.Throws<ArgumentNullException>(() => finansstyringRepository.BudgetkontoGetAsync(1, illegalKontonummer, DateTime.Now).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -184,7 +193,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at BudgetkontoGetAsync henter en given budgetkonto.
         /// </summary>
         [Test]
-        public async void TestAtBudgetkontoGetAsyncHenterBudgetkonto()
+        public void TestAtBudgetkontoGetAsyncHenterBudgetkonto()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -195,7 +204,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(finansstyringRepository, Is.Not.Null);
 
             var statusDato = DateTime.Now;
-            var budgetkonto = await finansstyringRepository.BudgetkontoGetAsync(1, "3000", statusDato);
+            var task = finansstyringRepository.BudgetkontoGetAsync(1, "3000", statusDato);
+            task.Wait();
+
+            var budgetkonto = task.Result; 
             Assert.That(budgetkonto, Is.Not.Null);
             Assert.That(budgetkonto.Regnskabsnummer, Is.EqualTo(1));
             Assert.That(budgetkonto.Kontonummer, Is.Not.Null);
@@ -210,7 +222,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at BogføringslinjerGetAsync henter et givent antal bogføringslinjer til et givent regnskab.
         /// </summary>
         [Test]
-        public async void TestAtBogføringslinjerGetAsyncHenterBogføringslinjer()
+        public void TestAtBogføringslinjerGetAsyncHenterBogføringslinjer()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -220,10 +232,12 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var bogføringslinjer = await finansstyringRepository.BogføringslinjerGetAsync(1, DateTime.Now, 50);
-            Assert.That(bogføringslinjer, Is.Not.Null);
-            Assert.That(bogføringslinjer, Is.Not.Empty);
-            Assert.That(bogføringslinjer.Count(), Is.EqualTo(50));
+            var task = finansstyringRepository.BogføringslinjerGetAsync(1, DateTime.Now, 50);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result, Is.Not.Empty);
+            Assert.That(task.Result.Count(), Is.EqualTo(50));
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -245,11 +259,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogføringslinjeCreateNewAsync(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>()));
+            ArgumentException exception = null;
+            var aggregateException = Assert.Throws<AggregateException>(() => finansstyringRepository.BogføringslinjeCreateNewAsync(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>()).Wait());
+            aggregateException.Handle(e =>
+            {
+                exception = e as ArgumentException;
+                return true;
+            });
+
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
+            Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("regnskabsnummer"));
@@ -275,11 +296,19 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(finansstyringRepository, Is.Not.Null);
 
             var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
-            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogføringslinjeCreateNewAsync(fixture.Create<int>(), dato, fixture.Create<string>()));
+
+            ArgumentException exception = null;
+            var aggregateException = Assert.Throws<AggregateException>(() => finansstyringRepository.BogføringslinjeCreateNewAsync(fixture.Create<int>(), dato, fixture.Create<string>()).Wait());
+            aggregateException.Handle(e =>
+            {
+                exception = e as ArgumentException;
+                return true;
+            });
+
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
+            Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("dato"));
@@ -304,7 +333,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepository.BogføringslinjeCreateNewAsync(fixture.Create<int>(), fixture.Create<DateTime>(), illegalValue));
+            ArgumentNullException exception = null;
+            var aggregateException = Assert.Throws<AggregateException>(() => finansstyringRepository.BogføringslinjeCreateNewAsync(fixture.Create<int>(), fixture.Create<DateTime>(), illegalValue).Wait());
+            aggregateException.Handle(e =>
+            {
+                exception = e as ArgumentNullException;
+                return true;
+            });
+
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -318,7 +354,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at BogføringslinjeCreateNewAsync danner og returnerer en ny bogføringslinje, der efterfølgende kan bogføres.
         /// </summary>
         [Test]
-        public async void TestAtBogføringslinjeCreateNewAsyncDannerBogføringslinjeModel()
+        public void TestAtBogføringslinjeCreateNewAsyncDannerBogføringslinjeModel()
         {
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
@@ -331,7 +367,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var regnskabsnummer = fixture.Create<int>();
             var dato = fixture.Create<DateTime>();
             var kontonummer = fixture.Create<string>();
-            var bogføringslinjeModel = await finansstyringRepository.BogføringslinjeCreateNewAsync(regnskabsnummer, dato, kontonummer);
+            var task = finansstyringRepository.BogføringslinjeCreateNewAsync(regnskabsnummer, dato, kontonummer);
+            task.Wait();
+
+            var bogføringslinjeModel = task.Result;
             Assert.That(bogføringslinjeModel, Is.Not.Null);
             Assert.That(bogføringslinjeModel.Regnskabsnummer, Is.EqualTo(regnskabsnummer));
             Assert.That(bogføringslinjeModel.Løbenummer, Is.EqualTo(int.MinValue));
@@ -366,11 +405,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogførAsync(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            var exception = Assert.Throws<ArgumentException>(() => finansstyringRepository.BogførAsync(illegalValue, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
+            Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", illegalValue)));
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("regnskabsnummer"));
@@ -396,11 +435,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(finansstyringRepository, Is.Not.Null);
 
             var dato = Convert.ToDateTime(illegalValue, new CultureInfo("en-US"));
-            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogførAsync(fixture.Create<int>(), dato, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            var exception = Assert.Throws<ArgumentException>(() => finansstyringRepository.BogførAsync(fixture.Create<int>(), dato, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
+            Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato)));
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("dato"));
@@ -425,7 +464,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), illegalValue, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), illegalValue, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -451,7 +490,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(async () => await finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>(), fixture.Create<int>()).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -477,11 +516,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<decimal>(), fixture.Create<int>()));
+            var exception = Assert.Throws<ArgumentException>(() => finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), illegalValue, fixture.Create<decimal>(), fixture.Create<int>()).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "debit", illegalValue)));
+            Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "debit", illegalValue)));
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("debit"));
@@ -506,11 +545,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentException>(async () => await finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), illegalValue, fixture.Create<int>()));
+            var exception = Assert.Throws<ArgumentException>(() => finansstyringRepository.BogførAsync(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), illegalValue, fixture.Create<int>()).Wait());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "kredit", illegalValue)));
+            Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "kredit", illegalValue)));
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("kredit"));
@@ -523,8 +562,8 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at BogførAsync bogfører værdier.
         /// </summary>
         [Test]
-        [Ignore]
-        public async void TestAtBogførAsyncBogførerValues()
+        [Ignore("Skal ikke køres")]
+        public void TestAtBogførAsyncBogførerValues()
         {
             var fixture = new Fixture();
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
@@ -537,15 +576,19 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var bogføringsresultat = await finansstyringRepository.BogførAsync(1, fixture.Create<DateTime>(), null, "DANKORT", "Test", "8990", 5000M, 0M, 0);
-            Assert.That(bogføringsresultat, Is.Not.Null);
-            Assert.That(bogføringsresultat.Bogføringslinje, Is.Not.Null);
-            Assert.That(bogføringsresultat.Bogføringsadvarsler, Is.Not.Null);
+            var task1 = finansstyringRepository.BogførAsync(1, fixture.Create<DateTime>(), null, "DANKORT", "Test", "8990", 5000M, 0M, 0);
+            task1.Wait();
 
-            bogføringsresultat = await finansstyringRepository.BogførAsync(1, fixture.Create<DateTime>(), null, "DANKORT", "Test", "8990", 0M, 5000M, 0);
-            Assert.That(bogføringsresultat, Is.Not.Null);
-            Assert.That(bogføringsresultat.Bogføringslinje, Is.Not.Null);
-            Assert.That(bogføringsresultat.Bogføringsadvarsler, Is.Not.Null);
+            Assert.That(task1.Result, Is.Not.Null);
+            Assert.That(task1.Result.Bogføringslinje, Is.Not.Null);
+            Assert.That(task1.Result.Bogføringsadvarsler, Is.Not.Null);
+
+            var task2 = finansstyringRepository.BogførAsync(1, fixture.Create<DateTime>(), null, "DANKORT", "Test", "8990", 0M, 5000M, 0);
+            task2.Wait();
+
+            Assert.That(task2.Result, Is.Not.Null);
+            Assert.That(task2.Result.Bogføringslinje, Is.Not.Null);
+            Assert.That(task2.Result.Bogføringsadvarsler, Is.Not.Null);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -554,7 +597,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at DebitorlisteGetAsync henter listen af debitorer til et givent regnskab.
         /// </summary>
         [Test]
-        public async void TestAtDebitorlisteGetAsyncHenterDebitorliste()
+        public void TestAtDebitorlisteGetAsyncHenterDebitorliste()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -564,9 +607,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var debitorer = await finansstyringRepository.DebitorlisteGetAsync(1, DateTime.Now);
-            Assert.That(debitorer, Is.Not.Null);
-            Assert.That(debitorer.Count(), Is.GreaterThanOrEqualTo(0));
+            var task = finansstyringRepository.DebitorlisteGetAsync(1, DateTime.Now);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result.Count(), Is.GreaterThanOrEqualTo(0));
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -575,7 +620,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at KreditorlisteGetAsync henter listen af kreditorer til et givent regnskab.
         /// </summary>
         [Test]
-        public async void TestAtKreditorlisteGetAsyncHenterKreditorliste()
+        public void TestAtKreditorlisteGetAsyncHenterKreditorliste()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -585,9 +630,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var kreditorer = await finansstyringRepository.KreditorlisteGetAsync(1, DateTime.Now);
-            Assert.That(kreditorer, Is.Not.Null);
-            Assert.That(kreditorer.Count(), Is.GreaterThanOrEqualTo(0));
+            var task = finansstyringRepository.KreditorlisteGetAsync(1, DateTime.Now);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result.Count(), Is.GreaterThanOrEqualTo(0));
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -596,7 +643,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at AdressekontolisteGetAsync henter listen af adressekonti til et givent regnskab.
         /// </summary>
         [Test]
-        public async void TestAtAdressekontolisteGetAsyncHenterAdressekontoliste()
+        public void TestAtAdressekontolisteGetAsyncHenterAdressekontoliste()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -606,9 +653,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var adressekonti = await finansstyringRepository.AdressekontolisteGetAsync(1, DateTime.Now);
-            Assert.That(adressekonti, Is.Not.Null);
-            Assert.That(adressekonti.Count(), Is.GreaterThanOrEqualTo(0));
+            var task = finansstyringRepository.AdressekontolisteGetAsync(1, DateTime.Now);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result.Count(), Is.GreaterThanOrEqualTo(0));
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -617,7 +666,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at AdressekontoGetAsync henter en adressekonto.
         /// </summary>
         [Test]
-        public async void TestAtAdressekontoGetAsyncHenterAdressekonto()
+        public void TestAtAdressekontoGetAsyncHenterAdressekonto()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -628,7 +677,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             Assert.That(finansstyringRepository, Is.Not.Null);
 
             var statusDato = DateTime.Now;
-            var adressekonto = await finansstyringRepository.AdressekontoGetAsync(1, 1, statusDato);
+            var task = finansstyringRepository.AdressekontoGetAsync(1, 1, statusDato);
+            task.Wait();
+
+            var adressekonto = task.Result;
             Assert.That(adressekonto, Is.Not.Null);
             Assert.That(adressekonto.Regnskabsnummer, Is.EqualTo(1));
             Assert.That(adressekonto.Nummer, Is.EqualTo(1));
@@ -641,7 +693,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at KontogruppelisteGetAsync henter listen af kontogrupper.
         /// </summary>
         [Test]
-        public async void TestAtKontogruppelisteGetAsyncHenterKontogrupper()
+        public void TestAtKontogruppelisteGetAsyncHenterKontogrupper()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -651,9 +703,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var kontogrupper = await finansstyringRepository.KontogruppelisteGetAsync();
-            Assert.That(kontogrupper, Is.Not.Null);
-            Assert.That(kontogrupper, Is.Not.Empty);
+            var task = finansstyringRepository.KontogruppelisteGetAsync();
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result, Is.Not.Empty);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }
@@ -662,7 +716,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
         /// Tester, at BudgetkontogruppelisteGetAsync henter liste af grupper til budgetkonti.
         /// </summary>
         [Test]
-        public async void TestAtBudgetkontogruppelisteGetAsyncHenterBudgetkontogrupper()
+        public void TestAtBudgetkontogruppelisteGetAsyncHenterBudgetkontogrupper()
         {
             var finansstyringKonfigurationRepositoryMock = MockRepository.GenerateMock<IFinansstyringKonfigurationRepository>();
             finansstyringKonfigurationRepositoryMock.Expect(m => m.FinansstyringServiceUri)
@@ -672,9 +726,11 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
             var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepositoryMock);
             Assert.That(finansstyringRepository, Is.Not.Null);
 
-            var budgetkontogrupper = await finansstyringRepository.BudgetkontogruppelisteGetAsync();
-            Assert.That(budgetkontogrupper, Is.Not.Null);
-            Assert.That(budgetkontogrupper, Is.Not.Empty);
+            var task = finansstyringRepository.BudgetkontogruppelisteGetAsync();
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result, Is.Not.Empty);
 
             finansstyringKonfigurationRepositoryMock.AssertWasCalled(m => m.FinansstyringServiceUri);
         }

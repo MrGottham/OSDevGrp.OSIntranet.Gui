@@ -218,7 +218,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(exception, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Empty);
-                                                 Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "FinansstyringServiceUri", null)));
+                                                 Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "FinansstyringServiceUri", null)));
                                                  Assert.That(exception.InnerException, Is.Not.Null);
                                              })
                                          .Repeat.Any();
@@ -513,7 +513,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(exception, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Empty);
-                                                 Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "FinansstyringServiceUri", null)));
+                                                 Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "FinansstyringServiceUri", null)));
                                                  Assert.That(exception.InnerException, Is.Not.Null);
                                              })
                                          .Repeat.Any();
@@ -915,7 +915,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(exception, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Empty);
-                                                 Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "AntalBogføringslinjer", null)));
+                                                 Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "AntalBogføringslinjer", null)));
                                                  Assert.That(exception.InnerException, Is.Not.Null);
                                              })
                                          .Repeat.Any();
@@ -1201,7 +1201,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(exception, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Empty);
-                                                 Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "AntalBogføringslinjer", null)));
+                                                 Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "AntalBogføringslinjer", null)));
                                                  Assert.That(exception.InnerException, Is.Not.Null);
                                              })
                                          .Repeat.Any();
@@ -1341,7 +1341,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(exception, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Empty);
-                                                 Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "DageForNyheder", null)));
+                                                 Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "DageForNyheder", null)));
                                                  Assert.That(exception.InnerException, Is.Not.Null);
                                              })
                                          .Repeat.Any();
@@ -1627,7 +1627,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(exception, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Null);
                                                  Assert.That(exception.Message, Is.Not.Empty);
-                                                 Assert.That(exception.Message, Is.StringStarting(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DageForNyheder", null)));
+                                                 Assert.That(exception.Message, Does.StartWith(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DageForNyheder", null)));
                                                  Assert.That(exception.InnerException, Is.Not.Null);
                                              })
                                          .Repeat.Any();

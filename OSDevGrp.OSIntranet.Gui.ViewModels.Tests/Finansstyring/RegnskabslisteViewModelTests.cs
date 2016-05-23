@@ -209,7 +209,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at RegnskabGet henter ViewModel for regnskabet fra listen af regnskaber.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabGetHenterRegnskabViewModelFraRegnskaber()
+        public void TestAtRegnskabGetHenterRegnskabViewModelFraRegnskaber()
         {
             var fixture = new Fixture();
             fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() =>
@@ -235,9 +235,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Empty);
 
-            var result = await regnskabslisteViewModel.RegnskabGetAsync(regnskabViewModelMock.Nummer);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.EqualTo(regnskabViewModelMock));
+            var task = regnskabslisteViewModel.RegnskabGetAsync(regnskabViewModelMock.Nummer);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
+            Assert.That(task.Result, Is.EqualTo(regnskabViewModelMock));
 
             finansstyringRepositoryMock.AssertWasNotCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
@@ -247,7 +249,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at RegnskabGet henter ViewModel for regnskabet gennem repositoryet til regnskaber.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabGetHenterRegnskabViewModelGennemFinansstyringRepository()
+        public void TestAtRegnskabGetHenterRegnskabViewModelGennemFinansstyringRepository()
         {
             var fixture = new Fixture();
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
@@ -273,8 +275,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
 
-            var result = await regnskabslisteViewModel.RegnskabGetAsync(regnskabModelMockCollection.ElementAt(1).Nummer);
-            Assert.That(result, Is.Not.Null);
+            var task = regnskabslisteViewModel.RegnskabGetAsync(regnskabModelMockCollection.ElementAt(1).Nummer);
+            task.Wait();
+
+            Assert.That(task.Result, Is.Not.Null);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
@@ -284,7 +288,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at RegnskabGet returnerer null, hvis der ikke findes et regnskab med regnskabsnummeret.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabGetReturnererNullHvisRegnskabIkkeFindes()
+        public void TestAtRegnskabGetReturnererNullHvisRegnskabIkkeFindes()
         {
             var fixture = new Fixture();
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
@@ -310,8 +314,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
 
-            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
-            Assert.That(result, Is.Null);
+            var task = regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            task.Wait();
+
+            Assert.That(task.Result, Is.Null);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
@@ -321,7 +327,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved IntranetGuiRepositoryException.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiRepositoryException()
+        public void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiRepositoryException()
         {
             var fixture = new Fixture();
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
@@ -350,8 +356,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
 
-            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
-            Assert.That(result, Is.Null);
+            var task = regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            task.Wait();
+
+            Assert.That(task.Result, Is.Null);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.Anything));
@@ -361,7 +369,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved IntranetGuiSystemException.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiSystemException()
+        public void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiSystemException()
         {
             var fixture = new Fixture();
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
@@ -390,8 +398,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
 
-            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
-            Assert.That(result, Is.Null);
+            var task = regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            task.Wait();
+
+            Assert.That(task.Result, Is.Null);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.Anything));
@@ -401,7 +411,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved IntranetGuiBusinessException.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiBusinessException()
+        public void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedIntranetGuiBusinessException()
         {
             var fixture = new Fixture();
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
@@ -430,8 +440,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
 
-            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
-            Assert.That(result, Is.Null);
+            var task = regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            task.Wait();
+
+            Assert.That(task.Result, Is.Null);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.Anything));
@@ -441,7 +453,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// Tester, at RegnskabGet returnerer null og kalder HandleException i exceptionhandleren ved Exception.
         /// </summary>
         [Test]
-        public async void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedException()
+        public void TestAtRegnskabGetReturnererNullOgKalderHandleExceptionVedException()
         {
             var fixture = new Fixture();
             fixture.Customize<IRegnskabModel>(e => e.FromFactory(() =>
@@ -470,8 +482,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Not.Null);
             Assert.That(regnskabslisteViewModel.Regnskaber, Is.Empty);
 
-            var result = await regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
-            Assert.That(result, Is.Null);
+            var task = regnskabslisteViewModel.RegnskabGetAsync(fixture.Create<int>());
+            task.Wait();
+
+            Assert.That(task.Result, Is.Null);
 
             finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabslisteGetAsync());
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.Anything));

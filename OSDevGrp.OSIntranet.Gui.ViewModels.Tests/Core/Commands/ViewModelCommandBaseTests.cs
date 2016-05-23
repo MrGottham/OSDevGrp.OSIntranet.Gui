@@ -432,11 +432,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(async () =>
-                {
-                    var task = Task.Run(modelGetter);
-                    await task.ContinueWith(t => command.HandleResultFromTask(t, null, null, onHandleResult));
-                });
+            ArgumentNullException exception = null;
+            var aggregateException = Assert.Throws<AggregateException>(() =>
+            {
+                var task = Task.Run(modelGetter);
+                task.ContinueWith(t => command.HandleResultFromTask(t, null, null, onHandleResult)).Wait();
+            });
+            aggregateException.Handle(e =>
+            {
+                exception = e as ArgumentNullException;
+                return true;
+            });
+
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -464,11 +471,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             var command = new MyViewModelCommand(exceptionHandlerViewModelMock);
             Assert.That(command, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(async () =>
-                {
-                    var task = Task.Run(modelGetter);
-                    await task.ContinueWith(t => command.HandleResultFromTask<IModel, object>(t, fixture.Create<IViewModel>(), null, null));
-                });
+            ArgumentNullException exception = null;
+            var aggregateException = Assert.Throws<AggregateException>(() =>
+            {
+                var task = Task.Run(modelGetter);
+                task.ContinueWith(t => command.HandleResultFromTask<IModel, object>(t, fixture.Create<IViewModel>(), null, null)).Wait();
+            });
+            aggregateException.Handle(e =>
+            {
+                exception = e as ArgumentNullException;
+                return true;
+            });
+
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
