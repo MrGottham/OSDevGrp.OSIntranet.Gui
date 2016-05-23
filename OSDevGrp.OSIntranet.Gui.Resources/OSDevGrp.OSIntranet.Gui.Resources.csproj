@@ -65,14 +65,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="OSDevGrp.OSIntranet.Gui.snk" />
+    <None Include="OSDevGrp.OSIntranet.Gui.snk">
+      <Generator>ResXFileCodeGenerator</Generator>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ExceptionMessages.da-DK.resx" />
     <EmbeddedResource Include="ExceptionMessages.en-US.resx" />
     <EmbeddedResource Include="ExceptionMessages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Texts.da-DK.resx" />
     <EmbeddedResource Include="Texts.en-US.resx" />
