@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Threading;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators;
@@ -129,7 +130,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         public void TestAtValidateDateReturnererSuccessVedLovligeValues(string value)
         {
             var valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
-            var result = Validation.ValidateDate(valueAsDateTime.ToShortDateString());
+            var result = Validation.ValidateDate(valueAsDateTime.ToString("d", Thread.CurrentThread.CurrentUICulture));
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -174,7 +175,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         {
             var valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
             var maxDateTime = DateTime.Parse(maxDate, new CultureInfo("en-US"));
-            var result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToShortDateString(), maxDateTime);
+            var result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToString("d", CultureInfo.CurrentUICulture), maxDateTime);
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -194,12 +195,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         {
             var valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
             var maxDateTime = DateTime.Parse(maxDate, new CultureInfo("en-US"));
-            var result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToShortDateString(), maxDateTime);
+            var result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToString("d", Thread.CurrentThread.CurrentUICulture), maxDateTime);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
-            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToLongDateString())));
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToString("D", Thread.CurrentThread.CurrentUICulture))));
             Assert.That(result.MemberNames, Is.Not.Null);
             Assert.That(result.MemberNames, Is.Empty);
         }
@@ -220,7 +221,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         public void TestAtValidateDecimalReturnererSuccessVedLovligeValues(string value)
         {
             var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
-            var result = Validation.ValidateDecimal(valueAsDecimal.ToString("C"));
+            var result = Validation.ValidateDecimal(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture));
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -256,7 +257,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         public void TestAtValidateDecimalGreaterOrEqualToReturnererSuccessVedLovligeValues(string value, decimal minValue)
         {
             var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
-            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C"), minValue);
+            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture), minValue);
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -271,12 +272,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         public void TestAtValidateDecimalGreaterOrEqualToReturnererValidationResultVedUlovligeValues(string value, decimal minValue)
         {
             var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
-            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C"), minValue);
+            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture), minValue);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
-            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.DecimalLowerThan, minValue.ToString("G"))));
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.DecimalLowerThan, minValue.ToString("G", Thread.CurrentThread.CurrentUICulture))));
             Assert.That(result.MemberNames, Is.Not.Null);
             Assert.That(result.MemberNames, Is.Empty);
         }

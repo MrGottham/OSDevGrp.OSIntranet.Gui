@@ -327,7 +327,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<DateTime>().AddDays(-7).ToShortDateString();
+            var newValue = fixture.Create<DateTime>().AddDays(-7).ToString("d", Thread.CurrentThread.CurrentUICulture);
             bogføringViewModel.DatoAsText = newValue;
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Dato = Arg<DateTime>.Is.Equal(DateTime.Parse(newValue, CultureInfo.CurrentUICulture)));
@@ -390,7 +390,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 };
 
             Assert.That(eventCalled, Is.False);
-            bogføringViewModel.DatoAsText = illegalValue;
+            DateTime testDate;
+            bogføringViewModel.DatoAsText = DateTime.TryParse(illegalValue, new CultureInfo("en-US"), DateTimeStyles.None, out testDate) ? testDate.ToString("d", Thread.CurrentThread.CurrentUICulture) : illegalValue;
             Assert.That(eventCalled, Is.True);
 
             var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
@@ -399,7 +400,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 case Text.DateGreaterThan:
                     Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Null);
                     Assert.That(bogføringViewModel.DatoValidationError, Is.Not.Empty);
-                    Assert.That(bogføringViewModel.DatoValidationError, Is.EqualTo(Resource.GetText(text, DateTime.Now.ToLongDateString())));
+                    Assert.That(bogføringViewModel.DatoValidationError, Is.EqualTo(Resource.GetText(text, DateTime.Now.ToString("D", Thread.CurrentThread.CurrentUICulture))));
                     break;
 
                 default:
@@ -448,6 +449,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
+            DateTime testDate;
+            var testValue = DateTime.TryParse(illegalValue, new CultureInfo("en-US"), DateTimeStyles.None, out testDate) ? testDate.ToString("d", Thread.CurrentThread.CurrentUICulture) : illegalValue;
+
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
             exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
                                          .WhenCalled(e =>
@@ -460,7 +464,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  switch (text)
                                                  {
                                                      case Text.DateGreaterThan: 
-                                                         Assert.That(validationException.Message, Is.EqualTo(Resource.GetText(text, DateTime.Now.ToLongDateString())));
+                                                         Assert.That(validationException.Message, Is.EqualTo(Resource.GetText(text, DateTime.Now.ToString("D", Thread.CurrentThread.CurrentUICulture))));
                                                          break;
 
                                                      default:
@@ -472,7 +476,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(validationException.PropertyName, Is.Not.Null);
                                                  Assert.That(validationException.PropertyName, Is.Not.Empty);
                                                  Assert.That(validationException.PropertyName, Is.EqualTo("DatoAsText"));
-                                                 Assert.That(validationException.Value, Is.EqualTo(illegalValue));
+                                                 Assert.That(validationException.Value, Is.EqualTo(testValue));
                                                  Assert.That(validationException.InnerException, Is.Null);
                                              })
                                          .Repeat.Any();
@@ -480,7 +484,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DatoAsText = illegalValue;
+            bogføringViewModel.DatoAsText = testValue;
 
             bogføringslinjeModelMock.AssertWasNotCalled(m => m.Dato = Arg<DateTime>.Is.Anything);
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
@@ -514,7 +518,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
-            var newValue = fixture.Create<DateTime>().AddDays(-7).ToShortDateString();
+            var newValue = fixture.Create<DateTime>().AddDays(-7).ToString("d", Thread.CurrentThread.CurrentUICulture);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
             exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
                                          .WhenCalled(e =>
@@ -572,7 +576,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
-            var newValue = fixture.Create<DateTime>().AddDays(-7).ToShortDateString();
+            var newValue = fixture.Create<DateTime>().AddDays(-7).ToString("d", Thread.CurrentThread.CurrentUICulture);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
             exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf))
                                          .WhenCalled(e =>
@@ -631,7 +635,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
-            var newValue = fixture.Create<DateTime>().AddDays(-7).ToShortDateString();
+            var newValue = fixture.Create<DateTime>().AddDays(-7).ToString("d", Thread.CurrentThread.CurrentUICulture);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
             exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf))
                                          .WhenCalled(e =>
@@ -683,7 +687,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
-            var newValue = fixture.Create<DateTime>().AddDays(-7).ToShortDateString();
+            var newValue = fixture.Create<DateTime>().AddDays(-7).ToString("d", Thread.CurrentThread.CurrentUICulture);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
             exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf))
                                          .WhenCalled(e =>
@@ -735,7 +739,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
-            var newValue = fixture.Create<DateTime>().AddDays(-7).ToShortDateString();
+            var newValue = fixture.Create<DateTime>().AddDays(-7).ToString("d", Thread.CurrentThread.CurrentUICulture);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
             exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf))
                                          .WhenCalled(e =>
@@ -787,7 +791,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                     .Return(0)
                                     .Repeat.Any();
 
-            var newValue = fixture.Create<DateTime>().AddDays(-7).ToShortDateString();
+            var newValue = fixture.Create<DateTime>().AddDays(-7).ToString("d", Thread.CurrentThread.CurrentUICulture);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
             exceptionHandlerViewModelMock.Expect(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf))
                                          .WhenCalled(e =>
@@ -2656,7 +2660,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = string.IsNullOrWhiteSpace(value) ? value : decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US")) .ToString("C");
+            bogføringViewModel.DebitAsText = string.IsNullOrWhiteSpace(value) ? value : decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US")) .ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(expectedValue));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
@@ -2716,7 +2720,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             Assert.That(eventCalled, Is.False);
             decimal valueAsDecimal;
-            bogføringViewModel.DebitAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue;
+            bogføringViewModel.DebitAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture) : illegalValue;
             Assert.That(eventCalled, Is.True);
 
             var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
@@ -2795,7 +2799,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(validationException.PropertyName, Is.Not.Null);
                                                  Assert.That(validationException.PropertyName, Is.Not.Empty);
                                                  Assert.That(validationException.PropertyName, Is.EqualTo("DebitAsText"));
-                                                 Assert.That(validationException.Value, Is.EqualTo(decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue));
+                                                 Assert.That(validationException.Value, Is.EqualTo(decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture) : illegalValue));
                                                  Assert.That(validationException.InnerException, Is.Null);
                                              })
                                          .Repeat.Any();
@@ -2803,7 +2807,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue;
+            bogføringViewModel.DebitAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture) : illegalValue;
 
             bogføringslinjeModelMock.AssertWasNotCalled(m => m.Debit = Arg<decimal>.Is.Anything);
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
@@ -2852,7 +2856,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(validationException.PropertyName, Is.Not.Null);
                                                  Assert.That(validationException.PropertyName, Is.Not.Empty);
                                                  Assert.That(validationException.PropertyName, Is.EqualTo("DebitAsText"));
-                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C")));
+                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C", Thread.CurrentThread.CurrentUICulture)));
                                                  Assert.That(validationException.InnerException, Is.Not.Null);
                                                  Assert.That(validationException.InnerException, Is.TypeOf<ArgumentNullException>());
                                              })
@@ -2861,7 +2865,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = newValue.ToString("C");
+            bogføringViewModel.DebitAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
@@ -2910,7 +2914,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(validationException.PropertyName, Is.Not.Null);
                                                  Assert.That(validationException.PropertyName, Is.Not.Empty);
                                                  Assert.That(validationException.PropertyName, Is.EqualTo("DebitAsText"));
-                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C")));
+                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C", Thread.CurrentThread.CurrentUICulture)));
                                                  Assert.That(validationException.InnerException, Is.Not.Null);
                                                  Assert.That(validationException.InnerException, Is.TypeOf<ArgumentException>());
                                              })
@@ -2919,7 +2923,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = newValue.ToString("C");
+            bogføringViewModel.DebitAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
@@ -2971,7 +2975,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = newValue.ToString("C");
+            bogføringViewModel.DebitAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
@@ -3023,7 +3027,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = newValue.ToString("C");
+            bogføringViewModel.DebitAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf));
@@ -3075,7 +3079,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = newValue.ToString("C");
+            bogføringViewModel.DebitAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
@@ -3128,7 +3132,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.DebitAsText = newValue.ToString("C");
+            bogføringViewModel.DebitAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Debit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
@@ -3175,7 +3179,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = string.IsNullOrWhiteSpace(value) ? value : decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US")).ToString("C");
+            bogføringViewModel.KreditAsText = string.IsNullOrWhiteSpace(value) ? value : decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US")).ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit = Arg<decimal>.Is.Equal(expectedValue));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
@@ -3235,7 +3239,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
             Assert.That(eventCalled, Is.False);
             decimal valueAsDecimal;
-            bogføringViewModel.KreditAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue;
+            bogføringViewModel.KreditAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture) : illegalValue;
             var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
             switch (text)
             {
@@ -3312,7 +3316,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(validationException.PropertyName, Is.Not.Null);
                                                  Assert.That(validationException.PropertyName, Is.Not.Empty);
                                                  Assert.That(validationException.PropertyName, Is.EqualTo("KreditAsText"));
-                                                 Assert.That(validationException.Value, Is.EqualTo(decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue));
+                                                 Assert.That(validationException.Value, Is.EqualTo(decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture) : illegalValue));
                                                  Assert.That(validationException.InnerException, Is.Null);
                                              })
                                          .Repeat.Any();
@@ -3320,7 +3324,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : illegalValue;
+            bogføringViewModel.KreditAsText = decimal.TryParse(illegalValue, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture) : illegalValue;
 
             bogføringslinjeModelMock.AssertWasNotCalled(m => m.Kredit = Arg<decimal>.Is.Anything);
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
@@ -3369,7 +3373,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(validationException.PropertyName, Is.Not.Null);
                                                  Assert.That(validationException.PropertyName, Is.Not.Empty);
                                                  Assert.That(validationException.PropertyName, Is.EqualTo("KreditAsText"));
-                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C")));
+                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C", Thread.CurrentThread.CurrentUICulture)));
                                                  Assert.That(validationException.InnerException, Is.Not.Null);
                                                  Assert.That(validationException.InnerException, Is.TypeOf<ArgumentNullException>());
                                              })
@@ -3378,7 +3382,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = newValue.ToString("C");
+            bogføringViewModel.KreditAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
@@ -3427,7 +3431,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                                                  Assert.That(validationException.PropertyName, Is.Not.Null);
                                                  Assert.That(validationException.PropertyName, Is.Not.Empty);
                                                  Assert.That(validationException.PropertyName, Is.EqualTo("KreditAsText"));
-                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C")));
+                                                 Assert.That(validationException.Value, Is.EqualTo(newValue.ToString("C", Thread.CurrentThread.CurrentUICulture)));
                                                  Assert.That(validationException.InnerException, Is.Not.Null);
                                                  Assert.That(validationException.InnerException, Is.TypeOf<ArgumentException>());
                                              })
@@ -3436,7 +3440,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = newValue.ToString("C");
+            bogføringViewModel.KreditAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiValidationException>.Is.TypeOf));
@@ -3488,7 +3492,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = newValue.ToString("C");
+            bogføringViewModel.KreditAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiRepositoryException>.Is.TypeOf));
@@ -3540,7 +3544,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = newValue.ToString("C");
+            bogføringViewModel.KreditAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiBusinessException>.Is.TypeOf));
@@ -3592,7 +3596,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = newValue.ToString("C");
+            bogføringViewModel.KreditAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
@@ -3645,7 +3649,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             var bogføringViewModel = new BogføringViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeModelMock, fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
             Assert.That(bogføringViewModel, Is.Not.Null);
 
-            bogføringViewModel.KreditAsText = newValue.ToString("C");
+            bogføringViewModel.KreditAsText = newValue.ToString("C", Thread.CurrentThread.CurrentUICulture);
 
             bogføringslinjeModelMock.AssertWasCalled(m => m.Kredit = Arg<decimal>.Is.Equal(newValue));
             exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
@@ -5104,7 +5108,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
 
                         var tasks = bogføringViewModel.Tasks.ToArray();
                         Assert.That(tasks, Is.Not.Null);
-                        Assert.That(tasks, Is.Not.Empty);
                         Task.WaitAll(tasks);
 
                         waitEvent.WaitOne(2500);
@@ -5140,7 +5143,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         public void TestAtValidateDatoAsTextReturnererSuccessVedLovligeValues(string value)
         {
             var valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
-            var result = BogføringViewModel.ValidateDatoAsText(valueAsDateTime.ToShortDateString());
+            var result = BogføringViewModel.ValidateDatoAsText(valueAsDateTime.ToString("d", Thread.CurrentThread.CurrentUICulture));
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -5170,7 +5173,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             switch (text)
             {
                 case Text.DateGreaterThan:
-                    Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(text, DateTime.Now.ToLongDateString())));
+                    Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(text, DateTime.Now.ToString("D", Thread.CurrentThread.CurrentUICulture))));
                     break;
 
                 default:
@@ -5288,7 +5291,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("$ 5000.00")]
         public void TestAtValidateCurrencyReturnererSuccessVedLovligeValues(string value)
         {
-            var result = BogføringViewModel.ValidateCurrency(string.IsNullOrWhiteSpace(value) ? value : decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US")).ToString("C"));
+            var result = BogføringViewModel.ValidateCurrency(string.IsNullOrWhiteSpace(value) ? value : decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US")).ToString("C", Thread.CurrentThread.CurrentUICulture));
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -5307,7 +5310,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         {
             var text = (Text) Enum.Parse(typeof (Text), validationErrorText);
             decimal valueAsDecimal;
-            var result = BogføringViewModel.ValidateCurrency(decimal.TryParse(value, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C") : value);
+            var result = BogføringViewModel.ValidateCurrency(decimal.TryParse(value, NumberStyles.Any, new CultureInfo("en-US"), out valueAsDecimal) ? valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture) : value);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);

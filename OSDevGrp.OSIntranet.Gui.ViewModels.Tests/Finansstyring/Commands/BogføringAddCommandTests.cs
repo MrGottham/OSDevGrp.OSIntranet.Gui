@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using NUnit.Framework;
@@ -82,7 +83,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
-            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToShortDateString(), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToString("d", Thread.CurrentThread.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C", Thread.CurrentThread.CurrentUICulture), string.Empty, 0);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -126,7 +127,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
             DateTime dato;
-            var bogføringViewModelMock = CreateBogføringViewModelMock(DateTime.TryParse(invalidValue, new CultureInfo("en-US"), DateTimeStyles.None, out dato) ? dato.ToShortDateString() : invalidValue, string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(DateTime.TryParse(invalidValue, new CultureInfo("en-US"), DateTimeStyles.None, out dato) ? dato.ToString("d", Thread.CurrentThread.CurrentUICulture) : invalidValue, string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C", Thread.CurrentThread.CurrentUICulture), string.Empty, 0);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -152,7 +153,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
-            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToShortDateString(), string.Empty, invalidValue, fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToString("d", Thread.CurrentThread.CurrentUICulture), string.Empty, invalidValue, fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C", Thread.CurrentThread.CurrentUICulture), string.Empty, 0);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -178,7 +179,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
-            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToShortDateString(), string.Empty, fixture.Create<string>(), invalidValue, string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToString("d", Thread.CurrentThread.CurrentUICulture), string.Empty, fixture.Create<string>(), invalidValue, string.Empty, fixture.Create<decimal>().ToString("C", Thread.CurrentThread.CurrentUICulture), string.Empty, 0);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -209,7 +210,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
             decimal value;
-            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToShortDateString(), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, decimal.TryParse(invalidValue, NumberStyles.Any, new CultureInfo("en-US"), out value) ? value.ToString("C") : invalidValue, string.Empty, 0);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToString("d", Thread.CurrentThread.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, decimal.TryParse(invalidValue, NumberStyles.Any, new CultureInfo("en-US"), out value) ? value.ToString("C", Thread.CurrentThread.CurrentUICulture) : invalidValue, string.Empty, 0);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -240,7 +241,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
             decimal value;
-            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToShortDateString(), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, string.Empty, decimal.TryParse(invalidValue, NumberStyles.Any, new CultureInfo("en-US"), out value) ? value.ToString("C") : invalidValue, 0);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToString("d", Thread.CurrentThread.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, string.Empty, decimal.TryParse(invalidValue, NumberStyles.Any, new CultureInfo("en-US"), out value) ? value.ToString("C", Thread.CurrentThread.CurrentUICulture) : invalidValue, 0);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -278,7 +279,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
 
             decimal debit;
             decimal kredit;
-            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToShortDateString(), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, decimal.TryParse(debitAsText, NumberStyles.Any, new CultureInfo("en-US"), out debit) ? debit.ToString("C") : debitAsText, decimal.TryParse(kreditAsText, NumberStyles.Any, new CultureInfo("en-US"), out kredit) ? kredit.ToString("C") : kreditAsText, 0);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToString("d", Thread.CurrentThread.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, decimal.TryParse(debitAsText, NumberStyles.Any, new CultureInfo("en-US"), out debit) ? debit.ToString("C", Thread.CurrentThread.CurrentUICulture) : debitAsText, decimal.TryParse(kreditAsText, NumberStyles.Any, new CultureInfo("en-US"), out kredit) ? kredit.ToString("C", Thread.CurrentThread.CurrentUICulture) : kreditAsText, 0);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -302,7 +303,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
             fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
 
-            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToShortDateString(), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C"), string.Empty, 0, true);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(fixture.Create<DateTime>().ToString("d", Thread.CurrentThread.CurrentUICulture), string.Empty, fixture.Create<string>(), fixture.Create<string>(), string.Empty, fixture.Create<decimal>().ToString("C", Thread.CurrentThread.CurrentUICulture), string.Empty, 0, true);
             var exceptionHandlerViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
 
             var command = new BogføringAddCommand(fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
@@ -381,7 +382,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             var debit = fixture.Create<decimal>();
             var kredit = fixture.Create<decimal>();
             var adressekonto = fixture.Create<int>();
-            var bogføringViewModelMock = CreateBogføringViewModelMock(dato.ToString(CultureInfo.CurrentUICulture), bilag, kontonummer, tekst, budgetkontonummer, debit.ToString("C"), kredit.ToString("C"), adressekonto);
+            var bogføringViewModelMock = CreateBogføringViewModelMock(dato.ToString("d", Thread.CurrentThread.CurrentUICulture), bilag, kontonummer, tekst, budgetkontonummer, debit.ToString("C", Thread.CurrentThread.CurrentUICulture), kredit.ToString("C", Thread.CurrentThread.CurrentUICulture), adressekonto);
             bogføringViewModelMock.Expect(m => m.Regnskab)
                                   .Return(regnskabViewModelMock)
                                   .Repeat.Any();
@@ -1022,7 +1023,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring.Commands
             bogføringSetCommandMock.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(regnskabViewModelMock)));
             exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
         }
-
 
         /// <summary>
         /// Tester, at Execute kalder HandleException på exceptionhandleren med en IntranetGuiCommandException ved IntranetGuiCommandException.
