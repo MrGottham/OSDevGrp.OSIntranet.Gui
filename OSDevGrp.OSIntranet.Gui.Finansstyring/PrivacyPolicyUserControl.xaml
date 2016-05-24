@@ -9,14 +9,6 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Common/CallistoStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
     <Grid Background="{StaticResource SettingsFlyoutContentBackgroundThemeBrush}" d:DataContext="{Binding RelativeSource={RelativeSource None}, Path=local:PrivacyPolicyUserControl.MainViewModel}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

@@ -9,6 +9,8 @@
     <!--
     <SolidColorBrush x:Key="ListViewItemPointerOverBackgroundThemeBrush" Color="Transparent"/>
     -->
+    <SolidColorBrush x:Key="SettingsFlyoutContentBackgroundThemeBrush">#FFFFFFFF</SolidColorBrush>
+    <SolidColorBrush x:Key="SettingsFlyoutContentForegroundThemeBrush">#FF000000</SolidColorBrush>
 
     <Style x:Key="HighlightedGridStyle" TargetType="Grid" BasedOn="{StaticResource LayoutRootStyle}">
         <Setter Property="Background" Value="CornflowerBlue"/>

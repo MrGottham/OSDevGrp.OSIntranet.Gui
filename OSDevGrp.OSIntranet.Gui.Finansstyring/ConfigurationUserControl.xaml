@@ -13,9 +13,6 @@
     
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Common/CallistoStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:IntegerToStringConverter x:Key="IntegerToStringConverter"/>
         </ResourceDictionary>
