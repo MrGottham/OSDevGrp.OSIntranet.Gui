@@ -13,7 +13,6 @@ using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using SettingsFlyout=Callisto.Controls.SettingsFlyout;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 {
@@ -229,25 +228,21 @@ namespace OSDevGrp.OSIntranet.Gui.Finansstyring
             {
                 var settingsFlyout = new SettingsFlyout
                 {
-                    FlyoutWidth = SettingsFlyout.SettingsFlyoutWidth.Narrow,
-                    HeaderText = Resource.GetText(Text.Configuration),
-                    HeaderBrush = new SolidColorBrush(Colors.DarkBlue),
-                    Content = new ConfigurationUserControl(),
-                    IsOpen = true
+                    Title = Resource.GetText(Text.Configuration),
+                    HeaderBackground = new SolidColorBrush(Colors.DarkBlue),
+                    Content = new ConfigurationUserControl()
                 };
-                settingsFlyout.IsOpen = true;
+                settingsFlyout.Show();
             });
             var privacyPolicyCommand = new SettingsCommand("privacyPolicy", Resource.GetText(Text.PrivacyPolicyHeader), eventHandler =>
             {
                 var settingsFlyout = new SettingsFlyout
                 {
-                    FlyoutWidth = SettingsFlyout.SettingsFlyoutWidth.Narrow,
-                    HeaderText = Resource.GetText(Text.PrivacyPolicyHeader),
-                    HeaderBrush = new SolidColorBrush(Colors.DarkBlue),
-                    Content = new PrivacyPolicyUserControl(),
-                    IsOpen = true
+                    Title = Resource.GetText(Text.PrivacyPolicyHeader),
+                    HeaderBackground = new SolidColorBrush(Colors.DarkBlue),
+                    Content = new PrivacyPolicyUserControl()
                 };
-                settingsFlyout.IsOpen = true;
+                settingsFlyout.Show();
             });
             eventArgs.Request.ApplicationCommands.Add(configurationCommand);
             eventArgs.Request.ApplicationCommands.Add(privacyPolicyCommand);
