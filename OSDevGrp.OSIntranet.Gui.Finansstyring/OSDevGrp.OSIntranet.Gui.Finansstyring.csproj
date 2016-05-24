@@ -197,6 +197,10 @@
     <None Include="OSDevGrp.OSIntranet.Gui.Finansstyring_TemporaryKey.pfx" />
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />
     <None Include="packages.config" />
+    <PRIResource Include="Strings\en-US\ExceptionMessages.resw" />
+    <PRIResource Include="Strings\da-DK\ExceptionMessages.resw" />
+    <PRIResource Include="Strings\en-US\Texts.resw" />
+    <PRIResource Include="Strings\da-DK\Texts.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\BadgeLogo.scale-100.png" />

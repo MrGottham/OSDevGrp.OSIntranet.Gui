@@ -14,8 +14,8 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
     {
         #region Private variables
 
-        private static readonly ResourceManager ExceptionMessages = new ResourceManager(typeof(ExceptionMessages).FullName, Assembly.GetExecutingAssembly());
-        private static readonly ResourceManager Texts = new ResourceManager(typeof(Texts).FullName, Assembly.GetExecutingAssembly());
+        private static ResourceManager _exceptionMessages = new ResourceManager(typeof(ExceptionMessages).FullName, Assembly.GetExecutingAssembly());
+        private static ResourceManager _texts = new ResourceManager(typeof(Texts).FullName, Assembly.GetExecutingAssembly());
         private static readonly IDictionary<string, byte[]> ResourceCache = new Dictionary<string, byte[]>();
         private static readonly object SyncRoot = new object();
 
@@ -33,7 +33,7 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         {
             try
             {
-                var message = ExceptionMessages.GetString(exceptionMessage.ToString());
+                var message = _exceptionMessages.GetString(exceptionMessage.ToString());
                 if (message == null)
                 {
                     throw new IntranetGuiSystemException("Null returned.");
@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         {
             try
             {
-                var txt = Texts.GetString(text.ToString());
+                var txt = _texts.GetString(text.ToString());
                 if (txt == null)
                 {
                     throw new IntranetGuiSystemException("Null returned.");
@@ -100,6 +100,32 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
                     return ResourceCache[resourceName];
                 }
             }
+        }
+
+        /// <summary>
+        /// Patcher den ResourceManager, der kan hente exception messages.
+        /// </summary>
+        /// <param name="resourceManager">ResourceManager, der kan hente exception messages.</param>
+        public static void PatchResourceManagerForExceptionMessages(ResourceManager resourceManager)
+        {
+            if (resourceManager == null)
+            {
+                throw new ArgumentNullException("resourceManager");
+            }
+            _exceptionMessages = resourceManager;
+        }
+
+        /// <summary>
+        /// Patcher den ResourceManager, der kan hente tekstangivelser.
+        /// </summary>
+        /// <param name="resourceManager">ResourceManager, der kan hente tekstangivelser.</param>
+        public static void PatchResourceManagerForTexts(ResourceManager resourceManager)
+        {
+            if (resourceManager == null)
+            {
+                throw new ArgumentNullException("resourceManager");
+            }
+            _texts = resourceManager;
         }
 
         #endregion
