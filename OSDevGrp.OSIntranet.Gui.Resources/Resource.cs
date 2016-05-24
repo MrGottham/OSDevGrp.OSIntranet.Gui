@@ -14,8 +14,8 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
     {
         #region Private variables
 
-        private static readonly ResourceManager ExceptionMessages = new ResourceManager("OSDevGrp.OSIntranet.Gui.Resources.ExceptionMessages", Assembly.GetExecutingAssembly());
-        private static readonly ResourceManager Texts = new ResourceManager("OSDevGrp.OSIntranet.Gui.Resources.Texts", Assembly.GetExecutingAssembly());
+        private static readonly ResourceManager ExceptionMessages = new ResourceManager(typeof(ExceptionMessages).FullName, Assembly.GetExecutingAssembly());
+        private static readonly ResourceManager Texts = new ResourceManager(typeof(Texts).FullName, Assembly.GetExecutingAssembly());
         private static readonly IDictionary<string, byte[]> ResourceCache = new Dictionary<string, byte[]>();
         private static readonly object SyncRoot = new object();
 
