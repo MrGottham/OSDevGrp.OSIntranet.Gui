@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Logger.LogError(ex);
             }
             finally
             {

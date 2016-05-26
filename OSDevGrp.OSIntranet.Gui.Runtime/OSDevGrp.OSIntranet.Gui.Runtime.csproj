@@ -118,6 +118,7 @@
     <Compile Include="ConfigurationProvider.cs" />
     <Compile Include="FinansstyringsnyhederLoaderBackgroundTask.cs" />
     <Compile Include="LocaleDataStorageHelper.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FinansstyringSyncDataBackgroundTask.cs" />
     <Compile Include="WindowsRuntimeResourceManager.cs" />
