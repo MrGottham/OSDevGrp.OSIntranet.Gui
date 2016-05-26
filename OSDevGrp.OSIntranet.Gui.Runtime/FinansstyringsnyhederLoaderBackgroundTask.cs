@@ -28,6 +28,8 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             var deferral = taskInstance.GetDeferral();
             try
             {
+                WindowsRuntimeResourceManager.PatchResourceManagers();
+
                 var configurationProvider = new ConfigurationProvider();
 
                 var finansstyringConfiguration = configurationProvider.Settings

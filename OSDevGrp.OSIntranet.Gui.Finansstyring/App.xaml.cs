@@ -13,6 +13,7 @@ using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using WindowsRuntimeResourceManager=OSDevGrp.OSIntranet.Gui.Finansstyring.Core.WindowsRuntimeResourceManager;
 
 namespace OSDevGrp.OSIntranet.Gui.Finansstyring
 {

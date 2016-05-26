@@ -109,6 +109,10 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />
+    <PRIResource Include="Strings\da-DK\Texts.resw" />
+    <PRIResource Include="Strings\en-US\Texts.resw" />
+    <PRIResource Include="Strings\en-US\ExceptionMessages.resw" />
+    <PRIResource Include="Strings\da-DK\ExceptionMessages.resw" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationProvider.cs" />
