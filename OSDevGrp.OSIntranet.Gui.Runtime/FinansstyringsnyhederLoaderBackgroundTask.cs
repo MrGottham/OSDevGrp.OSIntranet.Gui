@@ -155,7 +155,6 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             var tileXml = TileUpdateManager.GetTemplateContent(type);
             tileXml.GetElementsByTagName("text").First().InnerText = nyhed.Nyhedsinformation;
             return new TileNotification(tileXml);
-            
         }
 
         #endregion
