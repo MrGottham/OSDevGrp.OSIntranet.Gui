@@ -171,6 +171,7 @@
     <Compile Include="Core\SuspensionManager.cs" />
     <Compile Include="Core\SuspensionManagerException.cs" />
     <Compile Include="Core\ViewModelValidator.cs" />
+    <Compile Include="Core\WindowsRuntimeResourceManager.cs" />
     <Compile Include="KontoplanPage.xaml.cs">
       <DependentUpon>KontoplanPage.xaml</DependentUpon>
     </Compile>
