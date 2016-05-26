@@ -14,8 +14,10 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
     {
         #region Private variables
 
-        private static ResourceManager _exceptionMessages = new ResourceManager(typeof(ExceptionMessages).FullName, Assembly.GetExecutingAssembly());
-        private static ResourceManager _texts = new ResourceManager(typeof(Texts).FullName, Assembly.GetExecutingAssembly());
+        private static Func<string, string> _exceptionMessageGetter;
+        private static Func<string, string> _textGetter;
+        private static readonly ResourceManager ExceptionMessages = new ResourceManager(typeof(ExceptionMessages).FullName, Assembly.GetExecutingAssembly());
+        private static readonly ResourceManager Texts = new ResourceManager(typeof(Texts).FullName, Assembly.GetExecutingAssembly());
         private static readonly IDictionary<string, byte[]> ResourceCache = new Dictionary<string, byte[]>();
         private static readonly object SyncRoot = new object();
 
@@ -33,7 +35,7 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         {
             try
             {
-                var message = _exceptionMessages.GetString(exceptionMessage.ToString());
+                var message = _exceptionMessageGetter == null ? ExceptionMessages.GetString(exceptionMessage.ToString()) : _exceptionMessageGetter.Invoke(exceptionMessage.ToString());
                 if (message == null)
                 {
                     throw new IntranetGuiSystemException("Null returned.");
@@ -56,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         {
             try
             {
-                var txt = _texts.GetString(text.ToString());
+                var txt = _textGetter == null ? Texts.GetString(text.ToString()) : _textGetter.Invoke(text.ToString());
                 if (txt == null)
                 {
                     throw new IntranetGuiSystemException("Null returned.");
@@ -105,27 +107,27 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         /// <summary>
         /// Patcher den ResourceManager, der kan hente exception messages.
         /// </summary>
-        /// <param name="resourceManager">ResourceManager, der kan hente exception messages.</param>
-        public static void PatchResourceManagerForExceptionMessages(ResourceManager resourceManager)
+        /// <param name="exceptionMessageGetter">Funktion, der kan hente exception messages.</param>
+        public static void PatchResourceManagerForExceptionMessages(Func<string, string> exceptionMessageGetter)
         {
-            if (resourceManager == null)
+            if (exceptionMessageGetter == null)
             {
-                throw new ArgumentNullException("resourceManager");
+                throw new ArgumentNullException("exceptionMessageGetter");
             }
-            _exceptionMessages = resourceManager;
+            _exceptionMessageGetter = exceptionMessageGetter;
         }
 
         /// <summary>
         /// Patcher den ResourceManager, der kan hente tekstangivelser.
         /// </summary>
-        /// <param name="resourceManager">ResourceManager, der kan hente tekstangivelser.</param>
-        public static void PatchResourceManagerForTexts(ResourceManager resourceManager)
+        /// <param name="textGetter">Funktion, der kan hente tekstangivelser.</param>
+        public static void PatchResourceManagerForTexts(Func<string, string> textGetter)
         {
-            if (resourceManager == null)
+            if (textGetter == null)
             {
-                throw new ArgumentNullException("resourceManager");
+                throw new ArgumentNullException("textGetter");
             }
-            _texts = resourceManager;
+            _textGetter = textGetter;
         }
 
         #endregion

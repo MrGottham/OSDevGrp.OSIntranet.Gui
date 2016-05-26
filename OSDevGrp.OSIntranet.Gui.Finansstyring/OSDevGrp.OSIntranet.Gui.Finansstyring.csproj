@@ -171,7 +171,6 @@
     <Compile Include="Core\SuspensionManager.cs" />
     <Compile Include="Core\SuspensionManagerException.cs" />
     <Compile Include="Core\ViewModelValidator.cs" />
-    <Compile Include="Core\WindowsRuntimeResourceManager.cs" />
     <Compile Include="KontoplanPage.xaml.cs">
       <DependentUpon>KontoplanPage.xaml</DependentUpon>
     </Compile>
@@ -196,10 +195,6 @@
     <None Include="OSDevGrp.OSIntranet.Gui.Finansstyring_StoreKey.pfx" />
     <None Include="OSDevGrp.OSIntranet.Gui.Finansstyring_TemporaryKey.pfx" />
     <None Include="OSDevGrp.OSIntranet.Gui.snk" />
-    <PRIResource Include="Strings\en-US\ExceptionMessages.resw" />
-    <PRIResource Include="Strings\da-DK\ExceptionMessages.resw" />
-    <PRIResource Include="Strings\en-US\Texts.resw" />
-    <PRIResource Include="Strings\da-DK\Texts.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\BadgeLogo.scale-100.png" />
