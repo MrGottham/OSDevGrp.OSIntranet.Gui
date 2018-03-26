@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A9A2D3A6-9294-40EA-8851-C6F677A2E402}"
 	ProjectSection(SolutionItems) = preProject
@@ -44,52 +44,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Gui.Runtime", "OSDevGrp.OSIntranet.Gui.Runtime\OSDevGrp.OSIntranet.Gui.Runtime.csproj", "{212A5669-B973-4304-9750-DA7C8924B4CB}"
 EndProject
 Global
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 15
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Gui.Models.Interfaces\\OSDevGrp.OSIntranet.Gui.Models.Interfaces.csproj
-		SccLocalPath1 = .
-		SccProjectFilePathRelativizedFromConnection1 = OSDevGrp.OSIntranet.Gui.Models.Interfaces\\
-		SccProjectUniqueName2 = OSDevGrp.OSIntranet.Gui.Models.Tests\\OSDevGrp.OSIntranet.Gui.Models.Tests.csproj
-		SccLocalPath2 = .
-		SccProjectFilePathRelativizedFromConnection2 = OSDevGrp.OSIntranet.Gui.Models.Tests\\
-		SccProjectUniqueName3 = OSDevGrp.OSIntranet.Gui.Models\\OSDevGrp.OSIntranet.Gui.Models.csproj
-		SccLocalPath3 = .
-		SccProjectFilePathRelativizedFromConnection3 = OSDevGrp.OSIntranet.Gui.Models\\
-		SccProjectUniqueName4 = OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests\\OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests.csproj
-		SccLocalPath4 = .
-		SccProjectFilePathRelativizedFromConnection4 = OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests\\
-		SccProjectUniqueName5 = OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring\\OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.csproj
-		SccLocalPath5 = .
-		SccProjectFilePathRelativizedFromConnection5 = OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring\\
-		SccProjectUniqueName6 = OSDevGrp.OSIntranet.Gui.Repositories.Interfaces\\OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.csproj
-		SccLocalPath6 = .
-		SccProjectFilePathRelativizedFromConnection6 = OSDevGrp.OSIntranet.Gui.Repositories.Interfaces\\
-		SccProjectUniqueName7 = OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces\\OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.csproj
-		SccLocalPath7 = .
-		SccProjectFilePathRelativizedFromConnection7 = OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces\\
-		SccProjectUniqueName8 = OSDevGrp.OSIntranet.Gui.ViewModels.Tests\\OSDevGrp.OSIntranet.Gui.ViewModels.Tests.csproj
-		SccLocalPath8 = .
-		SccProjectFilePathRelativizedFromConnection8 = OSDevGrp.OSIntranet.Gui.ViewModels.Tests\\
-		SccProjectUniqueName9 = OSDevGrp.OSIntranet.Gui.ViewModels\\OSDevGrp.OSIntranet.Gui.ViewModels.csproj
-		SccLocalPath9 = .
-		SccProjectFilePathRelativizedFromConnection9 = OSDevGrp.OSIntranet.Gui.ViewModels\\
-		SccProjectUniqueName10 = OSDevGrp.OSIntranet.Gui.Intrastructure.Tests\\OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.csproj
-		SccLocalPath10 = .
-		SccProjectFilePathRelativizedFromConnection10 = OSDevGrp.OSIntranet.Gui.Intrastructure.Tests\\
-		SccProjectUniqueName11 = OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces\\OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.csproj
-		SccLocalPath11 = .
-		SccProjectFilePathRelativizedFromConnection11 = OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces\\
-		SccProjectUniqueName12 = OSDevGrp.OSIntranet.Gui.Resources\\OSDevGrp.OSIntranet.Gui.Resources.csproj
-		SccLocalPath12 = .
-		SccProjectFilePathRelativizedFromConnection12 = OSDevGrp.OSIntranet.Gui.Resources\\
-		SccProjectUniqueName13 = OSDevGrp.OSIntranet.Gui.Finansstyring\\OSDevGrp.OSIntranet.Gui.Finansstyring.csproj
-		SccLocalPath13 = .
-		SccProjectFilePathRelativizedFromConnection13 = OSDevGrp.OSIntranet.Gui.Finansstyring\\
-		SccProjectUniqueName14 = OSDevGrp.OSIntranet.Gui.Runtime\\OSDevGrp.OSIntranet.Gui.Runtime.csproj
-		SccLocalPath14 = .
-		SccProjectFilePathRelativizedFromConnection14 = OSDevGrp.OSIntranet.Gui.Runtime\\
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM

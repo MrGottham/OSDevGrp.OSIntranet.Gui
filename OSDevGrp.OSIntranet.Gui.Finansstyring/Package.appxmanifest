@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="13038MrGottham.OSFinansstyring" Publisher="CN=6C89856B-6378-4895-AE0B-8AFBF7818257" Version="1.1.2.5" />
+  <Identity Name="13038MrGottham.OSFinansstyring" Publisher="CN=6C89856B-6378-4895-AE0B-8AFBF7818257" Version="1.1.2.8" />
   <Properties>
     <DisplayName>OS Finansstyring</DisplayName>
     <PublisherDisplayName>MrGottham</PublisherDisplayName>
