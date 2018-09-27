@@ -17,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
     {
         #region Private constants
 
-        private const string FinansstyringServiceTestUri = "http://mother/osintranet/finansstyringservice.svc/mobile";
+        private const string FinansstyringServiceTestUri = "http://services.osdevgrp.local/osintranet/finansstyringservice.svc/mobile";
 
         #endregion
 

@@ -53,6 +53,18 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
 
                 await SyncData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage);
             }
+            catch (AggregateException aggregateException)
+            {
+                aggregateException.Handle(ex =>
+                {
+                    if (ex is IntranetGuiOfflineRepositoryException)
+                    {
+                        return true;
+                    }
+                    Logger.LogError(ex);
+                    return true;
+                });
+            }
             catch (Exception ex)
             {
                 Logger.LogError(ex);

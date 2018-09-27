@@ -51,22 +51,21 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;
 
                     var finansstyringRepository = new FinansstyringRepositoryLocale(finansstyringKonfigurationRepository, localeDataStorage);
-                    try
-                    {
-                        var finansstyringsnyhederGetTask = FinansstyringsnyhederGetAsync(finansstyringRepository);
-                        finansstyringsnyhederGetTask.Wait();
-                        finansstyringsnyheder = finansstyringsnyhederGetTask.Result;
-                    }
-                    catch (AggregateException ex)
-                    {
-                        if (ex.InnerException == null)
-                        {
-                            throw;
-                        }
-                        throw ex.InnerException;
-                    }
+
+                    var finansstyringsnyhederGetTask = FinansstyringsnyhederGetAsync(finansstyringRepository);
+                    finansstyringsnyhederGetTask.Wait();
+                    finansstyringsnyheder = finansstyringsnyhederGetTask.Result;
                 }
+
                 UpdateTile(finansstyringsnyheder);
+            }
+            catch (AggregateException aggregateException)
+            {
+                aggregateException.Handle(ex =>
+                {
+                    Logger.LogError(ex);
+                    return true;
+                });
             }
             catch (Exception ex)
             {

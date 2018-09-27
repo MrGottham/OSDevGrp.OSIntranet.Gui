@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         {
             if (_roamingSettings.Values.ContainsKey("FinansstyringServiceUri") == false)
             {
-                _roamingSettings.Values.Add("FinansstyringServiceUri", "http://mother/osintranet/finansstyringservice.svc/mobile");
+                _roamingSettings.Values.Add("FinansstyringServiceUri", "http://services.osdevgrp.local/osintranet/finansstyringservice.svc/mobile");
             }
             if (_roamingSettings.Values.ContainsKey("LokalDataFil") == false)
             {

@@ -11,6 +11,7 @@ using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Service;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
+using EndpointNotFoundException = System.ServiceModel.EndpointNotFoundException;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 {
@@ -334,7 +335,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "RegnskabslisteGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "RegnskabslisteGet");
             }
             catch (Exception ex)
             {
@@ -412,7 +413,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontoplanGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "KontoplanGet");
             }
             catch (Exception ex)
             {
@@ -485,7 +486,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontoGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "KontoGet");
             }
             catch (Exception ex)
             {
@@ -569,7 +570,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "BudgetkontoplanGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "BudgetkontoplanGet");
             }
             catch (Exception ex)
             {
@@ -648,7 +649,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "BudgetkontoGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "BudgetkontoGet");
             }
             catch (Exception ex)
             {
@@ -736,7 +737,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "BogføringslinjerGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "BogføringslinjerGet");
             }
             catch (Exception ex)
             {
@@ -820,7 +821,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "Bogfør", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "Bogfør");
             }
             catch (Exception ex)
             {
@@ -903,7 +904,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "DebitorlisteGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "DebitorlisteGet");
             }
             catch (Exception ex)
             {
@@ -986,7 +987,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KreditorlisteGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "KreditorlisteGet");
             }
             catch (Exception ex)
             {
@@ -1069,7 +1070,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "AdressekontolisteGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "AdressekontolisteGet");
             }
             catch (Exception ex)
             {
@@ -1142,7 +1143,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "AdressekontoGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "AdressekontoGet");
             }
             catch (Exception ex)
             {
@@ -1193,7 +1194,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontogruppelisteGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "KontogruppelisteGet");
             }
             catch (Exception ex)
             {
@@ -1244,12 +1245,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
             catch (CommunicationException ex)
             {
-                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, "KontogruppelisteGet", ex.Message), this, ex);
+                throw CreateIntranetGuiRepositoryException(ex, "BudgetkontogruppelisteGet");
             }
             catch (Exception ex)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "BudgetkontogruppelisteGet", ex.Message), ex);
             }
+        }
+
+        private IntranetGuiRepositoryException CreateIntranetGuiRepositoryException(CommunicationException ex, string methodName)
+        {
+            if (ex == null)
+            {
+                throw new ArgumentNullException(nameof(ex));
+            }
+
+            if (string.IsNullOrWhiteSpace(methodName))
+            {
+                throw new ArgumentNullException(nameof(methodName));
+            }
+
+            List<Type> typesForIntranetGuiOfflineRepositoryException = new List<Type>
+            {
+                typeof(EndpointNotFoundException)
+            };
+            
+            if (typesForIntranetGuiOfflineRepositoryException.Contains(ex.GetType()))
+            {
+                throw new IntranetGuiOfflineRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.OfflineFinansstyringRepository, methodName, ex.Message), this, ex);
+            }
+
+            throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, methodName, ex.Message), ex);
         }
 
         /// <summary>
