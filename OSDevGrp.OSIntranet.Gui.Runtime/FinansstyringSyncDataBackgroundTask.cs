@@ -31,18 +31,16 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// <param name="taskInstance">Instans af baggrundstasken.</param>
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
-            BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
-
             lock (SyncRoot)
             {
                 if (_isSynchronizing)
                 {
-                    deferral.Complete();
                     return;
                 }
                 _isSynchronizing = true;
             }
 
+            BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
             try
             {
 
@@ -86,9 +84,9 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             {
                 lock (SyncRoot)
                 {
-                    deferral.Complete();
                     _isSynchronizing = false;
                 }
+                deferral.Complete();
             }
         }
 
