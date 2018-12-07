@@ -20,6 +20,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
     {
         #region Private variables
 
+        private static bool _isSynchronizing;
         private static readonly object SyncRoot = new object();
 
         #endregion
@@ -30,9 +31,21 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// <param name="taskInstance">Instans af baggrundstasken.</param>
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
-            var deferral = taskInstance.GetDeferral();
+            BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
+
+            lock (SyncRoot)
+            {
+                if (_isSynchronizing)
+                {
+                    deferral.Complete();
+                    return;
+                }
+                _isSynchronizing = true;
+            }
+
             try
             {
+
                 WindowsRuntimeResourceManager.PatchResourceManagers();
 
                 var configurationProvider = new ConfigurationProvider();
@@ -71,7 +84,11 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             }
             finally
             {
-                deferral.Complete();
+                lock (SyncRoot)
+                {
+                    deferral.Complete();
+                    _isSynchronizing = false;
+                }
             }
         }
 

@@ -1,6 +1,6 @@
-MainPackage=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.9_AnyCPU.appx
-SymbolPackage=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\AppPackages\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.9_Test\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.9_AnyCPU.appxsym
-ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.9_language-da.appx
-ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.9_language-en.appx
-ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.9_scale-140.appx
-ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.9_scale-180.appx
+MainPackage=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.10_AnyCPU.appx
+SymbolPackage=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\AppPackages\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.10_Test\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.10_AnyCPU.appxsym
+ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.10_language-da.appx
+ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.10_language-en.appx
+ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.10_scale-140.appx
+ResourcePack=D:\Data\OSDevGrp.OSIntranet.Gui\OSDevGrp.OSIntranet.Gui.Finansstyring\bin\Release\OSDevGrp.OSIntranet.Gui.Finansstyring_1.1.2.10_scale-180.appx
