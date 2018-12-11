@@ -16,6 +16,13 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
     /// </summary>
     public sealed class FinansstyringsnyhederLoaderBackgroundTask : IBackgroundTask
     {
+        #region Private variables
+
+        private static bool _isLoading;
+        private static readonly object SyncRoot = new object();
+
+        #endregion
+
         #region Methods
 
         /// <summary>
@@ -24,6 +31,15 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         /// <param name="taskInstance">Instans af baggrundstasken.</param>
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
+            lock (SyncRoot)
+            {
+                if (_isLoading)
+                {
+                    return;
+                }
+                _isLoading = true;
+            }
+
             var deferral = taskInstance.GetDeferral();
             try
             {
@@ -73,6 +89,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
             }
             finally
             {
+                lock (SyncRoot)
+                {
+                    _isLoading = false;
+                }
                 deferral.Complete();
             }
         }
