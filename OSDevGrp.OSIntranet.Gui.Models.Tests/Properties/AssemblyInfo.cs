@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("OS Development Group")]
 [assembly: AssemblyProduct("Gui til OS Intranet")]
-[assembly: AssemblyCopyright("Copyright © OS Development Group 2018")]
+[assembly: AssemblyCopyright("Copyright © OS Development Group 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en-US")]

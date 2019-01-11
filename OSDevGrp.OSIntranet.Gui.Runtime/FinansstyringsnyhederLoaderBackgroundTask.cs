@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using Windows.ApplicationModel.Background;
+using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 
 namespace OSDevGrp.OSIntranet.Gui.Runtime
@@ -40,35 +42,35 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 _isLoading = true;
             }
 
-            var deferral = taskInstance.GetDeferral();
+            BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
             try
             {
                 WindowsRuntimeResourceManager.PatchResourceManagers();
 
-                var configurationProvider = new ConfigurationProvider();
+                ConfigurationProvider configurationProvider = new ConfigurationProvider();
 
-                var finansstyringConfiguration = configurationProvider.Settings
+                IDictionary<string, object> finansstyringConfiguration = configurationProvider.Settings
                     .Where(m => FinansstyringKonfigurationRepository.Keys.Contains(m.Key))
                     .ToDictionary(m => m.Key, m => m.Value);
-                var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+                IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
                 finansstyringKonfigurationRepository.KonfigurationerAdd(finansstyringConfiguration);
 
                 IEnumerable<INyhedModel> finansstyringsnyheder;
                 try
                 {
-                    var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepository);
+                    IFinansstyringRepository finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepository);
                     finansstyringsnyheder = await FinansstyringsnyhederGetAsync(finansstyringRepository);
                 }
                 catch (IntranetGuiOfflineRepositoryException)
                 {
-                    var localeDataStorage = new LocaleDataStorage(finansstyringKonfigurationRepository.LokalDataFil, finansstyringKonfigurationRepository.SynkroniseringDataFil, FinansstyringRepositoryLocale.XmlSchema);
+                    ILocaleDataStorage localeDataStorage = new LocaleDataStorage(finansstyringKonfigurationRepository.LokalDataFil, finansstyringKonfigurationRepository.SynkroniseringDataFil, FinansstyringRepositoryLocale.XmlSchema);
                     localeDataStorage.OnHasLocaleData += LocaleDataStorageHelper.HasLocaleDataEventHandler;
                     localeDataStorage.OnCreateReaderStream += LocaleDataStorageHelper.CreateReaderStreamEventHandler;
                     localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;
 
-                    var finansstyringRepository = new FinansstyringRepositoryLocale(finansstyringKonfigurationRepository, localeDataStorage);
+                    IFinansstyringRepository finansstyringRepository = new FinansstyringRepositoryLocale(finansstyringKonfigurationRepository, localeDataStorage);
 
-                    var finansstyringsnyhederGetTask = FinansstyringsnyhederGetAsync(finansstyringRepository);
+                    Task<IEnumerable<INyhedModel>> finansstyringsnyhederGetTask = FinansstyringsnyhederGetAsync(finansstyringRepository);
                     finansstyringsnyhederGetTask.Wait();
                     finansstyringsnyheder = finansstyringsnyhederGetTask.Result;
                 }
@@ -106,18 +108,19 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         {
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
-            var nyheder = new List<INyhedModel>();
+
+            List<INyhedModel> nyheder = new List<INyhedModel>();
             try
             {
-                var statusDato = DateTime.Now;
+                DateTime statusDato = DateTime.Now;
 
-                var konfiguration = finansstyringRepository.Konfiguration;
-                var nyhederFromDate = statusDato.AddDays(konfiguration.DageForNyheder*-1);
-                var nyhederToDate = statusDato;
+                IFinansstyringKonfigurationRepository konfiguration = finansstyringRepository.Konfiguration;
+                DateTime nyhederFromDate = statusDato.AddDays(konfiguration.DageForNyheder * -1);
+                DateTime nyhederToDate = statusDato;
 
-                foreach (var regnskab in await finansstyringRepository.RegnskabslisteGetAsync())
+                foreach (IRegnskabModel regnskab in await finansstyringRepository.RegnskabslisteGetAsync())
                 {
                     nyheder.AddRange((await finansstyringRepository.BogføringslinjerGetAsync(regnskab.Nummer, statusDato, konfiguration.AntalBogføringslinjer)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederFromDate.Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederToDate.Date) <= 0).ToList());
                     nyheder.AddRange((await finansstyringRepository.DebitorlisteGetAsync(regnskab.Nummer, statusDato)).Where(m => m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederFromDate.Date) >= 0 && m.Nyhedsudgivelsestidspunkt.Date.CompareTo(nyhederToDate.Date) <= 0).ToList());
@@ -143,14 +146,15 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         {
             if (nyheder == null)
             {
-                throw new ArgumentNullException("nyheder");
+                throw new ArgumentNullException(nameof(nyheder));
             }
-            var tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
+
+            TileUpdater tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
             tileUpdater.EnableNotificationQueue(true);
             tileUpdater.Clear();
-            foreach (var nyhedsgruppe in nyheder.Where(m => string.IsNullOrEmpty(m.Nyhedsinformation) == false).OrderByDescending(m => m.Nyhedsudgivelsestidspunkt.Date).Take(5).GroupBy(m => m.Nyhedsudgivelsestidspunkt.Date))
+            foreach (IGrouping<DateTime, INyhedModel> nyhedsgruppe in nyheder.Where(m => string.IsNullOrEmpty(m.Nyhedsinformation) == false).OrderByDescending(m => m.Nyhedsudgivelsestidspunkt.Date).Take(5).GroupBy(m => m.Nyhedsudgivelsestidspunkt.Date))
             {
-                foreach (var nyhed in nyhedsgruppe.OrderByDescending(m => m.Nyhedsaktualitet))
+                foreach (INyhedModel nyhed in nyhedsgruppe.OrderByDescending(m => m.Nyhedsaktualitet))
                 {
                     tileUpdater.Update(UpdateTile(nyhed, TileTemplateType.TileSquare150x150Text04));
                     tileUpdater.Update(UpdateTile(nyhed, TileTemplateType.TileWide310x150BlockAndText02));
@@ -168,9 +172,10 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         {
             if (nyhed == null)
             {
-                throw new ArgumentNullException("nyhed");
+                throw new ArgumentNullException(nameof(nyhed));
             }
-            var tileXml = TileUpdateManager.GetTemplateContent(type);
+
+            XmlDocument tileXml = TileUpdateManager.GetTemplateContent(type);
             tileXml.GetElementsByTagName("text").First().InnerText = nyhed.Nyhedsinformation;
             return new TileNotification(tileXml);
         }

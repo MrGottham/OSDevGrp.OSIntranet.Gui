@@ -506,6 +506,22 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         }
 
         /// <summary>
+        /// Stores a pending posting line in the <see cref="XDocument"/> containing the locale accounting data.
+        /// </summary>
+        /// <param name="postingLineElement">The <see cref="XElement"/> for the pending posting line.</param>
+        /// <param name="pending">True when the posting line is pending otherwise false.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="postingLineElement"/> is null.</exception>
+        public static void StorePendingPostingLineInDocument(this XElement postingLineElement, bool pending = true)
+        {
+            if (postingLineElement == null)
+            {
+                throw new ArgumentNullException(nameof(postingLineElement));
+            }
+
+            postingLineElement.UpdateAttribute("verserende", pending ? "true" : "false", false);
+        }
+
+        /// <summary>
         /// Finder og returnerer elementet til et givent regnskab.
         /// </summary>
         /// <param name="localeDataDocument">XML dokument, hvorfra elementet skal returneres.</param>

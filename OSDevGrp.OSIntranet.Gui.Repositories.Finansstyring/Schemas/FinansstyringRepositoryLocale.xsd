@@ -127,6 +127,7 @@
     </xs:attribute>
     <xs:attribute name="adressekonto" type="AdressekontoIdentifierType" use="optional"/>
     <xs:attribute name="synkroniseret" type="xs:boolean" use="required"/>
+    <xs:attribute name="verserende" type="xs:boolean" use="optional" />
   </xs:complexType>
   
   <!-- RegnskabModelType -->

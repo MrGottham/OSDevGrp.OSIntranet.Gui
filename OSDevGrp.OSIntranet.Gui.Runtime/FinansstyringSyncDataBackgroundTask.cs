@@ -21,6 +21,7 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         #region Private variables
 
         private static bool _isSynchronizing;
+        private static bool _cancelRequested;
         private static readonly object SyncRoot = new object();
 
         #endregion
@@ -38,25 +39,27 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     return;
                 }
                 _isSynchronizing = true;
+                _cancelRequested = false;
             }
+
+            taskInstance.Canceled += CanceledEventHandler;
 
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
             try
             {
-
                 WindowsRuntimeResourceManager.PatchResourceManagers();
 
-                var configurationProvider = new ConfigurationProvider();
+                ConfigurationProvider configurationProvider = new ConfigurationProvider();
 
-                var finansstyringConfiguration = configurationProvider.Settings
+                IDictionary<string, object> finansstyringConfiguration = configurationProvider.Settings
                     .Where(m => FinansstyringKonfigurationRepository.Keys.Contains(m.Key))
                     .ToDictionary(m => m.Key, m => m.Value);
-                var finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
+                IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository = new FinansstyringKonfigurationRepository();
                 finansstyringKonfigurationRepository.KonfigurationerAdd(finansstyringConfiguration);
 
-                var finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepository);
+                IFinansstyringRepository finansstyringRepository = new FinansstyringRepository(finansstyringKonfigurationRepository);
 
-                var localeDataStorage = new LocaleDataStorage(finansstyringKonfigurationRepository.LokalDataFil, finansstyringKonfigurationRepository.SynkroniseringDataFil, FinansstyringRepositoryLocale.XmlSchema);
+                ILocaleDataStorage localeDataStorage = new LocaleDataStorage(finansstyringKonfigurationRepository.LokalDataFil, finansstyringKonfigurationRepository.SynkroniseringDataFil, FinansstyringRepositoryLocale.XmlSchema);
                 localeDataStorage.OnHasLocaleData += LocaleDataStorageHelper.HasLocaleDataEventHandler;
                 localeDataStorage.OnCreateReaderStream += LocaleDataStorageHelper.CreateReaderStreamEventHandler;
                 localeDataStorage.OnCreateWriterStream += LocaleDataStorageHelper.CreateWriterStreamEventHandler;
@@ -100,22 +103,23 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         {
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
             if (finansstyringKonfigurationRepository == null)
             {
-                throw new ArgumentNullException("finansstyringKonfigurationRepository");
+                throw new ArgumentNullException(nameof(finansstyringKonfigurationRepository));
             }
             if (localeDataStorage == null)
             {
-                throw new ArgumentNullException("localeDataStorage");
+                throw new ArgumentNullException(nameof(localeDataStorage));
             }
+
             try
             {
                 XDocument syncDataDocument = null;
 
-                var kontogruppeliste = await finansstyringRepository.KontogruppelisteGetAsync();
-                foreach (var kontogruppe in kontogruppeliste)
+                IEnumerable<IKontogruppeModel> kontogruppeliste = await finansstyringRepository.KontogruppelisteGetAsync();
+                foreach (IKontogruppeModel kontogruppe in kontogruppeliste)
                 {
                     lock (SyncRoot)
                     {
@@ -131,8 +135,8 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     }
                 }
 
-                var budgetkontogruppeliste = await finansstyringRepository.BudgetkontogruppelisteGetAsync();
-                foreach (var budgetkontogruppe in budgetkontogruppeliste)
+                IEnumerable<IBudgetkontogruppeModel> budgetkontogruppeliste = await finansstyringRepository.BudgetkontogruppelisteGetAsync();
+                foreach (IBudgetkontogruppeModel budgetkontogruppe in budgetkontogruppeliste)
                 {
                     lock (SyncRoot)
                     {
@@ -148,19 +152,25 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                     }
                 }
 
-                var makeFullSync = true;
+                bool makeFullSync = true;
                 lock (SyncRoot)
                 {
                     if (syncDataDocument != null)
                     {
-                        var lastFullSync = syncDataDocument.GetSidsteFuldeSynkronisering();
+                        DateTime? lastFullSync = syncDataDocument.GetSidsteFuldeSynkronisering();
                         makeFullSync = lastFullSync.HasValue == false || lastFullSync.Value.Date < DateTime.Now.AddDays(-30).Date;
                     }
                 }
 
-                var regnskabSyncTasks = new List<Task>();
-                var regnskabsliste = await finansstyringRepository.RegnskabslisteGetAsync();
-                foreach (var regnskab in regnskabsliste)
+                IRegnskabModel[] regnskabsliste = (await finansstyringRepository.RegnskabslisteGetAsync()).ToArray();
+                await SyncLocaleData(finansstyringRepository, localeDataStorage, syncDataDocument, regnskabsliste);
+                if (_cancelRequested)
+                {
+                    return;
+                }
+
+                IList<Task> regnskabSyncTasks = new List<Task>();
+                foreach (IRegnskabModel regnskab in regnskabsliste)
                 {
                     lock (SyncRoot)
                     {
@@ -199,6 +209,134 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         }
 
         /// <summary>
+        /// Synchronize the locale accounting data for a collection of <see cref="IRegnskabModel"/> to the online accounting repository.
+        /// </summary>
+        /// <param name="accountingRepository">The <see cref="IFinansstyringRepository"/> for the online accounting repository.</param>
+        /// <param name="localeDataStorage">The <see cref="ILocaleDataStorage"/> for storing locale data.</param>>
+        /// <param name="syncDataDocument">The <see cref="XDocument"/> containing the locale accounting data.</param>
+        /// <param name="accountingCollection">The collection of <see cref="IRegnskabModel"/> on which to synchronize locale accounting data to the online repository.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="accountingRepository"/>, <paramref name="localeDataStorage"/> or <paramref name="accountingCollection"/> is null.</exception>
+        private static async Task SyncLocaleData(IFinansstyringRepository accountingRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IEnumerable<IRegnskabModel> accountingCollection)
+        {
+            if (accountingRepository == null)
+            {
+                throw new ArgumentNullException(nameof(accountingRepository));
+            }
+            if (localeDataStorage == null)
+            {
+                throw new ArgumentNullException(nameof(localeDataStorage));
+            }
+            if (accountingCollection == null)
+            {
+                throw new ArgumentNullException(nameof(accountingCollection));
+            }
+
+            try
+            {
+                lock (SyncRoot)
+                {
+                    if (syncDataDocument == null)
+                    {
+                        return;
+                    }
+                }
+
+                foreach (IRegnskabModel accountingModel in accountingCollection)
+                {
+                    await SyncLocaleData(accountingRepository, localeDataStorage, syncDataDocument, accountingModel);
+                    if (_cancelRequested)
+                    {
+                        return;
+                    }
+                }
+            }
+            catch (IntranetGuiOfflineRepositoryException)
+            {
+                // We are currently offline.
+                // Don't rethrow the exception.
+            }
+        }
+
+        /// <summary>
+        /// Synchronize the locale accounting data for a given <see cref="IRegnskabModel"/> to the online accounting repository.
+        /// </summary>
+        /// <param name="accountingRepository">The <see cref="IFinansstyringRepository"/> for the online accounting repository.</param>
+        /// <param name="localeDataStorage">The <see cref="ILocaleDataStorage"/> for storing locale data.</param>>
+        /// <param name="syncDataDocument">The <see cref="XDocument"/> containing the locale accounting data.</param>
+        /// <param name="accountingModel">The given <see cref="IRegnskabModel"/> on which to synchronize locale accounting data to the online repository.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="accountingRepository"/>, <paramref name="localeDataStorage"/>, <paramref name="syncDataDocument"/> or <paramref name="accountingModel"/> is null.</exception>
+        private static async Task SyncLocaleData(IFinansstyringRepository accountingRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel accountingModel)
+        {
+            if (accountingRepository == null)
+            {
+                throw new ArgumentNullException(nameof(accountingRepository));
+            }
+            if (localeDataStorage == null)
+            {
+                throw new ArgumentNullException(nameof(localeDataStorage));
+            }
+            if (syncDataDocument == null)
+            {
+                throw new ArgumentNullException(nameof(syncDataDocument));
+            }
+            if (accountingModel == null)
+            {
+                throw new ArgumentNullException(nameof(accountingModel));
+            }
+
+            try
+            {
+                XElement rootElement = syncDataDocument.Root;
+                XElement accountingElement = rootElement?.Elements(XName.Get("Regnskab", rootElement.Name.NamespaceName)).SingleOrDefault(element => GetAttributeValue(element, "nummer") != null && string.Compare(GetAttributeValue(element, "nummer"), accountingModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+                if (accountingElement == null)
+                {
+                    return;
+                }
+
+                XElement postingLineToSync;
+                lock (SyncRoot)
+                {
+                    postingLineToSync = GetPostingLineToSync(rootElement, accountingElement);
+                    if (postingLineToSync != null && _cancelRequested == false)
+                    {
+                        postingLineToSync.StorePendingPostingLineInDocument();
+                        localeDataStorage.StoreSyncDocument(syncDataDocument);
+                    }
+                }
+                while (postingLineToSync != null && _cancelRequested == false)
+                {
+                    DateTime postingDate = DateTime.ParseExact(GetAttributeValue(postingLineToSync, "dato"), "yyyyMMdd", CultureInfo.InvariantCulture);
+                    string voucherNo = GetAttributeValue(postingLineToSync, "bilag");
+                    string accountNumber = GetAttributeValue(postingLineToSync, "kontonummer");
+                    string text = GetAttributeValue(postingLineToSync, "tekst");
+                    string budgetAccountNumber = GetAttributeValue(postingLineToSync, "budgetkontonummer");
+                    decimal debit = GetAttributeValue(postingLineToSync, "debit") == null ? 0M : decimal.Parse(GetAttributeValue(postingLineToSync, "debit"), NumberStyles.Any, CultureInfo.InvariantCulture);
+                    decimal credit = GetAttributeValue(postingLineToSync, "kredit") == null ? 0M : decimal.Parse(GetAttributeValue(postingLineToSync, "kredit"), NumberStyles.Any, CultureInfo.InvariantCulture);
+                    int addressAccountNumber = GetAttributeValue(postingLineToSync, "adressekonto") == null ? 0 : int.Parse(GetAttributeValue(postingLineToSync, "adressekonto"), NumberStyles.Integer, CultureInfo.InvariantCulture);
+                    await accountingRepository.BogførAsync(accountingModel.Nummer, postingDate, voucherNo, accountNumber, text, budgetAccountNumber, debit, credit, addressAccountNumber);
+
+                    lock (SyncRoot)
+                    {
+                        postingLineToSync.Remove();
+                        localeDataStorage.StoreSyncDocument(syncDataDocument);
+
+                        postingLineToSync = GetPostingLineToSync(rootElement, accountingElement);
+                        if (postingLineToSync != null && _cancelRequested == false)
+                        {
+                            postingLineToSync.StorePendingPostingLineInDocument();
+                            localeDataStorage.StoreSyncDocument(syncDataDocument);
+                        }
+                    }
+                }
+            }
+            catch (IntranetGuiOfflineRepositoryException)
+            {
+                // We are currently offline.
+                // Don't rethrow the exception.
+            }
+        }
+
+        /// <summary>
         /// Synkroniserer finansstyringsdata til og fra det lokale datalager.
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af finansstyringsrepositoryet, hvorfra data skal synkroniseres til og fra det lokale datalager.</param>
@@ -211,38 +349,37 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         {
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
             if (finansstyringKonfigurationRepository == null)
             {
-                throw new ArgumentNullException("finansstyringKonfigurationRepository");
+                throw new ArgumentNullException(nameof(finansstyringKonfigurationRepository));
             }
             if (localeDataStorage == null)
             {
-                throw new ArgumentNullException("localeDataStorage");
+                throw new ArgumentNullException(nameof(localeDataStorage));
             }
             if (syncDataDocument == null)
             {
-                throw new ArgumentNullException("syncDataDocument");
+                throw new ArgumentNullException(nameof(syncDataDocument));
             }
             if (regnskabModel == null)
             {
-                throw new ArgumentNullException("regnskabModel");
+                throw new ArgumentNullException(nameof(regnskabModel));
             }
+
             try
             {
-                // Synkronisér regnskabsdata fra det lokale datalager til det online finansstyringsrepository.
-                await SyncLocaleData(finansstyringRepository, finansstyringKonfigurationRepository, localeDataStorage, syncDataDocument, regnskabModel);
                 // Synkronisér regnskabsdata fra det online finansstyringsrepository til det lokale datalager.
-                var currentDate = DateTime.Now;
-                foreach (var kontoModel in await finansstyringRepository.KontoplanGetAsync(regnskabModel.Nummer, currentDate))
+                DateTime currentDate = DateTime.Now;
+                foreach (IKontoModel kontoModel in await finansstyringRepository.KontoplanGetAsync(regnskabModel.Nummer, currentDate))
                 {
                     lock (SyncRoot)
                     {
                         kontoModel.StoreInDocument(syncDataDocument);
                     }
                 }
-                foreach (var budgetkontoModel in await finansstyringRepository.BudgetkontoplanGetAsync(regnskabModel.Nummer, currentDate))
+                foreach (IBudgetkontoModel budgetkontoModel in await finansstyringRepository.BudgetkontoplanGetAsync(regnskabModel.Nummer, currentDate))
                 {
                     lock (SyncRoot)
                     {
@@ -251,11 +388,11 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                 }
                 if (makeFullSync)
                 {
-                    var historicStatusDate = currentDate.AddMonths(-2);
+                    DateTime historicStatusDate = currentDate.AddMonths(-2);
                     while (historicStatusDate.Year >= currentDate.AddYears(-1).Year)
                     {
                         historicStatusDate = new DateTime(historicStatusDate.Year, historicStatusDate.Month, DateTime.DaysInMonth(historicStatusDate.Year, historicStatusDate.Month), 23, 59, 59);
-                        foreach (var budgetkontoModel in await finansstyringRepository.BudgetkontoplanGetAsync(regnskabModel.Nummer, historicStatusDate))
+                        foreach (IBudgetkontoModel budgetkontoModel in await finansstyringRepository.BudgetkontoplanGetAsync(regnskabModel.Nummer, historicStatusDate))
                         {
                             lock (SyncRoot)
                             {
@@ -265,14 +402,14 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
                         historicStatusDate = historicStatusDate.AddMonths(-2);
                     }
                 }
-                foreach (var adressekontoModel in await finansstyringRepository.AdressekontolisteGetAsync(regnskabModel.Nummer, currentDate))
+                foreach (IAdressekontoModel adressekontoModel in await finansstyringRepository.AdressekontolisteGetAsync(regnskabModel.Nummer, currentDate))
                 {
                     lock (SyncRoot)
                     {
                         adressekontoModel.StoreInDocument(syncDataDocument);
                     }
                 }
-                foreach (var bogføringslinjeModel in await finansstyringRepository.BogføringslinjerGetAsync(regnskabModel.Nummer, currentDate, finansstyringKonfigurationRepository.AntalBogføringslinjer))
+                foreach (IBogføringslinjeModel bogføringslinjeModel in await finansstyringRepository.BogføringslinjerGetAsync(regnskabModel.Nummer, currentDate, finansstyringKonfigurationRepository.AntalBogføringslinjer))
                 {
                     lock (SyncRoot)
                     {
@@ -292,101 +429,6 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         }
 
         /// <summary>
-        /// Synkroniserer finansstyringsdata fra det lokale datalager.
-        /// </summary>
-        /// <param name="finansstyringRepository">Implementering af finansstyringsrepositoryet, hvorfra data skal synkroniseres til og fra det lokale datalager.</param>
-        /// <param name="finansstyringKonfigurationRepository">Implementering af konfiguration til finansstyringsrepositoryet.</param>
-        /// <param name="localeDataStorage">Implementering af det lokale datalager.</param>
-        /// <param name="syncDataDocument">XML dokument indeholdende de synkroniserede data.</param>
-        /// <param name="regnskabModel">Model for regnskabet, hvor data skal synkroniseres til og fra.</param>
-        private static async Task SyncLocaleData(IFinansstyringRepository finansstyringRepository, IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository, ILocaleDataStorage localeDataStorage, XDocument syncDataDocument, IRegnskabModel regnskabModel)
-        {
-            if (finansstyringRepository == null)
-            {
-                throw new ArgumentNullException("finansstyringRepository");
-            }
-            if (finansstyringKonfigurationRepository == null)
-            {
-                throw new ArgumentNullException("finansstyringKonfigurationRepository");
-            }
-            if (localeDataStorage == null)
-            {
-                throw new ArgumentNullException("localeDataStorage");
-            }
-            if (syncDataDocument == null)
-            {
-                throw new ArgumentNullException("syncDataDocument");
-            }
-            if (regnskabModel == null)
-            {
-                throw new ArgumentNullException("regnskabModel");
-            }
-            try
-            {
-                var rootElement = syncDataDocument.Root;
-                var regnskabElement = rootElement.Elements(XName.Get("Regnskab", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, regnskabModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
-                if (regnskabElement == null)
-                {
-                    return;
-                }
-
-                XElement bogføringslinjeElementToSync;
-                lock (SyncRoot)
-                {
-                    bogføringslinjeElementToSync = GetBogføringslinjeElementToSync(rootElement, regnskabElement);
-                }
-                while (bogføringslinjeElementToSync != null)
-                {
-                    var dato = DateTime.ParseExact(bogføringslinjeElementToSync.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
-                    var bilag = bogføringslinjeElementToSync.Attribute(XName.Get("bilag", string.Empty)) == null ? null : bogføringslinjeElementToSync.Attribute(XName.Get("bilag", string.Empty)).Value;
-                    var kontonummer = bogføringslinjeElementToSync.Attribute(XName.Get("kontonummer", string.Empty)).Value;
-                    var tekst = bogføringslinjeElementToSync.Attribute(XName.Get("tekst", string.Empty)).Value;
-                    var budgetkontonummer = bogføringslinjeElementToSync.Attribute(XName.Get("budgetkontonummer", string.Empty)) == null ? null : bogføringslinjeElementToSync.Attribute(XName.Get("budgetkontonummer", string.Empty)).Value;
-                    var debit = bogføringslinjeElementToSync.Attribute(XName.Get("debit", string.Empty)) == null ? 0M : decimal.Parse(bogføringslinjeElementToSync.Attribute(XName.Get("debit", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                    var kredit = bogføringslinjeElementToSync.Attribute(XName.Get("kredit", string.Empty)) == null ? 0M : decimal.Parse(bogføringslinjeElementToSync.Attribute(XName.Get("kredit", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                    var adressekonto = bogføringslinjeElementToSync.Attribute(XName.Get("adressekonto", string.Empty)) == null ? 0 : int.Parse(bogføringslinjeElementToSync.Attribute(XName.Get("adressekonto", string.Empty)).Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
-                    await finansstyringRepository.BogførAsync(regnskabModel.Nummer, dato, bilag, kontonummer, tekst, budgetkontonummer, debit, kredit, adressekonto);
-
-                    lock (SyncRoot)
-                    {
-                        bogføringslinjeElementToSync.Remove();
-                        localeDataStorage.StoreSyncDocument(syncDataDocument);
-
-                        bogføringslinjeElementToSync = GetBogføringslinjeElementToSync(rootElement, regnskabElement);
-                    }
-                }
-            }
-            catch (IntranetGuiOfflineRepositoryException)
-            {
-                // We are currently offline.
-                // Don't rethrow the exception.
-            }
-        }
-
-        /// <summary>
-        /// Finder en XML node, som indeholder en usynkroniseret bogføringslinje.
-        /// </summary>
-        /// <param name="rootElement">XML rod elementet.</param>
-        /// <param name="regnskabElement">XML element indeholde synkroniserede data for et regnskab.</param>
-        /// <returns>XML node, som indeholder en usynkroniiseret bogføringslinje.</returns>
-        private static XElement GetBogføringslinjeElementToSync(XElement rootElement, XElement regnskabElement)
-        {
-            if (rootElement == null)
-            {
-                throw new ArgumentNullException("rootElement");
-            }
-            if (regnskabElement == null)
-            {
-                throw new ArgumentNullException("regnskabElement");
-            }
-            return regnskabElement.Elements(XName.Get("Bogfoeringslinje", rootElement.Name.NamespaceName))
-                .Where(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && m.Attribute(XName.Get("dato", string.Empty)) != null && m.Attribute(XName.Get("synkroniseret", string.Empty)) != null && Convert.ToBoolean(m.Attribute(XName.Get("synkroniseret", string.Empty)).Value) == false)
-                .OrderBy(m => DateTime.ParseExact(m.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture))
-                .ThenBy(m => int.Parse(m.Attribute(XName.Get("loebenummer")).Value, NumberStyles.Integer, CultureInfo.InvariantCulture))
-                .FirstOrDefault();
-        }
-
-        /// <summary>
         /// Eventhandler, der rejses, når data i det lokale datalager skal forberedes til læsning eller skrivning.
         /// </summary>
         /// <param name="sender">Objekt, der rejser eventet.</param>
@@ -395,20 +437,90 @@ namespace OSDevGrp.OSIntranet.Gui.Runtime
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
             if (eventArgs == null)
             {
-                throw new ArgumentNullException("eventArgs");
+                throw new ArgumentNullException(nameof(eventArgs));
             }
+
             if (eventArgs.ReadingContext == false && eventArgs.WritingContext == false)
             {
                 return;
             }
+
             lock (SyncRoot)
             {
                 eventArgs.LocaleDataDocument.StoreVersionNumberInDocument(FinansstyringRepositoryLocale.RepositoryVersion);
             }
+        }
+
+        /// <summary>
+        /// Event handler which handles a canceled event.
+        /// </summary>
+        /// <param name="sender">The <see cref="IBackgroundTaskInstance"/> which send the canceled event.</param>
+        /// <param name="reason">The <see cref="BackgroundTaskCancellationReason"/>.</param>
+        private static void CanceledEventHandler(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
+        {
+            lock (SyncRoot)
+            {
+                _cancelRequested = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets the first posting line which needs to be synchronized to the online accounting repository.
+        /// </summary>
+        /// <param name="rootElement">The root <see cref="XElement"/> within the <see cref="XDocument"/> containing the locale accounting data.</param>
+        /// <param name="accountingElement">The accounting <see cref="XElement"/> within the <see cref="XDocument"/> containing the local accounting data.</param>
+        /// <returns>The first posting line which need to be synchronized to the online accounting repository or null when no posting lines need to be synchronized.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="rootElement"/> or <paramref name="accountingElement"/> is null.</exception>
+        private static XElement GetPostingLineToSync(XElement rootElement, XElement accountingElement)
+        {
+            if (rootElement == null)
+            {
+                throw new ArgumentNullException(nameof(rootElement));
+            }
+            if (accountingElement == null)
+            {
+                throw new ArgumentNullException(nameof(accountingElement));
+            }
+
+            return accountingElement.Elements(XName.Get("Bogfoeringslinje", rootElement.Name.NamespaceName))
+                .Where(m => GetAttributeValue(m, "loebenummer") != null &&
+                            GetAttributeValue(m, "dato") != null &&
+                            GetAttributeValue(m, "synkroniseret") != null && Convert.ToBoolean(GetAttributeValue(m, "synkroniseret")) == false &&
+                            (GetAttributeValue(m, "verserende") == null || Convert.ToBoolean(GetAttributeValue(m, "verserende")) == false))
+                .OrderBy(m => DateTime.ParseExact(GetAttributeValue(m, "dato"), "yyyyMMdd", CultureInfo.InvariantCulture))
+                .ThenBy(m => int.Parse(GetAttributeValue(m, "loebenummer"), NumberStyles.Integer, CultureInfo.InvariantCulture))
+                .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets the value for a given attribute.
+        /// </summary>
+        /// <param name="element">The <see cref="XElement"/> on which to get the attribute.</param>
+        /// <param name="attributeName">The name of the attribute.</param>
+        /// <returns>The value for the given attribute or null when the attribute does not exists.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="element"/> is null or when <paramref name="attributeName"/> is null, empty or white space.</exception>
+        private static string GetAttributeValue(XElement element, string attributeName)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+            if (string.IsNullOrWhiteSpace(attributeName))
+            {
+                throw new ArgumentNullException(nameof(attributeName));
+            }
+
+            XAttribute attribute = element.Attribute(XName.Get(attributeName, string.Empty));
+            if (attribute == null)
+            {
+                return null;
+            }
+
+            return string.IsNullOrWhiteSpace(attribute.Value) ? null : attribute.Value;
         }
     }
 }
