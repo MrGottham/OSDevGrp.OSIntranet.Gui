@@ -349,37 +349,46 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new ArgumentNullException("localeDataDocument");
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(bogføringslinjeModel.Regnskabsnummer);
-            if (regnskabElement == null)
+
+            XElement accountingElement = localeDataDocument.GetRegnskabElement(bogføringslinjeModel.Regnskabsnummer);
+            if (accountingElement == null)
             {
                 return;
             }
-            var bogføringslinjeElement = regnskabElement.Elements(XName.Get("Bogfoeringslinje", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("loebenummer", string.Empty)).Value, bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
-            if (bogføringslinjeElement == null)
+
+            XElement postingLineElement = accountingElement.Elements(XName.Get("Bogfoeringslinje", accountingElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("loebenummer", string.Empty)).Value, bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+            if (postingLineElement == null)
             {
-                bogføringslinjeElement = new XElement(XName.Get("Bogfoeringslinje", regnskabElement.Name.NamespaceName));
-                bogføringslinjeElement.UpdateAttribute(XName.Get("loebenummer", string.Empty), bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture));
-                bogføringslinjeElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(bogføringslinjeModel.Dato));
-                bogføringslinjeElement.UpdateAttribute(XName.Get("bilag", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Bilag) ? null : bogføringslinjeModel.Bilag, false);
-                bogføringslinjeElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), bogføringslinjeModel.Kontonummer);
-                bogføringslinjeElement.UpdateAttribute(XName.Get("tekst", string.Empty), bogføringslinjeModel.Tekst);
-                bogføringslinjeElement.UpdateAttribute(XName.Get("budgetkontonummer", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Budgetkontonummer) ? null : bogføringslinjeModel.Budgetkontonummer, false);
-                bogføringslinjeElement.UpdateAttribute(XName.Get("debit", string.Empty), bogføringslinjeModel.Debit == 0M ? null : bogføringslinjeModel.Debit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
-                bogføringslinjeElement.UpdateAttribute(XName.Get("kredit", string.Empty), bogføringslinjeModel.Kredit == 0M ? null : bogføringslinjeModel.Kredit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
-                bogføringslinjeElement.UpdateAttribute(XName.Get("adressekonto", string.Empty), bogføringslinjeModel.Adressekonto == 0 ? null : bogføringslinjeModel.Adressekonto.ToString(CultureInfo.InvariantCulture), false);
-                bogføringslinjeElement.UpdateAttribute(XName.Get("synkroniseret", string.Empty), isStoringSynchronizedData ? "true" : "false");
-                regnskabElement.Add(bogføringslinjeElement);
+                postingLineElement = new XElement(XName.Get("Bogfoeringslinje", accountingElement.Name.NamespaceName));
+                postingLineElement.UpdateAttribute(XName.Get("loebenummer", string.Empty), bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture));
+                postingLineElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(bogføringslinjeModel.Dato));
+                postingLineElement.UpdateAttribute(XName.Get("bilag", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Bilag) ? null : bogføringslinjeModel.Bilag, false);
+                postingLineElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), bogføringslinjeModel.Kontonummer);
+                postingLineElement.UpdateAttribute(XName.Get("tekst", string.Empty), bogføringslinjeModel.Tekst);
+                postingLineElement.UpdateAttribute(XName.Get("budgetkontonummer", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Budgetkontonummer) ? null : bogføringslinjeModel.Budgetkontonummer, false);
+                postingLineElement.UpdateAttribute(XName.Get("debit", string.Empty), bogføringslinjeModel.Debit == 0M ? null : bogføringslinjeModel.Debit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
+                postingLineElement.UpdateAttribute(XName.Get("kredit", string.Empty), bogføringslinjeModel.Kredit == 0M ? null : bogføringslinjeModel.Kredit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
+                postingLineElement.UpdateAttribute(XName.Get("adressekonto", string.Empty), bogføringslinjeModel.Adressekonto == 0 ? null : bogføringslinjeModel.Adressekonto.ToString(CultureInfo.InvariantCulture), false);
+                postingLineElement.UpdateAttribute(XName.Get("synkroniseret", string.Empty), isStoringSynchronizedData ? "true" : "false");
+                accountingElement.Add(postingLineElement);
                 return;
             }
-            bogføringslinjeElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(bogføringslinjeModel.Dato));
-            bogføringslinjeElement.UpdateAttribute(XName.Get("bilag", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Bilag) ? null : bogføringslinjeModel.Bilag, false);
-            bogføringslinjeElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), bogføringslinjeModel.Kontonummer);
-            bogføringslinjeElement.UpdateAttribute(XName.Get("tekst", string.Empty), bogføringslinjeModel.Tekst);
-            bogføringslinjeElement.UpdateAttribute(XName.Get("budgetkontonummer", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Budgetkontonummer) ? null : bogføringslinjeModel.Budgetkontonummer, false);
-            bogføringslinjeElement.UpdateAttribute(XName.Get("debit", string.Empty), bogføringslinjeModel.Debit == 0M ? null : bogføringslinjeModel.Debit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
-            bogføringslinjeElement.UpdateAttribute(XName.Get("kredit", string.Empty), bogføringslinjeModel.Kredit == 0M ? null : bogføringslinjeModel.Kredit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
-            bogføringslinjeElement.UpdateAttribute(XName.Get("adressekonto", string.Empty), bogføringslinjeModel.Adressekonto == 0 ? null : bogføringslinjeModel.Adressekonto.ToString(CultureInfo.InvariantCulture), false);
-            bogføringslinjeElement.UpdateAttribute(XName.Get("synkroniseret", string.Empty), isStoringSynchronizedData ? "true" : "false");
+
+            XAttribute pendingAttribute = postingLineElement.Attribute(XName.Get("verserende", string.Empty));
+            if (pendingAttribute != null && string.IsNullOrWhiteSpace(pendingAttribute.Value) == false && Convert.ToBoolean(pendingAttribute.Value))
+            {
+                return;
+            }
+
+            postingLineElement.UpdateAttribute(XName.Get("dato", string.Empty), GetHistorikDato(bogføringslinjeModel.Dato));
+            postingLineElement.UpdateAttribute(XName.Get("bilag", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Bilag) ? null : bogføringslinjeModel.Bilag, false);
+            postingLineElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), bogføringslinjeModel.Kontonummer);
+            postingLineElement.UpdateAttribute(XName.Get("tekst", string.Empty), bogføringslinjeModel.Tekst);
+            postingLineElement.UpdateAttribute(XName.Get("budgetkontonummer", string.Empty), string.IsNullOrWhiteSpace(bogføringslinjeModel.Budgetkontonummer) ? null : bogføringslinjeModel.Budgetkontonummer, false);
+            postingLineElement.UpdateAttribute(XName.Get("debit", string.Empty), bogføringslinjeModel.Debit == 0M ? null : bogføringslinjeModel.Debit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
+            postingLineElement.UpdateAttribute(XName.Get("kredit", string.Empty), bogføringslinjeModel.Kredit == 0M ? null : bogføringslinjeModel.Kredit.ToString(CurrencyFormat, CultureInfo.InvariantCulture), false);
+            postingLineElement.UpdateAttribute(XName.Get("adressekonto", string.Empty), bogføringslinjeModel.Adressekonto == 0 ? null : bogføringslinjeModel.Adressekonto.ToString(CultureInfo.InvariantCulture), false);
+            postingLineElement.UpdateAttribute(XName.Get("synkroniseret", string.Empty), isStoringSynchronizedData ? "true" : "false");
         }
 
         /// <summary>
