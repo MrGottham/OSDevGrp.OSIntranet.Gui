@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
-using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests

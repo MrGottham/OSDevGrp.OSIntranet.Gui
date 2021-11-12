@@ -3,14 +3,14 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using AutoFixture;
+using AutoFixture.Kernel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
-using Ploeh.AutoFixture;
-using Ploeh.AutoFixture.Kernel;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
-using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands

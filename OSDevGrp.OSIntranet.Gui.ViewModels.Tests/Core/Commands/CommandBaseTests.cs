@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
+﻿using AutoFixture;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
-using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
 {

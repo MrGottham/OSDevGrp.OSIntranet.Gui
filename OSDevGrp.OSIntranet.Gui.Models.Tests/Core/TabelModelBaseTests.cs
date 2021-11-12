@@ -1,7 +1,7 @@
 ﻿using System;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Core;
-using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Core
 {

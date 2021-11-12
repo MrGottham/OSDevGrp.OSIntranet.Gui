@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.Resources;
-using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
 {

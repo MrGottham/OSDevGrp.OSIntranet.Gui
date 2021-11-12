@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Resources;
-using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring.Tests
 {

@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
-using Ploeh.AutoFixture;
 using System;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Exceptions
 {

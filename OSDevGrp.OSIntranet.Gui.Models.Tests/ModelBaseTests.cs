@@ -1,6 +1,6 @@
 ﻿using System;
+using AutoFixture;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Gui.Models.Tests
 {

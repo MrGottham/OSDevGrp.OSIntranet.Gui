@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
-using Ploeh.AutoFixture;
 using Rhino.Mocks;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 

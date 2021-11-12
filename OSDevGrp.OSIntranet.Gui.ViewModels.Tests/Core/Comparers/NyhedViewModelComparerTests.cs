@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Comparers;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
-using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers

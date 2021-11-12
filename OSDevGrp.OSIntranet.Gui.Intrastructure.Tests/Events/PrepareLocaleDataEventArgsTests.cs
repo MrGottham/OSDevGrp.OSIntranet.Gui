@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Linq;
+using AutoFixture;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 
 namespace OSDevGrp.OSIntranet.Gui.Intrastructure.Tests.Events
