@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
-using System.Resources;
-using System.Threading;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Resources.Images;
 
 namespace OSDevGrp.OSIntranet.Gui.Resources
 {
@@ -14,15 +16,18 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
     {
         #region Private variables
 
-        private static Func<string, string> _exceptionMessageGetter;
-        private static Func<string, string> _textGetter;
-        private static readonly ResourceManager ExceptionMessages = new ResourceManager(typeof(ExceptionMessages).FullName, Assembly.GetExecutingAssembly());
-        private static readonly ResourceManager Texts = new ResourceManager(typeof(Texts).FullName, Assembly.GetExecutingAssembly());
-        private static readonly IDictionary<string, byte[]> ResourceCache = new Dictionary<string, byte[]>();
-        private static readonly object SyncRoot = new object();
+        private static readonly IReadOnlyDictionary<string, string> DefaultExceptionMessages = GetDefaultMessageDictionary(typeof(ExceptionMessage));
+        private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GlobalizedExceptionMessages = GetGlobalizedMessageDictionary(typeof(ExceptionMessage));
+        private static readonly IReadOnlyDictionary<string, string> DefaultTexts = GetDefaultMessageDictionary(typeof(Text));
+        private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GlobalizedTexts = GetGlobalizedMessageDictionary(typeof(Text));
+        private static readonly IReadOnlyDictionary<string, EmbeddedResourceBase> EmbeddedResources = GetEmbeddedResourceDictionary(
+            new AccountImage(),
+            new BudgetAccountImage(),
+            new BudgetAccountImage(),
+            new PostingLineImage());
 
         #endregion
-        
+
         #region Methods
 
         /// <summary>
@@ -33,19 +38,7 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         /// <returns>Fejlbesked.</returns>
         public static string GetExceptionMessage(ExceptionMessage exceptionMessage, params object[] args)
         {
-            try
-            {
-                var message = _exceptionMessageGetter == null ? ExceptionMessages.GetString(exceptionMessage.ToString()) : _exceptionMessageGetter.Invoke(exceptionMessage.ToString());
-                if (message == null)
-                {
-                    throw new IntranetGuiSystemException("Null returned.");
-                }
-                return args == null ? message : string.Format(message, args);
-            }
-            catch (Exception ex)
-            {
-                throw new IntranetGuiSystemException(string.Format("Could not get resource string named '{0}' using culture {1}.", exceptionMessage, Thread.CurrentThread.CurrentUICulture.Name), ex);
-            }
+            return ResolveMessage(exceptionMessage.ToString(), GlobalizedExceptionMessages, DefaultExceptionMessages, CultureInfo.CurrentUICulture, args);
         }
 
         /// <summary>
@@ -56,19 +49,7 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         /// <returns>Tekst.</returns>
         public static string GetText(Text text, params object[] args)
         {
-            try
-            {
-                var txt = _textGetter == null ? Texts.GetString(text.ToString()) : _textGetter.Invoke(text.ToString());
-                if (txt == null)
-                {
-                    throw new IntranetGuiSystemException("Null returned.");
-                }
-                return args == null ? txt : string.Format(txt, args);
-            }
-            catch (Exception ex)
-            {
-                throw new IntranetGuiSystemException(string.Format("Could not get resource string named '{0}' using culture {1}.", text, Thread.CurrentThread.CurrentUICulture.Name), ex);
-            }
+            return ResolveMessage(text.ToString(), GlobalizedTexts, DefaultTexts, CultureInfo.CurrentUICulture, args);
         }
 
         /// <summary>
@@ -78,56 +59,115 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         /// <returns>Bytes for den angivne resource.</returns>
         public static byte[] GetEmbeddedResource(string resourceName)
         {
-            if (string.IsNullOrEmpty(resourceName))
+            if (string.IsNullOrWhiteSpace(resourceName))
             {
-                throw new ArgumentNullException("resourceName");
+                throw new ArgumentNullException(nameof(resourceName));
             }
-            lock (SyncRoot)
+
+            try
             {
-                if (ResourceCache.ContainsKey(resourceName))
+                EmbeddedResourceBase embeddedResource;
+                if (EmbeddedResources.TryGetValue(resourceName, out embeddedResource))
                 {
-                    return ResourceCache[resourceName];
+                    return embeddedResource.Value;
                 }
-                var resource = new Resource();
-                var assembly = resource.GetType().Assembly;
-                using (var resourceStream = assembly.GetManifestResourceStream(string.Format("OSDevGrp.OSIntranet.Gui.Resources.{0}", resourceName)))
+
+                throw new IntranetGuiSystemException(GetExceptionMessage(ExceptionMessage.UnableToLoadResource, $"OSDevGrp.OSIntranet.Gui.Resources.{resourceName}"));
+            }
+            catch (IntranetGuiSystemException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiSystemException(GetExceptionMessage(ExceptionMessage.UnableToLoadResource, $"OSDevGrp.OSIntranet.Gui.Resources.{resourceName}"), ex);
+            }
+        }
+
+        private static string ResolveMessage(string fieldName, IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> globalizedMessages, IReadOnlyDictionary<string, string> defaultMessages, CultureInfo cultureInfo, params object[] args)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+            {
+                throw new ArgumentNullException(nameof(fieldName));
+            }
+
+            if (globalizedMessages == null)
+            {
+                throw new ArgumentNullException(nameof(globalizedMessages));
+            }
+
+            if (defaultMessages == null)
+            {
+                throw new ArgumentNullException(nameof(defaultMessages));
+            }
+
+            if (cultureInfo == null)
+            {
+                throw new ArgumentNullException(nameof(cultureInfo));
+            }
+
+            try
+            {
+                string message;
+
+                IReadOnlyDictionary<string, string> messageDictionary;
+                if (globalizedMessages.TryGetValue(fieldName, out messageDictionary))
                 {
-                    if (resourceStream == null)
+                    if (messageDictionary.TryGetValue(cultureInfo.Name, out message))
                     {
-                        throw new IntranetGuiSystemException(GetExceptionMessage(ExceptionMessage.UnableToLoadResource, string.Format("OSDevGrp.OSIntranet.Gui.Resources.{0}", resourceName)));
+                        return string.Format(message, args);
                     }
-                    var bytes = new byte[resourceStream.Length];
-                    resourceStream.Read(bytes, 0, bytes.Length);
-                    ResourceCache.Add(resourceName, bytes);
-                    return ResourceCache[resourceName];
                 }
+
+                if (defaultMessages.TryGetValue(fieldName, out message))
+                {
+                    return string.Format(message, args);
+                }
+
+                throw new IntranetGuiSystemException($"Could not get resource string named '{fieldName}' using culture {cultureInfo.Name}.");
+            }
+            catch (IntranetGuiSystemException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetGuiSystemException($"Could not get resource string named '{fieldName}' using culture {cultureInfo.Name}.", ex);
             }
         }
 
-        /// <summary>
-        /// Patcher den ResourceManager, der kan hente exception messages.
-        /// </summary>
-        /// <param name="exceptionMessageGetter">Funktion, der kan hente exception messages.</param>
-        public static void PatchResourceManagerForExceptionMessages(Func<string, string> exceptionMessageGetter)
+        private static IReadOnlyDictionary<string, string> GetDefaultMessageDictionary(Type enumType)
         {
-            if (exceptionMessageGetter == null)
+            if (enumType == null)
             {
-                throw new ArgumentNullException("exceptionMessageGetter");
+                throw new ArgumentNullException(nameof(enumType));
             }
-            _exceptionMessageGetter = exceptionMessageGetter;
+
+            return new ConcurrentDictionary<string, string>(enumType.GetRuntimeFields()
+                .Where(fieldInfo => fieldInfo.GetCustomAttribute<DefaultMessageAttribute>() != null)
+                .ToDictionary(fieldInfo => fieldInfo.Name, fieldInfo => fieldInfo.GetCustomAttribute<DefaultMessageAttribute>().Message));
         }
 
-        /// <summary>
-        /// Patcher den ResourceManager, der kan hente tekstangivelser.
-        /// </summary>
-        /// <param name="textGetter">Funktion, der kan hente tekstangivelser.</param>
-        public static void PatchResourceManagerForTexts(Func<string, string> textGetter)
+        private static IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GetGlobalizedMessageDictionary(Type enumType)
         {
-            if (textGetter == null)
+            if (enumType == null)
             {
-                throw new ArgumentNullException("textGetter");
+                throw new ArgumentNullException(nameof(enumType));
             }
-            _textGetter = textGetter;
+
+            return new ConcurrentDictionary<string, IReadOnlyDictionary<string, string>>(enumType.GetRuntimeFields()
+                .Where(fieldInfo => fieldInfo.GetCustomAttributes<GlobalizedMessageAttribute>().Any())
+                .ToDictionary(fieldInfo => fieldInfo.Name, fieldInfo => (IReadOnlyDictionary<string, string>)new ConcurrentDictionary<string, string>(fieldInfo.GetCustomAttributes<GlobalizedMessageAttribute>().ToDictionary(globalizedMessageAttribute => globalizedMessageAttribute.CultureInfo.Name, globalizedMessageAttribute => globalizedMessageAttribute.Message))));
+        }
+
+        private static IReadOnlyDictionary<string, EmbeddedResourceBase> GetEmbeddedResourceDictionary(params EmbeddedResourceBase[] embeddedResourceCollection)
+        {
+            if (embeddedResourceCollection == null)
+            {
+                throw new ArgumentNullException(nameof(embeddedResourceCollection));
+            }
+
+            return new ConcurrentDictionary<string, EmbeddedResourceBase>(embeddedResourceCollection.ToDictionary(embeddedResource => embeddedResource.Name, embeddedResource => embeddedResource));
         }
 
         #endregion
