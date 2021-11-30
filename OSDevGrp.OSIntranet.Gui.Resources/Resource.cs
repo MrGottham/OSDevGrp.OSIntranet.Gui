@@ -23,7 +23,7 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
         private static readonly IReadOnlyDictionary<string, EmbeddedResourceBase> EmbeddedResources = GetEmbeddedResourceDictionary(
             new AccountImage(),
             new BudgetAccountImage(),
-            new BudgetAccountImage(),
+            new AddressAccountImage(),
             new PostingLineImage());
 
         #endregion
@@ -144,8 +144,8 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
             }
 
             return new ConcurrentDictionary<string, string>(enumType.GetRuntimeFields()
-                .Where(fieldInfo => fieldInfo.GetCustomAttribute<DefaultMessageAttribute>() != null)
-                .ToDictionary(fieldInfo => fieldInfo.Name, fieldInfo => fieldInfo.GetCustomAttribute<DefaultMessageAttribute>().Message));
+                .Where(fieldInfo => fieldInfo.GetCustomAttributes<DefaultMessageAttribute>().SingleOrDefault(defaultMessageAttribute => defaultMessageAttribute.GetType() == typeof(DefaultMessageAttribute)) != null)
+                .ToDictionary(fieldInfo => fieldInfo.Name, fieldInfo => fieldInfo.GetCustomAttributes<DefaultMessageAttribute>().Single(defaultMessageAttribute => defaultMessageAttribute.GetType() == typeof(DefaultMessageAttribute)).Message));
         }
 
         private static IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GetGlobalizedMessageDictionary(Type enumType)
