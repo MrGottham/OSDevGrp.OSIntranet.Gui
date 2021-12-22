@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Gui.Resources;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 {
     /// <summary>
     /// Extentions til modeller.
     /// </summary>
-    public static class ModelExtentions
+    internal static class ModelExtensions
     {
         #region Private constants
 
@@ -24,26 +26,34 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="regnskabModel">Model for et regnskab.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
-        public static void StoreInDocument(this IRegnskabModel regnskabModel, XDocument localeDataDocument)
+        internal static void StoreInDocument(this IRegnskabModel regnskabModel, XDocument localeDataDocument)
         {
             if (regnskabModel == null)
             {
-                throw new ArgumentNullException("regnskabModel");
+                throw new ArgumentNullException(nameof(regnskabModel));
             }
+
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(regnskabModel.Nummer);
+
+            XElement regnskabElement = localeDataDocument.GetRegnskabElement(regnskabModel.Nummer);
             if (regnskabElement == null)
             {
                 var rootElement = localeDataDocument.Root;
+                if (rootElement == null)
+                {
+                    return;
+                }
+
                 regnskabElement = new XElement(XName.Get("Regnskab", rootElement.Name.NamespaceName));
                 regnskabElement.UpdateAttribute(XName.Get("nummer", string.Empty), regnskabModel.Nummer.ToString(CultureInfo.InvariantCulture));
                 regnskabElement.UpdateAttribute(XName.Get("navn", string.Empty), regnskabModel.Navn);
                 rootElement.Add(regnskabElement);
                 return;
             }
+
             regnskabElement.UpdateAttribute(XName.Get("navn", string.Empty), regnskabModel.Navn);
         }
 
@@ -52,23 +62,28 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="kontoModel">Model for en konto.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
-        public static void StoreInDocument(this IKontoModel kontoModel, XDocument localeDataDocument)
+        internal static void StoreInDocument(this IKontoModel kontoModel, XDocument localeDataDocument)
         {
             if (kontoModel == null)
             {
-                throw new ArgumentNullException("kontoModel");
+                throw new ArgumentNullException(nameof(kontoModel));
             }
+
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(kontoModel.Regnskabsnummer);
+
+            XElement regnskabElement = localeDataDocument.GetRegnskabElement(kontoModel.Regnskabsnummer);
             if (regnskabElement == null)
             {
                 return;
             }
+
             XElement kontoHistorikElement;
-            var kontoElement = regnskabElement.Elements(XName.Get("Konto", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0);
+            XElement kontoElement = regnskabElement
+                .Elements(XName.Get("Konto", regnskabElement.Name.NamespaceName))
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("kontonummer", string.Empty), kontoModel.Kontonummer) == 0);
             if (kontoElement == null)
             {
                 kontoElement = new XElement(XName.Get("Konto", regnskabElement.Name.NamespaceName));
@@ -87,31 +102,38 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 regnskabElement.Add(kontoHistorikElement);
                 return;
             }
+
             kontoElement.UpdateAttribute(XName.Get("kontonavn", string.Empty), kontoModel.Kontonavn);
             kontoElement.UpdateAttribute(XName.Get("kontogruppe", string.Empty), kontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture));
             kontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), kontoModel.Beskrivelse, false);
             kontoElement.UpdateAttribute(XName.Get("note", string.Empty), kontoModel.Notat, false);
 
-            var kontoHistorikDato = GetHistorikDato(kontoModel.StatusDato);
-            kontoHistorikElement = localeDataDocument.GetHistorikElements(kontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoHistorikDato, StringComparison.Ordinal) == 0);
+            string kontoHistorikDato = GetHistorikDato(kontoModel.StatusDato);
+            kontoHistorikElement = localeDataDocument
+                .GetHistorikElements(kontoModel)
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), kontoHistorikDato) == 0);
             if (kontoHistorikElement == null)
             {
-                var makeHistoric = true;
-                kontoHistorikElement = localeDataDocument.GetHistorikElements(kontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, kontoHistorikDato, StringComparison.Ordinal) < 0);
+                bool makeHistoric = true;
+                kontoHistorikElement = localeDataDocument
+                    .GetHistorikElements(kontoModel)
+                    .FirstOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), kontoHistorikDato) < 0);
                 if (kontoHistorikElement != null)
                 {
-                    var prevStatusDato = DateTime.ParseExact(kontoHistorikElement.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
-                    var prevKredit = decimal.Parse(kontoHistorikElement.Attribute(XName.Get("kredit", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                    var prevSaldo = decimal.Parse(kontoHistorikElement.Attribute(XName.Get("saldo", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                    makeHistoric = (kontoModel.StatusDato.Year != prevStatusDato.Year) ||
-                                   (kontoModel.StatusDato.Year == prevStatusDato.Year && kontoModel.StatusDato.Month != prevStatusDato.Month) ||
-                                   (kontoModel.Kredit != prevKredit) ||
-                                   (kontoModel.Saldo != prevSaldo);
+                    DateTime prevStatusDato = DateTime.ParseExact(kontoHistorikElement.GetRequiredAttributeValue("dato", string.Empty), "yyyyMMdd", CultureInfo.InvariantCulture);
+                    decimal prevKredit = decimal.Parse(kontoHistorikElement.GetRequiredAttributeValue("kredit", string.Empty), NumberStyles.Any, CultureInfo.InvariantCulture);
+                    decimal prevSaldo = decimal.Parse(kontoHistorikElement.GetRequiredAttributeValue("saldo", string.Empty), NumberStyles.Any, CultureInfo.InvariantCulture);
+                    makeHistoric = kontoModel.StatusDato.Year != prevStatusDato.Year ||
+                                   kontoModel.StatusDato.Year == prevStatusDato.Year && kontoModel.StatusDato.Month != prevStatusDato.Month ||
+                                   kontoModel.Kredit != prevKredit ||
+                                   kontoModel.Saldo != prevSaldo;
                 }
+
                 if (!makeHistoric)
                 {
                     return;
                 }
+
                 kontoHistorikElement = new XElement(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName));
                 kontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), kontoModel.Kontonummer);
                 kontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), kontoHistorikDato);
@@ -120,6 +142,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 regnskabElement.Add(kontoHistorikElement);
                 return;
             }
+
             kontoHistorikElement.UpdateAttribute(XName.Get("kredit", string.Empty), kontoModel.Kredit.ToString(CurrencyFormat, CultureInfo.InvariantCulture));
             kontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), kontoModel.Saldo.ToString(CurrencyFormat, CultureInfo.InvariantCulture));
         }
@@ -129,26 +152,31 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="budgetkontoModel">Model for en budgetkonto.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
-        public static void StoreInDocument(this IBudgetkontoModel budgetkontoModel, XDocument localeDataDocument)
+        internal static void StoreInDocument(this IBudgetkontoModel budgetkontoModel, XDocument localeDataDocument)
         {
-            if (budgetkontoModel== null)
+            if (budgetkontoModel == null)
             {
-                throw new ArgumentNullException("budgetkontoModel");
+                throw new ArgumentNullException(nameof(budgetkontoModel));
             }
+
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(budgetkontoModel.Regnskabsnummer);
+
+            XElement regnskabElement = localeDataDocument.GetRegnskabElement(budgetkontoModel.Regnskabsnummer);
             if (regnskabElement == null)
             {
                 return;
             }
-            var sidsteMånedStatusDato = new DateTime(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month));
-            var sidsteMånedIndtægter = Math.Abs(budgetkontoModel.BudgetSidsteMåned > 0 ? budgetkontoModel.BudgetSidsteMåned : 0M);
-            var sidsteMånedUdgifter = Math.Abs(budgetkontoModel.BudgetSidsteMåned < 0 ? budgetkontoModel.BudgetSidsteMåned : 0M);
+
+            DateTime sidsteMånedStatusDato = new DateTime(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(budgetkontoModel.StatusDato.AddMonths(-1).Year, budgetkontoModel.StatusDato.AddMonths(-1).Month));
+            decimal sidsteMånedIndtægter = Math.Abs(budgetkontoModel.BudgetSidsteMåned > 0 ? budgetkontoModel.BudgetSidsteMåned : 0M);
+            decimal sidsteMånedUdgifter = Math.Abs(budgetkontoModel.BudgetSidsteMåned < 0 ? budgetkontoModel.BudgetSidsteMåned : 0M);
             XElement budgetkontoHistorikElement;
-            var budgetkontoElement = regnskabElement.Elements(XName.Get("Budgetkonto", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0);
+            XElement budgetkontoElement = regnskabElement
+                .Elements(XName.Get("Budgetkonto", regnskabElement.Name.NamespaceName))
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("kontonummer", string.Empty), budgetkontoModel.Kontonummer) == 0);
             if (budgetkontoElement == null)
             {
                 budgetkontoElement = new XElement(XName.Get("Budgetkonto", regnskabElement.Name.NamespaceName));
@@ -176,12 +204,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 regnskabElement.Add(budgetkontoHistorikElement);
                 return;
             }
+
             budgetkontoElement.UpdateAttribute(XName.Get("kontonavn", string.Empty), budgetkontoModel.Kontonavn);
             budgetkontoElement.UpdateAttribute(XName.Get("kontogruppe", string.Empty), budgetkontoModel.Kontogruppe.ToString(CultureInfo.InvariantCulture));
             budgetkontoElement.UpdateAttribute(XName.Get("beskrivelse", string.Empty), budgetkontoModel.Beskrivelse, false);
             budgetkontoElement.UpdateAttribute(XName.Get("note", string.Empty), budgetkontoModel.Notat, false);
 
-            for (var iteration = 0; iteration < 2; iteration++)
+            for (int iteration = 0; iteration < 2; iteration++)
             {
                 string budgetkontoHistorikDato;
                 switch (iteration)
@@ -194,40 +223,47 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                         budgetkontoHistorikDato = GetHistorikDato(sidsteMånedStatusDato);
                         break;
                 }
-                budgetkontoHistorikElement = localeDataDocument.GetHistorikElements(budgetkontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, budgetkontoHistorikDato, StringComparison.Ordinal) == 0);
+
+                budgetkontoHistorikElement = localeDataDocument
+                    .GetHistorikElements(budgetkontoModel)
+                    .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), budgetkontoHistorikDato) == 0);
                 if (budgetkontoHistorikElement == null)
                 {
-                    var makeHistoric = true;
-                    budgetkontoHistorikElement = localeDataDocument.GetHistorikElements(budgetkontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, budgetkontoHistorikDato, StringComparison.Ordinal) < 0);
+                    bool makeHistoric = true;
+                    budgetkontoHistorikElement = localeDataDocument
+                        .GetHistorikElements(budgetkontoModel)
+                        .FirstOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), budgetkontoHistorikDato) < 0);
                     if (budgetkontoHistorikElement != null)
                     {
-                        var prevStatusDato = DateTime.ParseExact(budgetkontoHistorikElement.Attribute(XName.Get("dato", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
-                        var prevIndtægter = decimal.Parse(budgetkontoHistorikElement.Attribute(XName.Get("indtaegter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                        var prevUdgifter = decimal.Parse(budgetkontoHistorikElement.Attribute(XName.Get("udgifter", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
-                        var prevBogført = decimal.Parse(budgetkontoHistorikElement.Attribute(XName.Get("bogfoert", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        DateTime prevStatusDato = DateTime.ParseExact(budgetkontoHistorikElement.GetRequiredAttributeValue("dato", string.Empty), "yyyyMMdd", CultureInfo.InvariantCulture);
+                        decimal prevIndtægter = decimal.Parse(budgetkontoHistorikElement.GetRequiredAttributeValue("indtaegter", string.Empty), NumberStyles.Any, CultureInfo.InvariantCulture);
+                        decimal prevUdgifter = decimal.Parse(budgetkontoHistorikElement.GetRequiredAttributeValue("udgifter", string.Empty), NumberStyles.Any, CultureInfo.InvariantCulture);
+                        decimal prevBogført = decimal.Parse(budgetkontoHistorikElement.GetRequiredAttributeValue("bogfoert", string.Empty), NumberStyles.Any, CultureInfo.InvariantCulture);
                         switch (iteration)
                         {
                             case 0:
-                                makeHistoric = (budgetkontoModel.StatusDato.Year != prevStatusDato.Year) ||
-                                               (budgetkontoModel.StatusDato.Year == prevStatusDato.Year && budgetkontoModel.StatusDato.Month != prevStatusDato.Month) ||
-                                               (budgetkontoModel.Indtægter != prevIndtægter) ||
-                                               (budgetkontoModel.Udgifter != prevUdgifter) ||
-                                               (budgetkontoModel.Bogført != prevBogført);
+                                makeHistoric = budgetkontoModel.StatusDato.Year != prevStatusDato.Year ||
+                                               budgetkontoModel.StatusDato.Year == prevStatusDato.Year && budgetkontoModel.StatusDato.Month != prevStatusDato.Month ||
+                                               budgetkontoModel.Indtægter != prevIndtægter ||
+                                               budgetkontoModel.Udgifter != prevUdgifter ||
+                                               budgetkontoModel.Bogført != prevBogført;
                                 break;
 
                             default:
-                                makeHistoric = (budgetkontoModel.StatusDato.Year != prevStatusDato.Year) ||
-                                               (budgetkontoModel.StatusDato.Year == prevStatusDato.Year && budgetkontoModel.StatusDato.Month != prevStatusDato.Month) ||
-                                               (sidsteMånedIndtægter != prevIndtægter) ||
-                                               (sidsteMånedUdgifter != prevUdgifter) ||
-                                               (budgetkontoModel.BogførtSidsteMåned != prevBogført);
+                                makeHistoric = budgetkontoModel.StatusDato.Year != prevStatusDato.Year ||
+                                               budgetkontoModel.StatusDato.Year == prevStatusDato.Year && budgetkontoModel.StatusDato.Month != prevStatusDato.Month ||
+                                               sidsteMånedIndtægter != prevIndtægter ||
+                                               sidsteMånedUdgifter != prevUdgifter ||
+                                               budgetkontoModel.BogførtSidsteMåned != prevBogført;
                                 break;
                         }
                     }
+
                     if (!makeHistoric)
                     {
                         continue;
                     }
+
                     budgetkontoHistorikElement = new XElement(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName));
                     budgetkontoHistorikElement.UpdateAttribute(XName.Get("kontonummer", string.Empty), budgetkontoModel.Kontonummer);
                     budgetkontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), budgetkontoHistorikDato);
@@ -247,8 +283,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                             regnskabElement.Add(budgetkontoHistorikElement);
                             break;
                     }
+
                     continue;
                 }
+
                 switch (iteration)
                 {
                     case 0:
@@ -271,23 +309,28 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="adressekontoModel">Model for adressekontoen.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
-        public static void StoreInDocument(this IAdressekontoModel adressekontoModel, XDocument localeDataDocument)
+        internal static void StoreInDocument(this IAdressekontoModel adressekontoModel, XDocument localeDataDocument)
         {
             if (adressekontoModel == null)
             {
-                throw new ArgumentNullException("adressekontoModel");
+                throw new ArgumentNullException(nameof(adressekontoModel));
             }
+
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(adressekontoModel.Regnskabsnummer);
+
+            XElement regnskabElement = localeDataDocument.GetRegnskabElement(adressekontoModel.Regnskabsnummer);
             if (regnskabElement == null)
             {
                 return;
             }
+
             XElement adressekontoHistorikElement;
-            var adressekontoElement = regnskabElement.Elements(XName.Get("Adressekonto", regnskabElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+            XElement adressekontoElement = regnskabElement
+                .Elements(XName.Get("Adressekonto", regnskabElement.Name.NamespaceName))
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("nummer", string.Empty), adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture)) == 0);
             if (adressekontoElement == null)
             {
                 adressekontoElement = new XElement(XName.Get("Adressekonto", regnskabElement.Name.NamespaceName));
@@ -304,25 +347,32 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 regnskabElement.Add(adressekontoHistorikElement);
                 return;
             }
+
             adressekontoElement.UpdateAttribute(XName.Get("navn", string.Empty), adressekontoModel.Navn);
             adressekontoElement.UpdateAttribute(XName.Get("primaerTelefon", string.Empty), adressekontoModel.PrimærTelefon, false);
             adressekontoElement.UpdateAttribute(XName.Get("sekundaerTelefon", string.Empty), adressekontoModel.SekundærTelefon, false);
 
-            var adressekontoHistorikDato = GetHistorikDato(adressekontoModel.StatusDato);
-            adressekontoHistorikElement = localeDataDocument.GetHistorikElements(adressekontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, adressekontoHistorikDato, StringComparison.Ordinal) == 0);
-            if (adressekontoHistorikElement== null)
+            string adressekontoHistorikDato = GetHistorikDato(adressekontoModel.StatusDato);
+            adressekontoHistorikElement = localeDataDocument
+                .GetHistorikElements(adressekontoModel)
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), adressekontoHistorikDato) == 0);
+            if (adressekontoHistorikElement == null)
             {
-                var makeHistoric = true;
-                adressekontoHistorikElement = localeDataDocument.GetHistorikElements(adressekontoModel).FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, adressekontoHistorikDato, StringComparison.Ordinal) < 0);
+                bool makeHistoric = true;
+                adressekontoHistorikElement = localeDataDocument
+                    .GetHistorikElements(adressekontoModel)
+                    .FirstOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), adressekontoHistorikDato) < 0);
                 if (adressekontoHistorikElement != null)
                 {
-                    var prevSaldo = decimal.Parse(adressekontoHistorikElement.Attribute(XName.Get("saldo", string.Empty)).Value, NumberStyles.Any, CultureInfo.InvariantCulture);
+                    decimal prevSaldo = decimal.Parse(adressekontoHistorikElement.GetRequiredAttributeValue("saldo", string.Empty), NumberStyles.Any, CultureInfo.InvariantCulture);
                     makeHistoric = adressekontoModel.Saldo != prevSaldo;
                 }
+
                 if (!makeHistoric)
                 {
                     return;
                 }
+
                 adressekontoHistorikElement = new XElement(XName.Get("AdressekontoHistorik", regnskabElement.Name.NamespaceName));
                 adressekontoHistorikElement.UpdateAttribute(XName.Get("nummer", string.Empty), adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture));
                 adressekontoHistorikElement.UpdateAttribute(XName.Get("dato", string.Empty), adressekontoHistorikDato);
@@ -330,6 +380,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 regnskabElement.Add(adressekontoHistorikElement);
                 return;
             }
+
             adressekontoHistorikElement.UpdateAttribute(XName.Get("saldo", string.Empty), adressekontoModel.Saldo.ToString(CurrencyFormat, CultureInfo.InvariantCulture));
         }
 
@@ -339,15 +390,16 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="bogføringslinjeModel">Model for bogføringslinjen.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
         /// <param name="isStoringSynchronizedData">Angivelse af, om det er synkroniserede data, der gemmes.</param>
-        public static void StoreInDocument(this IBogføringslinjeModel bogføringslinjeModel, XDocument localeDataDocument, bool isStoringSynchronizedData)
+        internal static void StoreInDocument(this IBogføringslinjeModel bogføringslinjeModel, XDocument localeDataDocument, bool isStoringSynchronizedData)
         {
             if (bogføringslinjeModel == null)
             {
-                throw new ArgumentNullException("bogføringslinjeModel");
+                throw new ArgumentNullException(nameof(bogføringslinjeModel));
             }
+
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
 
             XElement accountingElement = localeDataDocument.GetRegnskabElement(bogføringslinjeModel.Regnskabsnummer);
@@ -356,7 +408,9 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 return;
             }
 
-            XElement postingLineElement = accountingElement.Elements(XName.Get("Bogfoeringslinje", accountingElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("loebenummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("loebenummer", string.Empty)).Value, bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+            XElement postingLineElement = accountingElement
+                .Elements(XName.Get("Bogfoeringslinje", accountingElement.Name.NamespaceName))
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("loebenummer", string.Empty), bogføringslinjeModel.Løbenummer.ToString(CultureInfo.InvariantCulture)) == 0);
             if (postingLineElement == null)
             {
                 postingLineElement = new XElement(XName.Get("Bogfoeringslinje", accountingElement.Name.NamespaceName));
@@ -396,20 +450,27 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="kontogruppeModel">Model for en kontogruppe.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
-        public static void StoreInDocument(this IKontogruppeModel kontogruppeModel, XDocument localeDataDocument)
+        internal static void StoreInDocument(this IKontogruppeModel kontogruppeModel, XDocument localeDataDocument)
         {
             if (kontogruppeModel == null)
             {
-                throw new ArgumentNullException("kontogruppeModel");
+                throw new ArgumentNullException(nameof(kontogruppeModel));
             }
+
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var kontogruppeElement = localeDataDocument.GetKontogruppeElement(kontogruppeModel.Nummer);
+
+            XElement kontogruppeElement = localeDataDocument.GetKontogruppeElement(kontogruppeModel.Nummer);
             if (kontogruppeElement == null)
             {
-                var rootElement = localeDataDocument.Root;
+                XElement rootElement = localeDataDocument.Root;
+                if (rootElement == null)
+                {
+                    return;
+                }
+
                 kontogruppeElement = new XElement(XName.Get("Kontogruppe", rootElement.Name.NamespaceName));
                 kontogruppeElement.UpdateAttribute(XName.Get("nummer", string.Empty), kontogruppeModel.Nummer.ToString(CultureInfo.InvariantCulture));
                 kontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), kontogruppeModel.Tekst);
@@ -417,6 +478,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                 rootElement.Add(kontogruppeElement);
                 return;
             }
+
             kontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), kontogruppeModel.Tekst);
             kontogruppeElement.UpdateAttribute(XName.Get("balanceType", string.Empty), kontogruppeModel.Balancetype.ToString());
         }
@@ -426,26 +488,34 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="budgetkontogruppeModel">Model for en kontogruppe til budgetkonti.</param>
         /// <param name="localeDataDocument">XML dokument, hvori data skal gemmes.</param>
-        public static void StoreInDocument(this IBudgetkontogruppeModel budgetkontogruppeModel, XDocument localeDataDocument)
+        internal static void StoreInDocument(this IBudgetkontogruppeModel budgetkontogruppeModel, XDocument localeDataDocument)
         {
             if (budgetkontogruppeModel == null)
             {
-                throw new ArgumentNullException("budgetkontogruppeModel");
+                throw new ArgumentNullException(nameof(budgetkontogruppeModel));
             }
+
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var budgetkontogruppeElement = localeDataDocument.GetBudgetkontogruppeElement(budgetkontogruppeModel.Nummer);
+
+            XElement budgetkontogruppeElement = localeDataDocument.GetBudgetkontogruppeElement(budgetkontogruppeModel.Nummer);
             if (budgetkontogruppeElement == null)
             {
-                var rootElement = localeDataDocument.Root;
+                XElement rootElement = localeDataDocument.Root;
+                if (rootElement == null)
+                {
+                    return;
+                }
+
                 budgetkontogruppeElement = new XElement(XName.Get("Budgetkontogruppe", rootElement.Name.NamespaceName));
                 budgetkontogruppeElement.UpdateAttribute(XName.Get("nummer", string.Empty), budgetkontogruppeModel.Nummer.ToString(CultureInfo.InvariantCulture));
                 budgetkontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), budgetkontogruppeModel.Tekst);
                 rootElement.Add(budgetkontogruppeElement);
                 return;
             }
+
             budgetkontogruppeElement.UpdateAttribute(XName.Get("tekst", string.Empty), budgetkontogruppeModel.Tekst);
         }
 
@@ -454,16 +524,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="localeDataDocument">XML dokument, hvori versionsnummeret for repositoryet skal gemmes.</param>
         /// <param name="versionNumber">Versionsummer.</param>
-        public static void StoreVersionNumberInDocument(this XDocument localeDataDocument, decimal versionNumber)
+        internal static void StoreVersionNumberInDocument(this XDocument localeDataDocument, decimal versionNumber)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             if (localeDataDocument.Root == null || localeDataDocument.Root.Attribute(XName.Get("version", string.Empty)) != null)
             {
                 return;
             }
+
             localeDataDocument.Root.Add(new XAttribute(XName.Get("version", string.Empty), versionNumber.ToString(VersionFormat, CultureInfo.InvariantCulture)));
         }
 
@@ -472,17 +544,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="localeDataDocument">XML dokument, hvori datoen for sidste fulde synkronisering skal gemmes.</param>
         /// <param name="sidsteFuldeSynkronisering">Datoen for sidste fulde synkronisering.</param>
-        public static void StoreSidsteFuldeSynkroniseringInDocument(this XDocument localeDataDocument, DateTime sidsteFuldeSynkronisering)
+        internal static void StoreSidsteFuldeSynkroniseringInDocument(this XDocument localeDataDocument, DateTime sidsteFuldeSynkronisering)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            if (localeDataDocument.Root == null)
-            {
-                return;
-            }
-            localeDataDocument.Root.UpdateAttribute("sidsteFuldeSynkronisering", GetHistorikDato(sidsteFuldeSynkronisering), false);
+
+            localeDataDocument.Root?.UpdateAttribute("sidsteFuldeSynkronisering", GetHistorikDato(sidsteFuldeSynkronisering), false);
         }
 
         /// <summary>
@@ -490,19 +559,22 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="localeDataDocument">XML dokument, hvorfra datoen for sidste fulde synkronisering skal returneres.</param>
         /// <returns>Datoen for sidste fulde synkronisering.</returns>
-        public static DateTime? GetSidsteFuldeSynkronisering(this XDocument localeDataDocument)
+        internal static DateTime? GetSidsteFuldeSynkronisering(this XDocument localeDataDocument)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             try
             {
-                if (localeDataDocument.Root == null || localeDataDocument.Root.Attribute(XName.Get("sidsteFuldeSynkronisering", string.Empty)) == null)
+                string attributeValue = localeDataDocument.Root?.GetNonRequiredAttributeValue("sidsteFuldeSynkronisering", string.Empty);
+                if (string.IsNullOrWhiteSpace(attributeValue))
                 {
                     return null;
                 }
-                return DateTime.ParseExact(localeDataDocument.Root.Attribute(XName.Get("sidsteFuldeSynkronisering", string.Empty)).Value, "yyyyMMdd", CultureInfo.InvariantCulture);
+
+                return DateTime.ParseExact(attributeValue, "yyyyMMdd", CultureInfo.InvariantCulture);
             }
             catch (ArgumentNullException)
             {
@@ -520,7 +592,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="postingLineElement">The <see cref="XElement"/> for the pending posting line.</param>
         /// <param name="pending">True when the posting line is pending otherwise false.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="postingLineElement"/> is null.</exception>
-        public static void StorePendingPostingLineInDocument(this XElement postingLineElement, bool pending = true)
+        internal static void StorePendingPostingLineInDocument(this XElement postingLineElement, bool pending = true)
         {
             if (postingLineElement == null)
             {
@@ -536,14 +608,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="localeDataDocument">XML dokument, hvorfra elementet skal returneres.</param>
         /// <param name="nummer">Unik identifikation af regnskabet.</param>
         /// <returns>Elementet til det givne regnskab.</returns>
-        public static XElement GetRegnskabElement(this XDocument localeDataDocument, int nummer)
+        internal static XElement GetRegnskabElement(this XDocument localeDataDocument, int nummer)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var rootElement = localeDataDocument.Root;
-            return rootElement.Elements(XName.Get("Regnskab", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+
+            XElement rootElement = localeDataDocument.Root;
+            return rootElement?
+                .Elements(XName.Get("Regnskab", rootElement.Name.NamespaceName))
+                .SingleOrDefault(m =>string.CompareOrdinal(m.GetRequiredAttributeValue("nummer", string.Empty), nummer.ToString(CultureInfo.InvariantCulture)) == 0);
         }
 
         /// <summary>
@@ -552,32 +627,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="localeDataDocument">XML dokument, hvorfra elementer skal returneres.</param>
         /// <param name="kontoModel">Model for kontoen, hvortil historiske data skal returneres.</param>
         /// <returns>Elementer indeholdende historiske data til den givne konto.</returns>
-        public static IEnumerable<XElement> GetHistorikElements(this XDocument localeDataDocument, IKontoModel kontoModel)
+        internal static IEnumerable<XElement> GetHistorikElements(this XDocument localeDataDocument, IKontoModel kontoModel)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             if (kontoModel == null)
             {
-                throw new ArgumentNullException("kontoModel");
+                throw new ArgumentNullException(nameof(kontoModel));
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(kontoModel.Regnskabsnummer);
+
+            XElement regnskabElement = localeDataDocument.GetRegnskabElement(kontoModel.Regnskabsnummer);
             if (regnskabElement == null)
             {
                 return new List<XElement>(0);
             }
-            var historikElements = regnskabElement.Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, kontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(kontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
-            var removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
-            removeElementUntil = removeElementUntil.AddDays((removeElementUntil.Day)*-1);
-            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
-            while (elementToDelete != null)
-            {
-                elementToDelete.Remove();
-                historikElements.Remove(elementToDelete);
-                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
-            }
-            return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
+
+            IList<XElement> historikElements = regnskabElement
+                .Elements(XName.Get("KontoHistorik", regnskabElement.Name.NamespaceName))
+                .Where(m =>
+                    string.CompareOrdinal(m.GetRequiredAttributeValue("kontonummer", string.Empty), kontoModel.Kontonummer) == 0 &&
+                    string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), GetHistorikDato(kontoModel.StatusDato)) <= 0)
+                .ToList();
+
+            DateTime removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
+            removeElementUntil = removeElementUntil.AddDays(removeElementUntil.Day * -1);
+
+            return historikElements.RemoveHistoricalElements(removeElementUntil, m => m.GetRequiredAttributeValue("dato", string.Empty))
+                .OrderByDescending(m => m.GetRequiredAttributeValue("dato", string.Empty))
+                .ToList();
         }
 
         /// <summary>
@@ -586,32 +666,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="localeDataDocument">XML dokument, hvorfra elementer skal returneres.</param>
         /// <param name="budgetkontoModel">Model for budgetkontoen, hvortil historiske data skal returneres.</param>
         /// <returns>Elementer indeholdende historiske data til den givne budgetkonto.</returns>
-        public static IEnumerable<XElement> GetHistorikElements(this XDocument localeDataDocument, IBudgetkontoModel budgetkontoModel)
+        internal static IEnumerable<XElement> GetHistorikElements(this XDocument localeDataDocument, IBudgetkontoModel budgetkontoModel)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             if (budgetkontoModel == null)
             {
-                throw new ArgumentNullException("budgetkontoModel");
+                throw new ArgumentNullException(nameof(budgetkontoModel));
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(budgetkontoModel.Regnskabsnummer);
+
+            XElement regnskabElement = localeDataDocument.GetRegnskabElement(budgetkontoModel.Regnskabsnummer);
             if (regnskabElement == null)
             {
                 return new List<XElement>(0);
             }
-            var historikElements = regnskabElement.Elements(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("kontonummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("kontonummer", string.Empty)).Value, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(budgetkontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
-            var removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
-            removeElementUntil = removeElementUntil.AddDays((removeElementUntil.Day)*-1);
-            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
-            while (elementToDelete != null)
-            {
-                elementToDelete.Remove();
-                historikElements.Remove(elementToDelete);
-                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
-            }
-            return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
+
+            IList<XElement> historikElements = regnskabElement
+                .Elements(XName.Get("BudgetkontoHistorik", regnskabElement.Name.NamespaceName))
+                .Where(m =>
+                    string.CompareOrdinal(m.GetRequiredAttributeValue("kontonummer", string.Empty), budgetkontoModel.Kontonummer) == 0 &&
+                    string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), GetHistorikDato(budgetkontoModel.StatusDato)) <= 0)
+                .ToList();
+
+            DateTime removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
+            removeElementUntil = removeElementUntil.AddDays(removeElementUntil.Day * -1);
+
+            return historikElements.RemoveHistoricalElements(removeElementUntil, m => m.GetRequiredAttributeValue("dato", string.Empty))
+                .OrderByDescending(m => m.GetRequiredAttributeValue("dato", string.Empty))
+                .ToList();
         }
 
         /// <summary>
@@ -620,32 +705,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="localeDataDocument">XML dokument, hvorfra elementer skal returneres.</param>
         /// <param name="adressekontoModel">Model for adressekontoen, hvortil historiske data skal returneres.</param>
         /// <returns>Elementer indeholdende historiske data til den givne adressekonto.</returns>
-        public static IEnumerable<XElement> GetHistorikElements(this XDocument localeDataDocument, IAdressekontoModel adressekontoModel)
+        internal static IEnumerable<XElement> GetHistorikElements(this XDocument localeDataDocument, IAdressekontoModel adressekontoModel)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             if (adressekontoModel == null)
             {
-                throw new ArgumentNullException("adressekontoModel");
+                throw new ArgumentNullException(nameof(adressekontoModel));
             }
-            var regnskabElement = localeDataDocument.GetRegnskabElement(adressekontoModel.Regnskabsnummer);
+
+            XElement regnskabElement = localeDataDocument.GetRegnskabElement(adressekontoModel.Regnskabsnummer);
             if (regnskabElement == null)
             {
                 return new List<XElement>(0);
             }
-            var historikElements = regnskabElement.Elements(XName.Get("AdressekontoHistorik", regnskabElement.Name.NamespaceName)).Where(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0 && m.Attribute(XName.Get("dato", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(adressekontoModel.StatusDato), StringComparison.Ordinal) <= 0).ToList();
-            var removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
-            removeElementUntil = removeElementUntil.AddDays((removeElementUntil.Day)*-1);
-            var elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
-            while (elementToDelete != null)
-            {
-                elementToDelete.Remove();
-                historikElements.Remove(elementToDelete);
-                elementToDelete = historikElements.FirstOrDefault(m => string.Compare(m.Attribute(XName.Get("dato", string.Empty)).Value, GetHistorikDato(removeElementUntil), StringComparison.Ordinal) <= 0);
-            }
-            return historikElements.OrderByDescending(m => m.Attribute(XName.Get("dato", string.Empty)).Value).ToList();
+
+            IList<XElement> historikElements = regnskabElement
+                .Elements(XName.Get("AdressekontoHistorik", regnskabElement.Name.NamespaceName))
+                .Where(m =>
+                    string.CompareOrdinal(m.GetRequiredAttributeValue("nummer", string.Empty), adressekontoModel.Nummer.ToString(CultureInfo.InvariantCulture)) == 0 &&
+                    string.CompareOrdinal(m.GetRequiredAttributeValue("dato", string.Empty), GetHistorikDato(adressekontoModel.StatusDato)) <= 0)
+                .ToList();
+
+            DateTime removeElementUntil = DateTime.Today.AddYears(-2).AddMonths(-1);
+            removeElementUntil = removeElementUntil.AddDays(removeElementUntil.Day * -1);
+
+            return historikElements.RemoveHistoricalElements(removeElementUntil, m => m.GetRequiredAttributeValue("dato", string.Empty))
+                .OrderByDescending(m => m.GetRequiredAttributeValue("dato", string.Empty))
+                .ToList();
         }
 
         /// <summary>
@@ -654,14 +744,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="localeDataDocument">XML dokument, hvorfra elementet skal returneres.</param>
         /// <param name="nummer">Unik identifikation af kontogruppen.</param>
         /// <returns>Elementet til den givne kontogruppe.</returns>
-        public static XElement GetKontogruppeElement(this XDocument localeDataDocument, int nummer)
+        internal static XElement GetKontogruppeElement(this XDocument localeDataDocument, int nummer)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
-            var rootElement = localeDataDocument.Root;
-            return rootElement.Elements(XName.Get("Kontogruppe", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+
+            XElement rootElement = localeDataDocument.Root;
+            return rootElement?
+                .Elements(XName.Get("Kontogruppe", rootElement.Name.NamespaceName))
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("nummer", string.Empty), nummer.ToString(CultureInfo.InvariantCulture)) == 0);
         }
 
         /// <summary>
@@ -670,14 +763,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="localeDataDocument">XML dokument, hvorfra elementet skal returneres.</param>
         /// <param name="nummer">Unik identifikation af kontogruppen til budgetkonti.</param>
         /// <returns>Elementet til den givne kontogruppe for budgetkonti.</returns>
-        public static XElement GetBudgetkontogruppeElement(this XDocument localeDataDocument, int nummer)
+        internal static XElement GetBudgetkontogruppeElement(this XDocument localeDataDocument, int nummer)
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             var rootElement = localeDataDocument.Root;
-            return rootElement.Elements(XName.Get("Budgetkontogruppe", rootElement.Name.NamespaceName)).SingleOrDefault(m => m.Attribute(XName.Get("nummer", string.Empty)) != null && string.Compare(m.Attribute(XName.Get("nummer", string.Empty)).Value, nummer.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) == 0);
+            return rootElement?
+                .Elements(XName.Get("Budgetkontogruppe", rootElement.Name.NamespaceName))
+                .SingleOrDefault(m => string.CompareOrdinal(m.GetRequiredAttributeValue("nummer", string.Empty), nummer.ToString(CultureInfo.InvariantCulture)) == 0);
         }
 
         /// <summary>
@@ -687,36 +783,79 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="attributeName">Navn på XML attributten, der skal opdateres.</param>
         /// <param name="attributeValue">Værdi, som XML attributten skal opdateres med.</param>
         /// <param name="required">Angivelse af, om XML attributten er requried.</param>
-        public static void UpdateAttribute(this XElement localeDataElement, XName attributeName, string attributeValue, bool required = true)
+        internal static void UpdateAttribute(this XElement localeDataElement, XName attributeName, string attributeValue, bool required = true)
         {
             if (localeDataElement == null)
             {
-                throw new ArgumentNullException("localeDataElement");
+                throw new ArgumentNullException(nameof(localeDataElement));
             }
+
             if (attributeName == null)
             {
-                throw new ArgumentNullException("attributeName");
+                throw new ArgumentNullException(nameof(attributeName));
             }
-            if (string.IsNullOrEmpty(attributeValue) && required)
+
+            if (string.IsNullOrWhiteSpace(attributeValue) && required)
             {
-                throw new ArgumentNullException("attributeValue");
+                throw new ArgumentNullException(nameof(attributeValue));
             }
-            var attribute = localeDataElement.Attribute(attributeName);
+
+            XAttribute attribute = localeDataElement.Attribute(attributeName);
             if (attribute == null)
             {
-                if (string.IsNullOrEmpty(attributeValue) && required == false)
+                if (string.IsNullOrWhiteSpace(attributeValue) && required == false)
                 {
                     return;
                 }
+
                 localeDataElement.Add(new XAttribute(attributeName, attributeValue));
                 return;
             }
-            if (string.IsNullOrEmpty(attributeValue) && required == false)
+
+            if (string.IsNullOrWhiteSpace(attributeValue) && required == false)
             {
                 attribute.Remove();
                 return;
             }
+
             attribute.Value = attributeValue;
+        }
+
+        internal static string GetRequiredAttributeValue(this XElement localeDataElement, string attributeName, string attributeNamespace)
+        {
+            if (localeDataElement == null)
+            {
+                throw new ArgumentNullException(nameof(localeDataElement));
+            }
+
+            if (string.IsNullOrWhiteSpace(attributeName))
+            {
+                throw new ArgumentNullException(nameof(attributeName));
+            }
+
+            string attributeValue = GetNonRequiredAttributeValue(localeDataElement, attributeName, attributeNamespace);
+            if (string.IsNullOrWhiteSpace(attributeValue) == false)
+            {
+                return attributeValue;
+            }
+
+            throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.MissingRequiredAttributeValue, attributeName));
+        }
+
+        internal static string GetNonRequiredAttributeValue(this XElement localeDataElement, string attributeName, string attributeNamespace)
+        {
+            if (localeDataElement == null)
+            {
+                throw new ArgumentNullException(nameof(localeDataElement));
+            }
+
+            if (string.IsNullOrWhiteSpace(attributeName))
+            {
+                throw new ArgumentNullException(nameof(attributeName));
+            }
+
+            string attributeValue = localeDataElement.Attribute(XName.Get(attributeName, attributeNamespace))?.Value;
+            return string.IsNullOrWhiteSpace(attributeValue) == false ? attributeValue : null;
         }
 
         /// <summary>
@@ -724,9 +863,33 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// </summary>
         /// <param name="statusDato">Statusdato.</param>
         /// <returns>Historisk dato, som kan benyttes i XML dokumentet.</returns>
-        public static string GetHistorikDato(DateTime statusDato)
+        internal static string GetHistorikDato(DateTime statusDato)
         {
             return statusDato.ToString("yyyyMMdd");
+        }
+
+        internal static IEnumerable<XElement> RemoveHistoricalElements(this IList<XElement> historicalElementCollection, DateTime removeElementUntil, Func<XElement, string> historicalDateValueGetter)
+        {
+            if (historicalElementCollection == null)
+            {
+                throw new ArgumentNullException(nameof(historicalElementCollection));
+            }
+
+            if (historicalDateValueGetter == null)
+            {
+                throw new ArgumentNullException(nameof(historicalDateValueGetter));
+            }
+
+            XElement elementToDelete = historicalElementCollection.FirstOrDefault(m => string.CompareOrdinal(historicalDateValueGetter(m), GetHistorikDato(removeElementUntil)) <= 0);
+            while (elementToDelete != null)
+            {
+                elementToDelete.Remove();
+                historicalElementCollection.Remove(elementToDelete);
+
+                elementToDelete = historicalElementCollection.FirstOrDefault(m => string.CompareOrdinal(historicalDateValueGetter(m), GetHistorikDato(removeElementUntil)) <= 0);
+            }
+
+            return historicalElementCollection;
         }
     }
 }

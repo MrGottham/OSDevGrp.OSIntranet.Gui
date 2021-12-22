@@ -13,10 +13,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <summary>
         /// Returnerer konfigurationsrepositoryet, der supporterer finansstyring.
         /// </summary>
-        IFinansstyringKonfigurationRepository Konfiguration
-        {
-            get;
-        }
+        IFinansstyringKonfigurationRepository Konfiguration { get; }
 
         /// <summary>
         /// Henter en liste af regnskaber.
@@ -75,22 +72,14 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <param name="kontonummer">Kontonummer, som den nye bogføringslinje skal initieres med.</param>
         /// <returns>Ny bogføringslinje, der efterfølgende kan bogføres.</returns>
         Task<IBogføringslinjeModel> BogføringslinjeCreateNewAsync(int regnskabsnummer, DateTime dato, string kontonummer);
-            
+
         /// <summary>
-        /// Bogfører værdier i et givent regnskab.
+        /// Bogfører én til flere bogføringslinjer.
         /// </summary>
-        /// <param name="regnskabsnummer">Regnskabsnummer, hvor værdier skal bogføres.</param>
-        /// <param name="dato">Bogføringsdato.</param>
-        /// <param name="bilag">Bilagsnummer.</param>
-        /// <param name="kontonummer">Kontonummer, hvorpå værdier skal bogføres.</param>
-        /// <param name="tekst">Tekst.</param>
-        /// <param name="budgetkontonummer">Budgetkontonummer, hvorpå værdier skal bogføres.</param>
-        /// <param name="debit">Debitbeløb.</param>
-        /// <param name="kredit">Kreditbeløb.</param>
-        /// <param name="adressekonto">Unik identifikation af adressekontoen, hvorpå værdier skal bogføres.</param>
-        /// <returns>Bogføringsresultat.</returns>
-        Task<IBogføringsresultatModel> BogførAsync(int regnskabsnummer, DateTime dato, string bilag, string kontonummer, string tekst, string budgetkontonummer, decimal debit, decimal kredit, int adressekonto);
-            
+        /// <param name="bogføringslinjer">De bogføringslinjer, der skal bogføres.</param>
+        /// <returns>Bogføringsresultater for de enkelte bogførte bogføringslinjer.</returns>
+        Task<IEnumerable<IBogføringsresultatModel>> BogførAsync(params IBogføringslinjeModel[] bogføringslinjer);
+
         /// <summary>
         /// Henter listen af debitorer til et regnskab.
         /// </summary>

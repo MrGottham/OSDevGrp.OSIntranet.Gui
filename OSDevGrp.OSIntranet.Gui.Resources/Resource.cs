@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Resources.Images;
+using OSDevGrp.OSIntranet.Gui.Resources.Schemas;
 
 namespace OSDevGrp.OSIntranet.Gui.Resources
 {
@@ -24,7 +25,8 @@ namespace OSDevGrp.OSIntranet.Gui.Resources
             new AccountImage(),
             new BudgetAccountImage(),
             new AddressAccountImage(),
-            new PostingLineImage());
+            new PostingLineImage(),
+            new FinansstyringRepositoryLocaleSchema());
 
         #endregion
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -23,7 +22,6 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
 
         private readonly string _localeDataFileName;
         private readonly string _syncDataFileName;
-        private readonly string _schemaLocation;
         private static readonly object SyncRoot = new object();
 
         #endregion
@@ -38,21 +36,37 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <param name="schemaLocation">Lokation for XML schema, der benyttes til validering af de lokale data.</param>
         public LocaleDataStorage(string localeDataFileName, string syncDataFileName, string schemaLocation)
         {
-            if (string.IsNullOrEmpty(localeDataFileName))
+            if (string.IsNullOrWhiteSpace(localeDataFileName))
             {
-                throw new ArgumentNullException("localeDataFileName");
+                throw new ArgumentNullException(nameof(localeDataFileName));
             }
-            if (string.IsNullOrEmpty(syncDataFileName))
+
+            if (string.IsNullOrWhiteSpace(syncDataFileName))
             {
-                throw new ArgumentNullException("syncDataFileName");
+                throw new ArgumentNullException(nameof(syncDataFileName));
             }
-            if (string.IsNullOrEmpty(schemaLocation))
+
+            if (string.IsNullOrWhiteSpace(schemaLocation))
             {
-                throw new ArgumentNullException("schemaLocation");
+                throw new ArgumentNullException(nameof(schemaLocation));
             }
+
             _localeDataFileName = localeDataFileName;
             _syncDataFileName = syncDataFileName;
-            _schemaLocation = schemaLocation;
+
+            using (MemoryStream memoryStream = new MemoryStream(Resource.GetEmbeddedResource(schemaLocation)))
+            {
+                XmlReaderSettings readerSettings = new XmlReaderSettings
+                {
+                    IgnoreComments = true,
+                    IgnoreProcessingInstructions = true,
+                    IgnoreWhitespace = true
+                };
+                using (XmlReader reader = XmlReader.Create(memoryStream, readerSettings))
+                {
+                    Schema = XDocument.Load(reader);
+                }
+            }
         }
 
         #endregion
@@ -96,8 +110,10 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
                     {
                         return false;
                     }
-                    var handleEvaluationEventArgs = new HandleEvaluationEventArgs(this);
+
+                    HandleEvaluationEventArgs handleEvaluationEventArgs = new HandleEvaluationEventArgs(this);
                     OnHasLocaleData.Invoke(this, handleEvaluationEventArgs);
+
                     return handleEvaluationEventArgs.Result;
                 }
             }
@@ -106,43 +122,17 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         /// <summary>
         /// Filnavn indeholdende data i det lokale datalager.
         /// </summary>
-        public virtual string LocaleDataFileName
-        {
-            get
-            {
-                return Path.GetFileName(_localeDataFileName);
-            }
-        }
+        public virtual string LocaleDataFileName => Path.GetFileName(_localeDataFileName);
 
         /// <summary>
         /// Filnavn indeholdende synkroniseringsdata i det lokale datalager.
         /// </summary>
-        public virtual string SyncDataFileName
-        {
-            get
-            {
-                return Path.GetFileName(_syncDataFileName);
-            }
-        }
+        public virtual string SyncDataFileName => Path.GetFileName(_syncDataFileName);
 
         /// <summary>
         /// XML reader, der kan læse XML schema, som kan benyttes til validering af de lokale data.
         /// </summary>
-        public virtual XDocument Schema
-        {
-            get
-            {
-                var assembly = GetType().GetTypeInfo().Assembly;
-                using (var resourceStream = assembly.GetManifestResourceStream(string.Format("{0}.{1}", assembly.GetName().Name, _schemaLocation)))
-                {
-                    if (resourceStream == null)
-                    {
-                        throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnableToLoadResource, _schemaLocation));
-                    }
-                    return ReadDocument(resourceStream);
-                }
-            }
-        }
+        public virtual XDocument Schema { get; }
 
         #endregion
 
@@ -158,23 +148,23 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateReaderStream"));
             }
+
             try
             {
                 lock (SyncRoot)
                 {
-                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(this);
+                    HandleStreamCreationEventArgs handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(this);
                     OnCreateReaderStream.Invoke(this, handleStreamCreationEventArgs);
-                    using (var readerStream = handleStreamCreationEventArgs.Result)
+                    using (Stream readerStream = handleStreamCreationEventArgs.Result)
                     {
                         if (readerStream == null)
                         {
                             throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "readerStream", null));
                         }
-                        var localeDataDocument = ReadDocument(readerStream);
-                        if (PrepareLocaleData != null)
-                        {
-                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, true, false, false));
-                        }
+
+                        XDocument localeDataDocument = ReadDocument(Schema, readerStream);
+                        PrepareLocaleData?.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, true, false, false));
+
                         return localeDataDocument;
                     }
                 }
@@ -197,25 +187,26 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             if (OnCreateWriterStream == null)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
+
             try
             {
                 lock (SyncRoot)
                 {
-                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(false);
+                    HandleStreamCreationEventArgs handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(false);
                     OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
-                    using (var writerStream = handleStreamCreationEventArgs.Result)
+
+                    using (Stream writerStream = handleStreamCreationEventArgs.Result)
                     {
-                        if (PrepareLocaleData != null)
-                        {
-                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, false));
-                        }
-                        WriteDocument(localeDataDocument, writerStream);
+                        PrepareLocaleData?.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, false));
+
+                        WriteDocument(Schema, localeDataDocument, writerStream);
                     }
                 }
             }
@@ -238,39 +229,31 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             if (Equals(model, null))
             {
-                throw new ArgumentNullException("model");
+                throw new ArgumentNullException(nameof(model));
             }
+
             if (OnCreateWriterStream == null)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
+
             try
             {
                 lock (SyncRoot)
                 {
-                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(false);
+                    HandleStreamCreationEventArgs handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(false);
                     OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
-                    using (var writerStream = handleStreamCreationEventArgs.Result)
+
+                    using (Stream writerStream = handleStreamCreationEventArgs.Result)
                     {
-                        XDocument localeDataDocument;
-                        if (writerStream.Length == 0)
-                        {
-                            var localeDataSchema = Schema;
-                            var localeDataNamespace = localeDataSchema.Root.GetDefaultNamespace().NamespaceName;
-                            var localeDataRootName = localeDataSchema.Root.Element(XName.Get("element", "http://www.w3.org/2001/XMLSchema")).Attribute(XName.Get("name", string.Empty)).Value;
-                            localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
-                            localeDataDocument.Add(new XElement(XName.Get(localeDataRootName, localeDataNamespace)));
-                        }
-                        else
-                        {
-                            localeDataDocument = ReadDocument(writerStream);
-                        }
+                        XDocument localeDataDocument = writerStream.Length == 0
+                            ? InitializeLocaleDataDocument(Schema)
+                            : ReadDocument(Schema, writerStream);
+
                         StoreInDocument(model, localeDataDocument, false);
-                        if (PrepareLocaleData != null)
-                        {
-                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, false));
-                        }
-                        WriteDocument(localeDataDocument, writerStream);
+                        PrepareLocaleData?.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, false));
+
+                        WriteDocument(Schema, localeDataDocument, writerStream);
                     }
                 }
             }
@@ -292,25 +275,26 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             if (localeDataDocument == null)
             {
-                throw new ArgumentNullException("localeDataDocument");
+                throw new ArgumentNullException(nameof(localeDataDocument));
             }
+
             if (OnCreateWriterStream == null)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
+
             try
             {
                 lock (SyncRoot)
                 {
-                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(true);
+                    HandleStreamCreationEventArgs handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(true);
                     OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
-                    using (var writerStream = handleStreamCreationEventArgs.Result)
+
+                    using (Stream writerStream = handleStreamCreationEventArgs.Result)
                     {
-                        if (PrepareLocaleData != null)
-                        {
-                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, true));
-                        }
-                        WriteDocument(localeDataDocument, writerStream);
+                        PrepareLocaleData?.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, true));
+
+                        WriteDocument(Schema, localeDataDocument, writerStream);
                     }
                 }
             }
@@ -333,39 +317,31 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
         {
             if (Equals(model, null))
             {
-                throw new ArgumentNullException("model");
+                throw new ArgumentNullException(nameof(model));
             }
+
             if (OnCreateWriterStream == null)
             {
                 throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.EventHandlerNotDefined, "OnCreateWriterStream"));
             }
+
             try
             {
                 lock (SyncRoot)
                 {
-                    var handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(true);
+                    HandleStreamCreationEventArgs handleStreamCreationEventArgs = new HandleStreamCreationEventArgs(true);
                     OnCreateWriterStream.Invoke(this, handleStreamCreationEventArgs);
-                    using (var writerStream = handleStreamCreationEventArgs.Result)
+
+                    using (Stream writerStream = handleStreamCreationEventArgs.Result)
                     {
-                        XDocument localeDataDocument;
-                        if (writerStream.Length == 0)
-                        {
-                            var localeDataSchema = Schema;
-                            var localeDataNamespace = localeDataSchema.Root.GetDefaultNamespace().NamespaceName;
-                            var localeDataRootName = localeDataSchema.Root.Element(XName.Get("element", "http://www.w3.org/2001/XMLSchema")).Attribute(XName.Get("name", string.Empty)).Value;
-                            localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
-                            localeDataDocument.Add(new XElement(XName.Get(localeDataRootName, localeDataNamespace)));
-                        }
-                        else
-                        {
-                            localeDataDocument = ReadDocument(writerStream);
-                        }
+                        XDocument localeDataDocument = writerStream.Length == 0
+                            ? InitializeLocaleDataDocument(Schema)
+                            : ReadDocument(Schema, writerStream);
+
                         StoreInDocument(model, localeDataDocument, true);
-                        if (PrepareLocaleData != null)
-                        {
-                            PrepareLocaleData.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, true));
-                        }
-                        WriteDocument(localeDataDocument, writerStream);
+                        PrepareLocaleData?.Invoke(this, new PrepareLocaleDataEventArgs(localeDataDocument, false, true, true));
+
+                        WriteDocument(Schema, localeDataDocument, writerStream);
                     }
                 }
             }
@@ -379,116 +355,143 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring
             }
         }
 
-        /// <summary>
-        /// Indlæser en given stream i et XDocument.
-        /// </summary>
-        /// <param name="stream">Stream, der skal indlæses i et XDocument.</param>
-        /// <returns>XDocument indeholdende data fra det givne stream.</returns>
-        private static XDocument ReadDocument(Stream stream)
+        private static XDocument InitializeLocaleDataDocument(XDocument localeDataSchema)
         {
+            if (localeDataSchema == null)
+            {
+                throw new ArgumentNullException(nameof(localeDataSchema));
+            }
+
+            if (localeDataSchema.Root == null)
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.LocaleDataSchemaIsInvalid));
+            }
+
+            string localeDataNamespace = localeDataSchema.Root.GetDefaultNamespace().NamespaceName;
+            string localeDataRootName = localeDataSchema.Root.Element(XName.Get("element", "http://www.w3.org/2001/XMLSchema"))?.Attribute(XName.Get("name", string.Empty))?.Value;
+            if (string.IsNullOrWhiteSpace(localeDataRootName))
+            {
+                throw new IntranetGuiRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.LocaleDataSchemaIsInvalid));
+            }
+
+            XDocument localeDataDocument = new XDocument(new XDeclaration("1.0", "utf-8", null));
+            localeDataDocument.Add(new XElement(XName.Get(localeDataRootName, localeDataNamespace)));
+
+            return localeDataDocument;
+        }
+
+        private static XDocument ReadDocument(XDocument localeDataSchema, Stream stream)
+        {
+            if (localeDataSchema == null)
+            {
+                throw new ArgumentNullException(nameof(localeDataSchema));
+            }
+
             if (stream == null)
             {
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             }
-            var readerSettings = new XmlReaderSettings
+
+            XmlReaderSettings readerSettings = new XmlReaderSettings
             {
                 IgnoreComments = true,
                 IgnoreProcessingInstructions = true,
                 IgnoreWhitespace = true
             };
-            using (var reader = XmlReader.Create(stream, readerSettings))
+            using (XmlReader reader = XmlReader.Create(stream, readerSettings))
             {
                 return XDocument.Load(reader);
             }
         }
 
-        /// <summary>
-        /// Skriver et XDocument til en given stream.
-        /// </summary>
-        /// <param name="document">XDocument, der skal skrives.</param>
-        /// <param name="stream">Stream, der skal skrive indholdet af det given XDocument.</param>
-        private static void WriteDocument(XDocument document, Stream stream)
+        private static void WriteDocument(XDocument localeDataSchema, XDocument localeDataDocument, Stream stream)
         {
-            if (document == null)
+            if (localeDataSchema == null)
             {
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(localeDataSchema));
             }
+
+            if (localeDataDocument == null)
+            {
+                throw new ArgumentNullException(nameof(localeDataDocument));
+            }
+
             if (stream == null)
             {
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             }
+
             stream.Seek(0, SeekOrigin.Begin);
             stream.SetLength(0);
-            var writerSettings = new XmlWriterSettings
+
+            XmlWriterSettings writerSettings = new XmlWriterSettings
             {
                 Encoding = Encoding.UTF8,
-                Indent = true
+                Indent = true,
             };
-            using (var writer = XmlWriter.Create(stream, writerSettings))
+            using (XmlWriter writer = XmlWriter.Create(stream, writerSettings))
             {
-                document.WriteTo(writer);
+                localeDataDocument.WriteTo(writer);
                 writer.Flush();
             }
         }
 
-        /// <summary>
-        /// Gemmer data i et XDocument.
-        /// </summary>
-        /// <param name="model">Data, der skal gemmes i XDocument.</param>
-        /// <param name="document">XDocument, hvori data skal gemmes.</param>
-        /// <param name="isStoringSynchronizedData">Angivelse af, om det er synkroniserede data, der gemmes.</param>
         private static void StoreInDocument(IModel model, XDocument document, bool isStoringSynchronizedData)
         {
             if (Equals(model, null))
             {
-                throw new ArgumentNullException("model");
+                throw new ArgumentNullException(nameof(model));
             }
+
             if (document == null)
             {
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(document));
             }
-            var regnskabModel = model as IRegnskabModel;
+
+            IRegnskabModel regnskabModel = model as IRegnskabModel;
             if (regnskabModel != null)
             {
                 regnskabModel.StoreInDocument(document);
                 return;
             }
-            var kontoModel = model as IKontoModel;
+
+            IKontoModel kontoModel = model as IKontoModel;
             if (kontoModel != null)
             {
                 kontoModel.StoreInDocument(document);
                 return;
             }
-            var budgetkontoModel = model as IBudgetkontoModel;
+
+            IBudgetkontoModel budgetkontoModel = model as IBudgetkontoModel;
             if (budgetkontoModel != null)
             {
                 budgetkontoModel.StoreInDocument(document);
                 return;
             }
-            var adressekontoModel = model as IAdressekontoModel;
+
+            IAdressekontoModel adressekontoModel = model as IAdressekontoModel;
             if (adressekontoModel != null)
             {
                 adressekontoModel.StoreInDocument(document);
                 return;
             }
-            var bogføringslinjeModel = model as IBogføringslinjeModel;
+
+            IBogføringslinjeModel bogføringslinjeModel = model as IBogføringslinjeModel;
             if (bogføringslinjeModel != null)
             {
                 bogføringslinjeModel.StoreInDocument(document, isStoringSynchronizedData);
                 return;
             }
-            var kontogruppeModel = model as IKontogruppeModel;
+
+            IKontogruppeModel kontogruppeModel = model as IKontogruppeModel;
             if (kontogruppeModel != null)
             {
                 kontogruppeModel.StoreInDocument(document);
                 return;
             }
-            var budgetkontogruppeModel = model as IBudgetkontogruppeModel;
-            if (budgetkontogruppeModel == null)
-            {
-                return;
-            }
-            budgetkontogruppeModel.StoreInDocument(document);
+
+            IBudgetkontogruppeModel budgetkontogruppeModel = model as IBudgetkontogruppeModel;
+            budgetkontogruppeModel?.StoreInDocument(document);
         }
 
         #endregion

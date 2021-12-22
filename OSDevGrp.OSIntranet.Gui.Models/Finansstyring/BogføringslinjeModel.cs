@@ -42,32 +42,39 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             if (regnskabsnummer <= 0)
             {
-                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", regnskabsnummer), "regnskabsnummer");
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(regnskabsnummer), regnskabsnummer), nameof(regnskabsnummer));
             }
+
             if (løbenummer <= 0)
             {
-                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "løbenummer", løbenummer), "løbenummer");
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(løbenummer), løbenummer), nameof(løbenummer));
             }
+
             if (dato > DateTime.Now)
             {
-                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato), "dato");
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(dato), dato), nameof(dato));
             }
-            if (string.IsNullOrEmpty(kontonummer))
+
+            if (string.IsNullOrWhiteSpace(kontonummer))
             {
-                throw new ArgumentNullException("kontonummer");
+                throw new ArgumentNullException(nameof(kontonummer));
             }
-            if (string.IsNullOrEmpty(tekst))
+
+            if (string.IsNullOrWhiteSpace(tekst))
             {
-                throw new ArgumentNullException("tekst");
+                throw new ArgumentNullException(nameof(tekst));
             }
+
             if (debit < 0M)
             {
-                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "debit", debit), "debit");
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(debit), debit), nameof(debit));
             }
+
             if (kredit < 0M)
             {
-                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "kredit", kredit), "kredit");
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(kredit), kredit), nameof(kredit));
             }
+
             _regnskabsnummer = regnskabsnummer;
             _løbenummer = løbenummer;
             _dato = dato;
@@ -87,16 +94,19 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
         {
             if (regnskabsnummer <= 0)
             {
-                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "regnskabsnummer", regnskabsnummer), "regnskabsnummer");
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(regnskabsnummer), regnskabsnummer), nameof(regnskabsnummer));
             }
+
             if (dato > DateTime.Now)
             {
-                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "dato", dato), "dato");
+                throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(dato), dato), nameof(dato));
             }
-            if (string.IsNullOrEmpty(kontonummer))
+
+            if (string.IsNullOrWhiteSpace(kontonummer))
             {
-                throw new ArgumentNullException("kontonummer");
+                throw new ArgumentNullException(nameof(kontonummer));
             }
+
             _regnskabsnummer = regnskabsnummer;
             _løbenummer = int.MinValue;
             _dato = dato;
@@ -189,7 +199,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     throw new ArgumentNullException("value");
                 }
@@ -214,7 +224,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Finansstyring
             }
             set
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     throw new ArgumentNullException("value");
                 }

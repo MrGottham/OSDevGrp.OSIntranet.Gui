@@ -33,34 +33,22 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces
         /// <summary>
         /// Angivelse af, om der findes et lokalt datalager indeholdende data.
         /// </summary>
-        bool HasLocaleData
-        {
-            get;
-        }
+        bool HasLocaleData { get; }
 
         /// <summary>
         /// Filnavn indeholdende data i det lokale datalager.
         /// </summary>
-        string LocaleDataFileName
-        {
-            get;
-        }
+        string LocaleDataFileName { get; }
 
         /// <summary>
         /// Filnavn indeholdende synkroniseringsdata i det lokale datalager.
         /// </summary>
-        string SyncDataFileName
-        {
-            get;
-        }
+        string SyncDataFileName { get; }
 
         /// <summary>
         /// XDocument, der inderholder XML skemaet, som kan benyttes til validering af de lokale data.
         /// </summary>
-        XDocument Schema
-        {
-            get;
-        }
+        XDocument Schema { get; }
 
         /// <summary>
         /// Henter data fra det lokale datalager.

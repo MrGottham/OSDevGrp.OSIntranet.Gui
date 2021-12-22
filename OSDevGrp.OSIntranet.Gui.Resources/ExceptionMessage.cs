@@ -138,6 +138,16 @@
         [DefaultMessage("The accounting with the unique number '{0}' could not be found.")]
         [GlobalizedMessage(CultureInfoProvider.English, "The accounting with the unique number '{0}' could not be found.")]
         [GlobalizedMessage(CultureInfoProvider.Danish, "Kunne ikke finde et regnskab med regnskabsnummer: {0}")]
-        AccountingNotFound
+        AccountingNotFound,
+
+        [DefaultMessage("The XML schema for the locale data document is invalid.")]
+        [GlobalizedMessage(CultureInfoProvider.English, "The XML schema for the locale data document is invalid.")]
+        [GlobalizedMessage(CultureInfoProvider.Danish, "XML-skemaet for det lokale data dokument er ugyldigt.")]
+        LocaleDataSchemaIsInvalid,
+
+        [DefaultMessage("The required attribute named '{0}' is missing or does not have a value.")]
+        [GlobalizedMessage(CultureInfoProvider.English, "The required attribute named '{0}' is missing or does not have a value")]
+        [GlobalizedMessage(CultureInfoProvider.Danish, "Attributten med navnet '{0}' mangler eller har ikke en værdi.")]
+        MissingRequiredAttributeValue
     }
 }

@@ -142,6 +142,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
         public void TestAtConstructorKasterArgumentNullExceptionVedIllegalKontonummer(string illegalValue)
         {
             var fixture = new Fixture();
@@ -161,6 +162,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
         public void TestAtConstructorKasterArgumentNullExceptionVedIllegalTekst(string illegalValue)
         {
             var fixture = new Fixture();
@@ -357,6 +359,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
         public void TestAtKontonummerSetterKasterArgumentExceptionVedIllegalValue(string illegalValue)
         {
             var fixture = new Fixture();
@@ -432,6 +435,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
         public void TestAtTekstSetterKasterArgumentExceptionVedIllegalValue(string illegalValue)
         {
             var fixture = new Fixture();
@@ -845,6 +849,7 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
         public void TestAtCreateNewKasterArgumentNullExceptionVedIllegalKontonummer(string illegalValue)
         {
             var fixture = new Fixture();

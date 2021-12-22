@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
-using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
 {
@@ -20,13 +20,13 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         public void TestAtConstructorInitiererBogføringsresultatModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => new Mock<IBogføringslinjeModel>().Object));
+            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => new Mock<IBogføringsadvarselModel>().Object));
 
-            var bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
-            var bogføringsadvarselModelMockCollection = fixture.CreateMany<IBogføringsadvarselModel>(7).ToList();
-            var bogføringsresultatModel = new BogføringsresultatModel(bogføringslinjeModelMock, bogføringsadvarselModelMockCollection);
+            IBogføringslinjeModel bogføringslinjeModelMock = fixture.Create<IBogføringslinjeModel>();
+            IBogføringsadvarselModel[] bogføringsadvarselModelMockCollection = fixture.CreateMany<IBogføringsadvarselModel>(7).ToArray();
+            IBogføringsresultatModel bogføringsresultatModel = new BogføringsresultatModel(bogføringslinjeModelMock, bogføringsadvarselModelMockCollection);
             Assert.That(bogføringsresultatModel, Is.Not.Null);
             Assert.That(bogføringsresultatModel.Bogføringslinje, Is.Not.Null);
             Assert.That(bogføringsresultatModel.Bogføringslinje, Is.EqualTo(bogføringslinjeModelMock));
@@ -41,15 +41,19 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisBogføringslinjeModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
+            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => new Mock<IBogføringsadvarselModel>().Object));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BogføringsresultatModel(null, fixture.CreateMany<IBogføringsadvarselModel>(7).ToList()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BogføringsresultatModel(null, fixture.CreateMany<IBogføringsadvarselModel>(7).ToList()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("bogføringslinje"));
             Assert.That(exception.InnerException, Is.Null);
+            // ReSharper restore PossibleNullReferenceException
         }
 
         /// <summary>
@@ -58,15 +62,19 @@ namespace OSDevGrp.OSIntranet.Gui.Models.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisBogføringsadvarselModelCollectionErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringslinjeModel>()));
+            Fixture fixture = new Fixture();
+            fixture.Customize<IBogføringslinjeModel>(e => e.FromFactory(() => new Mock<IBogføringslinjeModel>().Object));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BogføringsresultatModel(fixture.Create<IBogføringslinjeModel>(), null));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BogføringsresultatModel(fixture.Create<IBogføringslinjeModel>(), null));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
+            // ReSharper disable PossibleNullReferenceException
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("bogføringsadvarsler"));
             Assert.That(exception.InnerException, Is.Null);
+            // ReSharper restore PossibleNullReferenceException
         }
     }
 }
