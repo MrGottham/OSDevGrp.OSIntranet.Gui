@@ -38,12 +38,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (dependencyCommand == null)
             {
-                throw new ArgumentNullException("dependencyCommand");
+                throw new ArgumentNullException(nameof(dependencyCommand));
             }
+
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
+
             _dependencyCommand = dependencyCommand;
             _finansstyringRepository = finansstyringRepository;
         }
@@ -68,30 +70,30 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="kontoViewModel">ViewModel for kontoen, der skal hentes og opdateres.</param>
         protected override void Execute(IKontoViewModel kontoViewModel)
         {
-            var regnskabViewModel = kontoViewModel.Regnskab;
+            IRegnskabViewModel regnskabViewModel = kontoViewModel.Regnskab;
+
             Task dependencyCommandTask = null;
             if (_dependencyCommand.CanExecute(regnskabViewModel))
             {
                 _dependencyCommand.Execute(regnskabViewModel);
                 dependencyCommandTask = _dependencyCommand.ExecuteTask;
             }
+
             _isBusy = true;
-            var task = _finansstyringRepository.KontoGetAsync(regnskabViewModel.Nummer, kontoViewModel.Kontonummer, kontoViewModel.StatusDato);
+            Task<IKontoModel> task = _finansstyringRepository.KontoGetAsync(regnskabViewModel.Nummer, kontoViewModel.Kontonummer, kontoViewModel.StatusDato);
             ExecuteTask = task.ContinueWith(t =>
+            {
+                try
                 {
-                    try
-                    {
-                        if (dependencyCommandTask != null)
-                        {
-                            dependencyCommandTask.Wait();
-                        }
-                        HandleResultFromTask(t, kontoViewModel, new List<IKontogruppeViewModel>(regnskabViewModel.Kontogrupper), HandleResult);
-                    }
-                    finally
-                    {
-                        _isBusy = false;
-                    }
-                });
+                    dependencyCommandTask?.GetAwaiter().GetResult();
+
+                    HandleResultFromTask(t, kontoViewModel, new List<IKontogruppeViewModel>(regnskabViewModel.Kontogrupper), HandleResult);
+                }
+                finally
+                {
+                    _isBusy = false;
+                }
+            });
         }
 
         /// <summary>
@@ -104,21 +106,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (kontoViewModel == null)
             {
-                throw new ArgumentNullException("kontoViewModel");
+                throw new ArgumentNullException(nameof(kontoViewModel));
             }
+
             if (kontoModel == null)
             {
-                throw new ArgumentNullException("kontoModel");
+                throw new ArgumentNullException(nameof(kontoModel));
             }
+
             if (kontogruppeViewModels == null)
             {
-                throw new ArgumentNullException("kontogruppeViewModels");
+                throw new ArgumentNullException(nameof(kontogruppeViewModels));
             }
-            var kontogruppeViewModel = kontogruppeViewModels.SingleOrDefault(m => m.Nummer == kontoModel.Kontogruppe);
+
+            IKontogruppeViewModel kontogruppeViewModel = kontogruppeViewModels.SingleOrDefault(m => m.Nummer == kontoModel.Kontogruppe);
             if (kontogruppeViewModel == null)
             {
                 throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.AccountGroupNotFound, kontoModel.Kontogruppe));
             }
+
             kontoViewModel.Kontonavn = kontoModel.Kontonavn;
             kontoViewModel.Beskrivelse = kontoModel.Beskrivelse;
             kontoViewModel.Notat = kontoModel.Notat;

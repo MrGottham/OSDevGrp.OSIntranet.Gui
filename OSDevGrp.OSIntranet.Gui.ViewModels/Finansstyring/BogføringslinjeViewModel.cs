@@ -11,15 +11,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
     /// </summary>
     public class BogføringslinjeViewModel : ValidateableViewModelBase, IReadOnlyBogføringslinjeViewModel
     {
-        #region Private variables
-
-        private readonly IRegnskabViewModel _regnskabViewModel;
-        private readonly IBogføringslinjeModel _bogføringslinjeModel;
-
-        #endregion
-
         #region Constructor
-        
+
         /// <summary>
         /// Danner ViewModel for en bogføringslinje.
         /// </summary>
@@ -29,17 +22,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (regnskabViewModel == null)
             {
-                throw new ArgumentNullException("regnskabViewModel");
+                throw new ArgumentNullException(nameof(regnskabViewModel));
             }
+
             if (bogføringslinjeModel == null)
             {
-                throw new ArgumentNullException("bogføringslinjeModel");
+                throw new ArgumentNullException(nameof(bogføringslinjeModel));
             }
-            _regnskabViewModel = regnskabViewModel;
-            _bogføringslinjeModel = bogføringslinjeModel;
-            _bogføringslinjeModel.PropertyChanged += PropertyChangedOnBogføringslinjeModelEventHandler;
+
+            Regnskab = regnskabViewModel;
+            Model = bogføringslinjeModel;
+            Model.PropertyChanged += PropertyChangedOnBogføringslinjeModelEventHandler;
         }
-        
+
         #endregion
 
         #region Properties
@@ -47,90 +42,42 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Regnskabet, som bogføringslinjen er tilknyttet.
         /// </summary>
-        public virtual IRegnskabViewModel Regnskab
-        {
-            get
-            {
-                return _regnskabViewModel;
-            }
-        }
+        public virtual IRegnskabViewModel Regnskab { get; }
 
         /// <summary>
         /// Unik identifikation af bogføringslinjen inden for regnskabet.
         /// </summary>
-        public virtual int Løbenummer
-        {
-            get
-            {
-                return _bogføringslinjeModel.Løbenummer;
-            }
-        }
+        public virtual int Løbenummer => Model.Løbenummer;
 
         /// <summary>
         /// Bogføringstidspunkt.
         /// </summary>
-        public virtual DateTime Dato
-        {
-            get
-            {
-                return _bogføringslinjeModel.Dato;
-            }
-        }
+        public virtual DateTime Dato => Model.Dato;
 
         /// <summary>
         /// Bilagsnummer.
         /// </summary>
-        public virtual string Bilag
-        {
-            get
-            {
-                return _bogføringslinjeModel.Bilag;
-            }
-        }
+        public virtual string Bilag => Model.Bilag;
 
         /// <summary>
         /// Kontonummer, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        public virtual string Kontonummer
-        {
-            get
-            {
-                return _bogføringslinjeModel.Kontonummer;
-            }
-        }
+        public virtual string Kontonummer => Model.Kontonummer;
 
         /// <summary>
         /// Tekst.
         /// </summary>
-        public virtual string Tekst
-        {
-            get
-            {
-                return _bogføringslinjeModel.Tekst;
-            }
-        }
+        public virtual string Tekst => Model.Tekst;
 
         /// <summary>
         /// Budgetkontonummer, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        public virtual string Budgetkontonummer
-        {
-            get
-            {
-                return _bogføringslinjeModel.Budgetkontonummer;
-            }
-        }
+        public virtual string Budgetkontonummer => Model.Budgetkontonummer;
 
         /// <summary>
         /// Debitbeløb.
         /// </summary>
-        public virtual decimal Debit
-        {
-            get
-            {
-                return _bogføringslinjeModel.Debit;
-            }
-        }
+        public virtual decimal Debit => Model.Debit;
 
         /// <summary>
         /// Tekstangivelse af debitbeløb.
@@ -139,7 +86,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var result = Debit;
+                decimal result = Debit;
                 return result == 0M ? string.Empty : result.ToString("C");
             }
         }
@@ -147,13 +94,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Kreditbeløb.
         /// </summary>
-        public virtual decimal Kredit
-        {
-            get
-            {
-                return _bogføringslinjeModel.Kredit;
-            }
-        }
+        public virtual decimal Kredit => Model.Kredit;
 
         /// <summary>
         /// Tekstangivelse af kreditbeløb.
@@ -162,7 +103,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var result = Kredit;
+                decimal result = Kredit;
                 return result == 0M ? string.Empty : result.ToString("C");
             }
         }
@@ -170,13 +111,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Bogføringsbeløb.
         /// </summary>
-        public virtual decimal Bogført
-        {
-            get
-            {
-                return _bogføringslinjeModel.Bogført;
-            }
-        }
+        public virtual decimal Bogført => Model.Bogført;
 
         /// <summary>
         /// Tekstangivelse af bogføringsbeløb.
@@ -185,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var result = Bogført;
+                decimal result = Bogført;
                 return result == 0M ? string.Empty : result.ToString("C");
             }
         }
@@ -193,46 +128,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Adressekonto, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        public virtual int Adressekonto
-        {
-            get
-            {
-                return _bogføringslinjeModel.Adressekonto;
-            }
-        }
+        public virtual int Adressekonto => Model.Adressekonto;
 
         /// <summary>
         /// Billede, der illustrerer en bogføringslinje.
         /// </summary>
-        public virtual byte[] Image
-        {
-            get
-            {
-                return Resource.GetEmbeddedResource("Images.Bogføringslinje.png");
-            }
-        }
+        public virtual byte[] Image => Resource.GetEmbeddedResource("Images.Bogføringslinje.png");
 
         /// <summary>
         /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
         /// </summary>
-        public override string DisplayName
-        {
-            get
-            {
-                return _bogføringslinjeModel.Nyhedsinformation;
-            }
-        }
+        public override string DisplayName => Model.Nyhedsinformation;
 
         /// <summary>
         /// Model for bogføringslinjen.
         /// </summary>
-        protected virtual IBogføringslinjeModel Model
-        {
-            get
-            {
-                return _bogføringslinjeModel;
-            }
-        }
+        protected IBogføringslinjeModel Model { get; }
 
         #endregion
 
@@ -247,32 +158,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (eventArgs == null)
             {
-                throw new ArgumentNullException("eventArgs");
+                throw new ArgumentNullException(nameof(eventArgs));
             }
+
             switch (eventArgs.PropertyName)
             {
-                case "Debit":
+                case nameof(Debit):
                     RaisePropertyChanged(eventArgs.PropertyName);
-                    RaisePropertyChanged("DebitAsText");
+                    RaisePropertyChanged(nameof(DebitAsText));
                     break;
 
-                case "Kredit":
+                case nameof(Kredit):
                     RaisePropertyChanged(eventArgs.PropertyName);
-                    RaisePropertyChanged("KreditAsText");
+                    RaisePropertyChanged(nameof(KreditAsText));
                     break;
 
-                case "Bogført":
+                case nameof(Bogført):
                     RaisePropertyChanged(eventArgs.PropertyName);
-                    RaisePropertyChanged("BogførtAsText");
+                    RaisePropertyChanged(nameof(BogførtAsText));
                     break;
 
                 case "Nyhedsinformation":
                     RaisePropertyChanged(eventArgs.PropertyName);
-                    RaisePropertyChanged("DisplayName");
+                    RaisePropertyChanged(nameof(DisplayName));
                     break;
 
                 default:

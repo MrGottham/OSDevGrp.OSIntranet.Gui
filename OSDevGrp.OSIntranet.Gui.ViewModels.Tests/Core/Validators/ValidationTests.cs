@@ -23,7 +23,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("ZYX")]
         public void TestAtValidateRequiredValueReturnererSuccessVedLovligeValues(string value)
         {
-            var result = Validation.ValidateRequiredValue(value);
+            ValidationResult result = Validation.ValidateRequiredValue(value);
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -36,12 +36,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase(" ")]
         public void TestAtValidateRequiredValueReturnererValidationResultVedUlovligeValues(string value)
         {
-            var result = Validation.ValidateRequiredValue(value);
+            ValidationResult result = Validation.ValidateRequiredValue(value);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
             Assert.That(result.ErrorMessage, Is.Not.Empty);
-            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueIsRequiered)));
+            Assert.That(result.ErrorMessage, Is.EqualTo(Resource.GetText(Text.ValueIsRequired)));
             Assert.That(result.MemberNames, Is.Not.Null);
             Assert.That(result.MemberNames, Is.Empty);
         }
@@ -54,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("http://www.google.dk")]
         public void TestAtValidateUriReturnererSuccessVedLovligeValues(string value)
         {
-            var result = Validation.ValidateUri(value);
+            ValidationResult result = Validation.ValidateUri(value);
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -64,10 +64,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
         [TestCase("XYZ")]
         public void TestAtValidateUriReturnererValidationResultVedUlovligeValues(string value)
         {
-            var result = Validation.ValidateUri(value);
+            ValidationResult result = Validation.ValidateUri(value);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
@@ -87,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase(30, 0, 30)]
         public void TestAtValidateIntervalReturnererSuccessVedLovligeValues(int value, int min, int max)
         {
-            var result = Validation.ValidateInterval(value, min, max);
+            ValidationResult result = Validation.ValidateInterval(value, min, max);
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -101,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase(40, 0, 30)]
         public void TestAtValidateIntervalReturnererValidationResultVedUlovligeValues(int value, int min, int max)
         {
-            var result = Validation.ValidateInterval(value, min, max);
+            ValidationResult result = Validation.ValidateInterval(value, min, max);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
@@ -129,8 +130,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("2051-12-31")]
         public void TestAtValidateDateReturnererSuccessVedLovligeValues(string value)
         {
-            var valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
-            var result = Validation.ValidateDate(valueAsDateTime.ToString("d", Thread.CurrentThread.CurrentUICulture));
+            DateTime valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
+            ValidationResult result = Validation.ValidateDate(valueAsDateTime.ToString("d", Thread.CurrentThread.CurrentUICulture));
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -139,13 +140,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         /// </summary>
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
         [TestCase("XYZ")]
         [TestCase("ZYX")]
         [TestCase("2014-01-35")]
         [TestCase("2014-13-01")]
         public void TestAtValidateDateReturnererValidationResultVedUlovligeValues(string value)
         {
-            var result = Validation.ValidateDate(value);
+            ValidationResult result = Validation.ValidateDate(value);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
@@ -173,9 +175,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("2051-12-31", "2051-12-31")]
         public void TestAtValidateDateLowerOrEqualToReturnererSuccessVedLovligeValues(string value, string maxDate)
         {
-            var valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
-            var maxDateTime = DateTime.Parse(maxDate, new CultureInfo("en-US"));
-            var result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToString("d", CultureInfo.CurrentUICulture), maxDateTime);
+            DateTime valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
+            DateTime maxDateTime = DateTime.Parse(maxDate, new CultureInfo("en-US"));
+            ValidationResult result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToString("d", CultureInfo.CurrentUICulture), maxDateTime);
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -193,9 +195,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("2051-12-31", "2050-12-31")]
         public void TestAtValidateDateLowerOrEqualToReturnererValidationResultVedUlovligeValues(string value, string maxDate)
         {
-            var valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
-            var maxDateTime = DateTime.Parse(maxDate, new CultureInfo("en-US"));
-            var result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToString("d", Thread.CurrentThread.CurrentUICulture), maxDateTime);
+            DateTime valueAsDateTime = DateTime.Parse(value, new CultureInfo("en-US"));
+            DateTime maxDateTime = DateTime.Parse(maxDate, new CultureInfo("en-US"));
+            ValidationResult result = Validation.ValidateDateLowerOrEqualTo(valueAsDateTime.ToString("d", Thread.CurrentThread.CurrentUICulture), maxDateTime);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
@@ -220,8 +222,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("$ 4,000.00")]
         public void TestAtValidateDecimalReturnererSuccessVedLovligeValues(string value)
         {
-            var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
-            var result = Validation.ValidateDecimal(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture));
+            decimal valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
+            ValidationResult result = Validation.ValidateDecimal(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture));
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -236,7 +238,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("ZYX")]
         public void TestAtValidateDecimalReturnererValidationResultVedUlovligeValues(string value)
         {
-            var result = Validation.ValidateDecimal(value);
+            ValidationResult result = Validation.ValidateDecimal(value);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);
@@ -256,8 +258,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("$ 4,000.00", 1000.00)]
         public void TestAtValidateDecimalGreaterOrEqualToReturnererSuccessVedLovligeValues(string value, decimal minValue)
         {
-            var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
-            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture), minValue);
+            decimal valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
+            ValidationResult result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture), minValue);
             Assert.That(result, Is.EqualTo(ValidationResult.Success));
         }
 
@@ -271,8 +273,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Validators
         [TestCase("$ 4,000.00", 4000.01)]
         public void TestAtValidateDecimalGreaterOrEqualToReturnererValidationResultVedUlovligeValues(string value, decimal minValue)
         {
-            var valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
-            var result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture), minValue);
+            decimal valueAsDecimal = decimal.Parse(value, NumberStyles.Any, new CultureInfo("en-US"));
+            ValidationResult result = Validation.ValidateDecimalGreaterOrEqualTo(valueAsDecimal.ToString("C", Thread.CurrentThread.CurrentUICulture), minValue);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.EqualTo(ValidationResult.Success));
             Assert.That(result.ErrorMessage, Is.Not.Null);

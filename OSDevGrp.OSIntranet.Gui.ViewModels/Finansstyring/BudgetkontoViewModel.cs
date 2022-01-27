@@ -44,10 +44,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         public virtual decimal Indtægter
         {
-            get
-            {
-                return Model.Indtægter;
-            }
+            get { return Model.Indtægter; }
             set
             {
                 try
@@ -64,34 +61,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetterede indtægter.
         /// </summary>
-        public virtual string IndtægterAsText
-        {
-            get
-            {
-                return Indtægter.ToString("C");
-            }
-        }
+        public virtual string IndtægterAsText => Indtægter.ToString("C");
 
         /// <summary>
         /// Label til budgetterede indtægter.
         /// </summary>
-        public virtual string IndtægterLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Income);
-            }
-        }
+        public virtual string IndtægterLabel => Resource.GetText(Text.Income);
 
         /// <summary>
         /// Budgetterede udgifter.
         /// </summary>
         public virtual decimal Udgifter
         {
-            get
-            {
-                return Model.Udgifter;
-            }
+            get { return Model.Udgifter; }
             set
             {
                 try
@@ -108,67 +90,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetterede udgifter.
         /// </summary>
-        public virtual string UdgifterAsText
-        {
-            get
-            {
-                return Udgifter.ToString("C");
-            }
-        }
+        public virtual string UdgifterAsText => Udgifter.ToString("C");
 
         /// <summary>
         /// Label til budgetterede udgifter.
         /// </summary>
-        public virtual string UdgifterLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Expenses);
-            }
-        }
+        public virtual string UdgifterLabel => Resource.GetText(Text.Expenses);
 
         /// <summary>
         /// Budgetteret beløb.
         /// </summary>
-        public virtual decimal Budget
-        {
-            get
-            {
-                return Model.Budget;
-            }
-        }
+        public virtual decimal Budget => Model.Budget;
 
         /// <summary>
         /// Tekstangivelse af budgetteret beløb.
         /// </summary>
-        public virtual string BudgetAsText
-        {
-            get
-            {
-                return Budget.ToString("C");
-            }
-        }
+        public virtual string BudgetAsText => Budget.ToString("C");
 
         /// <summary>
         /// Label til budgetteret beløb.
         /// </summary>
-        public virtual string BudgetLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Budget);
-            }
-        }
+        public virtual string BudgetLabel => Resource.GetText(Text.Budget);
 
         /// <summary>
         /// Budgetteret beløb for sidste måned.
         /// </summary>
         public virtual decimal BudgetSidsteMåned
         {
-            get
-            {
-                return Model.BudgetSidsteMåned;
-            }
+            get { return Model.BudgetSidsteMåned; }
             set
             {
                 try
@@ -185,34 +134,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetteret beløb for sidste måned.
         /// </summary>
-        public virtual string BudgetSidsteMånedAsText
-        {
-            get
-            {
-                return BudgetSidsteMåned.ToString("C");
-            }
-        }
+        public virtual string BudgetSidsteMånedAsText => BudgetSidsteMåned.ToString("C");
 
         /// <summary>
         /// Label af budgetteret beløb for sidste måned.
         /// </summary>
-        public virtual string BudgetSidsteMånedLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetLastMonth);
-            }
-        }
+        public virtual string BudgetSidsteMånedLabel => Resource.GetText(Text.BudgetLastMonth);
 
         /// <summary>
         /// Budgetteret beløb for år til dato.
         /// </summary>
         public virtual decimal BudgetÅrTilDato
         {
-            get
-            {
-                return Model.BudgetÅrTilDato;
-            }
+            get { return Model.BudgetÅrTilDato; }
             set
             {
                 try
@@ -229,34 +163,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetteret beløb for år til dato.
         /// </summary>
-        public virtual string BudgetÅrTilDatoAsText
-        {
-            get
-            {
-                return BudgetÅrTilDato.ToString("C");
-            }
-        }
+        public virtual string BudgetÅrTilDatoAsText => BudgetÅrTilDato.ToString("C");
 
         /// <summary>
         /// Label af budgetteret beløb for år til dato.
         /// </summary>
-        public virtual string BudgetÅrTilDatoLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetYearToDate);
-            }
-        }
+        public virtual string BudgetÅrTilDatoLabel => Resource.GetText(Text.BudgetYearToDate);
 
         /// <summary>
         /// Budgetteret beløb for sidste år.
         /// </summary>
         public virtual decimal BudgetSidsteÅr
         {
-            get
-            {
-                return Model.BudgetSidsteÅr;
-            }
+            get { return Model.BudgetSidsteÅr; }
             set
             {
                 try
@@ -273,34 +192,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetteret beløb for sidste år.
         /// </summary>
-        public virtual string BudgetSidsteÅrAsText
-        {
-            get
-            {
-                return BudgetSidsteÅr.ToString("C");
-            }
-        }
+        public virtual string BudgetSidsteÅrAsText => BudgetSidsteÅr.ToString("C");
 
         /// <summary>
         /// Label af budgetteret beløb for sidste år.
         /// </summary>
-        public virtual string BudgetSidsteÅrLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetLastYear);
-            }
-        }
+        public virtual string BudgetSidsteÅrLabel => Resource.GetText(Text.BudgetLastYear);
 
         /// <summary>
         /// Bogført beløb.
         /// </summary>
         public virtual decimal Bogført
         {
-            get
-            {
-                return Model.Bogført;
-            }
+            get { return Model.Bogført; }
             set
             {
                 try
@@ -317,34 +221,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb.
         /// </summary>
-        public virtual string BogførtAsText
-        {
-            get
-            {
-                return Bogført.ToString("C");
-            }
-        }
+        public virtual string BogførtAsText => Bogført.ToString("C");
 
         /// <summary>
         /// Label til bogført beløb.
         /// </summary>
-        public virtual string BogførtLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Bookkeeped);
-            }
-        }
+        public virtual string BogførtLabel => Resource.GetText(Text.Posted);
 
         /// <summary>
         /// Bogført beløb for sidste måned.
         /// </summary>
         public virtual decimal BogførtSidsteMåned
         {
-            get
-            {
-                return Model.BogførtSidsteMåned;
-            }
+            get { return Model.BogførtSidsteMåned; }
             set
             {
                 try
@@ -361,34 +250,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb for sidste måned.
         /// </summary>
-        public virtual string BogførtSidsteMånedAsText
-        {
-            get
-            {
-                return BogførtSidsteMåned.ToString("C");
-            }
-        }
+        public virtual string BogførtSidsteMånedAsText => BogførtSidsteMåned.ToString("C");
 
         /// <summary>
         /// Label af bogført beløb for sidste måned.
         /// </summary>
-        public virtual string BogførtSidsteMånedLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedLastMonth);
-            }
-        }
+        public virtual string BogførtSidsteMånedLabel => Resource.GetText(Text.PostedLastMonth);
 
         /// <summary>
         /// Bogført beløb for år til dato.
         /// </summary>
         public virtual decimal BogførtÅrTilDato
         {
-            get
-            {
-                return Model.BogførtÅrTilDato;
-            }
+            get { return Model.BogførtÅrTilDato; }
             set
             {
                 try
@@ -405,34 +279,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb for år til dato.
         /// </summary>
-        public virtual string BogførtÅrTilDatoAsText
-        {
-            get
-            {
-                return BogførtÅrTilDato.ToString("C");
-            }
-        }
+        public virtual string BogførtÅrTilDatoAsText => BogførtÅrTilDato.ToString("C");
 
         /// <summary>
         /// Label af bogført beløb for år til dato.
         /// </summary>
-        public virtual string BogførtÅrTilDatoLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedYearToDate);
-            }
-        }
+        public virtual string BogførtÅrTilDatoLabel => Resource.GetText(Text.PostedYearToDate);
 
         /// <summary>
         /// Bogført beløb for sidste år.
         /// </summary>
         public virtual decimal BogførtSidsteÅr
         {
-            get
-            {
-                return Model.BogførtSidsteÅr;
-            }
+            get { return Model.BogførtSidsteÅr; }
             set
             {
                 try
@@ -449,79 +308,37 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb for sidste år.
         /// </summary>
-        public virtual string BogførtSidsteÅrAsText
-        {
-            get
-            {
-                return BogførtSidsteÅr.ToString("C");
-            }
-        }
+        public virtual string BogførtSidsteÅrAsText => BogførtSidsteÅr.ToString("C");
 
         /// <summary>
         /// Label af bogført beløb for sidste år.
         /// </summary>
-        public virtual string BogførtSidsteÅrLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedLastYear);
-            }
-        }
+        public virtual string BogførtSidsteÅrLabel => Resource.GetText(Text.PostedLastYear);
 
         /// <summary>
         /// Disponibel beløb.
         /// </summary>
-        public virtual decimal Disponibel
-        {
-            get
-            {
-                return Model.Disponibel;
-            }
-        }
+        public virtual decimal Disponibel => Model.Disponibel;
 
         /// <summary>
         /// Tekstangivelse af disponibel beløb.
         /// </summary>
-        public virtual string DisponibelAsText
-        {
-            get
-            {
-                return Disponibel.ToString("C");
-            }
-        }
+        public virtual string DisponibelAsText => Disponibel.ToString("C");
 
         /// <summary>
         /// Label til disponibel beløb.
         /// </summary>
-        public virtual string DisponibelLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Available);
-            }
-        }
+        public virtual string DisponibelLabel => Resource.GetText(Text.Available);
 
         /// <summary>
         /// Kontoens værdi pr. opgørelsestidspunktet.
         /// </summary>
-        public override decimal Kontoværdi
-        {
-            get
-            {
-                return Math.Abs(Bogført);
-            }
-        }
+        public override decimal Kontoværdi => Math.Abs(Bogført);
 
         /// <summary>
         /// Kommando til genindlæsning og opdatering af budgetkontoen.
         /// </summary>
-        public override ICommand RefreshCommand
-        {
-            get
-            {
-                return _refreshCommand ?? (_refreshCommand = new BudgetkontoGetCommand(new BudgetkontogrupperGetCommand(FinansstyringRepository, ExceptionHandler), FinansstyringRepository, ExceptionHandler));
-            }
-        }
+        public override ICommand RefreshCommand => _refreshCommand ?? (_refreshCommand = new BudgetkontoGetCommand(new BudgetkontogrupperGetCommand(FinansstyringRepository, ExceptionHandler), FinansstyringRepository, ExceptionHandler));
 
         #endregion
 
@@ -535,49 +352,49 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             switch (propertyName)
             {
-                case "Indtægter":
-                    RaisePropertyChanged("IndtægterAsText");
+                case nameof(Indtægter):
+                    RaisePropertyChanged(nameof(IndtægterAsText));
                     break;
 
-                case "Udgifter":
-                    RaisePropertyChanged("UdgifterAsText");
+                case nameof(Udgifter):
+                    RaisePropertyChanged(nameof(UdgifterAsText));
                     break;
 
-                case "Budget":
-                    RaisePropertyChanged("BudgetAsText");
+                case nameof(Budget):
+                    RaisePropertyChanged(nameof(BudgetAsText));
                     break;
 
-                case "BudgetSidsteMåned":
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
+                case nameof(BudgetSidsteMåned):
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
                     break;
 
-                case "BudgetÅrTilDato":
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                case nameof(BudgetÅrTilDato):
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
                     break;
 
-                case "BudgetSidsteÅr":
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                case nameof(BudgetSidsteÅr):
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
                     break;
 
-                case "Bogført":
-                    RaisePropertyChanged("BogførtAsText");
-                    RaisePropertyChanged("Kontoværdi");
+                case nameof(Bogført):
+                    RaisePropertyChanged(nameof(BogførtAsText));
+                    RaisePropertyChanged(nameof(Kontoværdi));
                     break;
 
-                case "BogførtSidsteMåned":
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                case nameof(BogførtSidsteMåned):
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
                     break;
 
-                case "BogførtÅrTilDato":
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                case nameof(BogførtÅrTilDato):
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
                     break;
 
-                case "BogførtSidsteÅr":
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                case nameof(BogførtSidsteÅr):
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
                     break;
 
-                case "Disponibel":
-                    RaisePropertyChanged("DisponibelAsText");
+                case nameof(Disponibel):
+                    RaisePropertyChanged(nameof(DisponibelAsText));
                     break;
             }
         }

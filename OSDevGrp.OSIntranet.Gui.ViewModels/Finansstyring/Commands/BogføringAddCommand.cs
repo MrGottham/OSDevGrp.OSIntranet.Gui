@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -38,8 +41,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
+
             _finansstyringRepository = finansstyringRepository;
         }
 
@@ -74,42 +78,52 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 {
                     return false;
                 }
+
                 if (BogføringViewModel.ValidateBilag(viewModel.Bilag) != ValidationResult.Success)
                 {
                     return false;
                 }
+
                 if (BogføringViewModel.ValidateKontonummer(viewModel.Kontonummer) != ValidationResult.Success)
                 {
                     return false;
                 }
+
                 if (BogføringViewModel.ValidateTekst(viewModel.Tekst) != ValidationResult.Success)
                 {
                     return false;
                 }
+
                 if (BogføringViewModel.ValidateBudgetkontonummer(viewModel.Budgetkontonummer) != ValidationResult.Success)
                 {
                     return false;
                 }
+
                 if (BogføringViewModel.ValidateCurrency(viewModel.DebitAsText) != ValidationResult.Success)
                 {
                     return false;
                 }
+
                 if (BogføringViewModel.ValidateCurrency(viewModel.KreditAsText) != ValidationResult.Success)
                 {
                     return false;
                 }
+
                 if (BogføringViewModel.ValidateAdressekonto(viewModel.Adressekonto) != ValidationResult.Success)
                 {
                     return false;
                 }
+
                 if (Math.Abs(viewModel.Debit) + Math.Abs(viewModel.Kredit) <= 0M)
                 {
                     return false;
                 }
+
                 if (viewModel.IsWorking)
                 {
                     return false;
                 }
+
                 return _isBusy == false;
             }
             catch
@@ -125,18 +139,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         protected override void Execute(IBogføringViewModel viewModel)
         {
             _isBusy = true;
-            var task = _finansstyringRepository.BogførAsync(viewModel.Regnskab.Nummer, viewModel.Dato, viewModel.Bilag, viewModel.Kontonummer, viewModel.Tekst, viewModel.Budgetkontonummer, viewModel.Debit, viewModel.Kredit, viewModel.Adressekonto);
+
+            Task<IEnumerable<IBogføringsresultatModel>> task = _finansstyringRepository.BogførAsync(viewModel.ToModel());
             ExecuteTask = task.ContinueWith(t =>
+            {
+                try
                 {
-                    try
-                    {
-                        HandleResultFromTask(t, viewModel, new object(), HandleResult);
-                    }
-                    finally
-                    {
-                        _isBusy = false;
-                    }
-                });
+                    HandleResultFromTask(t, viewModel, new object(), HandleResult);
+                }
+                finally
+                {
+                    _isBusy = false;
+                }
+            });
         }
 
         /// <summary>
@@ -155,29 +170,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                     base.HandleException(exception, parameter);
                     return;
                 }
+
                 if (exception is IntranetGuiValidationException)
                 {
                     commandException = new IntranetGuiCommandException(Resource.GetExceptionMessage(ExceptionMessage.ErrorPostingAccountingLine), exception.Message, this, parameter, exception);
                     base.HandleException(commandException, parameter);
                     return;
                 }
+
                 if (exception is IntranetGuiBusinessException)
                 {
                     commandException = new IntranetGuiCommandException(Resource.GetExceptionMessage(ExceptionMessage.ErrorPostingAccountingLine), exception.Message, this, parameter, exception);
                     base.HandleException(commandException, parameter);
                     return;
                 }
+
                 if (exception is IntranetGuiRepositoryException)
                 {
                     commandException = new IntranetGuiCommandException(Resource.GetExceptionMessage(ExceptionMessage.ErrorPostingAccountingLine), Resource.GetExceptionMessage(ExceptionMessage.ErrorUpdateFinansstyringRepository), this, _finansstyringRepository, exception);
                     base.HandleException(commandException, parameter);
                     return;
                 }
+
                 if (exception is IntranetGuiSystemException)
                 {
                     base.HandleException(exception, parameter);
                     return;
                 }
+
                 systemException = new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.CommandError, "BogføringAddCommand", exception.Message), exception);
                 base.HandleException(systemException, parameter);
             }
@@ -194,73 +214,83 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// Tilføjer en bogføringslinje til regnskabet på baggrund af ViewModel til bogføring.
         /// </summary>
         /// <param name="bogføringViewModel">ViewModel, som er grundlaget for bogføringslinjen, der skal tilføjes.</param>
-        /// <param name="bogføringsresultatModel">Model indeholdende resultatet af endt bogføring.</param>
+        /// <param name="bogføringsresultatModelCollection">Kollektion af modeller indeholdende resultatet af endt bogføring.</param>
         /// <param name="arguments">Argument til tilføjelse af en bogføringslinjen til regnskabet.</param>
-        private void HandleResult(IBogføringViewModel bogføringViewModel, IBogføringsresultatModel bogføringsresultatModel, object arguments)
+        private void HandleResult(IBogføringViewModel bogføringViewModel, IEnumerable<IBogføringsresultatModel> bogføringsresultatModelCollection, object arguments)
         {
             if (bogføringViewModel == null)
             {
-                throw new ArgumentNullException("bogføringViewModel");
+                throw new ArgumentNullException(nameof(bogføringViewModel));
             }
-            if (bogføringsresultatModel == null)
+
+            if (bogføringsresultatModelCollection == null)
             {
-                throw new ArgumentNullException("bogføringsresultatModel");
+                throw new ArgumentNullException(nameof(bogføringsresultatModelCollection));
             }
+
             if (arguments == null)
             {
-                throw new ArgumentNullException("arguments");
+                throw new ArgumentNullException(nameof(arguments));
             }
-            var regnskabViewModel = bogføringViewModel.Regnskab;
+
+            IRegnskabViewModel regnskabViewModel = bogføringViewModel.Regnskab;
             if (regnskabViewModel == null)
             {
                 return;
             }
+
             try
             {
-                var bogføringslinjeViewModel = new BogføringViewModel(regnskabViewModel, bogføringsresultatModel.Bogføringslinje, _finansstyringRepository, ExceptionHandler);
-                regnskabViewModel.BogføringslinjeAdd(bogføringslinjeViewModel);
-                regnskabViewModel.NyhedAdd(new NyhedViewModel(bogføringsresultatModel.Bogføringslinje, bogføringslinjeViewModel.Image));
-                foreach (var bogføringsadvarselModel in bogføringsresultatModel.Bogføringsadvarsler)
+                foreach (IBogføringsresultatModel bogføringsresultatModel in bogføringsresultatModelCollection)
                 {
-                    regnskabViewModel.BogføringsadvarselAdd(new BogføringsadvarselViewModel(regnskabViewModel, bogføringslinjeViewModel, bogføringsadvarselModel, DateTime.Now));
-                }
-                if (string.IsNullOrEmpty(bogføringViewModel.Kontonummer) == false)
-                {
-                    var kontoViewModel = regnskabViewModel.Konti.FirstOrDefault(m => string.Compare(m.Kontonummer, bogføringViewModel.Kontonummer, StringComparison.Ordinal) == 0);
-                    if (kontoViewModel != null)
+                    IReadOnlyBogføringslinjeViewModel bogføringslinjeViewModel = new BogføringViewModel(regnskabViewModel, bogføringsresultatModel.Bogføringslinje, _finansstyringRepository, ExceptionHandler);
+                    regnskabViewModel.BogføringslinjeAdd(bogføringslinjeViewModel);
+                    regnskabViewModel.NyhedAdd(new NyhedViewModel(bogføringsresultatModel.Bogføringslinje, bogføringslinjeViewModel.Image));
+                    foreach (IBogføringsadvarselModel bogføringsadvarselModel in bogføringsresultatModel.Bogføringsadvarsler)
                     {
-                        var refreshCommand = kontoViewModel.RefreshCommand;
-                        if (refreshCommand.CanExecute(kontoViewModel))
+                        regnskabViewModel.BogføringsadvarselAdd(new BogføringsadvarselViewModel(regnskabViewModel, bogføringslinjeViewModel, bogføringsadvarselModel, DateTime.Now));
+                    }
+
+                    if (string.IsNullOrWhiteSpace(bogføringViewModel.Kontonummer) == false)
+                    {
+                        IKontoViewModel kontoViewModel = regnskabViewModel.Konti.SingleOrDefault(m => string.CompareOrdinal(m.Kontonummer, bogføringViewModel.Kontonummer) == 0);
+                        if (kontoViewModel != null)
                         {
-                            refreshCommand.Execute(kontoViewModel);
+                            ICommand refreshCommand = kontoViewModel.RefreshCommand;
+                            if (refreshCommand.CanExecute(kontoViewModel))
+                            {
+                                refreshCommand.Execute(kontoViewModel);
+                            }
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(bogføringViewModel.Budgetkontonummer) == false)
+                    {
+                        IBudgetkontoViewModel budgetkontoViewModel = regnskabViewModel.Budgetkonti.SingleOrDefault(m => string.CompareOrdinal(m.Kontonummer, bogføringViewModel.Budgetkontonummer) == 0);
+                        if (budgetkontoViewModel != null)
+                        {
+                            ICommand refreshCommand = budgetkontoViewModel.RefreshCommand;
+                            if (refreshCommand.CanExecute(budgetkontoViewModel))
+                            {
+                                refreshCommand.Execute(budgetkontoViewModel);
+                            }
+                        }
+                    }
+
+                    if (bogføringViewModel.Adressekonto != 0)
+                    {
+                        IAdressekontoViewModel adressekontoViewModel = regnskabViewModel.Debitorer.Concat(regnskabViewModel.Kreditorer).SingleOrDefault(m => m.Nummer == bogføringViewModel.Adressekonto);
+                        if (adressekontoViewModel != null)
+                        {
+                            ICommand refreshCommand = adressekontoViewModel.RefreshCommand;
+                            if (refreshCommand.CanExecute(adressekontoViewModel))
+                            {
+                                refreshCommand.Execute(adressekontoViewModel);
+                            }
                         }
                     }
                 }
-                if (string.IsNullOrEmpty(bogføringViewModel.Budgetkontonummer) == false)
-                {
-                    var budgetkontoViewModel = regnskabViewModel.Budgetkonti.FirstOrDefault(m => string.Compare(m.Kontonummer, bogføringViewModel.Budgetkontonummer, StringComparison.Ordinal) == 0);
-                    if (budgetkontoViewModel != null)
-                    {
-                        var refreshCommand = budgetkontoViewModel.RefreshCommand;
-                        if (refreshCommand.CanExecute(budgetkontoViewModel))
-                        {
-                            refreshCommand.Execute(budgetkontoViewModel);
-                        }
-                    }
-                }
-                if (bogføringViewModel.Adressekonto != 0)
-                {
-                    var adressekontoViewModelCollection = regnskabViewModel.Debitorer.Where(m => m.Nummer == bogføringViewModel.Adressekonto).ToList();
-                    adressekontoViewModelCollection.AddRange(regnskabViewModel.Kreditorer.Where(m => m.Nummer == bogføringViewModel.Adressekonto).ToList());
-                    foreach (var adressekontoViewModel in adressekontoViewModelCollection)
-                    {
-                        var refreshCommand = adressekontoViewModel.RefreshCommand;
-                        if (refreshCommand.CanExecute(adressekontoViewModel))
-                        {
-                            refreshCommand.Execute(adressekontoViewModel);
-                        }
-                    }
-                }
+
                 if (OnBogført != null)
                 {
                     OnBogført.Invoke(this, new EmptyEventArgs());
@@ -272,7 +302,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
             }
             finally
             {
-                var bogføringSetCommand = regnskabViewModel.BogføringSetCommand;
+                ICommand bogføringSetCommand = regnskabViewModel.BogføringSetCommand;
                 if (bogføringSetCommand != null && bogføringSetCommand.CanExecute(regnskabViewModel))
                 {
                     bogføringSetCommand.Execute(regnskabViewModel);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
 {
@@ -13,561 +14,348 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring
         /// <summary>
         /// Regnskabet, som bogføringslinjen kan bogføres på.
         /// </summary>
-        IRegnskabViewModel Regnskab
-        {
-            get;
-        }
+        IRegnskabViewModel Regnskab { get; }
 
         /// <summary>
         /// Bogføringstidspunkt.
         /// </summary>
-        DateTime Dato
-        {
-            get; 
-        }
+        DateTime Dato { get; }
 
         /// <summary>
         /// Tekstangivelse af bogføringstidspunkt.
         /// </summary>
-        string DatoAsText
-        {
-            get; 
-            set;
-        }
+        string DatoAsText { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af bogføringstidspunkt.
         /// </summary>
-        string DatoValidationError
-        {
-            get;
-        }
+        string DatoValidationError { get; }
 
         /// <summary>
         /// Angivelse af, om tekstangivelsen for bogføringstidspunktet kan redigeres.
         /// </summary>
-        bool DatoAsTextIsReadOnly
-        {
-            get;
-        }
+        bool DatoAsTextIsReadOnly { get; }
 
         /// <summary>
         /// Label til bogføringstidspunkt.
         /// </summary>
-        string DatoLabel
-        {
-            get;
-        }
+        string DatoLabel { get; }
 
         /// <summary>
         /// Bilagsnummer.
         /// </summary>
-        string Bilag
-        { 
-            get; 
-            set; 
-        }
+        string Bilag { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af bilagsnummer.
         /// </summary>
-        string BilagValidationError
-        {
-            get;
-        }
+        string BilagValidationError { get; }
 
         /// <summary>
         /// Angivelse af den maksimale tekstlængde for bilagsnummeret.
         /// </summary>
-        int BilagMaxLength
-        {
-            get;
-        }
+        int BilagMaxLength { get; }
 
         /// <summary>
         /// Angivelse af, om bilagsnummeret kan redigeres.
         /// </summary>
-        bool BilagIsReadOnly
-        {
-            get;
-        }
+        bool BilagIsReadOnly { get; }
 
         /// <summary>
         /// Label til bilagsnummer.
         /// </summary>
-        string BilagLabel
-        {
-            get; 
-        }
+        string BilagLabel { get; }
 
         /// <summary>
         /// Kontonummer, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string Kontonummer
-        {
-            get; 
-            set; 
-        }
+        string Kontonummer { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af kontonummer, hvortil bogføringslinjen er tilknyttet..
         /// </summary>
-        string KontonummerValidationError
-        {
-            get;
-        }
+        string KontonummerValidationError { get; }
 
         /// <summary>
         /// Angivelse af den maksimale tekstlængde for kontonummeret.
         /// </summary>
-        int KontonummerMaxLength
-        {
-            get;
-        }
+        int KontonummerMaxLength { get; }
 
         /// <summary>
         /// Angivelse af, om kontonummeret kan redigeres.
         /// </summary>
-        bool KontonummerIsReadOnly
-        {
-            get;
-        }
+        bool KontonummerIsReadOnly { get; }
 
         /// <summary>
         /// Label til kontonummeret, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string KontonummerLabel
-        {
-            get; 
-        }
+        string KontonummerLabel { get; }
 
         /// <summary>
         /// Navn på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string Kontonavn
-        {
-            get;
-        }
+        string Kontonavn { get; }
 
         /// <summary>
         /// Label til navnet på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string KontonavnLabel
-        {
-            get;
-        }
+        string KontonavnLabel { get; }
 
         /// <summary>
         /// Saldo på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        decimal KontoSaldo
-        {
-            get;
-        }
+        decimal KontoSaldo { get; }
 
         /// <summary>
         /// Tekstangivelse af saldo på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string KontoSaldoAsText
-        {
-            get;
-        }
+        string KontoSaldoAsText { get; }
 
         /// <summary>
         /// Label til saldoen på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string KontoSaldoLabel
-        {
-            get;
-        }
+        string KontoSaldoLabel { get; }
 
         /// <summary>
         /// Disponibel beløb på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        decimal KontoDisponibel
-        {
-            get;
-        }
+        decimal KontoDisponibel { get; }
 
         /// <summary>
         /// Tekstangivelse af disponibel beløb på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string KontoDisponibelAsText
-        {
-            get;
-        }
+        string KontoDisponibelAsText { get; }
 
         /// <summary>
         /// Label til disponibel beløb på kontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string KontoDisponibelLabel
-        {
-            get;
-        }
+        string KontoDisponibelLabel { get; }
 
         /// <summary>
         /// Tekst.
         /// </summary>
-        string Tekst
-        {
-            get;
-            set;
-        }
+        string Tekst { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af tekst.
         /// </summary>
-        string TekstValidationError
-        {
-            get;
-        }
+        string TekstValidationError { get; }
 
         /// <summary>
         /// Angivelse af den maksimale tekstlængde for teksten til bogføringslinjen.
         /// </summary>
-        int TekstMaxLength
-        {
-            get;
-        }
+        int TekstMaxLength { get; }
 
         /// <summary>
         /// Angivelse af, om teksten til bogføringslinjen kan redigeres.
         /// </summary>
-        bool TekstIsReadOnly
-        {
-            get;
-        }
+        bool TekstIsReadOnly { get; }
 
         /// <summary>
         /// Label til teksten på bogføringslinjen.
         /// </summary>
-        string TekstLabel
-        {
-            get; 
-        }
+        string TekstLabel { get; }
 
         /// <summary>
         /// Kontonummer på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string Budgetkontonummer
-        {
-            get;
-            set;
-        }
+        string Budgetkontonummer { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af kontonummer på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string BudgetkontonummerValidationError
-        {
-            get;
-        }
+        string BudgetkontonummerValidationError { get; }
 
         /// <summary>
         /// Angivelse af den maksimale tekstlængde for kontonummeret på budgetkontoen.
         /// </summary>
-        int BudgetkontonummerMaxLength
-        {
-            get;
-        }
+        int BudgetkontonummerMaxLength { get; }
 
         /// <summary>
         /// Angivelse af, om kontonummeret på budgetkontoen kan redigeres.
         /// </summary>
-        bool BudgetkontonummerIsReadOnly
-        {
-            get;
-        }
+        bool BudgetkontonummerIsReadOnly { get; }
 
         /// <summary>
         /// Label til kontonummeret på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string BudgetkontonummerLabel
-        {
-            get;
-        }
+        string BudgetkontonummerLabel { get; }
 
         /// <summary>
         /// Navn på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string Budgetkontonavn
-        {
-            get;
-        }
+        string Budgetkontonavn { get; }
 
         /// <summary>
         /// Label til navnet på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string BudgetkontonavnLabel
-        {
-            get;
-        }
+        string BudgetkontonavnLabel { get; }
 
         /// <summary>
         /// Bogført beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        decimal BudgetkontoBogført
-        {
-            get;
-        }
+        decimal BudgetkontoBogført { get; }
 
         /// <summary>
         /// Tekstangivelse af bogført beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string BudgetkontoBogførtAsText
-        {
-            get;
-        }
+        string BudgetkontoBogførtAsText { get; }
 
         /// <summary>
         /// Label til bogført beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string BudgetkontoBogførtLabel
-        {
-            get;
-        }
+        string BudgetkontoBogførtLabel { get; }
 
         /// <summary>
         /// Disponibel beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        decimal BudgetkontoDisponibel
-        {
-            get;
-        }
+        decimal BudgetkontoDisponibel { get; }
 
         /// <summary>
         /// Tekstangivelse af disponibel beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string BudgetkontoDisponibelAsText
-        {
-            get;
-        }
+        string BudgetkontoDisponibelAsText { get; }
 
         /// <summary>
         /// Label til disponibel beløb på budgetkontoen, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string BudgetkontoDisponibelLabel
-        {
-            get;
-        }
+        string BudgetkontoDisponibelLabel { get; }
 
         /// <summary>
         /// Debitbeløb.
         /// </summary>
-        decimal Debit
-        {
-            get;
-        }
+        decimal Debit { get; }
 
         /// <summary>
         /// Tekstangivelse af debitbeløb.
         /// </summary>
-        string DebitAsText
-        {
-            get; 
-            set; 
-        }
+        string DebitAsText { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af debitbeløb.
         /// </summary>
-        string DebitValidationError
-        {
-            get;
-        }
+        string DebitValidationError { get; }
 
         /// <summary>
         /// Angivelse af den maksimale tekstlængde for debitbeløbet.
         /// </summary>
-        int DebitMaxLength
-        {
-            get;
-        }
+        int DebitMaxLength { get; }
 
         /// <summary>
         /// Angivelse af, om debitbeløbet kan redigeres.
         /// </summary>
-        bool DebitIsReadOnly
-        {
-            get;
-        }
+        bool DebitIsReadOnly { get; }
 
         /// <summary>
         /// Label til debitbeløbet.
         /// </summary>
-        string DebitLabel
-        {
-            get;
-        }
+        string DebitLabel { get; }
 
         /// <summary>
         /// Kreditbeløb.
         /// </summary>
-        decimal Kredit
-        {
-            get;
-        }
+        decimal Kredit { get; }
 
         /// <summary>
         /// Tekstangivelse af kreditbeløb.
         /// </summary>
-        string KreditAsText
-        {
-            get;
-            set;
-        }
+        string KreditAsText { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af kreditbeløb.
         /// </summary>
-        string KreditValidationError
-        {
-            get;
-        }
+        string KreditValidationError { get; }
 
         /// <summary>
         /// Angivelse af den maksimale tekstlængde for kreditbeløbet.
         /// </summary>
-        int KreditMaxLength
-        {
-            get;
-        }
+        int KreditMaxLength { get; }
 
         /// <summary>
         /// Angivelse af, om kreditbeløbet kan redigeres.
         /// </summary>
-        bool KreditIsReadOnly
-        {
-            get;
-        }
+        bool KreditIsReadOnly { get; }
 
         /// <summary>
         /// Label til kreditbeløbet.
         /// </summary>
-        string KreditLabel
-        {
-            get;
-        }
+        string KreditLabel { get; }
 
         /// <summary>
         /// Unik identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        int Adressekonto
-        {
-            get; 
-            set;
-        }
+        int Adressekonto { get; set; }
 
         /// <summary>
         /// Valideringsfejl ved angivelse af den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string AdressekontoValidationError
-        {
-            get;
-        }
+        string AdressekontoValidationError { get; }
 
         /// <summary>
         /// Angivelse af, om den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet, kan redigeres.
         /// </summary>
-        bool AdressekontoIsReadOnly
-        {
-            get;
-        }
+        bool AdressekontoIsReadOnly { get; }
 
         /// <summary>
         /// Label til den unikke identifikation af adressekonto, hvortil bogføringslinjen er tilknyttet.
         /// </summary>
-        string AdressekontoLabel
-        {
-            get;
-        }
+        string AdressekontoLabel { get; }
 
         /// <summary>
         /// Navn på adressekontoen.
         /// </summary>
-        string AdressekontoNavn
-        {
-            get;
-        }
+        string AdressekontoNavn { get; }
 
         /// <summary>
         /// Label til navnet på adressekontoen.
         /// </summary>
-        string AdressekontoNavnLabel
-        {
-            get;
-        }
+        string AdressekontoNavnLabel { get; }
 
         /// <summary>
         /// Saldo på adressekontoen.
         /// </summary>
-        decimal AdressekontoSaldo
-        {
-            get;
-        }
+        decimal AdressekontoSaldo { get; }
 
         /// <summary>
         /// Tekstangivelse af saldo på adressekontoen.
         /// </summary>
-        string AdressekontoSaldoAsText
-        {
-            get;
-        }
+        string AdressekontoSaldoAsText { get; }
 
         /// <summary>
         /// Label til saldoen på adressekontoen.
         /// </summary>
-        string AdressekontoSaldoLabel
-        {
-            get;
-        }
+        string AdressekontoSaldoLabel { get; }
 
         /// <summary>
         /// Adressekonti, der kan tilknyttes bogføringslinjen.
         /// </summary>
-        IEnumerable<IAdressekontoViewModel> Adressekonti
-        {
-            get;
-        }
+        IEnumerable<IAdressekontoViewModel> Adressekonti { get; }
 
         /// <summary>
         /// Label til adressekonti, der kan tilknyttes bogføringslinjen.
         /// </summary>
-        string AdressekontiLabel
-        {
-            get;
-        }
+        string AdressekontiLabel { get; }
 
         /// <summary>
         /// Tasks, der udføres asynkront.
         /// </summary>
-        IEnumerable<Task> Tasks
-        {
-            get;
-        }
+        IEnumerable<Task> Tasks { get; }
 
         /// <summary>
         /// Angivelse af, om asynkront arbejde er igangværende for bogføringslinjen.
         /// </summary>
-        bool IsWorking
-        {
-            get;
-        }
+        bool IsWorking { get; }
 
         /// <summary>
         /// Kommando, der kan foretage bogføring af bogføringslinjen.
         /// </summary>
-        ICommand BogførCommand
-        {
-            get;
-        }
+        ICommand BogførCommand { get; }
 
         /// <summary>
         /// Label til kommandoen, der kan foretage bogføring af bogføringslinjen.
         /// </summary>
-        string BogførCommandLabel
-        {
-            get;
-        }
+        string BogførCommandLabel { get; }
+
+        IBogføringslinjeModel ToModel();
     }
 }

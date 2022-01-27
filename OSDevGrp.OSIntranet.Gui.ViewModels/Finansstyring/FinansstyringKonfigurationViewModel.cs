@@ -5,7 +5,6 @@ using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
-using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
@@ -34,12 +33,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (finansstyringKonfigurationRepository == null)
             {
-                throw new ArgumentNullException("finansstyringKonfigurationRepository");
+                throw new ArgumentNullException(nameof(finansstyringKonfigurationRepository));
             }
+
             if (exceptionHandlerViewModel == null)
             {
-                throw new ArgumentNullException("exceptionHandlerViewModel");
+                throw new ArgumentNullException(nameof(exceptionHandlerViewModel));
             }
+
             _finansstyringKonfigurationRepository = finansstyringKonfigurationRepository;
             _exceptionHandlerViewModel = exceptionHandlerViewModel;
         }
@@ -51,46 +52,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Unikt navn for konfigurationen.
         /// </summary>
-        public virtual string Configuration
-        {
-            get
-            {
-                return "OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.FinansstyringKonfigurationViewModel";
-            }
-        }
+        public virtual string Configuration => "OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.FinansstyringKonfigurationViewModel";
 
         /// <summary>
         /// Collection indeholdende navne for de enkelte konfigurationsværdier.
         /// </summary>
-        public virtual IEnumerable<string> Keys
-        {
-            get
-            {
-                return FinansstyringKonfigurationRepository.Keys;
-            }
-        }
+        public virtual IEnumerable<string> Keys => FinansstyringKonfigurationRepository.Keys;
 
         /// <summary>
         /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
         /// </summary>
-        public override string DisplayName
-        {
-            get
-            {
-                return Resource.GetText(Text.Configuration);
-            }
-        }
+        public override string DisplayName => Resource.GetText(Text.Configuration);
 
         /// <summary>
         /// Label til uri for servicen, der supporterer finansstyring.
         /// </summary>
-        public virtual string FinansstyringServiceUriLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.SupportingServiceUri);
-            }
-        }
+        public virtual string FinansstyringServiceUriLabel => Resource.GetText(Text.SupportingServiceUri);
 
         /// <summary>
         /// Uri til servicen, der supporterer finansstyring.
@@ -111,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "FinansstyringServiceUri", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, nameof(FinansstyringServiceUri), ex.Message), ex));
                     return string.Empty;
                 }
             }
@@ -122,16 +99,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     var validationResult = ValidateFinansstyringServiceUri(value);
                     if (validationResult != ValidationResult.Success)
                     {
-                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "FinansstyringServiceUri", value);
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, nameof(FinansstyringServiceUri), value);
                     }
+
                     FinansstyringServiceUriValidationError = null;
-                    var uri = new Uri(value);
+                    Uri uri = new Uri(value);
                     if (_finansstyringKonfigurationRepository.FinansstyringServiceUri == uri)
                     {
                         return;
                     }
-                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"FinansstyringServiceUri", uri}});
-                    RaisePropertyChanged("FinansstyringServiceUri");
+
+                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> { { nameof(FinansstyringServiceUri), uri } });
+
+                    RaisePropertyChanged(nameof(FinansstyringServiceUri));
                 }
                 catch (IntranetGuiValidationException ex)
                 {
@@ -144,7 +124,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "FinansstyringServiceUri", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, nameof(FinansstyringServiceUri), ex.Message), ex));
                 }
             }
         }
@@ -154,26 +134,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         public virtual string FinansstyringServiceUriValidationError
         {
-            get
-            {
-                return GetValidationError("FinansstyringServiceUri");
-            }
-            private set
-            {
-                SetValidationError("FinansstyringServiceUri", value, "FinansstyringServiceUriValidationError");
-            }
+            get { return GetValidationError(nameof(FinansstyringServiceUri)); }
+            private set { SetValidationError(nameof(FinansstyringServiceUri), value, nameof(FinansstyringServiceUriValidationError)); }
         }
 
         /// <summary>
         /// Label til filnavnet for det lokale datalager.
         /// </summary>
-        public virtual string LokalDataFilLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.LocaleDataFile);
-            }
-        }
+        public virtual string LokalDataFilLabel => Resource.GetText(Text.LocaleDataFile);
 
         /// <summary>
         /// Filnavn til det lokale datalager.
@@ -193,22 +161,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "LokalDataFil", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, nameof(LokalDataFil), ex.Message), ex));
                     return string.Empty;
                 }
             }
         }
-        
+
         /// <summary>
         /// Label til filnavnet for det lokale synkroniseringslager.
         /// </summary>
-        public virtual string SynkroniseringDataFilLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.SyncDataFile);
-            }
-        }
+        public virtual string SynkroniseringDataFilLabel => Resource.GetText(Text.SyncDataFile);
 
         /// <summary>
         /// Filnavn til det lokale synkroniseringslager.
@@ -228,7 +190,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "SynkroniseringDataFil", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, nameof(SynkroniseringDataFil), ex.Message), ex));
                     return string.Empty;
                 }
             }
@@ -237,13 +199,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Label til antal bogføringslinjer, der skal hentes.
         /// </summary>
-        public virtual string AntalBogføringslinjerLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.NumberOfAccountingLinesToGet);
-            }
-        }
+        public virtual string AntalBogføringslinjerLabel => Resource.GetText(Text.NumberOfAccountingLinesToGet);
 
         /// <summary>
         /// Antal bogføringslinjer, der skal hentes.
@@ -264,7 +220,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "AntalBogføringslinjer", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, nameof(AntalBogføringslinjer), ex.Message), ex));
                     return 0;
                 }
             }
@@ -275,15 +231,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     var validationResult = ValidateAntalBogføringslinjer(value);
                     if (validationResult != ValidationResult.Success)
                     {
-                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "AntalBogføringslinjer", value);
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, nameof(AntalBogføringslinjer), value);
                     }
+
                     AntalBogføringslinjerValidationError = null;
                     if (_finansstyringKonfigurationRepository.AntalBogføringslinjer == value)
                     {
                         return;
                     }
-                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"AntalBogføringslinjer", value}});
-                    RaisePropertyChanged("AntalBogføringslinjer");
+
+                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> { { nameof(AntalBogføringslinjer), value } });
+
+                    RaisePropertyChanged(nameof(AntalBogføringslinjer));
                 }
                 catch (IntranetGuiValidationException ex)
                 {
@@ -296,7 +255,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "AntalBogføringslinjer", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, nameof(AntalBogføringslinjer), ex.Message), ex));
                 }
             }
         }
@@ -306,26 +265,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         public virtual string AntalBogføringslinjerValidationError
         {
-            get
-            {
-                return GetValidationError("AntalBogføringslinjer");
-            }
-            private set
-            {
-                SetValidationError("AntalBogføringslinjer", value, "AntalBogføringslinjerValidationError");
-            }
+            get { return GetValidationError(nameof(AntalBogføringslinjer)); }
+            private set { SetValidationError(nameof(AntalBogføringslinjer), value, nameof(AntalBogføringslinjerValidationError)); }
         }
 
         /// <summary>
         /// Label til antal dage, som nyheder er gældende.
         /// </summary>
-        public virtual string DageForNyhederLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.DaysForNews);
-            }
-        }
+        public virtual string DageForNyhederLabel => Resource.GetText(Text.DaysForNews);
 
         /// <summary>
         /// Antal dage, som nyheder er gældende.
@@ -346,7 +293,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, "DageForNyheder", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileGettingPropertyValue, nameof(DageForNyheder), ex.Message), ex));
                     return 0;
                 }
             }
@@ -357,15 +304,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     var validationResult = ValidateDageForNyheder(value);
                     if (validationResult != ValidationResult.Success)
                     {
-                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, "DageForNyheder", value);
+                        throw new IntranetGuiValidationException(validationResult.ErrorMessage, this, nameof(DageForNyheder), value);
                     }
+
                     DageForNyhederValidationError = null;
                     if (_finansstyringKonfigurationRepository.DageForNyheder == value)
                     {
                         return;
                     }
-                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> {{"DageForNyheder", value}});
-                    RaisePropertyChanged("DageForNyheder");
+
+                    _finansstyringKonfigurationRepository.KonfigurationerAdd(new Dictionary<string, object> { { nameof(DageForNyheder), value } });
+
+                    RaisePropertyChanged(nameof(DageForNyheder));
                 }
                 catch (IntranetGuiValidationException ex)
                 {
@@ -378,7 +328,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 }
                 catch (Exception ex)
                 {
-                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, "DageForNyheder", ex.Message), ex));
+                    _exceptionHandlerViewModel.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorWhileSettingPropertyValue, nameof(DageForNyheder), ex.Message), ex));
                 }
             }
         }
@@ -388,14 +338,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// </summary>
         public virtual string DageForNyhederValidationError
         {
-            get
-            {
-                return GetValidationError("DageForNyheder");
-            }
-            private set
-            {
-                SetValidationError("DageForNyheder", value, "DageForNyhederValidationError");
-            }
+            get { return GetValidationError(nameof(DageForNyheder)); }
+            private set { SetValidationError(nameof(DageForNyheder), value, nameof(DageForNyhederValidationError)); }
         }
 
         #endregion
@@ -419,7 +363,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <returns>Valideringsresultat.</returns>
         public static ValidationResult ValidateFinansstyringServiceUri(string value)
         {
-            return Validation.ValidateUri(value);
+            return Core.Validators.Validation.ValidateUri(value);
         }
 
         /// <summary>
@@ -429,7 +373,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <returns>Valideringsresultat.</returns>
         public static ValidationResult ValidateAntalBogføringslinjer(int value)
         {
-            return Validation.ValidateInterval(value, 10, 250);
+            return Core.Validators.Validation.ValidateInterval(value, 10, 250);
         }
 
         /// <summary>
@@ -439,7 +383,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <returns>Valideringsresultat.</returns>
         public static ValidationResult ValidateDageForNyheder(int value)
         {
-            return Validation.ValidateInterval(value, 0, 30);
+            return Core.Validators.Validation.ValidateInterval(value, 0, 30);
         }
 
         #endregion

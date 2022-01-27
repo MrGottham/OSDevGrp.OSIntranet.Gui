@@ -17,10 +17,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #region Private variables
 
         private ICommand _removeCommand;
-        private readonly IRegnskabViewModel _regnskabViewModel;
         private readonly IReadOnlyBogføringslinjeViewModel _bogføringslinjeViewModel;
         private readonly IBogføringsadvarselModel _bogføringsadvarselModel;
-        private readonly DateTime _tidspunkt;
 
         #endregion
 
@@ -37,22 +35,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (regnskabViewModel == null)
             {
-                throw new ArgumentNullException("regnskabViewModel");
+                throw new ArgumentNullException(nameof(regnskabViewModel));
             }
+
             if (bogføringslinjeViewModel == null)
             {
-                throw new ArgumentNullException("bogføringslinjeViewModel");
+                throw new ArgumentNullException(nameof(bogføringslinjeViewModel));
             }
+
             if (bogføringsadvarselModel == null)
             {
-                throw new ArgumentNullException("bogføringsadvarselModel");
+                throw new ArgumentNullException(nameof(bogføringsadvarselModel));
             }
-            _regnskabViewModel = regnskabViewModel;
+
+            Regnskab = regnskabViewModel;
             _bogføringslinjeViewModel = bogføringslinjeViewModel;
             _bogføringslinjeViewModel.PropertyChanged += PropertyChangedOnBogføringslinjeViewModelEventHandler;
             _bogføringsadvarselModel = bogføringsadvarselModel;
             _bogføringsadvarselModel.PropertyChanged += PropertyChangedOnBogføringsadvarselModelEventHandler;
-            _tidspunkt = tidspunkt;
+            Tidspunkt = tidspunkt;
         }
 
         #endregion
@@ -62,101 +63,47 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Regnskabet, som adressekontoen er tilknyttet.
         /// </summary>
-        public virtual IRegnskabViewModel Regnskab
-        {
-            get
-            {
-                return _regnskabViewModel;
-            }
-        }
+        public virtual IRegnskabViewModel Regnskab { get; }
 
         /// <summary>
         /// Bogføringslinjen, der har medført advarslen.
         /// </summary>
-        public virtual IReadOnlyBogføringslinjeViewModel Bogføringslinje
-        {
-            get
-            {
-                return _bogføringslinjeViewModel;
-            }
-        }
+        public virtual IReadOnlyBogføringslinjeViewModel Bogføringslinje => _bogføringslinjeViewModel;
 
         /// <summary>
         /// Tidspunkt for advarslen, som er opstået ved bogføring.
         /// </summary>
-        public virtual DateTime Tidspunkt
-        {
-            get
-            {
-                return _tidspunkt;
-            }
-        }
+        public virtual DateTime Tidspunkt { get; }
 
         /// <summary>
         /// Tekstangivelse af tidspunktet for advarslen, som er opstået ved bogføring.
         /// </summary>
-        public virtual string TidspunktAsText
-        {
-            get
-            {
-                return string.Format("{0} {1}", Tidspunkt.ToString("d"), Tidspunkt.ToString("t"));
-            }
-        }
+        public virtual string TidspunktAsText => $"{Tidspunkt:d} {Tidspunkt:t}";
 
         /// <summary>
         /// Tekstangivelse af advarslen, som er opstået ved bogføring.
         /// </summary>
-        public virtual string Advarsel
-        {
-            get
-            {
-                return _bogføringsadvarselModel.Advarsel;
-            }
-        }
+        public virtual string Advarsel => _bogføringsadvarselModel.Advarsel;
 
         /// <summary>
         /// Kontonummer på kontoen, hvorpå advarslen er opstået ved bogføring.
         /// </summary>
-        public virtual string Kontonummer
-        {
-            get
-            {
-                return _bogføringsadvarselModel.Kontonummer;
-            }
-        }
+        public virtual string Kontonummer => _bogføringsadvarselModel.Kontonummer;
 
         /// <summary>
         /// Kontonavnet på kontoen, hvorpå advarslen er opstået ved bogføring.
         /// </summary>
-        public virtual string Kontonavn
-        {
-            get
-            {
-                return _bogføringsadvarselModel.Kontonavn;
-            }
-        }
+        public virtual string Kontonavn => _bogføringsadvarselModel.Kontonavn;
 
         /// <summary>
         /// Beløbet, der har medført advarslen.
         /// </summary>
-        public virtual decimal Beløb
-        {
-            get
-            {
-                return Math.Abs(_bogføringsadvarselModel.Beløb);
-            }
-        }
+        public virtual decimal Beløb => Math.Abs(_bogføringsadvarselModel.Beløb);
 
         /// <summary>
         /// Tekstangivelse af beløbet, der har medført advarslen.
         /// </summary>
-        public virtual string BeløbAsText
-        {
-            get
-            {
-                return Beløb.ToString("C");
-            }
-        }
+        public virtual string BeløbAsText => Beløb.ToString("C");
 
         /// <summary>
         /// Samlet information for advarslen.
@@ -165,8 +112,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var informationBuilder = new StringBuilder(TidspunktAsText);
-                informationBuilder.AppendFormat(" {0}", Beløb == 0M ? Resource.GetText(Text.AccountOverdrawnedWithoutValue, Kontonavn) : Resource.GetText(Text.AccountOverdrawnedWithValue, Kontonavn, BeløbAsText));
+                StringBuilder informationBuilder = new StringBuilder(TidspunktAsText);
+                informationBuilder.AppendFormat(" {0}", Beløb == 0M ? Resource.GetText(Text.AccountOverdrawnWithoutValue, Kontonavn) : Resource.GetText(Text.AccountOverdrawnWithValue, Kontonavn, BeløbAsText));
                 informationBuilder.AppendLine();
                 informationBuilder.AppendLine();
                 informationBuilder.AppendFormat("{0}: {1} {2}", Resource.GetText(Text.Cause), _bogføringslinjeViewModel.Tekst, _bogføringslinjeViewModel.BogførtAsText);
@@ -181,16 +128,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                if (_removeCommand == null)
+                if (_removeCommand != null)
                 {
-                    Action<object> action = obj =>
-                        {
-                            _bogføringslinjeViewModel.PropertyChanged -= PropertyChangedOnBogføringslinjeViewModelEventHandler;
-                            _bogføringsadvarselModel.PropertyChanged -= PropertyChangedOnBogføringsadvarselModelEventHandler;
-                            Regnskab.BogføringsadvarselRemove(this);
-                        };
-                    _removeCommand = new RelayCommand(action);
+                    return _removeCommand;
                 }
+
+                Action<object> action = obj =>
+                {
+                    _bogføringslinjeViewModel.PropertyChanged -= PropertyChangedOnBogføringslinjeViewModelEventHandler;
+                    _bogføringsadvarselModel.PropertyChanged -= PropertyChangedOnBogføringsadvarselModelEventHandler;
+                    Regnskab.BogføringsadvarselRemove(this);
+                };
+                _removeCommand = new RelayCommand(action);
+
                 return _removeCommand;
             }
         }
@@ -198,35 +148,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Label til kommandoen, der fjerner advarslen fra regnskabet, hvorpå den er tilknyttet.
         /// </summary>
-        public virtual string RemoveCommandLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Ignore);
-            }
-        }
+        public virtual string RemoveCommandLabel => Resource.GetText(Text.Ignore);
 
         /// <summary>
         /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
         /// </summary>
-        public override string DisplayName
-        {
-            get
-            {
-                return Resource.GetText(Text.PostingWarning);
-            }
-        }
+        public override string DisplayName => Resource.GetText(Text.PostingWarning);
 
         /// <summary>
         /// Billede, der illustrerer en advarsel ved en bogføring.
         /// </summary>
-        public virtual byte[] Image
-        {
-            get
-            {
-                return Resource.GetEmbeddedResource("Images.Bogføringslinje.png");
-            }
-        }
+        public virtual byte[] Image => Resource.GetEmbeddedResource("Images.Bogføringslinje.png");
 
         #endregion
 
@@ -241,26 +173,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (eventArgs == null)
             {
-                throw new ArgumentNullException("eventArgs");
+                throw new ArgumentNullException(nameof(eventArgs));
             }
+
             switch (eventArgs.PropertyName)
             {
                 case "Tekst":
-                    RaisePropertyChanged("Bogføringslinje");
-                    RaisePropertyChanged("Information");
+                    RaisePropertyChanged(nameof(Bogføringslinje));
+                    RaisePropertyChanged(nameof(Information));
                     break;
 
                 case "BogførtAsText":
-                    RaisePropertyChanged("Bogføringslinje");
-                    RaisePropertyChanged("Information");
+                    RaisePropertyChanged(nameof(Bogføringslinje));
+                    RaisePropertyChanged(nameof(Information));
                     break;
 
                 default:
-                    RaisePropertyChanged("Bogføringslinje");
+                    RaisePropertyChanged(nameof(Bogføringslinje));
                     break;
             }
         }
@@ -274,23 +208,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (eventArgs == null)
             {
-                throw new ArgumentNullException("eventArgs");
+                throw new ArgumentNullException(nameof(eventArgs));
             }
+
             switch (eventArgs.PropertyName)
             {
-                case "Kontonavn":
+                case nameof(Kontonavn):
                     RaisePropertyChanged(eventArgs.PropertyName);
-                    RaisePropertyChanged("Information");
+                    RaisePropertyChanged(nameof(Information));
                     break;
 
-                case "Beløb":
+                case nameof(Beløb):
                     RaisePropertyChanged(eventArgs.PropertyName);
-                    RaisePropertyChanged("BeløbAsText");
-                    RaisePropertyChanged("Information");
+                    RaisePropertyChanged(nameof(BeløbAsText));
+                    RaisePropertyChanged(nameof(Information));
                     break;
 
                 default:

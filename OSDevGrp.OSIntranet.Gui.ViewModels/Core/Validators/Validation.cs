@@ -18,8 +18,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
         public static ValidationResult ValidateRequiredValue(string value)
         {
             return string.IsNullOrWhiteSpace(value) == false
-                       ? ValidationResult.Success
-                       : new ValidationResult(Resource.GetText(Text.ValueIsRequiered));
+                ? ValidationResult.Success
+                : new ValidationResult(Resource.GetText(Text.ValueIsRequired));
         }
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
         {
             Uri uri;
             return Uri.TryCreate(value, UriKind.Absolute, out uri)
-                       ? ValidationResult.Success
-                       : new ValidationResult(Resource.GetText(Text.InvalidValueForUri, value));
+                ? ValidationResult.Success
+                : new ValidationResult(Resource.GetText(Text.InvalidValueForUri, value));
         }
 
         /// <summary>
@@ -48,6 +48,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
             {
                 return ValidationResult.Success;
             }
+
             return new ValidationResult(Resource.GetText(Text.ValueOutsideInterval, min, max));
         }
 
@@ -74,9 +75,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
             {
                 return new ValidationResult(Resource.GetText(Text.ValueIsNotDate));
             }
+
             return dateTime.Date.CompareTo(maxDateTime.Date) > 0
-                       ? new ValidationResult(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToString("D", CultureInfo.CurrentUICulture)))
-                       : ValidationResult.Success;
+                ? new ValidationResult(Resource.GetText(Text.DateGreaterThan, maxDateTime.ToString("D", CultureInfo.CurrentUICulture)))
+                : ValidationResult.Success;
         }
 
         /// <summary>
@@ -102,9 +104,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Validators
             {
                 return new ValidationResult(Resource.GetText(Text.ValueIsNotDecimal));
             }
+
             return valueAsDecimal < minValue
-                       ? new ValidationResult(Resource.GetText(Text.DecimalLowerThan, minValue.ToString("G", CultureInfo.CurrentUICulture)))
-                       : ValidationResult.Success;
+                ? new ValidationResult(Resource.GetText(Text.DecimalLowerThan, minValue.ToString("G", CultureInfo.CurrentUICulture)))
+                : ValidationResult.Success;
         }
     }
 }

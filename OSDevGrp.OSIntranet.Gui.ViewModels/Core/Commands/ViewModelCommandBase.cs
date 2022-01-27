@@ -14,13 +14,6 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
     /// <typeparam name="TViewModel">Typen på den ViewModel, hvorpå kommandoen skal udføres.</typeparam>
     public abstract class ViewModelCommandBase<TViewModel> : CommandBase where TViewModel : IViewModel
     {
-        #region Private variables
-
-        private readonly IExceptionHandlerViewModel _exceptionHandlerViewModel;
-        private readonly SynchronizationContext _synchronizationContext;
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
@@ -31,10 +24,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         {
             if (exceptionHandlerViewModel == null)
             {
-                throw new ArgumentNullException("exceptionHandlerViewModel");
+                throw new ArgumentNullException(nameof(exceptionHandlerViewModel));
             }
-            _exceptionHandlerViewModel = exceptionHandlerViewModel;
-            _synchronizationContext = SynchronizationContext.Current;
+
+            ExceptionHandler = exceptionHandlerViewModel;
+            SynchronizationContext = SynchronizationContext.Current;
         }
 
         #endregion
@@ -44,33 +38,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         /// <summary>
         /// Task, som kommandoen gør brug af.
         /// </summary>
-        public virtual Task ExecuteTask
-        {
-            get; 
-            protected set; 
-        }
+        public virtual Task ExecuteTask { get; protected set; }
 
         /// <summary>
         /// ViewModel for den exceptionhandler, der skal håndtere exceptions.
         /// </summary>
-        protected virtual IExceptionHandlerViewModel ExceptionHandler
-        {
-            get
-            {
-                return _exceptionHandlerViewModel;
-            }
-        }
+        protected IExceptionHandlerViewModel ExceptionHandler { get; }
 
         /// <summary>
         /// Synkroniseringskontekst.
         /// </summary>
-        protected virtual SynchronizationContext SynchronizationContext
-        {
-            get
-            {
-                return _synchronizationContext;
-            }
-        }
+        protected SynchronizationContext SynchronizationContext { get; }
 
         #endregion
 
@@ -83,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         /// <returns>Angivelse af, om kommandoen kan udføres.</returns>
         public override bool CanExecute(object parameter)
         {
-            return parameter is TViewModel && CanExecute((TViewModel) parameter);
+            return parameter is TViewModel && CanExecute((TViewModel)parameter);
         }
 
         /// <summary>
@@ -94,7 +72,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         {
             try
             {
-                Execute((TViewModel) parameter);
+                Execute((TViewModel)parameter);
             }
             catch (Exception ex)
             {
@@ -127,23 +105,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         {
             if (exception == null)
             {
-                throw new ArgumentNullException("exception");
+                throw new ArgumentNullException(nameof(exception));
             }
+
             if (exception is IntranetGuiRepositoryException)
             {
                 ExceptionHandler.HandleException(exception);
                 return;
             }
+
             if (exception is IntranetGuiBusinessException)
             {
                 ExceptionHandler.HandleException(exception);
                 return;
             }
+
             if (exception is IntranetGuiSystemException)
             {
                 ExceptionHandler.HandleException(exception);
                 return;
             }
+
             ExceptionHandler.HandleException(new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.CommandError, GetType().Name, exception.Message), exception));
         }
 
@@ -156,39 +138,43 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         /// <param name="viewModel">Implementering af den ViewModel, hvorpå resultatet skal benyttes.</param>
         /// <param name="argument">Argument, som skal benyttes ved håndtering af resultatet.</param>
         /// <param name="onHandleTaskResult">Callback metode, der udføres, når resultatet skal håndteres.</param>
-        protected virtual void HandleResultFromTask<TTaskResult, TArgument>(Task<TTaskResult> task, TViewModel viewModel, TArgument argument, Action<TViewModel, TTaskResult, TArgument> onHandleTaskResult)
+        protected void HandleResultFromTask<TTaskResult, TArgument>(Task<TTaskResult> task, TViewModel viewModel, TArgument argument, Action<TViewModel, TTaskResult, TArgument> onHandleTaskResult)
         {
             if (task == null)
             {
-                throw new ArgumentNullException("task");
+                throw new ArgumentNullException(nameof(task));
             }
+
             if (Equals(viewModel, null))
             {
-                throw new ArgumentNullException("viewModel");
+                throw new ArgumentNullException(nameof(viewModel));
             }
+
             if (onHandleTaskResult == null)
             {
-                throw new ArgumentNullException("onHandleTaskResult");
+                throw new ArgumentNullException(nameof(onHandleTaskResult));
             }
+
             try
             {
                 if (task.IsCanceled || task.IsFaulted)
                 {
-                    if (task.Exception != null)
+                    task.Exception?.Handle(exception =>
                     {
-                        task.Exception.Handle(exception =>
-                            {
-                                HandleException(exception, viewModel);
-                                return true;
-                            });
-                    }
+                        HandleException(exception, viewModel);
+                        return true;
+                    });
+
                     return;
                 }
-                if (Equals(task.Result, null))
+
+                TTaskResult result = task.GetAwaiter().GetResult();
+                if (Equals(result, null))
                 {
                     return;
                 }
-                HandleResultFromTask(task.Result, viewModel, argument, onHandleTaskResult, SynchronizationContext);
+
+                HandleResultFromTask(result, viewModel, argument, onHandleTaskResult, SynchronizationContext);
             }
             catch (Exception ex)
             {
@@ -210,12 +196,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
         {
             if (Equals(viewModel, null))
             {
-                throw new ArgumentNullException("viewModel");
+                throw new ArgumentNullException(nameof(viewModel));
             }
+
             if (onHandleTaskResult == null)
             {
-                throw new ArgumentNullException("onHandleTaskResult");
+                throw new ArgumentNullException(nameof(onHandleTaskResult));
             }
+
             if (synchronizationContext == null)
             {
                 try
@@ -226,14 +214,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands
                 {
                     HandleException(ex, viewModel);
                 }
+
                 return;
             }
-            var arguments = new Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>>(taskResult, viewModel, argument, onHandleTaskResult);
+
+            Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>> arguments = new Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>>(taskResult, viewModel, argument, onHandleTaskResult);
             synchronizationContext.Post(obj =>
-                {
-                    var tuple = (Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>>) obj;
-                    HandleResultFromTask(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, null);
-                }, arguments);
+            {
+                Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>> tuple = (Tuple<TTaskResult, TViewModel, TArgument, Action<TViewModel, TTaskResult, TArgument>>)obj;
+                HandleResultFromTask(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, null);
+            }, arguments);
         }
 
         #endregion

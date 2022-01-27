@@ -1,13 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows.Input;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
-using Rhino.Mocks;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
@@ -24,33 +25,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorInitiererBogføringsadvarselViewModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBogføringsadvarselModel>();
-                    mock.Expect(m => m.Advarsel)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontonummer)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Kontonavn)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Beløb)
-                        .Return(fixture.Create<decimal>()*-1)
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
 
-            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
-            var bogføringslinjeViewModelMock = fixture.Create<IReadOnlyBogføringslinjeViewModel>();
-            var bogføringsadvarselModelMock = fixture.Create<IBogføringsadvarselModel>();
-            var tidspunkt = fixture.Create<DateTime>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(regnskabViewModelMock, bogføringslinjeViewModelMock, bogføringsadvarselModelMock, tidspunkt);
+            IRegnskabViewModel regnskabViewModelMock = fixture.BuildRegnskabViewModel();
+            IReadOnlyBogføringslinjeViewModel bogføringslinjeViewModelMock = fixture.BuildReadOnlyBogføringslinjeViewModel();
+            string advarsel = fixture.Create<string>();
+            string kontonummer = fixture.Create<string>();
+            string kontonavn = fixture.Create<string>();
+            decimal beløb = fixture.Create<decimal>() * 1;
+            Mock<IBogføringsadvarselModel> bogføringsadvarselModelMock = fixture.BuildBogføringsadvarselModelMock(advarsel, kontonummer, kontonavn, beløb);
+            DateTime tidspunkt = DateTime.Now;
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(regnskabViewModelMock, bogføringslinjeViewModelMock, bogføringsadvarselModelMock.Object, tidspunkt);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Regnskab, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Regnskab, Is.EqualTo(regnskabViewModelMock));
@@ -62,18 +47,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringsadvarselViewModel.TidspunktAsText, Is.EqualTo(string.Format("{0} {1}", tidspunkt.ToShortDateString(), tidspunkt.ToShortTimeString())));
             Assert.That(bogføringsadvarselViewModel.Advarsel, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Advarsel, Is.Not.Empty);
-            Assert.That(bogføringsadvarselViewModel.Advarsel, Is.EqualTo(bogføringsadvarselModelMock.Advarsel));
+            Assert.That(bogføringsadvarselViewModel.Advarsel, Is.EqualTo(advarsel));
             Assert.That(bogføringsadvarselViewModel.Kontonummer, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Kontonummer, Is.Not.Empty);
-            Assert.That(bogføringsadvarselViewModel.Kontonummer, Is.EqualTo(bogføringsadvarselModelMock.Kontonummer));
+            Assert.That(bogføringsadvarselViewModel.Kontonummer, Is.EqualTo(kontonummer));
             Assert.That(bogføringsadvarselViewModel.Kontonavn, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Kontonavn, Is.Not.Empty);
-            Assert.That(bogføringsadvarselViewModel.Kontonavn, Is.EqualTo(bogføringsadvarselModelMock.Kontonavn));
+            Assert.That(bogføringsadvarselViewModel.Kontonavn, Is.EqualTo(kontonavn));
             Assert.That(bogføringsadvarselViewModel.Beløb, Is.GreaterThan(0M));
-            Assert.That(bogføringsadvarselViewModel.Beløb, Is.EqualTo(Math.Abs(bogføringsadvarselModelMock.Beløb)));
+            Assert.That(bogføringsadvarselViewModel.Beløb, Is.EqualTo(Math.Abs(beløb)));
             Assert.That(bogføringsadvarselViewModel.BeløbAsText, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.BeløbAsText, Is.Not.Empty);
-            Assert.That(bogføringsadvarselViewModel.BeløbAsText, Is.EqualTo(Math.Abs(bogføringsadvarselModelMock.Beløb).ToString("C")));
+            Assert.That(bogføringsadvarselViewModel.BeløbAsText, Is.EqualTo(Math.Abs(beløb).ToString("C")));
             Assert.That(bogføringsadvarselViewModel.Information, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Information, Is.Not.Empty);
             Assert.That(bogføringsadvarselViewModel.RemoveCommand, Is.Not.Null);
@@ -88,10 +73,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(bogføringsadvarselViewModel.Image, Is.Not.Empty);
             Assert.That(bogføringsadvarselViewModel.Image, Is.EqualTo(Resource.GetEmbeddedResource("Images.Bogføringslinje.png")));
 
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Advarsel);
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Kontonummer);
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Kontonavn);
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Beløb);
+            bogføringsadvarselModelMock.Verify(m => m.Advarsel, Times.Once);
+            bogføringsadvarselModelMock.Verify(m => m.Kontonummer, Times.Once);
+            bogføringsadvarselModelMock.Verify(m => m.Kontonavn, Times.Once);
+            bogføringsadvarselModelMock.Verify(m => m.Beløb, Times.Once);
         }
 
         /// <summary>
@@ -100,12 +85,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisRegnskabViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BogføringsadvarselViewModel(null, fixture.Create<IReadOnlyBogføringslinjeViewModel>(), fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BogføringsadvarselViewModel(null, fixture.BuildReadOnlyBogføringslinjeViewModel(), fixture.BuildBogføringsadvarselModel(), DateTime.Now));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -119,12 +103,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisBogføringslinjeViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), null, fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), null, fixture.BuildBogføringsadvarselModel(), DateTime.Now));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -138,12 +121,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisBogføringsadvarselModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), null, fixture.Create<DateTime>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildReadOnlyBogføringslinjeViewModel(), null, DateTime.Now));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -157,47 +139,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtInformationGetterReturnererInformationHvorBeløbIkkeErNul()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>();
-                    mock.Expect(m => m.Tekst)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.BogførtAsText)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    return mock;
-                }));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBogføringsadvarselModel>();
-                    mock.Expect(m => m.Kontonavn)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Beløb)
-                        .Return(fixture.Create<decimal>()*-1)
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
 
-            var bogføringslinjeViewModelMock = fixture.Create<IReadOnlyBogføringslinjeViewModel>();
-            var bogføringsadvarselModelMock = fixture.Create<IBogføringsadvarselModel>();
-            var tidspunkt = fixture.Create<DateTime>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeViewModelMock, bogføringsadvarselModelMock, tidspunkt);
+            string tekst = fixture.Create<string>();
+            decimal debit = Math.Abs(fixture.Create<decimal>());
+            decimal kredit = Math.Abs(fixture.Create<decimal>());
+            Mock<IReadOnlyBogføringslinjeViewModel> bogføringslinjeViewModelMock = fixture.BuildReadOnlyBogføringslinjeViewModelMock(tekst: tekst, debit: debit, kredit: kredit);
+            string kontonavn = fixture.Create<string>();
+            decimal beløb = Math.Abs(fixture.Create<decimal>()) * -1;
+            Mock<IBogføringsadvarselModel> bogføringsadvarselModelMock = fixture.BuildBogføringsadvarselModelMock(kontonavn: kontonavn, beløb: beløb);
+            DateTime tidspunkt = DateTime.Now;
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), bogføringslinjeViewModelMock.Object, bogføringsadvarselModelMock.Object, tidspunkt);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Tidspunkt, Is.EqualTo(tidspunkt));
             Assert.That(bogføringsadvarselViewModel.Beløb, Is.GreaterThan(0M));
             Assert.That(bogføringsadvarselViewModel.Information, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Information, Is.Not.Empty);
-            Assert.That(bogføringsadvarselViewModel.Information, Is.EqualTo(string.Format("{0} {1} {2}\r\n\r\n{3}: {4} {5}", tidspunkt.ToShortDateString(), tidspunkt.ToShortTimeString(), Resource.GetText(Text.AccountOverdrawnedWithValue, bogføringsadvarselModelMock.Kontonavn, Math.Abs(bogføringsadvarselModelMock.Beløb).ToString("C")), Resource.GetText(Text.Cause), bogføringslinjeViewModelMock.Tekst, bogføringslinjeViewModelMock.BogførtAsText)));
+            Assert.That(bogføringsadvarselViewModel.Information, Is.EqualTo($"{tidspunkt.ToShortDateString()} {tidspunkt.ToShortTimeString()} {Resource.GetText(Text.AccountOverdrawnWithValue, kontonavn, Math.Abs(beløb).ToString("C"))}\r\n\r\n{Resource.GetText(Text.Cause)}: {tekst} {debit - kredit:C}"));
 
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Kontonavn);
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Beløb);
-            bogføringslinjeViewModelMock.AssertWasCalled(m => m.Tekst);
-            bogføringslinjeViewModelMock.AssertWasCalled(m => m.BogførtAsText);
+            bogføringsadvarselModelMock.Verify(m => m.Kontonavn, Times.Once);
+            bogføringsadvarselModelMock.Verify(m => m.Beløb, Times.Once);
+            bogføringslinjeViewModelMock.Verify(m => m.Tekst, Times.Once);
+            bogføringslinjeViewModelMock.Verify(m => m.BogførtAsText, Times.Once);
         }
 
         /// <summary>
@@ -206,47 +169,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtInformationGetterReturnererInformationHvorBeløbErNul()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>();
-                    mock.Expect(m => m.Tekst)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.BogførtAsText)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    return mock;
-                }));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IBogføringsadvarselModel>();
-                    mock.Expect(m => m.Kontonavn)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Beløb)
-                        .Return(0M)
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
 
-            var bogføringslinjeViewModelMock = fixture.Create<IReadOnlyBogføringslinjeViewModel>();
-            var bogføringsadvarselModelMock = fixture.Create<IBogføringsadvarselModel>();
-            var tidspunkt = fixture.Create<DateTime>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeViewModelMock, bogføringsadvarselModelMock, tidspunkt);
+            string tekst = fixture.Create<string>();
+            decimal debit = Math.Abs(fixture.Create<decimal>());
+            decimal kredit = Math.Abs(fixture.Create<decimal>());
+            Mock<IReadOnlyBogføringslinjeViewModel> bogføringslinjeViewModelMock = fixture.BuildReadOnlyBogføringslinjeViewModelMock(tekst: tekst, debit: debit, kredit: kredit);
+            string kontonavn = fixture.Create<string>();
+            Mock<IBogføringsadvarselModel> bogføringsadvarselModelMock = fixture.BuildBogføringsadvarselModelMock(kontonavn: kontonavn, beløb: 0M);
+            DateTime tidspunkt = DateTime.Now;
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), bogføringslinjeViewModelMock.Object, bogføringsadvarselModelMock.Object, tidspunkt);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Tidspunkt, Is.EqualTo(tidspunkt));
             Assert.That(bogføringsadvarselViewModel.Beløb, Is.EqualTo(0M));
             Assert.That(bogføringsadvarselViewModel.Information, Is.Not.Null);
             Assert.That(bogføringsadvarselViewModel.Information, Is.Not.Empty);
-            Assert.That(bogføringsadvarselViewModel.Information, Is.EqualTo(string.Format("{0} {1} {2}\r\n\r\n{3}: {4} {5}", tidspunkt.ToShortDateString(), tidspunkt.ToShortTimeString(), Resource.GetText(Text.AccountOverdrawnedWithoutValue, bogføringsadvarselModelMock.Kontonavn), Resource.GetText(Text.Cause), bogføringslinjeViewModelMock.Tekst, bogføringslinjeViewModelMock.BogførtAsText)));
+            Assert.That(bogføringsadvarselViewModel.Information, Is.EqualTo($"{tidspunkt.ToShortDateString()} {tidspunkt.ToShortTimeString()} {Resource.GetText(Text.AccountOverdrawnWithoutValue, kontonavn)}\r\n\r\n{Resource.GetText(Text.Cause)}: {tekst} {debit-kredit:C}"));
 
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Kontonavn);
-            bogføringsadvarselModelMock.AssertWasCalled(m => m.Beløb);
-            bogføringslinjeViewModelMock.AssertWasCalled(m => m.Tekst);
-            bogføringslinjeViewModelMock.AssertWasCalled(m => m.BogførtAsText);
+            bogføringsadvarselModelMock.Verify(m => m.Kontonavn, Times.Once);
+            bogføringsadvarselModelMock.Verify(m => m.Beløb, Times.Once);
+            bogføringslinjeViewModelMock.Verify(m => m.Tekst, Times.Once);
+            bogføringslinjeViewModelMock.Verify(m => m.BogførtAsText, Times.Once);
         }
 
         /// <summary>
@@ -255,16 +198,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtRemoveCommandGetterReturnererCommand()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildReadOnlyBogføringslinjeViewModel(), fixture.BuildBogføringsadvarselModel(), DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var removeCommand = bogføringsadvarselViewModel.RemoveCommand;
+            ICommand removeCommand = bogføringsadvarselViewModel.RemoveCommand;
             Assert.That(removeCommand, Is.Not.Null);
         }
 
@@ -279,19 +218,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase(1, true)]
         public void TestAtCanExecuteOnRemoveCommandReturnererValue(object parameter, bool expectedResult)
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildReadOnlyBogføringslinjeViewModel(), fixture.BuildBogføringsadvarselModel(), DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var removeCommand = bogføringsadvarselViewModel.RemoveCommand;
+            ICommand removeCommand = bogføringsadvarselViewModel.RemoveCommand;
             Assert.That(removeCommand, Is.Not.Null);
 
-            var result = removeCommand.CanExecute(parameter);
+            bool result = removeCommand.CanExecute(parameter);
             Assert.That(result, Is.EqualTo(expectedResult));
         }
 
@@ -306,16 +241,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase(1)]
         public void TestAtExecuteOnRemoveCommandExecutes(object parameter)
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(MockRepository.GenerateMock<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildReadOnlyBogføringslinjeViewModel(), fixture.BuildBogføringsadvarselModel(), DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var removeCommand = bogføringsadvarselViewModel.RemoveCommand;
+            ICommand removeCommand = bogføringsadvarselViewModel.RemoveCommand;
             Assert.That(removeCommand, Is.Not.Null);
 
             removeCommand.Execute(parameter);
@@ -327,22 +258,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtExecuteOnRemoveCommandFjernerBogføringsadvarselViewModelFraRegnskab()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(regnskabViewModelMock, fixture.Create<IReadOnlyBogføringslinjeViewModel>(), fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            Mock<IRegnskabViewModel> regnskabViewModelMock = fixture.BuildRegnskabViewModelMock();
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(regnskabViewModelMock.Object, fixture.BuildReadOnlyBogføringslinjeViewModel(), fixture.BuildBogføringsadvarselModel(), DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var removeCommand = bogføringsadvarselViewModel.RemoveCommand;
+            ICommand removeCommand = bogføringsadvarselViewModel.RemoveCommand;
             Assert.That(removeCommand, Is.Not.Null);
 
             removeCommand.Execute(null);
 
-            regnskabViewModelMock.AssertWasCalled(m => m.BogføringsadvarselRemove(Arg<IBogføringsadvarselViewModel>.Is.Equal(bogføringsadvarselViewModel)));
+            regnskabViewModelMock.Verify(m => m.BogføringsadvarselRemove(It.Is<IBogføringsadvarselViewModel>(value => value != null && value == bogføringsadvarselViewModel)), Times.Once);
         }
 
         /// <summary>
@@ -369,28 +296,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Image", "Bogføringslinje")]
         public void TestAtPropertyChangedOnBogføringslinjeViewModelEventHandlerRejserPropertyChangedOnBogføringslinjeViewModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringslinjeViewModelMock = fixture.Create<IReadOnlyBogføringslinjeViewModel>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeViewModelMock, fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            Mock<IReadOnlyBogføringslinjeViewModel> bogføringslinjeViewModelMock = fixture.BuildReadOnlyBogføringslinjeViewModelMock();
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), bogføringslinjeViewModelMock.Object, fixture.BuildBogføringsadvarselModel(), DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var eventCalled = false;
+            bool eventCalled = false;
             bogføringsadvarselViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.CompareOrdinal(e.PropertyName, expectPropertyName) == 0)
                 {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
-                    {
-                        eventCalled = true;
-                    }
-                };
+                    eventCalled = true;
+                }
+            };
 
             Assert.That(eventCalled, Is.False);
             bogføringslinjeViewModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeViewModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
@@ -403,17 +326,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtPropertyChangedOnBogføringslinjeViewModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringslinjeViewModelMock = fixture.Create<IReadOnlyBogføringslinjeViewModel>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeViewModelMock, fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            Mock<IReadOnlyBogføringslinjeViewModel> bogføringslinjeViewModelMock = fixture.BuildReadOnlyBogføringslinjeViewModelMock();
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), bogføringslinjeViewModelMock.Object, fixture.BuildBogføringsadvarselModel(), DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => bogføringslinjeViewModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => bogføringslinjeViewModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -427,17 +346,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtPropertyChangedOnBogføringslinjeViewModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringslinjeViewModelMock = fixture.Create<IReadOnlyBogføringslinjeViewModel>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), bogføringslinjeViewModelMock, fixture.Create<IBogføringsadvarselModel>(), fixture.Create<DateTime>());
+            Mock<IReadOnlyBogføringslinjeViewModel> bogføringslinjeViewModelMock = fixture.BuildReadOnlyBogføringslinjeViewModelMock();
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), bogføringslinjeViewModelMock.Object, fixture.BuildBogføringsadvarselModel(), DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => bogføringslinjeViewModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeViewModelMock, null));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => bogføringslinjeViewModelMock.Raise(m => m.PropertyChanged += null, bogføringslinjeViewModelMock, null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -458,28 +373,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Beløb", "Information")]
         public void TestAtPropertyChangedOnBogføringsadvarselModelEventHandlerRejserPropertyChangedOnBogføringsadvarselModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringsadvarselModelMock = fixture.Create<IBogføringsadvarselModel>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), bogføringsadvarselModelMock, fixture.Create<DateTime>());
+            Mock<IBogføringsadvarselModel> bogføringsadvarselModelMock = fixture.BuildBogføringsadvarselModelMock();
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildReadOnlyBogføringslinjeViewModel(), bogføringsadvarselModelMock.Object, DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var eventCalled = false;
+            bool eventCalled = false;
             bogføringsadvarselViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.CompareOrdinal(e.PropertyName, expectPropertyName) == 0)
                 {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
-                    {
-                        eventCalled = true;
-                    }
-                };
+                    eventCalled = true;
+                }
+            };
 
             Assert.That(eventCalled, Is.False);
             bogføringsadvarselModelMock.Raise(m => m.PropertyChanged += null, bogføringsadvarselModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
@@ -492,17 +403,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtPropertyChangedOnBogføringsadvarselModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringsadvarselModelMock = fixture.Create<IBogføringsadvarselModel>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), bogføringsadvarselModelMock, fixture.Create<DateTime>());
+            Mock<IBogføringsadvarselModel> bogføringsadvarselModelMock = fixture.BuildBogføringsadvarselModelMock();
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildReadOnlyBogføringslinjeViewModel(), bogføringsadvarselModelMock.Object, DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => bogføringsadvarselModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => bogføringsadvarselModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -516,17 +423,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtPropertyChangedOnBogføringsadvarselModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IReadOnlyBogføringslinjeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IReadOnlyBogføringslinjeViewModel>()));
-            fixture.Customize<IBogføringsadvarselModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBogføringsadvarselModel>()));
+            Fixture fixture = new Fixture();
 
-            var bogføringsadvarselModelMock = fixture.Create<IBogføringsadvarselModel>();
-            var bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IReadOnlyBogføringslinjeViewModel>(), bogføringsadvarselModelMock, fixture.Create<DateTime>());
+            Mock<IBogføringsadvarselModel> bogføringsadvarselModelMock = fixture.BuildBogføringsadvarselModelMock();
+            IBogføringsadvarselViewModel bogføringsadvarselViewModel = new BogføringsadvarselViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildReadOnlyBogføringslinjeViewModel(), bogføringsadvarselModelMock.Object, DateTime.Now);
             Assert.That(bogføringsadvarselViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => bogføringsadvarselModelMock.Raise(m => m.PropertyChanged += null, bogføringsadvarselModelMock, null));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => bogføringsadvarselModelMock.Raise(m => m.PropertyChanged += null, bogføringsadvarselModelMock, null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);

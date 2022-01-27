@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
@@ -36,12 +37,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (dependencyCommand == null)
             {
-                throw new ArgumentNullException("dependencyCommand");
+                throw new ArgumentNullException(nameof(dependencyCommand));
             }
+
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
+
             _dependencyCommand = dependencyCommand;
             _finansstyringRepository = finansstyringRepository;
         }
@@ -72,23 +75,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 _dependencyCommand.Execute(regnskabViewModel);
                 dependencyCommandTask = _dependencyCommand.ExecuteTask;
             }
+
             _isBusy = true;
-            var task = _finansstyringRepository.BudgetkontoplanGetAsync(regnskabViewModel.Nummer, regnskabViewModel.StatusDato);
+            Task<IEnumerable<IBudgetkontoModel>> task = _finansstyringRepository.BudgetkontoplanGetAsync(regnskabViewModel.Nummer, regnskabViewModel.StatusDato);
             ExecuteTask = task.ContinueWith(t =>
+            {
+                try
                 {
-                    try
-                    {
-                        if (dependencyCommandTask != null)
-                        {
-                            dependencyCommandTask.Wait();
-                        }
-                        HandleResultFromTask(t, regnskabViewModel, new List<IBudgetkontogruppeViewModel>(regnskabViewModel.Budgetkontogrupper), HandleResult);
-                    }
-                    finally
-                    {
-                        _isBusy = false;
-                    }
-                });
+                    dependencyCommandTask?.GetAwaiter().GetResult();
+
+                    HandleResultFromTask(t, regnskabViewModel, new List<IBudgetkontogruppeViewModel>(regnskabViewModel.Budgetkontogrupper), HandleResult);
+                }
+                finally
+                {
+                    _isBusy = false;
+                }
+            });
         }
 
         /// <summary>
@@ -101,33 +103,38 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (regnskabViewModel == null)
             {
-                throw new ArgumentNullException("regnskabViewModel");
+                throw new ArgumentNullException(nameof(regnskabViewModel));
             }
+
             if (budgetkontoModels == null)
             {
-                throw new ArgumentNullException("budgetkontoModels");
+                throw new ArgumentNullException(nameof(budgetkontoModels));
             }
+
             if (budgetkontogruppeViewModels == null)
             {
-                throw new ArgumentNullException("budgetkontogruppeViewModels");
+                throw new ArgumentNullException(nameof(budgetkontogruppeViewModels));
             }
-            var budgetkontogruppeViewModelCollection = budgetkontogruppeViewModels.ToArray();
-            var budgetkontoViewModelCollection = new List<IBudgetkontoViewModel>(regnskabViewModel.Budgetkonti);
-            foreach (var budgetkontoModel in budgetkontoModels)
+
+            IBudgetkontogruppeViewModel[] budgetkontogruppeViewModelCollection = budgetkontogruppeViewModels.ToArray();
+            IList<IBudgetkontoViewModel> budgetkontoViewModelCollection = new List<IBudgetkontoViewModel>(regnskabViewModel.Budgetkonti);
+            foreach (IBudgetkontoModel budgetkontoModel in budgetkontoModels)
             {
                 try
                 {
-                    var budgetkontogruppeViewModel = budgetkontogruppeViewModelCollection.SingleOrDefault(m => m.Nummer == budgetkontoModel.Kontogruppe);
+                    IBudgetkontogruppeViewModel budgetkontogruppeViewModel = budgetkontogruppeViewModelCollection.SingleOrDefault(m => m.Nummer == budgetkontoModel.Kontogruppe);
                     if (budgetkontogruppeViewModel == null)
                     {
                         continue;
                     }
-                    var budgetkontoViewModel = regnskabViewModel.Budgetkonti.FirstOrDefault(m => string.Compare(m.Kontonummer, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0);
+
+                    IBudgetkontoViewModel budgetkontoViewModel = regnskabViewModel.Budgetkonti.SingleOrDefault(m => string.CompareOrdinal(m.Kontonummer, budgetkontoModel.Kontonummer) == 0);
                     if (budgetkontoViewModel == null)
                     {
                         regnskabViewModel.BudgetkontoAdd(new BudgetkontoViewModel(regnskabViewModel, budgetkontoModel, budgetkontogruppeViewModel, _finansstyringRepository, ExceptionHandler));
                         continue;
                     }
+
                     budgetkontoViewModel.Kontonavn = budgetkontoModel.Kontonavn;
                     budgetkontoViewModel.Beskrivelse = budgetkontoModel.Beskrivelse;
                     budgetkontoViewModel.Notat = budgetkontoModel.Notat;
@@ -145,17 +152,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
                 }
                 finally
                 {
-                    var budgetkontoViewModel = budgetkontoViewModelCollection.FirstOrDefault(m => string.Compare(m.Kontonummer, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0);
+                    IBudgetkontoViewModel budgetkontoViewModel = budgetkontoViewModelCollection.SingleOrDefault(m => string.CompareOrdinal(m.Kontonummer, budgetkontoModel.Kontonummer) == 0);
                     while (budgetkontoViewModel != null)
                     {
                         budgetkontoViewModelCollection.Remove(budgetkontoViewModel);
-                        budgetkontoViewModel = budgetkontoViewModelCollection.FirstOrDefault(m => string.Compare(m.Kontonummer, budgetkontoModel.Kontonummer, StringComparison.Ordinal) == 0);
+                        budgetkontoViewModel = budgetkontoViewModelCollection.SingleOrDefault(m => string.CompareOrdinal(m.Kontonummer, budgetkontoModel.Kontonummer) == 0);
                     }
                 }
             }
-            foreach (var unreadedBudgetkontoViewModel in budgetkontoViewModelCollection)
+
+            foreach (IBudgetkontoViewModel unreadedBudgetkontoViewModel in budgetkontoViewModelCollection)
             {
-                var refreshCommand = unreadedBudgetkontoViewModel.RefreshCommand;
+                ICommand refreshCommand = unreadedBudgetkontoViewModel.RefreshCommand;
                 if (refreshCommand.CanExecute(unreadedBudgetkontoViewModel))
                 {
                     refreshCommand.Execute(unreadedBudgetkontoViewModel);

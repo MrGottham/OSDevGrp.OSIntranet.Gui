@@ -38,12 +38,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (dependencyCommand == null)
             {
-                throw new ArgumentNullException("dependencyCommand");
+                throw new ArgumentNullException(nameof(dependencyCommand));
             }
+
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
+
             _dependencyCommand = dependencyCommand;
             _finansstyringRepository = finansstyringRepository;
         }
@@ -68,30 +70,29 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         /// <param name="budgetkontoViewModel">ViewModel for budgetkontoen, der skal hentes og opdateres.</param>
         protected override void Execute(IBudgetkontoViewModel budgetkontoViewModel)
         {
-            var regnskabViewModel = budgetkontoViewModel.Regnskab;
+            IRegnskabViewModel regnskabViewModel = budgetkontoViewModel.Regnskab;
             Task dependencyCommandTask = null;
             if (_dependencyCommand.CanExecute(regnskabViewModel))
             {
                 _dependencyCommand.Execute(regnskabViewModel);
                 dependencyCommandTask = _dependencyCommand.ExecuteTask;
             }
+
             _isBusy = true;
-            var task = _finansstyringRepository.BudgetkontoGetAsync(regnskabViewModel.Nummer, budgetkontoViewModel.Kontonummer, budgetkontoViewModel.StatusDato);
+            Task<IBudgetkontoModel> task = _finansstyringRepository.BudgetkontoGetAsync(regnskabViewModel.Nummer, budgetkontoViewModel.Kontonummer, budgetkontoViewModel.StatusDato);
             ExecuteTask = task.ContinueWith(t =>
+            {
+                try
                 {
-                    try
-                    {
-                        if (dependencyCommandTask != null)
-                        {
-                            dependencyCommandTask.Wait();
-                        }
-                        HandleResultFromTask(t, budgetkontoViewModel, new List<IBudgetkontogruppeViewModel>(regnskabViewModel.Budgetkontogrupper), HandleResult);
-                    }
-                    finally
-                    {
-                        _isBusy = false;
-                    }
-                });
+                    dependencyCommandTask?.GetAwaiter().GetResult();
+
+                    HandleResultFromTask(t, budgetkontoViewModel, new List<IBudgetkontogruppeViewModel>(regnskabViewModel.Budgetkontogrupper), HandleResult);
+                }
+                finally
+                {
+                    _isBusy = false;
+                }
+            });
         }
 
         /// <summary>
@@ -104,21 +105,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (budgetkontoViewModel == null)
             {
-                throw new ArgumentNullException("budgetkontoViewModel");
+                throw new ArgumentNullException(nameof(budgetkontoViewModel));
             }
+
             if (budgetkontoModel == null)
             {
-                throw new ArgumentNullException("budgetkontoModel");
+                throw new ArgumentNullException(nameof(budgetkontoModel));
             }
+
             if (budgetkontogruppeViewModels == null)
             {
-                throw new ArgumentNullException("budgetkontogruppeViewModels");
+                throw new ArgumentNullException(nameof(budgetkontogruppeViewModels));
             }
-            var budgetkontogruppeViewModel = budgetkontogruppeViewModels.SingleOrDefault(m => m.Nummer == budgetkontoModel.Kontogruppe);
+
+            IBudgetkontogruppeViewModel budgetkontogruppeViewModel = budgetkontogruppeViewModels.SingleOrDefault(m => m.Nummer == budgetkontoModel.Kontogruppe);
             if (budgetkontogruppeViewModel == null)
             {
                 throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountGroupNotFound, budgetkontoModel.Kontogruppe));
             }
+
             budgetkontoViewModel.Kontonavn = budgetkontoModel.Kontonavn;
             budgetkontoViewModel.Beskrivelse = budgetkontoModel.Beskrivelse;
             budgetkontoViewModel.Notat = budgetkontoModel.Notat;

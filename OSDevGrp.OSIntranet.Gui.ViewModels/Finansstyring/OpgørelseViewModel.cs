@@ -34,8 +34,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (regnskabViewModel == null)
             {
-                throw new ArgumentNullException("regnskabViewModel");
+                throw new ArgumentNullException(nameof(regnskabViewModel));
             }
+
             _regnskabViewModel = regnskabViewModel;
             _regnskabViewModel.PropertyChanged += PropertyChangedOnRegnskabViewModelEventHandler;
         }
@@ -47,13 +48,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Regnskabet, som opgørelseslinjen er tilkyttet.
         /// </summary>
-        public virtual IRegnskabViewModel Regnskab
-        {
-            get
-            {
-                return _regnskabViewModel;
-            }
-        }
+        public virtual IRegnskabViewModel Regnskab => _regnskabViewModel;
 
         /// <summary>
         /// Registrerede budgetkonti, som indgår i opgørelseslinjen.
@@ -82,24 +77,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet budgetteret beløb for opgørelseslinjen.
         /// </summary>
-        public virtual string BudgetAsText
-        {
-            get
-            {
-                return Budget.ToString("C");
-            }
-        }
+        public virtual string BudgetAsText => Budget.ToString("C");
 
         /// <summary>
         /// Label til samlet budgetteret beløb for opgørelseslinjen.
         /// </summary>
-        public virtual string BudgetLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Budget);
-            }
-        }
+        public virtual string BudgetLabel => Resource.GetText(Text.Budget);
 
         /// <summary>
         /// Samlet budgetteret beløb for sidste måned til opgørelseslinjen.
@@ -115,24 +98,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet budgetteret beløb for sidste måned til opgørelseslinjen.
         /// </summary>
-        public virtual string BudgetSidsteMånedAsText
-        {
-            get
-            {
-                return BudgetSidsteMåned.ToString("C");
-            }
-        }
+        public virtual string BudgetSidsteMånedAsText => BudgetSidsteMåned.ToString("C");
 
         /// <summary>
         /// Label til samlet budgetteret beløb for sidste måned til opgørelseslinjen.
         /// </summary>
-        public virtual string BudgetSidsteMånedLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetLastMonth);
-            }
-        }
+        public virtual string BudgetSidsteMånedLabel => Resource.GetText(Text.BudgetLastMonth);
 
         /// <summary>
         /// Samlet budgetteret beløb for år til dato til opgørelseslinjen.
@@ -148,24 +119,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet budgetteret beløb for år til dato til opgørelseslinjen.
         /// </summary>
-        public virtual string BudgetÅrTilDatoAsText
-        {
-            get
-            {
-                return BudgetÅrTilDato.ToString("C");
-            }
-        }
+        public virtual string BudgetÅrTilDatoAsText => BudgetÅrTilDato.ToString("C");
 
         /// <summary>
         /// Label til samlet budgetteret beløb for år til dato til opgørelseslinjen.
         /// </summary>
-        public virtual string BudgetÅrTilDatoLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetYearToDate);
-            }
-        }
+        public virtual string BudgetÅrTilDatoLabel => Resource.GetText(Text.BudgetYearToDate);
 
         /// <summary>
         /// Samlet budgetteret beløb for sidste år til opgørelseslinjen.
@@ -181,24 +140,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet budgetteret beløb for sidste år til opgørelseslinjen.
         /// </summary>
-        public virtual string BudgetSidsteÅrAsText
-        {
-            get
-            {
-                return BudgetSidsteÅr.ToString("C");
-            }
-        }
+        public virtual string BudgetSidsteÅrAsText => BudgetSidsteÅr.ToString("C");
 
         /// <summary>
         /// Label til samlet budgetteret beløb for sidste år til opgørelseslinjen..
         /// </summary>
-        public virtual string BudgetSidsteÅrLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetLastYear);
-            }
-        }
+        public virtual string BudgetSidsteÅrLabel => Resource.GetText(Text.BudgetLastYear);
 
         /// <summary>
         /// Samlet bogført beløb til opgørelseslinjen.
@@ -214,24 +161,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet bogført beløb til opgørelseslinjen.
         /// </summary>
-        public virtual string BogførtAsText
-        {
-            get
-            {
-                return Bogført.ToString("C");
-            }
-        }
+        public virtual string BogførtAsText => Bogført.ToString("C");
 
         /// <summary>
         /// Label til samlet bogført beløb til opgørelseslinjen.
         /// </summary>
-        public virtual string BogførtLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Bookkeeped);
-            }
-        }
+        public virtual string BogførtLabel => Resource.GetText(Text.Posted);
 
         /// <summary>
         /// Samlet bogført beløb for sidste måned til opgørelseslinjen.
@@ -247,24 +182,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet bogført beløb for sidste måned til opgørelseslinjen.
         /// </summary>
-        public virtual string BogførtSidsteMånedAsText
-        {
-            get
-            {
-                return BogførtSidsteMåned.ToString("C");
-            }
-        }
+        public virtual string BogførtSidsteMånedAsText => BogførtSidsteMåned.ToString("C");
 
         /// <summary>
         /// Label til samlet bogført beløb for sidste måned til opgørelseslinjen.
         /// </summary>
-        public virtual string BogførtSidsteMånedLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedLastMonth);
-            }
-        }
+        public virtual string BogførtSidsteMånedLabel => Resource.GetText(Text.PostedLastMonth);
 
         /// <summary>
         /// Samlet bogført beløb for år til dato til opgørelseslinjen.
@@ -280,24 +203,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet bogført beløb for år til dato til opgørelseslinjen.
         /// </summary>
-        public virtual string BogførtÅrTilDatoAsText
-        {
-            get
-            {
-                return BogførtÅrTilDato.ToString("C");
-            }
-        }
+        public virtual string BogførtÅrTilDatoAsText => BogførtÅrTilDato.ToString("C");
 
         /// <summary>
         /// Label til samlet bogført beløb for år til dato til opgørelseslinjen.
         /// </summary>
-        public virtual string BogførtÅrTilDatoLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedYearToDate);
-            }
-        }
+        public virtual string BogførtÅrTilDatoLabel => Resource.GetText(Text.PostedYearToDate);
 
         /// <summary>
         /// Samlet bogført beløb for sidste år til opgørelseslinjen.
@@ -313,13 +224,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet bogført beløb for sidste år til opgørelseslinjen.
         /// </summary>
-        public virtual string BogførtSidsteÅrAsText
-        {
-            get
-            {
-                return BogførtSidsteÅr.ToString("C");
-            }
-        }
+        public virtual string BogførtSidsteÅrAsText => BogførtSidsteÅr.ToString("C");
 
         /// <summary>
         /// Label til samlet bogført beløb for sidste år til opgørelseslinjen.
@@ -328,7 +233,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                return Resource.GetText(Text.BookkeepedLastYear);
+                return Resource.GetText(Text.PostedLastYear);
             }
         }
 
@@ -346,24 +251,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af samlet disponibel beløb til opgørelseslinjen.
         /// </summary>
-        public virtual string DisponibelAsText
-        {
-            get
-            {
-                return Disponibel.ToString("C");
-            }
-        }
+        public virtual string DisponibelAsText => Disponibel.ToString("C");
 
         /// <summary>
         /// Label til samlet disponibel beløb til opgørelseslinjen.
         /// </summary>
-        public virtual string DisponibelLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Available);
-            }
-        }
+        public virtual string DisponibelLabel => Resource.GetText(Text.Available);
 
         #endregion
 
@@ -377,33 +270,35 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (budgetkontoViewModel == null)
             {
-                throw new ArgumentNullException("budgetkontoViewModel");
+                throw new ArgumentNullException(nameof(budgetkontoViewModel));
             }
+
             if (_regnskabViewModel.Budgetkonti.Contains(budgetkontoViewModel) == false || budgetkontoViewModel.Kontogruppe == null || budgetkontoViewModel.Kontogruppe.Nummer != Nummer || budgetkontoViewModel.ErRegistreret)
             {
                 return;
             }
+
             budgetkontoViewModel.ErRegistreret = true;
             budgetkontoViewModel.PropertyChanged += PropertyChangedOnBudgetkontoViewModelEventHandler;
-            RaisePropertyChanged("Budgetkonti");
-            RaisePropertyChanged("Budget");
-            RaisePropertyChanged("BudgetAsText");
-            RaisePropertyChanged("BudgetSidsteMåned");
-            RaisePropertyChanged("BudgetSidsteMånedAsText");
-            RaisePropertyChanged("BudgetÅrTilDato");
-            RaisePropertyChanged("BudgetÅrTilDatoAsText");
-            RaisePropertyChanged("BudgetSidsteÅr");
-            RaisePropertyChanged("BudgetSidsteÅrAsText");
-            RaisePropertyChanged("Bogført");
-            RaisePropertyChanged("BogførtAsText");
-            RaisePropertyChanged("BogførtSidsteMåned");
-            RaisePropertyChanged("BogførtSidsteMånedAsText");
-            RaisePropertyChanged("BogførtÅrTilDato");
-            RaisePropertyChanged("BogførtÅrTilDatoAsText");
-            RaisePropertyChanged("BogførtSidsteÅr");
-            RaisePropertyChanged("BogførtSidsteÅrAsText");
-            RaisePropertyChanged("Disponibel");
-            RaisePropertyChanged("DisponibelAsText");
+            RaisePropertyChanged(nameof(Budgetkonti));
+            RaisePropertyChanged(nameof(Budget));
+            RaisePropertyChanged(nameof(BudgetAsText));
+            RaisePropertyChanged(nameof(BudgetSidsteMåned));
+            RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
+            RaisePropertyChanged(nameof(BudgetÅrTilDato));
+            RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
+            RaisePropertyChanged(nameof(BudgetSidsteÅr));
+            RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
+            RaisePropertyChanged(nameof(Bogført));
+            RaisePropertyChanged(nameof(BogførtAsText));
+            RaisePropertyChanged(nameof(BogførtSidsteMåned));
+            RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
+            RaisePropertyChanged(nameof(BogførtÅrTilDato));
+            RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
+            RaisePropertyChanged(nameof(BogførtSidsteÅr));
+            RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
+            RaisePropertyChanged(nameof(Disponibel));
+            RaisePropertyChanged(nameof(DisponibelAsText));
         }
 
         /// <summary>
@@ -415,34 +310,36 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             base.ModelChanged(propertyName);
             switch (propertyName)
             {
-                case "Nummer":
-                    foreach (var budgetkontoViewModel in _regnskabViewModel.Budgetkonti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret))
+                case nameof(Nummer):
+                    foreach (IBudgetkontoViewModel budgetkontoViewModel in _regnskabViewModel.Budgetkonti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret))
                     {
                         budgetkontoViewModel.ErRegistreret = false;
                     }
-                    foreach (var budgetkontoViewModel in _regnskabViewModel.Budgetkonti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret == false))
+
+                    foreach (IBudgetkontoViewModel budgetkontoViewModel in _regnskabViewModel.Budgetkonti.Where(m => m.Kontogruppe != null && m.Kontogruppe.Nummer == Nummer && m.ErRegistreret == false))
                     {
                         Register(budgetkontoViewModel);
                     }
-                    RaisePropertyChanged("Budgetkonti");
-                    RaisePropertyChanged("Budget");
-                    RaisePropertyChanged("BudgetAsText");
-                    RaisePropertyChanged("BudgetSidsteMåned");
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
-                    RaisePropertyChanged("BudgetÅrTilDato");
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
-                    RaisePropertyChanged("BudgetSidsteÅr");
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
-                    RaisePropertyChanged("Bogført");
-                    RaisePropertyChanged("BogførtAsText");
-                    RaisePropertyChanged("BogførtSidsteMåned");
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
-                    RaisePropertyChanged("BogførtÅrTilDato");
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
-                    RaisePropertyChanged("BogførtSidsteÅr");
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
-                    RaisePropertyChanged("Disponibel");
-                    RaisePropertyChanged("DisponibelAsText");
+
+                    RaisePropertyChanged(nameof(Budgetkonti));
+                    RaisePropertyChanged(nameof(Budget));
+                    RaisePropertyChanged(nameof(BudgetAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteMåned));
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDato));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅr));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Bogført));
+                    RaisePropertyChanged(nameof(BogførtAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteMåned));
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDato));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅr));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Disponibel));
+                    RaisePropertyChanged(nameof(DisponibelAsText));
                     break;
             }
         }
@@ -456,34 +353,36 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (eventArgs == null)
             {
-                throw new ArgumentNullException("eventArgs");
+                throw new ArgumentNullException(nameof(eventArgs));
             }
+
             switch (eventArgs.PropertyName)
             {
-                case "Budgetkonti":
-                    RaisePropertyChanged("Budgetkonti");
-                    RaisePropertyChanged("Budget");
-                    RaisePropertyChanged("BudgetAsText");
-                    RaisePropertyChanged("BudgetSidsteMåned");
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
-                    RaisePropertyChanged("BudgetÅrTilDato");
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
-                    RaisePropertyChanged("BudgetSidsteÅr");
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
-                    RaisePropertyChanged("Bogført");
-                    RaisePropertyChanged("BogførtAsText");
-                    RaisePropertyChanged("BogførtSidsteMåned");
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
-                    RaisePropertyChanged("BogførtÅrTilDato");
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
-                    RaisePropertyChanged("BogførtSidsteÅr");
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
-                    RaisePropertyChanged("Disponibel");
-                    RaisePropertyChanged("DisponibelAsText");
+                case nameof(Budgetkonti):
+                    RaisePropertyChanged(nameof(Budgetkonti));
+                    RaisePropertyChanged(nameof(Budget));
+                    RaisePropertyChanged(nameof(BudgetAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteMåned));
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDato));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅr));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Bogført));
+                    RaisePropertyChanged(nameof(BogførtAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteMåned));
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDato));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅr));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Disponibel));
+                    RaisePropertyChanged(nameof(DisponibelAsText));
                     break;
             }
         }
@@ -497,21 +396,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (eventArgs == null)
             {
-                throw new ArgumentNullException("eventArgs");
+                throw new ArgumentNullException(nameof(eventArgs));
             }
-            var budgetkontoViewModel = sender as IBudgetkontoViewModel;
+
+            IBudgetkontoViewModel budgetkontoViewModel = sender as IBudgetkontoViewModel;
             if (budgetkontoViewModel == null)
             {
-                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "sender", sender.GetType().Name));
+                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(sender), sender.GetType().Name));
             }
+
             switch (eventArgs.PropertyName)
             {
                 case "Kontonummer":
-                    RaisePropertyChanged("Budgetkonti");
+                    RaisePropertyChanged(nameof(Budgetkonti));
                     break;
 
                 case "Kontogruppe":
@@ -520,70 +422,71 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         budgetkontoViewModel.PropertyChanged -= PropertyChangedOnBudgetkontoViewModelEventHandler;
                         budgetkontoViewModel.ErRegistreret = false;
                     }
-                    RaisePropertyChanged("Budgetkonti");
-                    RaisePropertyChanged("Budget");
-                    RaisePropertyChanged("BudgetAsText");
-                    RaisePropertyChanged("BudgetSidsteMåned");
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
-                    RaisePropertyChanged("BudgetÅrTilDato");
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
-                    RaisePropertyChanged("BudgetSidsteÅr");
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
-                    RaisePropertyChanged("Bogført");
-                    RaisePropertyChanged("BogførtAsText");
-                    RaisePropertyChanged("BogførtSidsteMåned");
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
-                    RaisePropertyChanged("BogførtÅrTilDato");
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
-                    RaisePropertyChanged("BogførtSidsteÅr");
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
-                    RaisePropertyChanged("Disponibel");
-                    RaisePropertyChanged("DisponibelAsText");
+
+                    RaisePropertyChanged(nameof(Budgetkonti));
+                    RaisePropertyChanged(nameof(Budget));
+                    RaisePropertyChanged(nameof(BudgetAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteMåned));
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDato));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅr));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Bogført));
+                    RaisePropertyChanged(nameof(BogførtAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteMåned));
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDato));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅr));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Disponibel));
+                    RaisePropertyChanged(nameof(DisponibelAsText));
                     break;
 
-                case "Budget":
-                    RaisePropertyChanged("Budget");
-                    RaisePropertyChanged("BudgetAsText");
+                case nameof(Budget):
+                    RaisePropertyChanged(nameof(Budget));
+                    RaisePropertyChanged(nameof(BudgetAsText));
                     break;
 
-                case "BudgetSidsteMåned":
-                    RaisePropertyChanged("BudgetSidsteMåned");
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
+                case nameof(BudgetSidsteMåned):
+                    RaisePropertyChanged(nameof(BudgetSidsteMåned));
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
                     break;
 
-                case "BudgetÅrTilDato":
-                    RaisePropertyChanged("BudgetÅrTilDato");
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                case nameof(BudgetÅrTilDato):
+                    RaisePropertyChanged(nameof(BudgetÅrTilDato));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
                     break;
 
-                case "BudgetSidsteÅr":
-                    RaisePropertyChanged("BudgetSidsteÅr");
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                case nameof(BudgetSidsteÅr):
+                    RaisePropertyChanged(nameof(BudgetSidsteÅr));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
                     break;
 
-                case "Bogført":
-                    RaisePropertyChanged("Bogført");
-                    RaisePropertyChanged("BogførtAsText");
+                case nameof(Bogført):
+                    RaisePropertyChanged(nameof(Bogført));
+                    RaisePropertyChanged(nameof(BogførtAsText));
                     break;
 
-                case "BogførtSidsteMåned":
-                    RaisePropertyChanged("BogførtSidsteMåned");
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                case nameof(BogførtSidsteMåned):
+                    RaisePropertyChanged(nameof(BogførtSidsteMåned));
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
                     break;
 
-                case "BogførtÅrTilDato":
-                    RaisePropertyChanged("BogførtÅrTilDato");
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                case nameof(BogførtÅrTilDato):
+                    RaisePropertyChanged(nameof(BogførtÅrTilDato));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
                     break;
 
-                case "BogførtSidsteÅr":
-                    RaisePropertyChanged("BogførtSidsteÅr");
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                case nameof(BogførtSidsteÅr):
+                    RaisePropertyChanged(nameof(BogførtSidsteÅr));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
                     break;
 
-                case "Disponibel":
-                    RaisePropertyChanged("Disponibel");
-                    RaisePropertyChanged("DisponibelAsText");
+                case nameof(Disponibel):
+                    RaisePropertyChanged(nameof(Disponibel));
+                    RaisePropertyChanged(nameof(DisponibelAsText));
                     break;
 
                 case "ErRegistreret":
@@ -592,25 +495,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                         budgetkontoViewModel.PropertyChanged -= PropertyChangedOnBudgetkontoViewModelEventHandler;
                         budgetkontoViewModel.ErRegistreret = false;
                     }
-                    RaisePropertyChanged("Budgetkonti");
-                    RaisePropertyChanged("Budget");
-                    RaisePropertyChanged("BudgetAsText");
-                    RaisePropertyChanged("BudgetSidsteMåned");
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
-                    RaisePropertyChanged("BudgetÅrTilDato");
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
-                    RaisePropertyChanged("BudgetSidsteÅr");
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
-                    RaisePropertyChanged("Bogført");
-                    RaisePropertyChanged("BogførtAsText");
-                    RaisePropertyChanged("BogførtSidsteMåned");
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
-                    RaisePropertyChanged("BogførtÅrTilDato");
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
-                    RaisePropertyChanged("BogførtSidsteÅr");
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
-                    RaisePropertyChanged("Disponibel");
-                    RaisePropertyChanged("DisponibelAsText");
+
+                    RaisePropertyChanged(nameof(Budgetkonti));
+                    RaisePropertyChanged(nameof(Budget));
+                    RaisePropertyChanged(nameof(BudgetAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteMåned));
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDato));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅr));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Bogført));
+                    RaisePropertyChanged(nameof(BogførtAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteMåned));
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDato));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅr));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Disponibel));
+                    RaisePropertyChanged(nameof(DisponibelAsText));
                     break;
             }
         }

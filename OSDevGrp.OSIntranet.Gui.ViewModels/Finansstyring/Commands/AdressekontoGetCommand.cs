@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
@@ -31,8 +32,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
+
             _finansstyringRepository = finansstyringRepository;
         }
 
@@ -57,18 +59,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         protected override void Execute(IAdressekontoViewModel viewModel)
         {
             _isBusy = true;
-            var task = _finansstyringRepository.AdressekontoGetAsync(viewModel.Regnskab.Nummer, viewModel.Nummer, viewModel.StatusDato);
+            Task<IAdressekontoModel> task = _finansstyringRepository.AdressekontoGetAsync(viewModel.Regnskab.Nummer, viewModel.Nummer, viewModel.StatusDato);
             ExecuteTask = task.ContinueWith(t =>
+            {
+                try
                 {
-                    try
-                    {
-                        HandleResultFromTask(t, viewModel, new object(), HandleResult);
-                    }
-                    finally
-                    {
-                        _isBusy = false;
-                    }
-                });
+                    HandleResultFromTask(t, viewModel, new object(), HandleResult);
+                }
+                finally
+                {
+                    _isBusy = false;
+                }
+            });
         }
 
         /// <summary>
@@ -81,16 +83,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands
         {
             if (adressekontoViewModel == null)
             {
-                throw new ArgumentNullException("adressekontoViewModel");
+                throw new ArgumentNullException(nameof(adressekontoViewModel));
             }
+
             if (adressekontoModel == null)
             {
-                throw new ArgumentNullException("adressekontoModel");
+                throw new ArgumentNullException(nameof(adressekontoModel));
             }
+
             if (argument == null)
             {
-                throw new ArgumentNullException("argument");
+                throw new ArgumentNullException(nameof(argument));
             }
+
             adressekontoViewModel.Navn = adressekontoModel.Navn;
             adressekontoViewModel.PrimærTelefon = adressekontoModel.PrimærTelefon;
             adressekontoViewModel.SekundærTelefon = adressekontoModel.SekundærTelefon;

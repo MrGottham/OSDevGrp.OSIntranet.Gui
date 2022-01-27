@@ -55,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         #endregion
 
         #region Constructor
-        
+
         /// <summary>
         /// Danner ViewModel for et regnskab.
         /// </summary>
@@ -67,16 +67,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (regnskabModel == null)
             {
-                throw new ArgumentNullException("regnskabModel");
+                throw new ArgumentNullException(nameof(regnskabModel));
             }
+
             if (finansstyringRepository == null)
             {
-                throw new ArgumentNullException("finansstyringRepository");
+                throw new ArgumentNullException(nameof(finansstyringRepository));
             }
+
             if (exceptionHandlerViewModel == null)
             {
-                throw new ArgumentNullException("exceptionHandlerViewModel");
+                throw new ArgumentNullException(nameof(exceptionHandlerViewModel));
             }
+
             _regnskabModel = regnskabModel;
             _regnskabModel.PropertyChanged += PropertyChangedOnRegnskabModelEventHandler;
             _statusDato = statusDato;
@@ -94,7 +97,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             KontogruppeViewModels.CollectionChanged += CollectionChangedOnKontogruppeViewModelsEventHandler;
             BudgetkontogruppeViewModels.CollectionChanged += CollectionChangedOnBudgetkontogruppeViewModelsEventHandler;
         }
-        
+
         #endregion
 
         #region Properties
@@ -102,78 +105,53 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Regnskabsnummer.
         /// </summary>
-        public virtual int Nummer
-        {
-            get
-            {
-                return _regnskabModel.Nummer;
-            }
-        }
+        public virtual int Nummer => _regnskabModel.Nummer;
 
         /// <summary>
         /// Navn.
         /// </summary>
         public virtual string Navn
         {
-            get
-            {
-                return _regnskabModel.Navn;
-            }
-            set
-            {
-                _regnskabModel.Navn = value;
-            }
+            get { return _regnskabModel.Navn; }
+            set { _regnskabModel.Navn = value; }
         }
 
         /// <summary>
         /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
         /// </summary>
-        public override string DisplayName
-        {
-            get
-            {
-                return Navn;
-            }
-        }
+        public override string DisplayName => Navn;
 
         /// <summary>
         /// Statusdato for regnskabet.
         /// </summary>
         public virtual DateTime StatusDato
         {
-            get
-            {
-                return _statusDato;
-            }
+            get { return _statusDato; }
             set
             {
                 if (_statusDato.CompareTo(value) > 0)
                 {
-                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "value", value), "value");
+                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(value), value), nameof(value));
                 }
+
                 if (_statusDato.CompareTo(value) == 0)
                 {
                     return;
                 }
+
                 _statusDato = value;
-                RaisePropertyChanged("StatusDato");
-                RaisePropertyChanged("StatusDatoAsMonthText");
-                RaisePropertyChanged("StatusDatoAsLastMonthText");
-                RaisePropertyChanged("StatusDatoAsYearToDateText");
-                RaisePropertyChanged("StatusDatoAsLastYearText");
+                RaisePropertyChanged(nameof(StatusDato));
+                RaisePropertyChanged(nameof(StatusDatoAsMonthText));
+                RaisePropertyChanged(nameof(StatusDatoAsLastMonthText));
+                RaisePropertyChanged(nameof(StatusDatoAsYearToDateText));
+                RaisePropertyChanged(nameof(StatusDatoAsLastYearText));
             }
         }
 
         /// <summary>
         ///  Månedstekst for statusdatoen.
         /// </summary>
-        public virtual string StatusDatoAsMonthText
-        {
-            get
-            {
-                return GetMonthTextForStatusDato(StatusDato);
-            }
-        }
+        public virtual string StatusDatoAsMonthText => GetMonthTextForStatusDato(StatusDato);
 
         /// <summary>
         /// Månedstekst for forrige måned i forhold til statusdato.
@@ -182,7 +160,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var lastMonth = new DateTime(StatusDato.AddMonths(-1).Year, StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(StatusDato.AddMonths(-1).Year, StatusDato.AddMonths(-1).Month));
+                DateTime lastMonth = new DateTime(StatusDato.AddMonths(-1).Year, StatusDato.AddMonths(-1).Month, DateTime.DaysInMonth(StatusDato.AddMonths(-1).Year, StatusDato.AddMonths(-1).Month));
                 return GetMonthTextForStatusDato(lastMonth);
             }
         }
@@ -190,13 +168,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekst for år til dato i forhold til statusdato.
         /// </summary>
-        public virtual string StatusDatoAsYearToDateText
-        {
-            get
-            {
-                return Resource.GetText(Text.YearToDate, StatusDato.Year);
-            }
-        }
+        public virtual string StatusDatoAsYearToDateText => Resource.GetText(Text.YearToDate, StatusDato.Year);
 
         /// <summary>
         /// Tekst for sidste år i forhold til statusdato.
@@ -205,7 +177,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var lastYear = new DateTime(StatusDato.AddYears(-1).Year, 12, DateTime.DaysInMonth(StatusDato.AddYears(-1).Year, 12));
+                DateTime lastYear = new DateTime(StatusDato.AddYears(-1).Year, 12, DateTime.DaysInMonth(StatusDato.AddYears(-1).Year, 12));
                 return Resource.GetText(Text.LastYear, lastYear.Year);
             }
         }
@@ -217,7 +189,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(false);
+                IComparer<IKontoViewModel> comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(false);
                 return _kontoViewModels.OrderBy(m => m, comparer);
             }
         }
@@ -225,13 +197,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Konti fordelt på kontogrupper.
         /// </summary>
-        public virtual IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiGrouped
-        {
-            get
-            {
-                return GenerateKontoViewModelBaseGroups(Konti, new List<IKontogruppeViewModel>(Kontogrupper));
-            }
-        }
+        public virtual IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiGrouped => GenerateKontoViewModelBaseGroups(Konti, new List<IKontogruppeViewModel>(Kontogrupper));
 
         /// <summary>
         /// Topbenyttede konti.
@@ -240,7 +206,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(true);
+                IComparer<IKontoViewModel> comparer = new KontoViewModelBaseComparer<IKontoViewModel, IKontogruppeViewModel>(true);
                 return Konti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m.Kontoværdi).Take(25).OrderBy(m => m, comparer);
             }
         }
@@ -248,24 +214,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Topbenyttede konti fordelt på kontogrupper.
         /// </summary>
-        public virtual IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiTopGrouped
-        {
-            get
-            {
-                return GenerateKontoViewModelBaseGroups(KontiTop, new List<IKontogruppeViewModel>(Kontogrupper));
-            }
-        }
+        public virtual IEnumerable<KeyValuePair<IKontogruppeViewModel, IEnumerable<IKontoViewModel>>> KontiTopGrouped => GenerateKontoViewModelBaseGroups(KontiTop, new List<IKontogruppeViewModel>(Kontogrupper));
 
         /// <summary>
         /// Overskrift til konti.
         /// </summary>
-        public virtual string KontiHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.Accounts);
-            }
-        }
+        public virtual string KontiHeader => Resource.GetText(Text.Accounts);
 
         /// <summary>
         /// Kolonneoverskrifter til konti.
@@ -276,7 +230,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 lock (SyncRoot)
                 {
-                    return _kontoColumns ?? (_kontoColumns = new ObservableCollection<string>(new Collection<string>(new List<string> {Resource.GetText(Text.AccountNumber), Resource.GetText(Text.AccountName), Resource.GetText(Text.Credit), Resource.GetText(Text.Balance), Resource.GetText(Text.Available)})));
+                    return _kontoColumns ?? (_kontoColumns = new ObservableCollection<string>(new Collection<string>(new List<string> { Resource.GetText(Text.AccountNumber), Resource.GetText(Text.AccountName), Resource.GetText(Text.Credit), Resource.GetText(Text.Balance), Resource.GetText(Text.Available) })));
                 }
             }
         }
@@ -288,7 +242,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(false);
+                IComparer<IBudgetkontoViewModel> comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(false);
                 return _budgetkontoViewModels.OrderBy(m => m, comparer);
             }
         }
@@ -296,13 +250,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Budgetkonti fordelt på kontogrupper til budetkonti.
         /// </summary>
-        public virtual IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiGrouped
-        {
-            get
-            {
-                return GenerateKontoViewModelBaseGroups(Budgetkonti, new List<IBudgetkontogruppeViewModel>(Budgetkontogrupper));
-            }
-        }
+        public virtual IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiGrouped => GenerateKontoViewModelBaseGroups(Budgetkonti, new List<IBudgetkontogruppeViewModel>(Budgetkontogrupper));
 
         /// <summary>
         /// Topbenyttede budgetkonti.
@@ -311,7 +259,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(true);
+                IComparer<IBudgetkontoViewModel> comparer = new KontoViewModelBaseComparer<IBudgetkontoViewModel, IBudgetkontogruppeViewModel>(true);
                 return Budgetkonti.Where(m => m.Kontoværdi != 0M).OrderBy(m => m.Kontoværdi).Take(25).OrderBy(m => m, comparer);
             }
         }
@@ -319,24 +267,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Topbenyttede budgetkonti fordelt på kontogrupper til budetkonti.
         /// </summary>
-        public virtual IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiTopGrouped
-        {
-            get
-            {
-                return GenerateKontoViewModelBaseGroups(BudgetkontiTop, new List<IBudgetkontogruppeViewModel>(Budgetkontogrupper));
-            }
-        }
+        public virtual IEnumerable<KeyValuePair<IBudgetkontogruppeViewModel, IEnumerable<IBudgetkontoViewModel>>> BudgetkontiTopGrouped => GenerateKontoViewModelBaseGroups(BudgetkontiTop, new List<IBudgetkontogruppeViewModel>(Budgetkontogrupper));
 
         /// <summary>
         /// Overskrift til budgetkonti.
         /// </summary>
-        public virtual string BudgetkontiHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetAccounts);
-            }
-        }
+        public virtual string BudgetkontiHeader => Resource.GetText(Text.BudgetAccounts);
 
         /// <summary>
         /// Kolonneoverskrifter til budgetkonti.
@@ -347,7 +283,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 lock (SyncRoot)
                 {
-                    return _budgetkontoColumns ?? (_budgetkontoColumns = new ObservableCollection<string>(new Collection<string>(new List<string> { Resource.GetText(Text.AccountNumber), Resource.GetText(Text.AccountName), Resource.GetText(Text.Budget), Resource.GetText(Text.Bookkeeped) })));
+                    return _budgetkontoColumns ?? (_budgetkontoColumns = new ObservableCollection<string>(new Collection<string>(new List<string> { Resource.GetText(Text.AccountNumber), Resource.GetText(Text.AccountName), Resource.GetText(Text.Budget), Resource.GetText(Text.Posted) })));
                 }
             }
         }
@@ -359,7 +295,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new BogføringslinjeViewModelComparer();
+                IComparer<IReadOnlyBogføringslinjeViewModel> comparer = new BogføringslinjeViewModelComparer();
                 return _bogføringslinjeViewModels.OrderBy(m => m, comparer);
             }
         }
@@ -367,13 +303,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til bogføringslinjer.
         /// </summary>
-        public virtual string BogføringslinjerHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.Bookkeeping);
-            }
-        }
+        public virtual string BogføringslinjerHeader => Resource.GetText(Text.Bookkeeping);
 
         /// <summary>
         /// Kolonneoverskrifter til bogføringslinjer.
@@ -384,7 +314,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 lock (SyncRoot)
                 {
-                    return _bogføringslinjeColumns ?? (_bogføringslinjeColumns = new ObservableCollection<string>(new Collection<string>(new List<string> {Resource.GetText(Text.Date), Resource.GetText(Text.Annex), Resource.GetText(Text.Account), Resource.GetText(Text.Text), Resource.GetText(Text.BudgetAccount), Resource.GetText(Text.Debit), Resource.GetText(Text.Credit)})));
+                    return _bogføringslinjeColumns ?? (_bogføringslinjeColumns = new ObservableCollection<string>(new Collection<string>(new List<string> { Resource.GetText(Text.Date), Resource.GetText(Text.Reference), Resource.GetText(Text.Account), Resource.GetText(Text.Text), Resource.GetText(Text.BudgetAccount), Resource.GetText(Text.Debit), Resource.GetText(Text.Credit) })));
                 }
             }
         }
@@ -409,8 +339,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     {
                         return;
                     }
+
                     _bogføringViewModel = value;
-                    RaisePropertyChanged("Bogføring");
+                    RaisePropertyChanged(nameof(Bogføring));
                 }
             }
         }
@@ -418,24 +349,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til en ViewModel, hvorfra der kan bogføres.
         /// </summary>
-        public virtual string BogføringHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.Bookkeeping);
-            }
-        }
+        public virtual string BogføringHeader => Resource.GetText(Text.Bookkeeping);
 
         /// <summary>
         /// Kommando, der kan sætte en ny ViewModel, hvorfra der kan bogføres.
         /// </summary>
-        public virtual ITaskableCommand BogføringSetCommand
-        {
-            get
-            {
-                return _bogføringSetCommand ??  (_bogføringSetCommand = new BogføringSetCommand(_finansstyringRepository, _exceptionHandlerViewModel, true));
-            }
-        }
+        public virtual ITaskableCommand BogføringSetCommand => _bogføringSetCommand ??  (_bogføringSetCommand = new BogføringSetCommand(_finansstyringRepository, _exceptionHandlerViewModel, true));
 
         /// <summary>
         /// Bogføringsadvarsler.
@@ -451,13 +370,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til bogføringsadvarsler.
         /// </summary>
-        public virtual string BogføringsadvarslerHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.PostingWarnings);
-            }
-        }
+        public virtual string BogføringsadvarslerHeader => Resource.GetText(Text.PostingWarnings);
 
         /// <summary>
         /// Linjer, der indgår i årsopgørelsen.
@@ -493,7 +406,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 lock (SyncRoot)
                 {
-                    return _opgørelseColumns ?? (_opgørelseColumns = new ObservableCollection<string>(new Collection<string>(new List<string> {string.Empty, Resource.GetText(Text.Budget), Resource.GetText(Text.Bookkeeped)})));
+                    return _opgørelseColumns ?? (_opgørelseColumns = new ObservableCollection<string>(new Collection<string>(new List<string> { string.Empty, Resource.GetText(Text.Budget), Resource.GetText(Text.Posted) })));
                 }
             }
         }
@@ -512,24 +425,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetteret beløb fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetAsText
-        {
-            get
-            {
-                return Budget.ToString("C");
-            }
-        }
+        public virtual string BudgetAsText => Budget.ToString("C");
 
         /// <summary>
         /// Label til budgetteret beløb fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Budget);
-            }
-        }
+        public virtual string BudgetLabel => Resource.GetText(Text.Budget);
 
         /// <summary>
         /// Budgetteret beløb for sidste måned fra årsopgørelsen.
@@ -545,24 +446,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetteret beløb for sidste måned fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetSidsteMånedAsText
-        {
-            get
-            {
-                return BudgetSidsteMåned.ToString("C");
-            }
-        }
+        public virtual string BudgetSidsteMånedAsText => BudgetSidsteMåned.ToString("C");
 
         /// <summary>
         /// Label til budgetteret beløb for sidste måned fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetSidsteMånedLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetLastMonth);
-}
-        }
+        public virtual string BudgetSidsteMånedLabel => Resource.GetText(Text.BudgetLastMonth);
 
         /// <summary>
         /// Budgetteret beløb for år til dato fra årsopgørelsen.
@@ -578,24 +467,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetteret beløb for år til dato fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetÅrTilDatoAsText
-        {
-            get
-            {
-                return BudgetÅrTilDato.ToString("C");
-            }
-        }
+        public virtual string BudgetÅrTilDatoAsText => BudgetÅrTilDato.ToString("C");
 
         /// <summary>
         /// Label til budgetteret beløb for år til dato fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetÅrTilDatoLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetYearToDate);
-            }
-        }
+        public virtual string BudgetÅrTilDatoLabel => Resource.GetText(Text.BudgetYearToDate);
 
         /// <summary>
         /// Budgetteret beløb for sidste år fra årsopgørelsen.
@@ -611,24 +488,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af budgetteret beløb for sidste år fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetSidsteÅrAsText
-        {
-            get
-            {
-                return BudgetSidsteÅr.ToString("C");
-            }
-        }
+        public virtual string BudgetSidsteÅrAsText => BudgetSidsteÅr.ToString("C");
 
         /// <summary>
         /// Label til budgetteret beløb for sidste år fra årsopgørelsen.
         /// </summary>
-        public virtual string BudgetSidsteÅrLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BudgetLastYear);
-}
-        }
+        public virtual string BudgetSidsteÅrLabel => Resource.GetText(Text.BudgetLastYear);
 
         /// <summary>
         /// Bogført beløb fra årsopgørelsen.
@@ -644,24 +509,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb fra årsopgørelsen.
         ///  </summary>
-        public virtual string BogførtAsText
-        {
-            get
-            {
-                return Bogført.ToString("C");
-            }
-        }
+        public virtual string BogførtAsText => Bogført.ToString("C");
 
         /// <summary>
         /// Label til bogført beløb fra årsopgørelsen.
         /// </summary>
-        public virtual string BogførtLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.Bookkeeped);
-            }
-        }
+        public virtual string BogførtLabel => Resource.GetText(Text.Posted);
 
         /// <summary>
         /// Bogført beløb for sidste måned fra årsopgørelsen.
@@ -677,24 +530,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb for sidste måned fra årsopgørelsen.
         /// </summary>
-        public virtual string BogførtSidsteMånedAsText
-        {
-            get
-            {
-                return BogførtSidsteMåned.ToString("C");
-            }
-        }
+        public virtual string BogførtSidsteMånedAsText => BogførtSidsteMåned.ToString("C");
 
         /// <summary>
         /// Label til bogført beløb for sidste måned fra årsopgørelsen.
         /// </summary>
-        public virtual string BogførtSidsteMånedLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedLastMonth);
-            }
-        }
+        public virtual string BogførtSidsteMånedLabel => Resource.GetText(Text.PostedLastMonth);
 
         /// <summary>
         /// Bogført beløb for år til dato til fra årsopgørelsen.
@@ -710,24 +551,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb for år til dato til fra årsopgørelsen.
         /// </summary>
-        public virtual string BogførtÅrTilDatoAsText
-        {
-            get
-            {
-                return BogførtÅrTilDato.ToString("C");
-            }
-        }
+        public virtual string BogførtÅrTilDatoAsText => BogførtÅrTilDato.ToString("C");
 
         /// <summary>
         /// Label til bogført beløb for år til dato til fra årsopgørelsen.
         /// </summary>
-        public virtual string BogførtÅrTilDatoLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedYearToDate);
-            }
-        }
+        public virtual string BogførtÅrTilDatoLabel => Resource.GetText(Text.PostedYearToDate);
 
         /// <summary>
         /// Bogført beløb for sidste år fra årsopgørelsen.
@@ -743,35 +572,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af bogført beløb for sidste år fra årsopgørelsen.
         /// </summary>
-        public virtual string BogførtSidsteÅrAsText
-        {
-            get
-            {
-                return BogførtSidsteÅr.ToString("C");
-            }
-        }
+        public virtual string BogførtSidsteÅrAsText => BogførtSidsteÅr.ToString("C");
 
         /// <summary>
         /// Label til bogført beløb for sidste år fra årsopgørelsen.
         /// </summary>
-        public virtual string BogførtSidsteÅrLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.BookkeepedLastYear);
-            }
-        }
+        public virtual string BogførtSidsteÅrLabel => Resource.GetText(Text.PostedLastYear);
 
         /// <summary>
         /// Overskrift til balancen.
         /// </summary>
-        public virtual string BalanceHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.AccountingBalance);
-            }
-        }
+        public virtual string BalanceHeader => Resource.GetText(Text.AccountingBalance);
 
         /// <summary>
         /// Linjer, der indgår i balancens aktiver.
@@ -787,13 +598,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til linjer, der indgår i balancens aktiver.
         /// </summary>
-        public virtual string AktiverHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.Asserts);
-            }
-        }
+        public virtual string AktiverHeader => Resource.GetText(Text.Asserts);
 
         /// <summary>
         /// Kolonneoverskrifter til linjer, der indgår i balancens aktiver.
@@ -804,7 +609,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
             {
                 lock (SyncRoot)
                 {
-                    return _balanceColumns ?? (_balanceColumns = new ObservableCollection<string>(new Collection<string>(new List<string> {string.Empty, Resource.GetText(Text.Balance)})));
+                    return _balanceColumns ?? (_balanceColumns = new ObservableCollection<string>(new Collection<string>(new List<string> { string.Empty, Resource.GetText(Text.Balance) })));
                 }
             }
         }
@@ -823,24 +628,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af aktiver i alt.
         /// </summary>
-        public virtual string AktiverIAltAsText
-        {
-            get
-            {
-                return AktiverIAlt.ToString("C");
-            }
-        }
+        public virtual string AktiverIAltAsText => AktiverIAlt.ToString("C");
 
         /// <summary>
         /// Label til aktiver i alt.
         /// </summary>
-        public virtual string AktiverIAltLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.AssertsTotal);
-            }
-        }
+        public virtual string AktiverIAltLabel => Resource.GetText(Text.AssertsTotal);
 
         /// <summary>
         /// Linjer, der indgår i balancens passiver.
@@ -856,24 +649,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til linjer, der indgår i balancens passiver.
         /// </summary>
-        public virtual string PassiverHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.Liabilities);
-            }
-        }
+        public virtual string PassiverHeader => Resource.GetText(Text.Liabilities);
 
         /// <summary>
         /// Kolonneoverskrifter til linjer, der indgår i balancens aktiver.
         /// </summary>
-        public virtual IEnumerable<string> PassiverColumns
-        {
-            get
-            {
-                return AktiverColumns;
-            }
-        }
+        public virtual IEnumerable<string> PassiverColumns => AktiverColumns;
 
         /// <summary>
         /// Passiver i alt.
@@ -889,24 +670,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Tekstangivelse af passiver i alt.
         /// </summary>
-        public virtual string PassiverIAltAsText
-        {
-            get
-            {
-                return PassiverIAlt.ToString("C");
-            }
-        }
+        public virtual string PassiverIAltAsText => PassiverIAlt.ToString("C");
 
         /// <summary>
         /// Label til passiver i alt.
         /// </summary>
-        public virtual string PassiverIAltLabel
-        {
-            get
-            {
-                return Resource.GetText(Text.LiabilitiesTotal);
-            }
-        }
+        public virtual string PassiverIAltLabel => Resource.GetText(Text.LiabilitiesTotal);
 
         /// <summary>
         /// Debitorer.
@@ -915,7 +684,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new AdressekontoViewModelComparer();
+                IComparer<IAdressekontoViewModel> comparer = new AdressekontoViewModelComparer();
                 return _debitorerViewModels.OrderBy(m => m, comparer);
             }
         }
@@ -923,13 +692,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til debitorer.
         /// </summary>
-        public virtual string DebitorerHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.Debtors);
-            }
-        }
+        public virtual string DebitorerHeader => Resource.GetText(Text.Debtors);
 
         /// <summary>
         /// Kreditorer.
@@ -938,7 +701,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new AdressekontoViewModelComparer();
+                IComparer<IAdressekontoViewModel> comparer = new AdressekontoViewModelComparer();
                 return _kreditorerViewModels.OrderBy(m => m, comparer);
             }
         }
@@ -946,13 +709,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til kreditorer.
         /// </summary>
-        public virtual string KreditorerHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.Creditors);
-            }
-        }
+        public virtual string KreditorerHeader => Resource.GetText(Text.Creditors);
 
         /// <summary>
         /// Nyheder.
@@ -961,7 +718,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             get
             {
-                var comparer = new NyhedViewModelComparer();
+                IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
                 return _nyhedViewModels.OrderBy(m => m, comparer);
             }
         }
@@ -969,13 +726,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Overskrift til nyheder.
         /// </summary>
-        public virtual string NyhederHeader
-        {
-            get
-            {
-                return Resource.GetText(Text.NewsMultiple);
-            }
-        }
+        public virtual string NyhederHeader => Resource.GetText(Text.NewsMultiple);
 
         /// <summary>
         /// Kontogrupper.
@@ -1016,16 +767,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 {
                     return _refreshCommand;
                 }
-                var executeCommands = new Collection<ICommand>
-                    {
-                        new RelayCommand(obj => StatusDato = DateTime.Now),
-                        new KontoplanGetCommand(new KontogrupperGetCommand(_finansstyringRepository, _exceptionHandlerViewModel), _finansstyringRepository, _exceptionHandlerViewModel),
-                        new BudgetkontoplanGetCommand(new BudgetkontogrupperGetCommand(_finansstyringRepository, _exceptionHandlerViewModel), _finansstyringRepository, _exceptionHandlerViewModel),
-                        new BogføringslinjerGetCommand(_finansstyringRepository, _exceptionHandlerViewModel),
-                        new DebitorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel),
-                        new KreditorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel)
-                    };
+
+                ICollection<ICommand> executeCommands = new Collection<ICommand>
+                {
+                    new RelayCommand(obj => StatusDato = DateTime.Now),
+                    new KontoplanGetCommand(new KontogrupperGetCommand(_finansstyringRepository, _exceptionHandlerViewModel), _finansstyringRepository, _exceptionHandlerViewModel),
+                    new BudgetkontoplanGetCommand(new BudgetkontogrupperGetCommand(_finansstyringRepository, _exceptionHandlerViewModel), _finansstyringRepository, _exceptionHandlerViewModel),
+                    new BogføringslinjerGetCommand(_finansstyringRepository, _exceptionHandlerViewModel), new DebitorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel),
+                    new KreditorlisteGetCommand(_finansstyringRepository, _exceptionHandlerViewModel)
+                };
                 _refreshCommand = new CommandCollectionExecuterCommand(executeCommands);
+
                 return _refreshCommand;
             }
         }
@@ -1042,19 +794,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (kontoViewModel == null)
             {
-                throw new ArgumentNullException("kontoViewModel");
+                throw new ArgumentNullException(nameof(kontoViewModel));
             }
+
             // Tilføj kontoen til regnskabet.
             kontoViewModel.PropertyChanged += PropertyChangedOnKontoViewModelEventHandler;
             _kontoViewModels.Add(kontoViewModel);
+            
             // Registrér kontoen til at indgå i balancen.
-            var balanceViewModel = _balanceViewModels.SingleOrDefault(m => m.Nummer == kontoViewModel.Kontogruppe.Nummer);
+            IBalanceViewModel balanceViewModel = _balanceViewModels.SingleOrDefault(m => m.Nummer == kontoViewModel.Kontogruppe.Nummer);
             if (balanceViewModel == null)
             {
                 balanceViewModel = kontoViewModel.Kontogruppe.CreateBalancelinje(this);
                 balanceViewModel.PropertyChanged += PropertyChangedOnBalanceViewModelEventHandler;
                 _balanceViewModels.Add(balanceViewModel);
             }
+
             balanceViewModel.Register(kontoViewModel);
         }
 
@@ -1066,19 +821,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (budgetkontoViewModel == null)
             {
-                throw new ArgumentNullException("budgetkontoViewModel");
+                throw new ArgumentNullException(nameof(budgetkontoViewModel));
             }
+
             // Tilføj budgetkontoen til regnskabet.
             budgetkontoViewModel.PropertyChanged += PropertyChangedOnBudgetkontoViewModelEventHandler;
             _budgetkontoViewModels.Add(budgetkontoViewModel);
+            
             // Registrér budgetkontoen til at indgå i årsopgørelsen.
-            var opgørelseViewModel = _opgørelseViewModels.SingleOrDefault(m => m.Nummer == budgetkontoViewModel.Kontogruppe.Nummer);
+            IOpgørelseViewModel opgørelseViewModel = _opgørelseViewModels.SingleOrDefault(m => m.Nummer == budgetkontoViewModel.Kontogruppe.Nummer);
             if (opgørelseViewModel == null)
             {
                 opgørelseViewModel = budgetkontoViewModel.Kontogruppe.CreateOpgørelseslinje(this);
                 opgørelseViewModel.PropertyChanged += PropertyChangedOnOpgørelseViewModelEventHandler;
                 _opgørelseViewModels.Add(opgørelseViewModel);
             }
+
             opgørelseViewModel.Register(budgetkontoViewModel);
         }
 
@@ -1090,8 +848,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (bogføringslinjeViewModel == null)
             {
-                throw new ArgumentNullException("bogføringslinjeViewModel");
+                throw new ArgumentNullException(nameof(bogføringslinjeViewModel));
             }
+
             bogføringslinjeViewModel.PropertyChanged += PropertyChangedOnBogføringslinjeViewModelEventHandler;
             _bogføringslinjeViewModels.Add(bogføringslinjeViewModel);
         }
@@ -1104,8 +863,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (bogføringViewModel == null)
             {
-                throw new ArgumentNullException("bogføringViewModel");
+                throw new ArgumentNullException(nameof(bogføringViewModel));
             }
+
             Bogføring = bogføringViewModel;
         }
 
@@ -1117,8 +877,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (bogføringsadvarselViewModel == null)
             {
-                throw new ArgumentNullException("bogføringsadvarselViewModel");
+                throw new ArgumentNullException(nameof(bogføringsadvarselViewModel));
             }
+
             bogføringsadvarselViewModel.PropertyChanged += PropertyChangedOnBogføringsadvarselViewModelEventHandler;
             _bogføringsadvarselViewModels.Add(bogføringsadvarselViewModel);
         }
@@ -1131,8 +892,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (bogføringsadvarselViewModel == null)
             {
-                throw new ArgumentNullException("bogføringsadvarselViewModel");
+                throw new ArgumentNullException(nameof(bogføringsadvarselViewModel));
             }
+
             while (_bogføringsadvarselViewModels.Contains(bogføringsadvarselViewModel))
             {
                 _bogføringsadvarselViewModels.Remove(bogføringsadvarselViewModel);
@@ -1148,8 +910,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (adressekontoViewModel == null)
             {
-                throw new ArgumentNullException("adressekontoViewModel");
+                throw new ArgumentNullException(nameof(adressekontoViewModel));
             }
+
             adressekontoViewModel.PropertyChanged += PropertyChangedOnAdressekontoViewModelForDebitorEventHandler;
             _debitorerViewModels.Add(adressekontoViewModel);
         }
@@ -1162,8 +925,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (adressekontoViewModel == null)
             {
-                throw new ArgumentNullException("adressekontoViewModel");
+                throw new ArgumentNullException(nameof(adressekontoViewModel));
             }
+
             adressekontoViewModel.PropertyChanged += PropertyChangedOnAdressekontoViewModelForKreditorEventHandler;
             _kreditorerViewModels.Add(adressekontoViewModel);
         }
@@ -1176,8 +940,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (nyhedViewModel == null)
             {
-                throw new ArgumentNullException("nyhedViewModel");
+                throw new ArgumentNullException(nameof(nyhedViewModel));
             }
+
             nyhedViewModel.PropertyChanged += PropertyChangedOnNyhedViewModelEventHandler;
             _nyhedViewModels.Add(nyhedViewModel);
         }
@@ -1190,14 +955,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (kontogruppeViewModel == null)
             {
-                throw new ArgumentNullException("kontogruppeViewModel");
+                throw new ArgumentNullException(nameof(kontogruppeViewModel));
             }
+
             lock (SyncRoot)
             {
                 if (KontogruppeViewModels.Any(m => m.Nummer == kontogruppeViewModel.Nummer))
                 {
                     return;
                 }
+
                 kontogruppeViewModel.PropertyChanged += PropertyChangedOnKontogruppeViewModelEventHandler;
                 KontogruppeViewModels.Add(kontogruppeViewModel);
             }
@@ -1211,14 +978,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (budgetkontogruppeViewModel == null)
             {
-                throw new ArgumentNullException("budgetkontogruppeViewModel");
+                throw new ArgumentNullException(nameof(budgetkontogruppeViewModel));
             }
+
             lock (SyncRoot)
             {
                 if (BudgetkontogruppeViewModels.Any(m => m.Nummer == budgetkontogruppeViewModel.Nummer))
                 {
                     return;
                 }
+
                 budgetkontogruppeViewModel.PropertyChanged += PropertyChangedOnBudgetkontogruppeViewModelEventHandler;
                 BudgetkontogruppeViewModels.Add(budgetkontogruppeViewModel);
             }
@@ -1231,8 +1000,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <returns>Månedsteksten til den givne statusdato.</returns>
         private string GetMonthTextForStatusDato(DateTime statusDato)
         {
-            var monthText = statusDato.ToString("MMMM yyyy");
-            return string.Format("{0}{1}", monthText.Substring(0, 1).ToUpper(), monthText.Substring(1).ToLower());
+            string monthText = statusDato.ToString("MMMM yyyy");
+            return $"{monthText.Substring(0, 1).ToUpper()}{monthText.Substring(1).ToLower()}";
         }
 
         /// <summary>
@@ -1244,17 +1013,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
-                case "Navn":
+                case nameof(Navn):
                     RaisePropertyChanged(e.PropertyName);
-                    RaisePropertyChanged("DisplayName");
+                    RaisePropertyChanged(nameof(DisplayName));
                     break;
 
                 default:
@@ -1272,31 +1043,33 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
                 case "Kontonummer":
-                    RaisePropertyChanged("Konti");
-                    RaisePropertyChanged("KontiGrouped");
-                    RaisePropertyChanged("KontiTop");
-                    RaisePropertyChanged("KontiTopGrouped");
+                    RaisePropertyChanged(nameof(Konti));
+                    RaisePropertyChanged(nameof(KontiGrouped));
+                    RaisePropertyChanged(nameof(KontiTop));
+                    RaisePropertyChanged(nameof(KontiTopGrouped));
                     break;
 
                 case "Kontogruppe":
-                    RaisePropertyChanged("Konti");
-                    RaisePropertyChanged("KontiGrouped");
-                    RaisePropertyChanged("KontiTop");
-                    RaisePropertyChanged("KontiTopGrouped");
+                    RaisePropertyChanged(nameof(Konti));
+                    RaisePropertyChanged(nameof(KontiGrouped));
+                    RaisePropertyChanged(nameof(KontiTop));
+                    RaisePropertyChanged(nameof(KontiTopGrouped));
                     break;
 
                 case "Kontoværdi":
-                    RaisePropertyChanged("KontiTop");
-                    RaisePropertyChanged("KontiTopGrouped");
+                    RaisePropertyChanged(nameof(KontiTop));
+                    RaisePropertyChanged(nameof(KontiTopGrouped));
                     break;
             }
         }
@@ -1310,31 +1083,33 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
                 case "Kontonummer":
-                    RaisePropertyChanged("Budgetkonti");
-                    RaisePropertyChanged("BudgetkontiGrouped");
-                    RaisePropertyChanged("BudgetkontiTop");
-                    RaisePropertyChanged("BudgetkontiTopGrouped");
+                    RaisePropertyChanged(nameof(Budgetkonti));
+                    RaisePropertyChanged(nameof(BudgetkontiGrouped));
+                    RaisePropertyChanged(nameof(BudgetkontiTop));
+                    RaisePropertyChanged(nameof(BudgetkontiTopGrouped));
                     break;
 
                 case "Kontogruppe":
-                    RaisePropertyChanged("Budgetkonti");
-                    RaisePropertyChanged("BudgetkontiGrouped");
-                    RaisePropertyChanged("BudgetkontiTop");
-                    RaisePropertyChanged("BudgetkontiTopGrouped");
+                    RaisePropertyChanged(nameof(Budgetkonti));
+                    RaisePropertyChanged(nameof(BudgetkontiGrouped));
+                    RaisePropertyChanged(nameof(BudgetkontiTop));
+                    RaisePropertyChanged(nameof(BudgetkontiTopGrouped));
                     break;
 
                 case "Kontoværdi":
-                    RaisePropertyChanged("BudgetkontiTop");
-                    RaisePropertyChanged("BudgetkontiTopGrouped");
+                    RaisePropertyChanged(nameof(BudgetkontiTop));
+                    RaisePropertyChanged(nameof(BudgetkontiTopGrouped));
                     break;
             }
         }
@@ -1348,17 +1123,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
                 case "Løbenummer":
                 case "Dato":
-                    RaisePropertyChanged("Bogføringslinjer");
+                    RaisePropertyChanged(nameof(Bogføringslinjer));
                     break;
             }
         }
@@ -1372,16 +1149,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
                 case "Tidspunkt":
-                    RaisePropertyChanged("Bogføringsadvarsler");
+                    RaisePropertyChanged(nameof(Bogføringsadvarsler));
                     break;
             }
         }
@@ -1395,56 +1174,58 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
-                case "Nummer":
-                    RaisePropertyChanged("Opgørelseslinjer");
+                case nameof(Nummer):
+                    RaisePropertyChanged(nameof(Opgørelseslinjer));
                     break;
 
-                case "Budget":
-                    RaisePropertyChanged("Budget");
-                    RaisePropertyChanged("BudgetAsText");
+                case nameof(Budget):
+                    RaisePropertyChanged(nameof(Budget));
+                    RaisePropertyChanged(nameof(BudgetAsText));
                     break;
 
-                case "BudgetSidsteMåned":
-                    RaisePropertyChanged("BudgetSidsteMåned");
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
+                case nameof(BudgetSidsteMåned):
+                    RaisePropertyChanged(nameof(BudgetSidsteMåned));
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
                     break;
 
-                case "BudgetÅrTilDato":
-                    RaisePropertyChanged("BudgetÅrTilDato");
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
+                case nameof(BudgetÅrTilDato):
+                    RaisePropertyChanged(nameof(BudgetÅrTilDato));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
                     break;
 
-                case "BudgetSidsteÅr":
-                    RaisePropertyChanged("BudgetSidsteÅr");
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
+                case nameof(BudgetSidsteÅr):
+                    RaisePropertyChanged(nameof(BudgetSidsteÅr));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
                     break;
 
-                case "Bogført":
-                    RaisePropertyChanged("Bogført");
-                    RaisePropertyChanged("BogførtAsText");
+                case nameof(Bogført):
+                    RaisePropertyChanged(nameof(Bogført));
+                    RaisePropertyChanged(nameof(BogførtAsText));
                     break;
 
-                case "BogførtSidsteMåned":
-                    RaisePropertyChanged("BogførtSidsteMåned");
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
+                case nameof(BogførtSidsteMåned):
+                    RaisePropertyChanged(nameof(BogførtSidsteMåned));
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
                     break;
 
-                case "BogførtÅrTilDato":
-                    RaisePropertyChanged("BogførtÅrTilDato");
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
+                case nameof(BogførtÅrTilDato):
+                    RaisePropertyChanged(nameof(BogførtÅrTilDato));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
                     break;
 
-                case "BogførtSidsteÅr":
-                    RaisePropertyChanged("BogførtSidsteÅr");
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                case nameof(BogførtSidsteÅr):
+                    RaisePropertyChanged(nameof(BogførtSidsteÅr));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
                     break;
             }
         }
@@ -1458,46 +1239,51 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
-            var balanceViewModel = sender as IBalanceViewModel;
+
+            IBalanceViewModel balanceViewModel = sender as IBalanceViewModel;
             if (balanceViewModel == null)
             {
-                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, "sender", sender.GetType().Name));
+                throw new IntranetGuiSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalArgumentValue, nameof(sender), sender.GetType().Name));
             }
+
             switch (e.PropertyName)
             {
-                case "Nummer":
+                case nameof(Nummer):
                     if (balanceViewModel.Balancetype == Balancetype.Aktiver)
                     {
-                        RaisePropertyChanged("Aktiver");
+                        RaisePropertyChanged(nameof(Aktiver));
                         break;
                     }
-                    RaisePropertyChanged("Passiver");
+
+                    RaisePropertyChanged(nameof(Passiver));
                     break;
 
                 case "Balancetype":
-                    RaisePropertyChanged("Aktiver");
-                    RaisePropertyChanged("AktiverIAlt");
-                    RaisePropertyChanged("AktiverIAltAsText");
-                    RaisePropertyChanged("Passiver");
-                    RaisePropertyChanged("PassiverIAlt");
-                    RaisePropertyChanged("PassiverIAltAsText");
+                    RaisePropertyChanged(nameof(Aktiver));
+                    RaisePropertyChanged(nameof(AktiverIAlt));
+                    RaisePropertyChanged(nameof(AktiverIAltAsText));
+                    RaisePropertyChanged(nameof(Passiver));
+                    RaisePropertyChanged(nameof(PassiverIAlt));
+                    RaisePropertyChanged(nameof(PassiverIAltAsText));
                     break;
 
                 case "Saldo":
                     if (balanceViewModel.Balancetype == Balancetype.Aktiver)
                     {
-                        RaisePropertyChanged("AktiverIAlt");
-                        RaisePropertyChanged("AktiverIAltAsText");
+                        RaisePropertyChanged(nameof(AktiverIAlt));
+                        RaisePropertyChanged(nameof(AktiverIAltAsText));
                         break;
                     }
-                    RaisePropertyChanged("PassiverIAlt");
-                    RaisePropertyChanged("PassiverIAltAsText");
+
+                    RaisePropertyChanged(nameof(PassiverIAlt));
+                    RaisePropertyChanged(nameof(PassiverIAltAsText));
                     break;
             }
         }
@@ -1511,18 +1297,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
-                case "Navn":
-                case "StatusDato":
+                case nameof(Navn):
+                case nameof(StatusDato):
                 case "Saldo":
-                    RaisePropertyChanged("Debitorer");
+                    RaisePropertyChanged(nameof(Debitorer));
                     break;
             }
         }
@@ -1536,18 +1324,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
-                case "Navn":
-                case "StatusDato":
+                case nameof(Navn):
+                case nameof(StatusDato):
                 case "Saldo":
-                    RaisePropertyChanged("Kreditorer");
+                    RaisePropertyChanged(nameof(Kreditorer));
                     break;
             }
         }
@@ -1561,17 +1351,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
                 case "Nyhedsudgivelsestidspunkt":
                 case "Nyhedsaktualitet":
-                    RaisePropertyChanged("Nyheder");
+                    RaisePropertyChanged(nameof(Nyheder));
                     break;
             }
         }
@@ -1585,16 +1377,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
-                case "Nummer":
-                    RaisePropertyChanged("Kontogrupper");
+                case nameof(Nummer):
+                    RaisePropertyChanged(nameof(Kontogrupper));
                     break;
             }
         }
@@ -1608,16 +1402,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.PropertyName)
             {
-                case "Nummer":
-                    RaisePropertyChanged("Budgetkontogrupper");
+                case nameof(Nummer):
+                    RaisePropertyChanged(nameof(Budgetkontogrupper));
                     break;
             }
         }
@@ -1631,31 +1427,36 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Konti");
-                    RaisePropertyChanged("KontiGrouped");
-                    RaisePropertyChanged("KontiTop");
-                    RaisePropertyChanged("KontiTopGrouped");
+                    RaisePropertyChanged(nameof(Konti));
+                    RaisePropertyChanged(nameof(KontiGrouped));
+                    RaisePropertyChanged(nameof(KontiTop));
+                    RaisePropertyChanged(nameof(KontiTopGrouped));
                     if (Bogføring != null)
                     {
                         break;
                     }
+
                     lock (SyncRoot)
                     {
                         if (BogføringSetCommand.CanExecute(this) == false)
                         {
                             break;
                         }
+
                         BogføringSetCommand.Execute(this);
                     }
+
                     break;
             }
         }
@@ -1669,19 +1470,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Budgetkonti");
-                    RaisePropertyChanged("BudgetkontiGrouped");
-                    RaisePropertyChanged("BudgetkontiTop");
-                    RaisePropertyChanged("BudgetkontiTopGrouped");
+                    RaisePropertyChanged(nameof(Budgetkonti));
+                    RaisePropertyChanged(nameof(BudgetkontiGrouped));
+                    RaisePropertyChanged(nameof(BudgetkontiTop));
+                    RaisePropertyChanged(nameof(BudgetkontiTopGrouped));
                     break;
             }
         }
@@ -1695,28 +1498,33 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Bogføringslinjer");
+                    RaisePropertyChanged(nameof(Bogføringslinjer));
                     if (Bogføring != null)
                     {
                         break;
                     }
+
                     lock (SyncRoot)
                     {
                         if (BogføringSetCommand.CanExecute(this) == false)
                         {
                             break;
                         }
+
                         BogføringSetCommand.Execute(this);
                     }
+
                     break;
             }
         }
@@ -1730,20 +1538,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Bogføringsadvarsler");
+                    RaisePropertyChanged(nameof(Bogføringsadvarsler));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    RaisePropertyChanged("Bogføringsadvarsler");
+                    RaisePropertyChanged(nameof(Bogføringsadvarsler));
                     break;
             }
         }
@@ -1757,32 +1567,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Opgørelseslinjer");
-                    RaisePropertyChanged("Budget");
-                    RaisePropertyChanged("BudgetAsText");
-                    RaisePropertyChanged("BudgetSidsteMåned");
-                    RaisePropertyChanged("BudgetSidsteMånedAsText");
-                    RaisePropertyChanged("BudgetÅrTilDato");
-                    RaisePropertyChanged("BudgetÅrTilDatoAsText");
-                    RaisePropertyChanged("BudgetSidsteÅr");
-                    RaisePropertyChanged("BudgetSidsteÅrAsText");
-                    RaisePropertyChanged("Bogført");
-                    RaisePropertyChanged("BogførtAsText");
-                    RaisePropertyChanged("BogførtSidsteMåned");
-                    RaisePropertyChanged("BogførtSidsteMånedAsText");
-                    RaisePropertyChanged("BogførtÅrTilDato");
-                    RaisePropertyChanged("BogførtÅrTilDatoAsText");
-                    RaisePropertyChanged("BogførtSidsteÅr");
-                    RaisePropertyChanged("BogførtSidsteÅrAsText");
+                    RaisePropertyChanged(nameof(Opgørelseslinjer));
+                    RaisePropertyChanged(nameof(Budget));
+                    RaisePropertyChanged(nameof(BudgetAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteMåned));
+                    RaisePropertyChanged(nameof(BudgetSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDato));
+                    RaisePropertyChanged(nameof(BudgetÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅr));
+                    RaisePropertyChanged(nameof(BudgetSidsteÅrAsText));
+                    RaisePropertyChanged(nameof(Bogført));
+                    RaisePropertyChanged(nameof(BogførtAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteMåned));
+                    RaisePropertyChanged(nameof(BogførtSidsteMånedAsText));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDato));
+                    RaisePropertyChanged(nameof(BogførtÅrTilDatoAsText));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅr));
+                    RaisePropertyChanged(nameof(BogførtSidsteÅrAsText));
                     break;
             }
         }
@@ -1796,12 +1608,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -1809,18 +1623,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                     {
                         break;
                     }
+
                     if (e.NewItems.OfType<IBalanceViewModel>().Any(m => m.Balancetype == Balancetype.Aktiver))
                     {
-                        RaisePropertyChanged("Aktiver");
-                        RaisePropertyChanged("AktiverIAlt");
-                        RaisePropertyChanged("AktiverIAltAsText");
+                        RaisePropertyChanged(nameof(Aktiver));
+                        RaisePropertyChanged(nameof(AktiverIAlt));
+                        RaisePropertyChanged(nameof(AktiverIAltAsText));
                     }
+
                     if (e.NewItems.OfType<IBalanceViewModel>().Any(m => m.Balancetype == Balancetype.Passiver))
                     {
-                        RaisePropertyChanged("Passiver");
-                        RaisePropertyChanged("PassiverIAlt");
-                        RaisePropertyChanged("PassiverIAltAsText");
+                        RaisePropertyChanged(nameof(Passiver));
+                        RaisePropertyChanged(nameof(PassiverIAlt));
+                        RaisePropertyChanged(nameof(PassiverIAltAsText));
                     }
+
                     break;
             }
         }
@@ -1834,16 +1651,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Debitorer");
+                    RaisePropertyChanged(nameof(Debitorer));
                     break;
             }
         }
@@ -1857,16 +1676,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Kreditorer");
+                    RaisePropertyChanged(nameof(Kreditorer));
                     break;
             }
         }
@@ -1880,16 +1701,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Nyheder");
+                    RaisePropertyChanged(nameof(Nyheder));
                     break;
             }
         }
@@ -1903,16 +1726,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Kontogrupper");
+                    RaisePropertyChanged(nameof(Kontogrupper));
                     break;
             }
         }
@@ -1926,16 +1751,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (sender == null)
             {
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException(nameof(sender));
             }
+
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    RaisePropertyChanged("Budgetkontogrupper");
+                    RaisePropertyChanged(nameof(Budgetkontogrupper));
                     break;
             }
         }
@@ -1952,30 +1779,35 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         {
             if (kontoViewModels == null)
             {
-                throw new ArgumentNullException("kontoViewModels");
+                throw new ArgumentNullException(nameof(kontoViewModels));
             }
+
             if (kontogruppeViewModels == null)
             {
-                throw new ArgumentNullException("kontogruppeViewModels");
+                throw new ArgumentNullException(nameof(kontogruppeViewModels));
             }
-            var kontogrupper = kontogruppeViewModels.ToArray();
 
-            var dictionary = new Dictionary<TKontogruppeViewModel, IEnumerable<TKontoViewModel>>();
-            foreach (var kontoViewModel in kontoViewModels)
+            TKontogruppeViewModel[] kontogrupper = kontogruppeViewModels.ToArray();
+
+            IDictionary<TKontogruppeViewModel, IEnumerable<TKontoViewModel>> dictionary = new Dictionary<TKontogruppeViewModel, IEnumerable<TKontoViewModel>>();
+            foreach (TKontoViewModel kontoViewModel in kontoViewModels)
             {
-                var kontogruppeViewModel = kontogrupper.SingleOrDefault(m => m.Nummer == kontoViewModel.Kontogruppe.Nummer);
+                TKontogruppeViewModel kontogruppeViewModel = kontogrupper.SingleOrDefault(m => m.Nummer == kontoViewModel.Kontogruppe.Nummer);
                 if (Equals(kontogruppeViewModel, null))
                 {
                     continue;
                 }
-                var key = dictionary.Keys.SingleOrDefault(m => m.Nummer == kontogruppeViewModel.Nummer);
+
+                TKontogruppeViewModel key = dictionary.Keys.SingleOrDefault(m => m.Nummer == kontogruppeViewModel.Nummer);
                 while (Equals(key, null))
                 {
                     dictionary.Add(kontogruppeViewModel, new List<TKontoViewModel>());
                     key = dictionary.Keys.SingleOrDefault(m => m.Nummer == kontogruppeViewModel.Nummer);
                 }
-                ((IList<TKontoViewModel>) dictionary[key]).Add(kontoViewModel);
+
+                ((IList<TKontoViewModel>)dictionary[key]).Add(kontoViewModel);
             }
+
             return dictionary;
         }
 
