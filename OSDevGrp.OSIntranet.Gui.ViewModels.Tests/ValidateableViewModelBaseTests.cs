@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
 {
@@ -21,13 +23,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
             /// <summary>
             /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
             /// </summary>
-            public override string DisplayName
-            {
-                get
-                {
-                    return GetType().Name;
-                }
-            }
+            public override string DisplayName => GetType().Name;
 
             #endregion
 
@@ -63,11 +59,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtConstructorInitiererValidateableViewModelBase()
         {
-            var validateableViewModel = new MyValidateableViewModel();
+            IValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
             Assert.That(validateableViewModel.DisplayName, Is.Not.Null);
             Assert.That(validateableViewModel.DisplayName, Is.Not.Empty);
-            Assert.That(validateableViewModel.DisplayName, Is.EqualTo(typeof (MyValidateableViewModel).Name));
+            Assert.That(validateableViewModel.DisplayName, Is.EqualTo(nameof(MyValidateableViewModel)));
         }
 
         /// <summary>
@@ -76,17 +72,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtClearValidationErrorsNulstillerValidationErrors()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var propertyNames = fixture.CreateMany<string>(7).ToList();
+            IEnumerable<string> propertyNames = fixture.CreateMany<string>(7).ToList();
             foreach (var propertyName in propertyNames)
             {
                 validateableViewModel.SetValidationError(propertyName, fixture.Create<string>(), fixture.Create<string>());
 
-                var validationError = validateableViewModel.GetValidationError(propertyName);
+                string validationError = validateableViewModel.GetValidationError(propertyName);
                 Assert.That(validationError, Is.Not.Null);
                 Assert.That(validationError, Is.Not.Empty);
             }
@@ -95,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
 
             foreach (var propertyName in propertyNames)
             {
-                var validationError = validateableViewModel.GetValidationError(propertyName);
+                string validationError = validateableViewModel.GetValidationError(propertyName);
                 Assert.That(validationError, Is.Not.Null);
                 Assert.That(validationError, Is.Empty);
             }
@@ -109,10 +105,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("")]
         public void TestAtGetValidationErrorKasterArgumentNullExceptionHvisPropertyNameErInvalid(string invalidPropertyName)
         {
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => validateableViewModel.GetValidationError(invalidPropertyName));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => validateableViewModel.GetValidationError(invalidPropertyName));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -126,13 +122,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtGetValidationErrorReturnererEmptyHvisValideringsfejlIkkeErSat()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var propertyName = fixture.Create<string>();
-            var validationError = validateableViewModel.GetValidationError(propertyName);
+            string propertyName = fixture.Create<string>();
+            string validationError = validateableViewModel.GetValidationError(propertyName);
             Assert.That(validationError, Is.Not.Null);
             Assert.That(validationError, Is.Empty);
         }
@@ -143,17 +139,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtGetValidationErrorReturnererValideringsfejl()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var propertyName = fixture.Create<string>();
-            var validationError = fixture.Create<string>();
+            string propertyName = fixture.Create<string>();
+            string validationError = fixture.Create<string>();
 
             validateableViewModel.SetValidationError(propertyName, validationError, fixture.Create<string>());
 
-            var result = validateableViewModel.GetValidationError(propertyName);
+            string result = validateableViewModel.GetValidationError(propertyName);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo(result));
@@ -167,12 +163,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("")]
         public void TestAtSetValidationErrorKasterArgumentNullExceptionHvisPropertyNameErInvalid(string invalidPropertyName)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => validateableViewModel.SetValidationError(invalidPropertyName, fixture.Create<string>(), fixture.Create<string>()));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => validateableViewModel.SetValidationError(invalidPropertyName, fixture.Create<string>(), fixture.Create<string>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -188,12 +184,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("")]
         public void TestAtSetValidationErrorKasterArgumentNullExceptionHvisRaisePropertyNameErInvalid(string invalidRaisePropertyName)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => validateableViewModel.SetValidationError(fixture.Create<string>(), fixture.Create<string>(), invalidRaisePropertyName));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => validateableViewModel.SetValidationError(fixture.Create<string>(), fixture.Create<string>(), invalidRaisePropertyName));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -210,12 +206,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("Tekst", "Teksten skal angives.")]
         public void TestAtSetValidationErrorSetsValidationErrorHvorValideringsfejlIkkeErSat(string propertyName, string expectedValidationError)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var validationError = validateableViewModel.GetValidationError(propertyName);
+            string validationError = validateableViewModel.GetValidationError(propertyName);
             Assert.That(validationError, Is.Not.Null);
             Assert.That(validationError, Is.Empty);
 
@@ -236,12 +232,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("Tekst", "Teksten skal angives.")]
         public void TestAtSetValidationErrorSetsValidationErrorHvorValideringsfejlErSat(string propertyName, string expectedValidationError)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var validationError = validateableViewModel.GetValidationError(propertyName);
+            string validationError = validateableViewModel.GetValidationError(propertyName);
             Assert.That(validationError, Is.Not.Null);
             Assert.That(validationError, Is.Empty);
 
@@ -268,15 +264,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("")]
         public void TestAtSetValidationErrorClearsValidationError(string clearValue)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var propertyName = fixture.Create<string>();
+            string propertyName = fixture.Create<string>();
             validateableViewModel.SetValidationError(propertyName, fixture.Create<string>(), fixture.Create<string>());
 
-            var validationError = validateableViewModel.GetValidationError(propertyName);
+            string validationError = validateableViewModel.GetValidationError(propertyName);
             Assert.That(validationError, Is.Not.Null);
             Assert.That(validationError, Is.Not.Empty);
 
@@ -302,23 +298,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("TekstValidationError", "Teksten skal angives.")]
         public void TestAtSetValidationErrorRejserPropertyChanged(string expectedPropertyName, string validationError)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var validateableViewModel = new MyValidateableViewModel();
+            MyValidateableViewModel validateableViewModel = new MyValidateableViewModel();
             Assert.That(validateableViewModel, Is.Not.Null);
 
-            var eventCalled = false;
+            bool eventCalled = false;
             validateableViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.CompareOrdinal(e.PropertyName, expectedPropertyName) == 0)
                 {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    if (string.Compare(e.PropertyName, expectedPropertyName, StringComparison.Ordinal) == 0)
-                    {
-                        eventCalled = true;
-                    }
-                };
+                    eventCalled = true;
+                }
+            };
 
             Assert.That(eventCalled, Is.False);
             validateableViewModel.SetValidationError(fixture.Create<string>(), validationError, expectedPropertyName);

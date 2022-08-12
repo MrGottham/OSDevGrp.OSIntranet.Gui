@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
-using Rhino.Mocks;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
@@ -22,30 +24,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorInitiererNyhedViewModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<byte[]>(e => e.FromFactory(() => TestHelper.GetEmbeddedResource((new Resource()).GetType().Assembly, "Images.Bogføringslinje.png")));
-            fixture.Customize<INyhedModel>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<INyhedModel>();
-                    mock.Expect(m => m.Nyhedsaktualitet)
-                        .Return(Nyhedsaktualitet.Medium)
-                        .Repeat.Any();
-                    mock.Expect(m => m.Nyhedsudgivelsestidspunkt)
-                        .Return(fixture.Create<DateTime>())
-                        .Repeat.Any();
-                    mock.Expect(m => m.Nyhedsinformation)
-                        .Return(fixture.Create<string>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var nyhedModelMock = fixture.Create<INyhedModel>();
-            var image = fixture.Create<byte[]>();
-            var nyhedViewModel = new NyhedViewModel(nyhedModelMock, image);
+            Nyhedsaktualitet nyhedsaktualitet = fixture.Create<Nyhedsaktualitet>();
+            DateTime nyhedsudgivelsestidspunkt = DateTime.Now.AddDays(random.Next(0, 7) * -1).AddMinutes(random.Next(0, 120) * -1);
+            string nyhedsinformation = fixture.Create<string>();
+            Mock<INyhedModel> nyhedModelMock = fixture.BuildNyhedModelMock(nyhedsaktualitet, nyhedsudgivelsestidspunkt, nyhedsinformation);
+
+            byte[] image = Resource.GetEmbeddedResource("Images.Bogføringslinje.png");
+
+            INyhedViewModel nyhedViewModel = new NyhedViewModel(nyhedModelMock.Object, image);
             Assert.That(nyhedViewModel, Is.Not.Null);
-            Assert.That(nyhedViewModel.Nyhedsaktualitet, Is.EqualTo(nyhedModelMock.Nyhedsaktualitet));
-            Assert.That(nyhedViewModel.Nyhedsudgivelsestidspunkt, Is.EqualTo(nyhedModelMock.Nyhedsudgivelsestidspunkt));
+            Assert.That(nyhedViewModel.Nyhedsaktualitet, Is.EqualTo(nyhedsaktualitet));
+            Assert.That(nyhedViewModel.Nyhedsudgivelsestidspunkt, Is.EqualTo(nyhedsudgivelsestidspunkt));
             Assert.That(nyhedViewModel.DisplayName, Is.Not.Null);
             Assert.That(nyhedViewModel.DisplayName, Is.Not.Empty);
             Assert.That(nyhedViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.News)));
@@ -54,11 +46,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             Assert.That(nyhedViewModel.Image, Is.EqualTo(image));
             Assert.That(nyhedViewModel.Nyhedsinformation, Is.Not.Null);
             Assert.That(nyhedViewModel.Nyhedsinformation, Is.Not.Empty);
-            Assert.That(nyhedViewModel.Nyhedsinformation, Is.EqualTo(nyhedModelMock.Nyhedsinformation));
+            Assert.That(nyhedViewModel.Nyhedsinformation, Is.EqualTo(nyhedsinformation));
 
-            nyhedModelMock.AssertWasCalled(m => m.Nyhedsaktualitet);
-            nyhedModelMock.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt);
-            nyhedModelMock.AssertWasCalled(m => m.Nyhedsinformation);
+            nyhedModelMock.Verify(m => m.Nyhedsaktualitet, Times.Once);
+            nyhedModelMock.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            nyhedModelMock.Verify(m => m.Nyhedsinformation, Times.Once);
         }
 
         /// <summary>
@@ -67,10 +59,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisNyhedModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<byte[]>(e => e.FromFactory(() => TestHelper.GetEmbeddedResource((new Resource()).GetType().Assembly, "Images.Bogføringslinje.png")));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            Assert.Throws<ArgumentNullException>(() => new NyhedViewModel(null, fixture.Create<byte[]>()));
+            // ReSharper disable ObjectCreationAsStatement
+            Assert.Throws<ArgumentNullException>(() => new NyhedViewModel(null, fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()));
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         /// <summary>
@@ -79,10 +73,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisImageErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<INyhedModel>(e => e.FromFactory(() => MockRepository.GenerateMock<INyhedModel>()));
+            Fixture fixture = new Fixture();
 
-            Assert.Throws<ArgumentNullException>(() => new NyhedViewModel(fixture.Create<INyhedModel>(), null));
+            // ReSharper disable ObjectCreationAsStatement
+            Assert.Throws<ArgumentNullException>(() => new NyhedViewModel(fixture.BuildNyhedModel(), null));
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         /// <summary>
@@ -94,26 +89,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [TestCase("Nyhedsinformation", "Nyhedsinformation")]
         public void TestAtPropertyChangedOnNyhedModelEventHandlerRejserPropertyChangedOnNyhedModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
-            var fixture = new Fixture();
-            fixture.Customize<byte[]>(e => e.FromFactory(() => TestHelper.GetEmbeddedResource((new Resource()).GetType().Assembly, "Images.Bogføringslinje.png")));
-            fixture.Customize<INyhedModel>(e => e.FromFactory(() => MockRepository.GenerateMock<INyhedModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var nyhedModelMock = fixture.Create<INyhedModel>();
-            var nyhedViewModel = new NyhedViewModel(nyhedModelMock, fixture.Create<byte[]>());
+            Mock<INyhedModel> nyhedModelMock = fixture.BuildNyhedModelMock();
+
+            INyhedViewModel nyhedViewModel = new NyhedViewModel(nyhedModelMock.Object, fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray());
             Assert.That(nyhedViewModel, Is.Not.Null);
 
-            var eventCalled = false;
-            nyhedModelMock.PropertyChanged += (s, e) =>
+            bool eventCalled = false;
+            nyhedViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.CompareOrdinal(e.PropertyName, expectPropertyName) == 0)
                 {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
-                    {
-                        eventCalled = true;
-                    }
-                };
+                    eventCalled = true;
+                }
+            };
 
             Assert.That(eventCalled, Is.False);
             nyhedModelMock.Raise(m => m.PropertyChanged += null, nyhedModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
@@ -126,12 +121,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtPropertyChangedOnNyhedModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<byte[]>(e => e.FromFactory(() => TestHelper.GetEmbeddedResource((new Resource()).GetType().Assembly, "Images.Bogføringslinje.png")));
-            fixture.Customize<INyhedModel>(e => e.FromFactory(() => MockRepository.GenerateMock<INyhedModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var nyhedModelMock = fixture.Create<INyhedModel>();
-            var nyhedViewModel = new NyhedViewModel(nyhedModelMock, fixture.Create<byte[]>());
+            Mock<INyhedModel> nyhedModelMock = fixture.BuildNyhedModelMock();
+
+            INyhedViewModel nyhedViewModel = new NyhedViewModel(nyhedModelMock.Object, fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray());
             Assert.That(nyhedViewModel, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => nyhedModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
@@ -143,14 +138,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtPropertyChangedOnNyhedModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<byte[]>(e => e.FromFactory(() => TestHelper.GetEmbeddedResource((new Resource()).GetType().Assembly, "Images.Bogføringslinje.png")));
-            fixture.Customize<INyhedModel>(e => e.FromFactory(() => MockRepository.GenerateMock<INyhedModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var nyhedModelMock = fixture.Create<INyhedModel>();
-            var nyhedViewModel = new NyhedViewModel(nyhedModelMock, fixture.Create<byte[]>());
+            Mock<INyhedModel> nyhedModelMock = fixture.BuildNyhedModelMock();
+
+            INyhedViewModel nyhedViewModel = new NyhedViewModel(nyhedModelMock.Object, fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray());
             Assert.That(nyhedViewModel, Is.Not.Null);
- 
+
             Assert.Throws<ArgumentNullException>(() => nyhedModelMock.Raise(m => m.PropertyChanged += null, fixture.Create<object>(), null));
         }
     }

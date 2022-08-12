@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
-using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
 {
@@ -21,10 +20,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtConstructorInitiererCommandCollectionExecuterCommand()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommand>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommand>()));
+            Fixture fixture = new Fixture();
 
-            var command = new CommandCollectionExecuterCommand(fixture.CreateMany<ICommand>().ToList());
+            ICommand command = new CommandCollectionExecuterCommand(fixture.BuildCommandCollection());
             Assert.That(command, Is.Not.Null);
         }
 
@@ -34,7 +32,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisCommandCollectionErNull()
         {
+            // ReSharper disable ObjectCreationAsStatement
             Assert.Throws<ArgumentNullException>(() => new CommandCollectionExecuterCommand(null));
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         /// <summary>
@@ -43,13 +43,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteReturnererFalseHvisCommandCollectionErEmpty()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var commandMockCollection = new List<ICommand>(0);
+            ICommand[] commandMockCollection = Array.Empty<ICommand>();
             Assert.That(commandMockCollection, Is.Not.Null);
             Assert.That(commandMockCollection, Is.Empty);
 
-            var command = new CommandCollectionExecuterCommand(commandMockCollection);
+            ICommand command = new CommandCollectionExecuterCommand(commandMockCollection);
             Assert.That(command, Is.Not.Null);
 
             Assert.That(command.CanExecute(fixture.Create<object>()), Is.False);
@@ -61,30 +61,31 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteReturnererFalseHvisCanExecuteOnCommandsReturnererFalse()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommand>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<ICommand>();
-                    mock.Expect(m => m.CanExecute(Arg<object>.Is.Anything))
-                        .Return(false)
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
 
-            var commandMockCollection = fixture.CreateMany<ICommand>(25).ToList();
+            Mock<ICommand>[] commandMockCollection =
+            {
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false)
+            };
             Assert.That(commandMockCollection, Is.Not.Null);
             Assert.That(commandMockCollection, Is.Not.Empty);
 
-            var command = new CommandCollectionExecuterCommand(commandMockCollection);
+            ICommand command = new CommandCollectionExecuterCommand(commandMockCollection.Select(commandMock => commandMock.Object).ToArray());
             Assert.That(command, Is.Not.Null);
 
-            var parameter = fixture.Create<object>();
-            var result = command.CanExecute(parameter); 
+            object parameter = fixture.Create<object>();
+            bool result = command.CanExecute(parameter); 
             Assert.That(result, Is.False);
 
             foreach (var commandMock in commandMockCollection)
             {
-                commandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(parameter)));
+                commandMock.Verify(m => m.CanExecute(It.Is<object>(value => value != null && value == parameter)), Times.Once);
             }
         }
 
@@ -94,36 +95,31 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteReturnererTrueHvisCanExecuteOnOneCommandReturnererTrue()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommand>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<ICommand>();
-                    mock.Expect(m => m.CanExecute(Arg<object>.Is.Anything))
-                        .Return(false)
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
 
-            var executeableCommand = MockRepository.GenerateMock<ICommand>();
-            executeableCommand.Expect(m => m.CanExecute(Arg<object>.Is.Anything))
-                              .Return(true)
-                              .Repeat.Any();
-
-            var commandMockCollection = fixture.CreateMany<ICommand>(24).ToList();
-            commandMockCollection.Add(executeableCommand);
+            Mock<ICommand>[] commandMockCollection =
+            {
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false)
+            };
             Assert.That(commandMockCollection, Is.Not.Null);
             Assert.That(commandMockCollection, Is.Not.Empty);
 
-            var command = new CommandCollectionExecuterCommand(commandMockCollection);
+            ICommand command = new CommandCollectionExecuterCommand(commandMockCollection.Select(commandMock => commandMock.Object).ToArray());
             Assert.That(command, Is.Not.Null);
 
-            var parameter = fixture.Create<object>();
-            var result = command.CanExecute(parameter); 
+            object parameter = fixture.Create<object>();
+            bool result = command.CanExecute(parameter);
             Assert.That(result, Is.True);
 
             foreach (var commandMock in commandMockCollection)
             {
-                commandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(parameter)));
+                commandMock.Verify(m => m.CanExecute(It.Is<object>(value => value != null && value == parameter)), Times.Once);
             }
         }
 
@@ -133,41 +129,45 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtExecuteExecutesExecutableCommands()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommand>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<ICommand>();
-                    mock.Expect(m => m.CanExecute(Arg<object>.Is.Anything))
-                        .Return(false)
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
 
-            var executeableCommand = MockRepository.GenerateMock<ICommand>();
-            executeableCommand.Expect(m => m.CanExecute(Arg<object>.Is.Anything))
-                              .Return(true)
-                              .Repeat.Any();
+            Mock<ICommand>[] executableCommandMockCollection =
+            {
+                fixture.BuildCommandMock(),
+                fixture.BuildCommandMock(),
+                fixture.BuildCommandMock(),
+                fixture.BuildCommandMock(),
+            };
+            Assert.That(executableCommandMockCollection, Is.Not.Null);
+            Assert.That(executableCommandMockCollection, Is.Not.Empty);
 
-            var commandMockCollection = fixture.CreateMany<ICommand>(24).ToList();
-            commandMockCollection.Add(executeableCommand);
-            Assert.That(commandMockCollection, Is.Not.Null);
-            Assert.That(commandMockCollection, Is.Not.Empty);
+            Mock<ICommand>[] nonExecutableCommandMockCollection =
+            {
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false),
+                fixture.BuildCommandMock(false)
+            };
+            Assert.That(nonExecutableCommandMockCollection, Is.Not.Null);
+            Assert.That(nonExecutableCommandMockCollection, Is.Not.Empty);
 
-            var command = new CommandCollectionExecuterCommand(commandMockCollection);
+            ICommand command = new CommandCollectionExecuterCommand(executableCommandMockCollection.Concat(nonExecutableCommandMockCollection).Select(commandMock => commandMock.Object).ToArray());
             Assert.That(command, Is.Not.Null);
 
-            var parameter = fixture.Create<object>();
+            object parameter = fixture.Create<object>();
             command.Execute(parameter);
 
-            foreach (var commandMock in commandMockCollection)
+            foreach (var commandMock in executableCommandMockCollection.Concat(nonExecutableCommandMockCollection))
             {
-                commandMock.AssertWasCalled(m => m.CanExecute(Arg<object>.Is.Equal(parameter)));
+                commandMock.Verify(m => m.CanExecute(It.Is<object>(value => value != null && value == parameter)), Times.Once);
             }
-            for (var commandNo = 0; commandNo < commandMockCollection.Count - 1; commandNo++)
+            foreach (var commandMock in executableCommandMockCollection)
             {
-                commandMockCollection.ElementAt(commandNo).AssertWasNotCalled(m => m.Execute(Arg<object>.Is.Anything));
+                commandMock.Verify(m => m.Execute(It.Is<object>(value => value != null && value == parameter)), Times.Once);
             }
-            executeableCommand.AssertWasCalled(m => m.Execute(Arg<object>.Is.Equal(parameter)));
+            foreach (var commandMock in nonExecutableCommandMockCollection)
+            {
+                commandMock.Verify(m => m.Execute(It.IsAny<object>()), Times.Never);
+            }
         }
     }
 }

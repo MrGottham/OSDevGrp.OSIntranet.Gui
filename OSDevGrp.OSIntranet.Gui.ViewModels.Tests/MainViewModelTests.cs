@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Events;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
@@ -10,7 +10,8 @@ using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
-using Rhino.Mocks;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
 {
@@ -26,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtConstructorInitiererMainViewModel()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
             Assert.That(mainViewModel.DisplayName, Is.Not.Null);
             Assert.That(mainViewModel.DisplayName, Is.Not.Empty);
@@ -39,10 +40,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtRegnskabslisteGetterReturnererRegnskabslisteViewModel()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var regnskabslisteViewModel = mainViewModel.Regnskabsliste;
+            IRegnskabslisteViewModel regnskabslisteViewModel = mainViewModel.Regnskabsliste;
             Assert.That(regnskabslisteViewModel, Is.Not.Null);
             Assert.That(regnskabslisteViewModel, Is.TypeOf<RegnskabslisteViewModel>());
         }
@@ -53,10 +54,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtFinansstyringKonfigurationGetterReturnererFinansstyringKonfigurationViewModel()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var finansstyringKonfigurationViewModel = mainViewModel.FinansstyringKonfiguration;
+            IFinansstyringKonfigurationViewModel finansstyringKonfigurationViewModel = mainViewModel.FinansstyringKonfiguration;
             Assert.That(finansstyringKonfigurationViewModel, Is.Not.Null);
             Assert.That(finansstyringKonfigurationViewModel, Is.TypeOf<FinansstyringKonfigurationViewModel>());
         }
@@ -67,10 +68,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtExceptionHandlerGetterReturnererExceptionHandlerViewModel()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var exceptionHandlerViewModel = mainViewModel.ExceptionHandler;
+            IExceptionHandlerViewModel exceptionHandlerViewModel = mainViewModel.ExceptionHandler;
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel, Is.TypeOf<ExceptionHandlerViewModel>());
         }
@@ -81,10 +82,10 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtPrivacyPolicyGetterReturnererPrivacyPolicyViewModel()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var privacyPolicyViewModel = mainViewModel.PrivacyPolicy;
+            IPrivacyPolicyViewModel privacyPolicyViewModel = mainViewModel.PrivacyPolicy;
             Assert.That(privacyPolicyViewModel, Is.Not.Null);
             Assert.That(privacyPolicyViewModel, Is.TypeOf<PrivacyPolicyViewModel>());
         }
@@ -95,7 +96,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtApplyConfigurationKasterArgumentNullExceptionHvisConfigurationSettingsErNull()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => mainViewModel.ApplyConfiguration(null));
@@ -107,13 +108,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtSwitchToLocaleDataStorageKasterArgumentNullExceptionHvisFinansstyringRepositoryLocaleErNull()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var regnskabslisteViewModel = mainViewModel.Regnskabsliste;
+            IRegnskabslisteViewModel regnskabslisteViewModel = mainViewModel.Regnskabsliste;
             Assert.That(regnskabslisteViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => mainViewModel.SwitchToLocaleDataStorage(null));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => mainViewModel.SwitchToLocaleDataStorage(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -127,13 +128,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtSwitchToLocaleDataStorageSkifterTilLokaltDataLager()
         {
-            var mainViewModel = new MainViewModel();
+            Fixture fixture = new Fixture();
+
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var regnskabslisteViewModel = mainViewModel.Regnskabsliste;
+            IRegnskabslisteViewModel regnskabslisteViewModel = mainViewModel.Regnskabsliste;
             Assert.That(regnskabslisteViewModel, Is.Not.Null);
 
-            mainViewModel.SwitchToLocaleDataStorage(MockRepository.GenerateMock<IFinansstyringRepository>());
+            mainViewModel.SwitchToLocaleDataStorage(fixture.BuildFinansstyringRepository());
             Assert.That(mainViewModel.Regnskabsliste, Is.Not.SameAs(regnskabslisteViewModel));
         }
 
@@ -144,10 +147,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [TestCase("Regnskabsliste")]
         public void TestAtSwitchToLocaleDataStorageRejserPropertyChanged(string expectedPropertyName)
         {
-            var mainViewModel = new MainViewModel();
+            Fixture fixture = new Fixture();
+
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var eventCalled = false;
+            bool eventCalled = false;
             mainViewModel.PropertyChanged += (s, e) =>
             {
                 Assert.That(s, Is.Not.Null);
@@ -155,14 +160,14 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
                 Assert.That(e, Is.Not.Null);
                 Assert.That(e.PropertyName, Is.Not.Null);
                 Assert.That(e.PropertyName, Is.Not.Empty);
-                if (string.Compare(e.PropertyName, expectedPropertyName, StringComparison.InvariantCulture) == 0)
+                if (string.CompareOrdinal(e.PropertyName, expectedPropertyName) == 0)
                 {
                     eventCalled = true;
                 }
             };
 
             Assert.That(eventCalled, Is.False);
-            mainViewModel.SwitchToLocaleDataStorage(MockRepository.GenerateMock<IFinansstyringRepository>());
+            mainViewModel.SwitchToLocaleDataStorage(fixture.BuildFinansstyringRepository());
             Assert.That(eventCalled, Is.True);
         }
 
@@ -172,20 +177,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtApplyConfigurationAdderConfigurationSettings()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var configurationSettings = new Dictionary<string, object>
-                {
-                    {"FinansstyringServiceUri", "http://www.google.dk"},
-                    {"AntalBogføringslinjer", fixture.Create<int>()},
-                    {"DageForNyheder", fixture.Create<int>()}
-                };
+            IDictionary<string, object> configurationSettings = new Dictionary<string, object>
+            {
+                { "FinansstyringServiceUri", "http://www.google.dk" },
+                { "AntalBogføringslinjer", fixture.Create<int>() },
+                { "DageForNyheder", fixture.Create<int>() }
+            };
             mainViewModel.ApplyConfiguration(configurationSettings);
 
-            var finansstyringKonfigurationRepository = (IFinansstyringKonfigurationRepository) mainViewModel.GetType().GetProperty("FinansstyringKonfigurationRepository", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static).GetValue(mainViewModel);
+            // ReSharper disable PossibleNullReferenceException
+            IFinansstyringKonfigurationRepository finansstyringKonfigurationRepository = (IFinansstyringKonfigurationRepository) mainViewModel.GetType().GetProperty("FinansstyringKonfigurationRepository", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static).GetValue(mainViewModel);
+            // ReSharper restore PossibleNullReferenceException
             Assert.That(finansstyringKonfigurationRepository, Is.Not.Null);
             Assert.That(finansstyringKonfigurationRepository.FinansstyringServiceUri, Is.Not.Null);
             Assert.That(finansstyringKonfigurationRepository.FinansstyringServiceUri, Is.EqualTo(new Uri(Convert.ToString(configurationSettings["FinansstyringServiceUri"]))));
@@ -199,7 +206,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtSubscribeKasterArgumentNullExceptionHvisEventSubscriberErNull()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => mainViewModel.Subscribe<IIntranetGuiEventArgs>(null));
@@ -211,20 +218,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtSubscribeTilmelderSubscriber()
         {
-            var mainViewModel = new MainViewModel();
+            Fixture fixture = new Fixture();
+
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var eventSubscriberMock = MockRepository.GenerateMock<IEventSubscriber<IIntranetGuiEventArgs>>();
-            mainViewModel.Subscribe(eventSubscriberMock);
+            IEventSubscriber<IIntranetGuiEventArgs> eventSubscriber = fixture.BuildEventSubscriber<IIntranetGuiEventArgs>();
+            mainViewModel.Subscribe(eventSubscriber);
 
-            var field = mainViewModel.GetType().GetField("_eventSubscribers", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo field = mainViewModel.GetType().GetField("_eventSubscribers", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(field, Is.Not.Null);
 
             // ReSharper disable PossibleNullReferenceException
-            var eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
+            IList<object> eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
             // ReSharper restore PossibleNullReferenceException
             Assert.That(eventSubscribers, Is.Not.Null);
-            Assert.That(eventSubscribers.Contains(eventSubscriberMock), Is.True);
+            Assert.That(eventSubscribers.Contains(eventSubscriber), Is.True);
         }
 
         /// <summary>
@@ -233,7 +242,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtUnsubscribeKasterArgumentNullExceptionHvisEventSubscriberErNull()
         {
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => mainViewModel.Unsubscribe<IIntranetGuiEventArgs>(null));
@@ -245,26 +254,28 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtUnsubscribeFramelderSubscriber()
         {
-            var mainViewModel = new MainViewModel();
+            Fixture fixture = new Fixture();
+
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var eventSubscriberMock = MockRepository.GenerateMock<IEventSubscriber<IIntranetGuiEventArgs>>();
-            mainViewModel.Subscribe(eventSubscriberMock);
+            IEventSubscriber<IIntranetGuiEventArgs> eventSubscriber = fixture.BuildEventSubscriber<IIntranetGuiEventArgs>();
+            mainViewModel.Subscribe(eventSubscriber);
 
-            var field = mainViewModel.GetType().GetField("_eventSubscribers", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo field = mainViewModel.GetType().GetField("_eventSubscribers", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(field, Is.Not.Null);
 
             // ReSharper disable PossibleNullReferenceException
-            var eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
+            IList<object> eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
             // ReSharper restore PossibleNullReferenceException
             Assert.That(eventSubscribers, Is.Not.Null);
-            Assert.That(eventSubscribers.Contains(eventSubscriberMock), Is.True);
+            Assert.That(eventSubscribers.Contains(eventSubscriber), Is.True);
 
-            mainViewModel.Unsubscribe(eventSubscriberMock);
+            mainViewModel.Unsubscribe(eventSubscriber);
 
             eventSubscribers = (IList<object>) field.GetValue(mainViewModel);
             Assert.That(eventSubscribers, Is.Not.Null);
-            Assert.That(eventSubscribers.Contains(eventSubscriberMock), Is.False);
+            Assert.That(eventSubscribers.Contains(eventSubscriber), Is.False);
         }
 
         /// <summary>
@@ -273,38 +284,37 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtOnEventKaldesForAlleHandleExceptionEventArgsSubscribers()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IEventSubscriber<IHandleExceptionEventArgs>>(e => e.FromFactory(() =>
-                {
-                    var eventSubscriberMock = MockRepository.GenerateMock<IEventSubscriber<IHandleExceptionEventArgs>>();
-                    eventSubscriberMock.Expect(m => m.OnEvent(Arg<IHandleExceptionEventArgs>.Is.NotNull))
-                                       .WhenCalled(a =>
-                                           {
-                                               var handleExceptionEventArgs =
-                                                   (IHandleExceptionEventArgs) a.Arguments.ElementAt(0);
-                                               handleExceptionEventArgs.IsHandled = false;
-                                           });
-                    return eventSubscriberMock;
-                }));
+            Fixture fixture = new Fixture();
 
-            var mainViewModel = new MainViewModel();
+            IMainViewModel mainViewModel = new MainViewModel();
             Assert.That(mainViewModel, Is.Not.Null);
 
-            var exceptionHandlerViewModel = mainViewModel.ExceptionHandler;
+            List<Mock<IEventSubscriber<IHandleExceptionEventArgs>>> eventSubscriberMockCollection = new List<Mock<IEventSubscriber<IHandleExceptionEventArgs>>>
+            {
+                fixture.BuildEventSubscriberMock<IHandleExceptionEventArgs>(handleExceptionEventArgs => handleExceptionEventArgs.IsHandled = false),
+                fixture.BuildEventSubscriberMock<IHandleExceptionEventArgs>(handleExceptionEventArgs => handleExceptionEventArgs.IsHandled = false),
+                fixture.BuildEventSubscriberMock<IHandleExceptionEventArgs>(handleExceptionEventArgs => handleExceptionEventArgs.IsHandled = false),
+                fixture.BuildEventSubscriberMock<IHandleExceptionEventArgs>(handleExceptionEventArgs => handleExceptionEventArgs.IsHandled = false),
+                fixture.BuildEventSubscriberMock<IHandleExceptionEventArgs>(handleExceptionEventArgs => handleExceptionEventArgs.IsHandled = false),
+                fixture.BuildEventSubscriberMock<IHandleExceptionEventArgs>(handleExceptionEventArgs => handleExceptionEventArgs.IsHandled = false),
+                fixture.BuildEventSubscriberMock<IHandleExceptionEventArgs>(handleExceptionEventArgs => handleExceptionEventArgs.IsHandled = false)
+            };
+
+            IExceptionHandlerViewModel exceptionHandlerViewModel = mainViewModel.ExceptionHandler;
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
 
-            var eventSubscribers = fixture.CreateMany<IEventSubscriber<IHandleExceptionEventArgs>>(7).ToList();
             try
             {
-                eventSubscribers.ForEach(mainViewModel.Subscribe);
+                eventSubscriberMockCollection.ForEach(eventSubscriberMock => mainViewModel.Subscribe(eventSubscriberMock.Object));
 
-                exceptionHandlerViewModel.HandleException(fixture.Create<IntranetGuiSystemException>());
+                IntranetGuiSystemException exception = fixture.Create<IntranetGuiSystemException>();
+                exceptionHandlerViewModel.HandleException(exception);
 
-                eventSubscribers.ForEach(m => m.AssertWasCalled(n => n.OnEvent(Arg<IHandleExceptionEventArgs>.Is.NotNull)));
+                eventSubscriberMockCollection.ForEach(eventSubscriberMock => eventSubscriberMock.Verify(m => m.OnEvent(It.Is<IHandleExceptionEventArgs>(value => value != null && value == exception)), Times.Once));
             }
             finally
             {
-                eventSubscribers.ForEach(mainViewModel.Unsubscribe);
+                eventSubscriberMockCollection.ForEach(eventSubscriberMock => mainViewModel.Unsubscribe(eventSubscriberMock.Object));
             }
         }
     }

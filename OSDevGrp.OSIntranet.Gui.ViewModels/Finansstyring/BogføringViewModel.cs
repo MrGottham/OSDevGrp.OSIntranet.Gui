@@ -83,9 +83,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 return;
             }
 
-            KontoViewModelRefresh();
-            BudgetkontoViewModelRefresh();
-            AdressekontoViewModelCollectionRefresh();
+            Task.WhenAll(KontoViewModelRefresh(), BudgetkontoViewModelRefresh(), AdressekontoViewModelCollectionRefresh()).GetAwaiter();
         }
 
         #endregion
@@ -1024,9 +1022,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
                 case nameof(Dato):
                     DatoValidationError = null;
                     RaisePropertyChanged(nameof(DatoAsText));
-                    KontoViewModelRefresh();
-                    BudgetkontoViewModelRefresh();
-                    AdressekontoViewModelCollectionRefresh();
+                    Task.WhenAll(KontoViewModelRefresh(), BudgetkontoViewModelRefresh(), AdressekontoViewModelCollectionRefresh()).GetAwaiter();
                     break;
 
                 case nameof(Bilag):
@@ -1035,7 +1031,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case nameof(Kontonummer):
                     KontonummerValidationError = null;
-                    KontoViewModelRefresh();
+                    KontoViewModelRefresh().GetAwaiter();
                     break;
 
                 case nameof(Tekst):
@@ -1044,7 +1040,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case nameof(Budgetkontonummer):
                     BudgetkontonummerValidationError = null;
-                    BudgetkontoViewModelRefresh();
+                    BudgetkontoViewModelRefresh().GetAwaiter();
                     break;
 
                 case nameof(Debit):
@@ -1057,7 +1053,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
 
                 case nameof(Adressekonto):
                     AdressekontoValidationError = null;
-                    AdressekontoViewModelCollectionRefresh();
+                    AdressekontoViewModelCollectionRefresh().GetAwaiter();
                     break;
             }
         }
@@ -1065,7 +1061,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Genindlæser ViewModel for kontoen, som bogføringslinjen er tilknyttet.
         /// </summary>
-        private async void KontoViewModelRefresh()
+        private async Task KontoViewModelRefresh()
         {
             KontoViewModel = null;
             if (string.IsNullOrWhiteSpace(Kontonummer))
@@ -1113,7 +1109,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Genindlæser ViewModel for budgetkontoen, som bogføringslinjen er tilknyttet.
         /// </summary>
-        private async void BudgetkontoViewModelRefresh()
+        private async Task BudgetkontoViewModelRefresh()
         {
             BudgetkontoViewModel = null;
             if (string.IsNullOrWhiteSpace(Budgetkontonummer))
@@ -1161,7 +1157,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring
         /// <summary>
         /// Genindlæser ViewModels for adressekonti og dermed ViewModel for adressekontoen, som bogføringslinjen er tilknyttet.
         /// </summary>
-        private async void AdressekontoViewModelCollectionRefresh()
+        private async Task AdressekontoViewModelCollectionRefresh()
         {
             AdressekontoViewModel = null;
             try

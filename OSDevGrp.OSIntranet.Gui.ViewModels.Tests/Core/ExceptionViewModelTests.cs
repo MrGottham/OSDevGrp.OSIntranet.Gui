@@ -5,6 +5,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
@@ -21,16 +22,17 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorInitiererExceptionViewModel()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var detailBuilder = new StringBuilder(exception.Message);
+            Exception exception = fixture.Create<Exception>();
+            StringBuilder detailBuilder = new StringBuilder(exception.Message);
             if (string.IsNullOrEmpty(exception.StackTrace) == false)
             {
                 detailBuilder.AppendLine();
                 detailBuilder.AppendLine(exception.StackTrace);
             }
-            var exceptionViewModel = new ExceptionViewModel(exception);
+
+            IExceptionViewModel exceptionViewModel = new ExceptionViewModel(exception);
             Assert.That(exceptionViewModel, Is.Not.Null);
             Assert.That(exceptionViewModel.Message, Is.Not.Null);
             Assert.That(exceptionViewModel.Message, Is.Not.Empty);
@@ -49,7 +51,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisExceptionErNull()
         {
+            // ReSharper disable ObjectCreationAsStatement
             Assert.Throws<ArgumentNullException>(() => new ExceptionViewModel(null));
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         /// <summary>
@@ -58,11 +62,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtMessageReturnererFejlbeskedFraException()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IntranetGuiRepositoryException>(e => e.FromFactory(() => new IntranetGuiRepositoryException(fixture.Create<string>(), fixture.Create<Exception>())));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<IntranetGuiRepositoryException>();
-            var exceptionViewModel = new ExceptionViewModel(exception);
+            IntranetGuiRepositoryException exception = new IntranetGuiRepositoryException(fixture.Create<string>(), fixture.Create<Exception>();
+
+            IExceptionViewModel exceptionViewModel = new ExceptionViewModel(exception);
             Assert.That(exceptionViewModel, Is.Not.Null);
             Assert.That(exceptionViewModel.Message, Is.Not.Null);
             Assert.That(exceptionViewModel.Message, Is.Not.Empty);
@@ -75,18 +79,18 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtDetailsReturnererDetaljeretFejlbesked()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IntranetGuiRepositoryException>(e => e.FromFactory(() => new IntranetGuiRepositoryException(fixture.Create<string>(), fixture.Create<Exception>())));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<IntranetGuiRepositoryException>();
-            var detailsBuilder = new StringBuilder(exception.Message);
-            var detailBuilder = new StringBuilder(exception.Message);
+            IntranetGuiRepositoryException exception = new IntranetGuiRepositoryException(fixture.Create<string>(), fixture.Create<Exception>();
+            StringBuilder detailsBuilder = new StringBuilder(exception.Message);
+            StringBuilder detailBuilder = new StringBuilder(exception.Message);
             if (string.IsNullOrEmpty(exception.StackTrace) == false)
             {
                 detailBuilder.AppendLine();
                 detailBuilder.AppendLine(exception.StackTrace);
             }
-            var innerException = exception.InnerException;
+
+            Exception innerException = exception.InnerException;
             while (innerException != null)
             {
                 detailsBuilder.AppendLine();
@@ -98,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
                 innerException = innerException.InnerException;
             }
 
-            var exceptionViewModel = new ExceptionViewModel(exception);
+            IExceptionViewModel exceptionViewModel = new ExceptionViewModel(exception);
             Assert.That(exceptionViewModel, Is.Not.Null);
             Assert.That(exceptionViewModel.Details, Is.Not.Null);
             Assert.That(exceptionViewModel.Details, Is.Not.Empty);

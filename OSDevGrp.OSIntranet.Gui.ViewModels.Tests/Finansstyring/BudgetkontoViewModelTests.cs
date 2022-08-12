@@ -1,15 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
-using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring.Commands;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
-using Rhino.Mocks;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
@@ -26,161 +25,124 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorInitiererBudgetkontoViewModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.Kontonummer)
-                .Return(fixture.Create<string>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Kontonavn)
-                .Return(fixture.Create<string>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Beskrivelse)
-                .Return(fixture.Create<string>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Notat)
-                .Return(fixture.Create<string>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.StatusDato)
-                .Return(fixture.Create<DateTime>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Indtægter)
-                .Return(fixture.Create<decimal>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Udgifter)
-                .Return(fixture.Create<decimal>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Budget)
-                .Return(fixture.Create<decimal>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.BudgetSidsteMåned)
-                .Return(fixture.Create<decimal>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.BudgetÅrTilDato)
-                .Return(fixture.Create<decimal>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.BudgetSidsteÅr)
-                .Return(fixture.Create<decimal>())
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Bogført)
-                .Return(Math.Abs(fixture.Create<decimal>())*-1)
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.BogførtSidsteMåned)
-                .Return(Math.Abs(fixture.Create<decimal>())*-1)
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.BogførtÅrTilDato)
-                .Return(Math.Abs(fixture.Create<decimal>())*-1)
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.BogførtSidsteÅr)
-                .Return(Math.Abs(fixture.Create<decimal>())*-1)
-                .Repeat.Any();
-            budgetkontoModelMock.Expect(m => m.Disponibel)
-                .Return(fixture.Create<decimal>())
-                .Repeat.Any();
-            var budgetkontogruppeViewModelMock = fixture.Create<IBudgetkontogruppeViewModel>();
-            var budgetkontoViewModel = new BudgetkontoViewModel(regnskabViewModelMock, budgetkontoModelMock, budgetkontogruppeViewModelMock, fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>());
+            IRegnskabViewModel regnskabViewModel = fixture.BuildRegnskabViewModel();
+            string kontonummer = fixture.Create<string>();
+            string kontonavn = fixture.Create<string>();
+            string beskrivelse = fixture.Create<string>();
+            string notat = fixture.Create<string>();
+            DateTime statusDato = fixture.Create<DateTime>();
+            decimal indtægter = fixture.Create<decimal>();
+            decimal udgifter = fixture.Create<decimal>();
+            decimal budget = fixture.Create<decimal>();
+            decimal budgetSidsteMåned = fixture.Create<decimal>();
+            decimal budgetÅrTilDato = fixture.Create<decimal>();
+            decimal budgetSidsteÅr = fixture.Create<decimal>();
+            decimal bogført = fixture.Create<decimal>();
+            decimal bogførtSidsteMåned = fixture.Create<decimal>();
+            decimal bogførtÅrTilDato = fixture.Create<decimal>();
+            decimal bogførtSidsteÅr = fixture.Create<decimal>();
+            decimal disponibel = fixture.Create<decimal>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(kontonummer: kontonummer, kontonavn: kontonavn, beskrivelse: beskrivelse, notat: notat, statusDato: statusDato, indtægter: indtægter, udgifter: udgifter, budget: budget, budgetSidsteMåned: budgetSidsteMåned, budgetÅrTilDato: budgetÅrTilDato, budgetSidsteÅr: budgetSidsteÅr, bogført: bogført, bogførtSidsteMåned: bogførtSidsteMåned, bogførtÅrTilDato: bogførtÅrTilDato, bogførtSidsteÅr: bogførtSidsteÅr, disponibel: disponibel);
+            IBudgetkontogruppeViewModel budgetkontogruppeViewModel = fixture.BuildBudgetkontogruppeViewModel();
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(regnskabViewModel, budgetkontoModelMock.Object, budgetkontogruppeViewModel, fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel());
             Assert.That(budgetkontoViewModel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.Regnskab, Is.Not.Null);
-            Assert.That(budgetkontoViewModel.Regnskab, Is.EqualTo(regnskabViewModelMock));
+            Assert.That(budgetkontoViewModel.Regnskab, Is.EqualTo(regnskabViewModel));
             Assert.That(budgetkontoViewModel.Kontonummer, Is.Not.Null);
             Assert.That(budgetkontoViewModel.Kontonummer, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.Kontonummer, Is.EqualTo(budgetkontoModelMock.Kontonummer));
+            Assert.That(budgetkontoViewModel.Kontonummer, Is.EqualTo(kontonummer));
             Assert.That(budgetkontoViewModel.Kontonavn, Is.Not.Null);
             Assert.That(budgetkontoViewModel.Kontonavn, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.Kontonavn, Is.EqualTo(budgetkontoModelMock.Kontonavn));
+            Assert.That(budgetkontoViewModel.Kontonavn, Is.EqualTo(kontonavn));
             Assert.That(budgetkontoViewModel.Beskrivelse, Is.Not.Null);
             Assert.That(budgetkontoViewModel.Beskrivelse, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.Beskrivelse, Is.EqualTo(budgetkontoModelMock.Beskrivelse));
+            Assert.That(budgetkontoViewModel.Beskrivelse, Is.EqualTo(beskrivelse));
             Assert.That(budgetkontoViewModel.Notat, Is.Not.Null);
             Assert.That(budgetkontoViewModel.Notat, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.Notat, Is.EqualTo(budgetkontoModelMock.Notat));
+            Assert.That(budgetkontoViewModel.Notat, Is.EqualTo(notat));
             Assert.That(budgetkontoViewModel.Kontogruppe, Is.Not.Null);
-            Assert.That(budgetkontoViewModel.Kontogruppe, Is.EqualTo(budgetkontogruppeViewModelMock));
-            Assert.That(budgetkontoViewModel.StatusDato, Is.EqualTo(budgetkontoModelMock.StatusDato));
-            Assert.That(budgetkontoViewModel.Indtægter, Is.EqualTo(budgetkontoModelMock.Indtægter));
+            Assert.That(budgetkontoViewModel.Kontogruppe, Is.EqualTo(budgetkontogruppeViewModel));
+            Assert.That(budgetkontoViewModel.StatusDato, Is.EqualTo(statusDato));
+            Assert.That(budgetkontoViewModel.Indtægter, Is.EqualTo(indtægter));
             Assert.That(budgetkontoViewModel.IndtægterAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.IndtægterAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.IndtægterAsText, Is.EqualTo(budgetkontoModelMock.Indtægter.ToString("C")));
+            Assert.That(budgetkontoViewModel.IndtægterAsText, Is.EqualTo(indtægter.ToString("C")));
             Assert.That(budgetkontoViewModel.IndtægterLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.IndtægterLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.IndtægterLabel, Is.EqualTo(Resource.GetText(Text.Income)));
-            Assert.That(budgetkontoViewModel.Udgifter, Is.EqualTo(budgetkontoModelMock.Udgifter));
+            Assert.That(budgetkontoViewModel.Udgifter, Is.EqualTo(udgifter));
             Assert.That(budgetkontoViewModel.UdgifterAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.UdgifterAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.UdgifterAsText, Is.EqualTo(budgetkontoModelMock.Udgifter.ToString("C")));
+            Assert.That(budgetkontoViewModel.UdgifterAsText, Is.EqualTo(udgifter.ToString("C")));
             Assert.That(budgetkontoViewModel.UdgifterLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.UdgifterLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.UdgifterLabel, Is.EqualTo(Resource.GetText(Text.Expenses)));
-            Assert.That(budgetkontoViewModel.Budget, Is.EqualTo(budgetkontoModelMock.Budget));
+            Assert.That(budgetkontoViewModel.Budget, Is.EqualTo(budget));
             Assert.That(budgetkontoViewModel.BudgetAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BudgetAsText, Is.EqualTo(budgetkontoModelMock.Budget.ToString("C")));
+            Assert.That(budgetkontoViewModel.BudgetAsText, Is.EqualTo(budget.ToString("C")));
             Assert.That(budgetkontoViewModel.BudgetLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.BudgetLabel, Is.EqualTo(Resource.GetText(Text.Budget)));
-            Assert.That(budgetkontoViewModel.BudgetSidsteMåned, Is.EqualTo(budgetkontoModelMock.BudgetSidsteMåned));
+            Assert.That(budgetkontoViewModel.BudgetSidsteMåned, Is.EqualTo(budgetSidsteMåned));
             Assert.That(budgetkontoViewModel.BudgetSidsteMånedAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetSidsteMånedAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BudgetSidsteMånedAsText, Is.EqualTo(budgetkontoModelMock.BudgetSidsteMåned.ToString("C")));
+            Assert.That(budgetkontoViewModel.BudgetSidsteMånedAsText, Is.EqualTo(budgetSidsteMåned.ToString("C")));
             Assert.That(budgetkontoViewModel.BudgetSidsteMånedLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetSidsteMånedLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.BudgetSidsteMånedLabel, Is.EqualTo(Resource.GetText(Text.BudgetLastMonth)));
-            Assert.That(budgetkontoViewModel.BudgetÅrTilDato, Is.EqualTo(budgetkontoModelMock.BudgetÅrTilDato));
+            Assert.That(budgetkontoViewModel.BudgetÅrTilDato, Is.EqualTo(budgetÅrTilDato));
             Assert.That(budgetkontoViewModel.BudgetÅrTilDatoAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetÅrTilDatoAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BudgetÅrTilDatoAsText, Is.EqualTo(budgetkontoModelMock.BudgetÅrTilDato.ToString("C")));
+            Assert.That(budgetkontoViewModel.BudgetÅrTilDatoAsText, Is.EqualTo(budgetÅrTilDato.ToString("C")));
             Assert.That(budgetkontoViewModel.BudgetÅrTilDatoLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetÅrTilDatoLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.BudgetÅrTilDatoLabel, Is.EqualTo(Resource.GetText(Text.BudgetYearToDate)));
-            Assert.That(budgetkontoViewModel.BudgetSidsteÅr, Is.EqualTo(budgetkontoModelMock.BudgetSidsteÅr));
+            Assert.That(budgetkontoViewModel.BudgetSidsteÅr, Is.EqualTo(budgetSidsteÅr));
             Assert.That(budgetkontoViewModel.BudgetSidsteÅrAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetSidsteÅrAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BudgetSidsteÅrAsText, Is.EqualTo(budgetkontoModelMock.BudgetSidsteÅr.ToString("C")));
+            Assert.That(budgetkontoViewModel.BudgetSidsteÅrAsText, Is.EqualTo(budgetSidsteÅr.ToString("C")));
             Assert.That(budgetkontoViewModel.BudgetSidsteÅrLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BudgetSidsteÅrLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.BudgetSidsteÅrLabel, Is.EqualTo(Resource.GetText(Text.BudgetLastYear)));
-            Assert.That(budgetkontoViewModel.Bogført, Is.EqualTo(budgetkontoModelMock.Bogført));
+            Assert.That(budgetkontoViewModel.Bogført, Is.EqualTo(bogført));
             Assert.That(budgetkontoViewModel.BogførtAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtAsText, Is.EqualTo(budgetkontoModelMock.Bogført.ToString("C")));
+            Assert.That(budgetkontoViewModel.BogførtAsText, Is.EqualTo(bogført.ToString("C")));
             Assert.That(budgetkontoViewModel.BogførtLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtLabel, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtLabel, Is.EqualTo(Resource.GetText(Text.Bookkeeped)));
-            Assert.That(budgetkontoViewModel.BogførtSidsteMåned, Is.EqualTo(budgetkontoModelMock.BogførtSidsteMåned));
+            Assert.That(budgetkontoViewModel.BogførtLabel, Is.EqualTo(Resource.GetText(Text.Posted)));
+            Assert.That(budgetkontoViewModel.BogførtSidsteMåned, Is.EqualTo(bogførtSidsteMåned));
             Assert.That(budgetkontoViewModel.BogførtSidsteMånedAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtSidsteMånedAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtSidsteMånedAsText, Is.EqualTo(budgetkontoModelMock.BogførtSidsteMåned.ToString("C")));
+            Assert.That(budgetkontoViewModel.BogførtSidsteMånedAsText, Is.EqualTo(bogførtSidsteMåned.ToString("C")));
             Assert.That(budgetkontoViewModel.BogførtSidsteMånedLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtSidsteMånedLabel, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtSidsteMånedLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedLastMonth)));
-            Assert.That(budgetkontoViewModel.BogførtÅrTilDato, Is.EqualTo(budgetkontoModelMock.BogførtÅrTilDato));
+            Assert.That(budgetkontoViewModel.BogførtSidsteMånedLabel, Is.EqualTo(Resource.GetText(Text.PostedLastMonth)));
+            Assert.That(budgetkontoViewModel.BogførtÅrTilDato, Is.EqualTo(bogførtÅrTilDato));
             Assert.That(budgetkontoViewModel.BogførtÅrTilDatoAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtÅrTilDatoAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtÅrTilDatoAsText, Is.EqualTo(budgetkontoModelMock.BogførtÅrTilDato.ToString("C")));
+            Assert.That(budgetkontoViewModel.BogførtÅrTilDatoAsText, Is.EqualTo(bogførtÅrTilDato.ToString("C")));
             Assert.That(budgetkontoViewModel.BogførtÅrTilDatoLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtÅrTilDatoLabel, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtÅrTilDatoLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedYearToDate)));
-            Assert.That(budgetkontoViewModel.BogførtSidsteÅr, Is.EqualTo(budgetkontoModelMock.BogførtSidsteÅr));
+            Assert.That(budgetkontoViewModel.BogførtÅrTilDatoLabel, Is.EqualTo(Resource.GetText(Text.Bookkeeping)));
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅr, Is.EqualTo(bogførtSidsteÅr));
             Assert.That(budgetkontoViewModel.BogførtSidsteÅrAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtSidsteÅrAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtSidsteÅrAsText, Is.EqualTo(budgetkontoModelMock.BogførtSidsteÅr.ToString("C")));
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrAsText, Is.EqualTo(bogførtSidsteÅr.ToString("C")));
             Assert.That(budgetkontoViewModel.BogførtSidsteÅrLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.BogførtSidsteÅrLabel, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.BogførtSidsteÅrLabel, Is.EqualTo(Resource.GetText(Text.BookkeepedLastYear)));
-            Assert.That(budgetkontoViewModel.Disponibel, Is.EqualTo(budgetkontoModelMock.Disponibel));
+            Assert.That(budgetkontoViewModel.BogførtSidsteÅrLabel, Is.EqualTo(Resource.GetText(Text.PostedLastYear)));
+            Assert.That(budgetkontoViewModel.Disponibel, Is.EqualTo(disponibel));
             Assert.That(budgetkontoViewModel.DisponibelAsText, Is.Not.Null);
             Assert.That(budgetkontoViewModel.DisponibelAsText, Is.Not.Empty);
-            Assert.That(budgetkontoViewModel.DisponibelAsText, Is.EqualTo(budgetkontoModelMock.Disponibel.ToString("C")));
+            Assert.That(budgetkontoViewModel.DisponibelAsText, Is.EqualTo(disponibel.ToString("C")));
             Assert.That(budgetkontoViewModel.DisponibelLabel, Is.Not.Null);
             Assert.That(budgetkontoViewModel.DisponibelLabel, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.DisponibelLabel, Is.EqualTo(Resource.GetText(Text.Available)));
-            Assert.That(budgetkontoViewModel.Kontoværdi, Is.EqualTo(Math.Abs(budgetkontoModelMock.Bogført)));
+            Assert.That(budgetkontoViewModel.Kontoværdi, Is.EqualTo(Math.Abs(bogført)));
             Assert.That(budgetkontoViewModel.DisplayName, Is.Not.Null);
             Assert.That(budgetkontoViewModel.DisplayName, Is.Not.Empty);
             Assert.That(budgetkontoViewModel.DisplayName, Is.EqualTo(Resource.GetText(Text.BudgetAccount)));
@@ -191,24 +153,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(budgetkontoViewModel.RefreshCommand, Is.Not.Null);
             Assert.That(budgetkontoViewModel.RefreshCommand, Is.TypeOf<BudgetkontoGetCommand>());
 
-            budgetkontoModelMock.AssertWasNotCalled(m => m.Regnskabsnummer);
-            budgetkontoModelMock.AssertWasCalled(m => m.Kontonummer);
-            budgetkontoModelMock.AssertWasCalled(m => m.Kontonavn);
-            budgetkontoModelMock.AssertWasCalled(m => m.Beskrivelse);
-            budgetkontoModelMock.AssertWasCalled(m => m.Notat);
-            budgetkontoModelMock.AssertWasNotCalled(m => m.Kontogruppe);
-            budgetkontoModelMock.AssertWasCalled(m => m.StatusDato);
-            budgetkontoModelMock.AssertWasCalled(m => m.Indtægter);
-            budgetkontoModelMock.AssertWasCalled(m => m.Udgifter);
-            budgetkontoModelMock.AssertWasCalled(m => m.Budget);
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetSidsteMåned);
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetÅrTilDato);
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetSidsteÅr);
-            budgetkontoModelMock.AssertWasCalled(m => m.Bogført);
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteMåned);
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtÅrTilDato);
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteÅr);
-            budgetkontoModelMock.AssertWasCalled(m => m.Disponibel);
+            budgetkontoModelMock.Verify(m => m.Regnskabsnummer, Times.Never);
+            budgetkontoModelMock.Verify(m => m.Kontonummer, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Kontonavn, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Beskrivelse, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Notat, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Kontogruppe, Times.Never);
+            budgetkontoModelMock.Verify(m => m.StatusDato, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Indtægter, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Udgifter, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Budget, Times.Once);
+            budgetkontoModelMock.Verify(m => m.BudgetSidsteMåned, Times.Once);
+            budgetkontoModelMock.Verify(m => m.BudgetÅrTilDato, Times.Once);
+            budgetkontoModelMock.Verify(m => m.BudgetSidsteÅr, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Bogført, Times.Once);
+            budgetkontoModelMock.Verify(m => m.BogførtSidsteMåned, Times.Once);
+            budgetkontoModelMock.Verify(m => m.BogførtÅrTilDato, Times.Once);
+            budgetkontoModelMock.Verify(m => m.BogførtSidsteÅr, Times.Once);
+            budgetkontoModelMock.Verify(m => m.Disponibel, Times.Once);
         }
 
         /// <summary>
@@ -217,13 +179,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisRegnskabViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(null, fixture.Create<IBudgetkontoModel>(), fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(null, fixture.BuildBudgetkontoModel(), fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -237,13 +197,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisBudgetontoModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), null, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), null, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -257,13 +215,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisBudgetkontogruppeViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IBudgetkontoModel>(), null, fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildBudgetkontoModel(), null, fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -277,13 +233,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IBudgetkontoModel>(), fixture.Create<IBudgetkontogruppeViewModel>(), null, fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildBudgetkontoModel(), fixture.BuildBudgetkontogruppeViewModel(), null, fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -297,13 +251,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisExceptionHandlerViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IBudgetkontoModel>(), fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), null));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildBudgetkontoModel(), fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), null));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -317,24 +269,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtIndtægterSetterOpdatererIndtægterOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.Indtægter = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.Indtægter = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.Indtægter = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -343,28 +290,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtIndtægterSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.Indtægter = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.Indtægter = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.Indtægter = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.Indtægter = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.Indtægter = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -373,24 +312,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtUdgifterSetterOpdatererUdgifterOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.Udgifter = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.Udgifter = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.Udgifter = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -399,28 +333,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtUdgifterSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.Udgifter = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.Udgifter = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.Udgifter = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.Udgifter = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.Udgifter = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -429,24 +355,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBudgetSidsteMånedSetterOpdatererBudgetSidsteMånedOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BudgetSidsteMåned = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetSidsteMåned = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.BudgetSidsteMåned = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -455,28 +376,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBudgetSidsteMånedSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.BudgetSidsteMåned = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.BudgetSidsteMåned = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BudgetSidsteMåned = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetSidsteMåned = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.BudgetSidsteMåned = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -485,24 +398,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBudgetÅrTilDatoSetterOpdatererBudgetÅrTilDatoOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BudgetÅrTilDato = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetÅrTilDato = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.BudgetÅrTilDato = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -511,28 +419,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBudgetÅrTilDatoSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.BudgetÅrTilDato = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.BudgetÅrTilDato = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BudgetÅrTilDato = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetÅrTilDato = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.BudgetÅrTilDato = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -541,24 +441,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBudgetSidsteÅrSetterOpdatererBudgetSidsteÅrOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BudgetSidsteÅr = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetSidsteÅr = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.BudgetSidsteÅr = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -567,28 +462,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBudgetSidsteÅrSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.BudgetSidsteÅr = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.BudgetSidsteÅr = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BudgetSidsteÅr = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BudgetSidsteÅr = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.BudgetSidsteÅr = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -597,24 +484,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtSetterOpdatererBogførtOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.Bogført = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.Bogført = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.Bogført = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -623,28 +505,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.Bogført = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.Bogført = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.Bogført = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.Bogført = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.Bogført = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -653,24 +527,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtSidsteMånedSetterOpdatererBogførtSidsteMånedOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BogførtSidsteMåned = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteMåned = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.BogførtSidsteMåned = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -679,28 +548,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtSidsteMånedSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.BogførtSidsteMåned = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.BogførtSidsteMåned = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BogførtSidsteMåned = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteMåned = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.BogførtSidsteMåned = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -709,24 +570,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtÅrTilDatoSetterOpdatererBogførtÅrTilDatoOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BogførtÅrTilDato = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtÅrTilDato = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.BogførtÅrTilDato = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -735,28 +591,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtÅrTilDatoSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.BogførtÅrTilDato = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.BogførtÅrTilDato = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BogførtÅrTilDato = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtÅrTilDato = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.BogførtÅrTilDato = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -765,24 +613,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtSidsteÅrSetterOpdatererBogførtSidsteÅrOnBudgetkontoModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BogførtSidsteÅr = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteÅr = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            budgetkontoModelMock.VerifySet(m => m.BogførtSidsteÅr = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -791,28 +634,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBogførtSidsteÅrSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var budgetkontoModelMock = MockRepository.GenerateMock<IBudgetkontoModel>();
-            budgetkontoModelMock.Expect(m => m.BogførtSidsteÅr = Arg<decimal>.Is.GreaterThan(0M))
-                                .Throw(exception)
-                                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock(setupCallback: mock => mock.SetupSet(m => m.BogførtSidsteÅr = It.IsAny<decimal>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<decimal>();
+            decimal newValue = fixture.Create<decimal>();
             budgetkontoViewModel.BogførtSidsteÅr = newValue;
 
-            budgetkontoModelMock.AssertWasCalled(m => m.BogførtSidsteÅr = Arg<decimal>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            budgetkontoModelMock.VerifySet(m => m.BogførtSidsteÅr = It.Is<decimal>(value => value == newValue), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -851,37 +686,32 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("Bogført", "Kontoværdi")]
         public void TestAtPropertyChangedOnKontoModelEventHandlerRejserPropertyChangedOnBudgetkontoModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IBudgetkontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontoModel>()));
-            fixture.Customize<IBudgetkontogruppeViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IBudgetkontogruppeViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var budgetkontoModelMock = fixture.Create<IBudgetkontoModel>();
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<IBudgetkontoModel> budgetkontoModelMock = fixture.BuildBudgetkontoModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var budgetkontoViewModel = new BudgetkontoViewModel(fixture.Create<IRegnskabViewModel>(), budgetkontoModelMock, fixture.Create<IBudgetkontogruppeViewModel>(), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IBudgetkontoViewModel budgetkontoViewModel = new BudgetkontoViewModel(fixture.BuildRegnskabViewModel(), budgetkontoModelMock.Object, fixture.BuildBudgetkontogruppeViewModel(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(budgetkontoViewModel, Is.Not.Null);
 
-            var eventCalled = false;
+            bool  eventCalled = false;
             budgetkontoViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.CompareOrdinal(e.PropertyName, expectPropertyName) == 0)
                 {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
-                    {
-                        eventCalled = true;
-                    }
-                };
+                    eventCalled = true;
+                }
+            };
 
             Assert.That(eventCalled, Is.False);
             budgetkontoModelMock.Raise(m => m.PropertyChanged += null, budgetkontoModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(eventCalled, Is.True);
 
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
     }
 }

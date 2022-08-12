@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Comparers;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
-using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
 {
@@ -21,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [Test]
         public void TestAtConstructorInitiererNyhedViewModelComparer()
         {
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
         }
 
@@ -31,14 +32,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [Test]
         public void TestAtCompareKasterArgumentNullExceptionHvisXErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<INyhedViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<INyhedViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
 
             // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            Assert.Throws<ArgumentNullException>(() => comparer.Compare(null, fixture.Create<INyhedViewModel>()));
+            Assert.Throws<ArgumentNullException>(() => comparer.Compare(null, fixture.BuildNyhedViewModel()));
             // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 
@@ -48,14 +48,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [Test]
         public void TestAtCompareKasterArgumentNullExceptionHvisYErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<INyhedViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<INyhedViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
 
             // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            Assert.Throws<ArgumentNullException>(() => comparer.Compare(fixture.Create<INyhedViewModel>(), null));
+            Assert.Throws<ArgumentNullException>(() => comparer.Compare(fixture.BuildNyhedViewModel(), null));
             // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 
@@ -65,30 +64,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [Test]
         public void TestAtCompareReturnererValueLowerThanZeroHvisNyhedsudgivelsestidspunktOnXErGreaterThanNyhedsudgivelsestidspunktOnY()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var dato = fixture.Create<DateTime>();
-            var x = MockRepository.GenerateMock<INyhedViewModel>();
-            x.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
-             .Repeat.Any();
+            DateTime nyhedsudgivelsestidspunkt = DateTime.Now.AddDays(random.Next(0, 7) * -1).AddMinutes(random.Next(0, 120) * -1);
+            Mock<INyhedViewModel> x = fixture.BuildNyhedViewModelMock(nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt);
+            Mock<INyhedViewModel> y = fixture.BuildNyhedViewModelMock(nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt.AddDays(-7));
 
-            var y = MockRepository.GenerateMock<INyhedViewModel>();
-            y.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato.AddDays(-7))
-             .Repeat.Any();
-
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
 
-            var result = comparer.Compare(x, y);
+            int result = comparer.Compare(x.Object, y.Object);
             Assert.That(result, Is.LessThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            x.AssertWasNotCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            y.AssertWasNotCalled(m => m.Nyhedsaktualitet);
+            x.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            x.Verify(m => m.Nyhedsaktualitet, Times.Never);
+            y.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            y.Verify(m => m.Nyhedsaktualitet, Times.Never);
         }
 
         /// <summary>
@@ -97,30 +89,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [Test]
         public void TestAtCompareReturnererValueGreaterThanZeroHvisNyhedsudgivelsestidspunktOnXErLowerThanNyhedsudgivelsestidspunktOnY()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var dato = fixture.Create<DateTime>();
-            var x = MockRepository.GenerateMock<INyhedViewModel>();
-            x.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato.AddDays(-7))
-             .Repeat.Any();
+            DateTime nyhedsudgivelsestidspunkt = DateTime.Now.AddDays(random.Next(0, 7) * -1).AddMinutes(random.Next(0, 120) * -1);
+            Mock<INyhedViewModel> x = fixture.BuildNyhedViewModelMock(nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt.AddDays(-7));
+            Mock<INyhedViewModel> y = fixture.BuildNyhedViewModelMock(nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt);
 
-            var y = MockRepository.GenerateMock<INyhedViewModel>();
-            y.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
-             .Repeat.Any();
-
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
 
-            var result = comparer.Compare(x, y);
+            int result = comparer.Compare(x.Object, y.Object);
             Assert.That(result, Is.GreaterThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            x.AssertWasNotCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            y.AssertWasNotCalled(m => m.Nyhedsaktualitet);
+            x.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            x.Verify(m => m.Nyhedsaktualitet, Times.Never);
+            y.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            y.Verify(m => m.Nyhedsaktualitet, Times.Never);
         }
 
         /// <summary>
@@ -129,36 +114,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [Test]
         public void TestAtCompareReturnererValueLowerThanZeroHvisNyhedsudgivelsestidspunktOnXEqualsNyhedsudgivelsestidspunktOnYOgNyhedsaktualitetOnXErGreaterThanNyhedsaktualitetOnY()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var dato = fixture.Create<DateTime>();
-            var x = MockRepository.GenerateMock<INyhedViewModel>();
-            x.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
-             .Repeat.Any();
-            x.Expect(m => m.Nyhedsaktualitet)
-             .Return(Nyhedsaktualitet.High)
-             .Repeat.Any();
+            DateTime nyhedsudgivelsestidspunkt = DateTime.Now.AddDays(random.Next(0, 7) * -1).AddMinutes(random.Next(0, 120) * -1);
+            Mock<INyhedViewModel> x = fixture.BuildNyhedViewModelMock(nyhedsaktualitet: Nyhedsaktualitet.High, nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt);
+            Mock<INyhedViewModel> y = fixture.BuildNyhedViewModelMock(nyhedsaktualitet: Nyhedsaktualitet.Low, nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt);
 
-            var y = MockRepository.GenerateMock<INyhedViewModel>();
-            y.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
-             .Repeat.Any();
-            y.Expect(m => m.Nyhedsaktualitet)
-             .Return(Nyhedsaktualitet.Low)
-             .Repeat.Any();
-
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
 
-            var result = comparer.Compare(x, y);
+            int result = comparer.Compare(x.Object, y.Object);
             Assert.That(result, Is.LessThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            x.AssertWasCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            y.AssertWasCalled(m => m.Nyhedsaktualitet);
+            x.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            x.Verify(m => m.Nyhedsaktualitet, Times.Once);
+            y.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            y.Verify(m => m.Nyhedsaktualitet, Times.Once);
         }
 
         /// <summary>
@@ -167,36 +139,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [Test]
         public void TestAtCompareReturnererValueGreaterThanZeroHvisNyhedsudgivelsestidspunktOnXEqualsNyhedsudgivelsestidspunktOnYOgNyhedsaktualitetOnXErLowerThanNyhedsaktualitetOnY()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var dato = fixture.Create<DateTime>();
-            var x = MockRepository.GenerateMock<INyhedViewModel>();
-            x.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
-             .Repeat.Any();
-            x.Expect(m => m.Nyhedsaktualitet)
-             .Return(Nyhedsaktualitet.Low)
-             .Repeat.Any();
+            DateTime nyhedsudgivelsestidspunkt = DateTime.Now.AddDays(random.Next(0, 7) * -1).AddMinutes(random.Next(0, 120) * -1);
+            Mock<INyhedViewModel> x = fixture.BuildNyhedViewModelMock(nyhedsaktualitet: Nyhedsaktualitet.Low, nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt);
+            Mock<INyhedViewModel> y = fixture.BuildNyhedViewModelMock(nyhedsaktualitet: Nyhedsaktualitet.High, nyhedsudgivelsestidspunkt: nyhedsudgivelsestidspunkt);
 
-            var y = MockRepository.GenerateMock<INyhedViewModel>();
-            y.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(dato)
-             .Repeat.Any();
-            y.Expect(m => m.Nyhedsaktualitet)
-             .Return(Nyhedsaktualitet.High)
-             .Repeat.Any();
-
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
 
-            var result = comparer.Compare(x, y);
+            int result = comparer.Compare(x.Object, y.Object);
             Assert.That(result, Is.GreaterThan(0));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            x.AssertWasCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(1));
-            y.AssertWasCalled(m => m.Nyhedsaktualitet);
+            x.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            x.Verify(m => m.Nyhedsaktualitet, Times.Once);
+            y.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            y.Verify(m => m.Nyhedsaktualitet, Times.Once);
         }
 
         /// <summary>
@@ -208,35 +167,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Comparers
         [TestCase("2013-06-30T10:00:00", "2013-06-30T11:00:00", 1)]
         public void TestAtCompareReturnererCompareResultHvisNyhedsudgivelsestidspunktOnXEqualsNyhedsudgivelsestidspunktOnYOgNyhedsaktualitetOnXEqualsNyhedsaktualitetOnY(string xDate, string yDate, int expectCompareResult)
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
+            Fixture fixture = new Fixture();
 
-            var x = MockRepository.GenerateMock<INyhedViewModel>();
-            x.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(DateTime.Parse(xDate, new CultureInfo("en-US")))
-             .Repeat.Any();
-            x.Expect(m => m.Nyhedsaktualitet)
-             .Return(Nyhedsaktualitet.Medium)
-             .Repeat.Any();
+            Mock<INyhedViewModel> x = fixture.BuildNyhedViewModelMock(nyhedsaktualitet: Nyhedsaktualitet.Medium, nyhedsudgivelsestidspunkt: DateTime.Parse(xDate, new CultureInfo("en-US")));
+            Mock<INyhedViewModel> y = fixture.BuildNyhedViewModelMock(nyhedsaktualitet: Nyhedsaktualitet.Medium, nyhedsudgivelsestidspunkt: DateTime.Parse(yDate, new CultureInfo("en-US")));
 
-            var y = MockRepository.GenerateMock<INyhedViewModel>();
-            y.Expect(m => m.Nyhedsudgivelsestidspunkt)
-             .Return(DateTime.Parse(yDate, new CultureInfo("en-US")))
-             .Repeat.Any();
-            y.Expect(m => m.Nyhedsaktualitet)
-             .Return(Nyhedsaktualitet.Medium)
-             .Repeat.Any();
-
-            var comparer = new NyhedViewModelComparer();
+            IComparer<INyhedViewModel> comparer = new NyhedViewModelComparer();
             Assert.That(comparer, Is.Not.Null);
 
-            var result = comparer.Compare(x, y);
+            int result = comparer.Compare(x.Object, y.Object);
             Assert.That(result, Is.EqualTo(expectCompareResult));
 
-            x.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(2));
-            x.AssertWasCalled(m => m.Nyhedsaktualitet);
-            y.AssertWasCalled(m => m.Nyhedsudgivelsestidspunkt, opt => opt.Repeat.Times(2));
-            y.AssertWasCalled(m => m.Nyhedsaktualitet);
+            x.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            x.Verify(m => m.Nyhedsaktualitet, Times.Once);
+            y.Verify(m => m.Nyhedsudgivelsestidspunkt, Times.Once);
+            y.Verify(m => m.Nyhedsaktualitet, Times.Once);
         }
     }
 }

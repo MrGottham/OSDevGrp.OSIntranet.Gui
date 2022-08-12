@@ -2,6 +2,7 @@
 using System.Reflection;
 using AutoFixture;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
 {
@@ -20,13 +21,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
             /// <summary>
             /// Navn for ViewModel, som kan benyttes til visning i brugergrænsefladen.
             /// </summary>
-            public override string DisplayName
-            {
-                get
-                {
-                    return MethodBase.GetCurrentMethod().Name.Substring(4);
-                }
-            }
+            public override string DisplayName => MethodBase.GetCurrentMethod()?.Name.Substring(4);
 
             #endregion
 
@@ -40,7 +35,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
             {
                 base.RaisePropertyChanged(propertyName);
             }
-            
+
             #endregion
         }
 
@@ -50,7 +45,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtConstructorInitiererViewModelBase()
         {
-            var myViewModel = new MyViewModel();
+            IViewModel myViewModel = new MyViewModel();
             Assert.That(myViewModel, Is.Not.Null);
             Assert.That(myViewModel.DisplayName, Is.Not.Null);
             Assert.That(myViewModel.DisplayName, Is.Not.Empty);
@@ -63,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtRaisePropertyChangedKasterArgumentNullExceptionHvisPropertyNameErNull()
         {
-            var myViewModel = new MyViewModel();
+            MyViewModel myViewModel = new MyViewModel();
             Assert.That(myViewModel, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => myViewModel.RaisePropertyChanged(null));
@@ -75,7 +70,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtRaisePropertyChangedKasterArgumentNullExceptionHvisPropertyNameErEmpty()
         {
-            var myViewModel = new MyViewModel();
+            MyViewModel myViewModel = new MyViewModel();
             Assert.That(myViewModel, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => myViewModel.RaisePropertyChanged(string.Empty));
@@ -87,22 +82,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests
         [Test]
         public void TestAtRaisePropertyChangedRejserEvent()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var myViewModel = new MyViewModel();
+            MyViewModel myViewModel = new MyViewModel();
             Assert.That(myViewModel, Is.Not.Null);
 
-            var propertyName = fixture.Create<string>();
-            var eventCalled = false;
+            string propertyName = fixture.Create<string>();
+            bool eventCalled = false;
             myViewModel.PropertyChanged += (s, e) =>
-                {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.EqualTo(propertyName));
-                    eventCalled = true;
-                };
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.EqualTo(propertyName));
+                eventCalled = true;
+            };
 
             Assert.That(eventCalled, Is.False);
             myViewModel.RaisePropertyChanged(propertyName);

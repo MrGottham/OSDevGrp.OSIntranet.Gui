@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
@@ -17,12 +18,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtConstructorInitiererRelayCommandUdenPredicate()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
             Action<object> execute = obj => { };
             execute.Invoke(fixture.Create<object>());
 
-            var command = new RelayCommand(execute);
+            ICommand command = new RelayCommand(execute);
             Assert.That(command, Is.Not.Null);
         }
 
@@ -32,16 +33,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtConstructorInitiererRelayCommandMedPredicate()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
             Action<object> execute = obj => { };
             execute.Invoke(fixture.Create<object>());
 
             Predicate<object> canExecute = obj => true;
-            var result = canExecute.Invoke(fixture.Create<object>());
+            bool result = canExecute.Invoke(fixture.Create<object>());
             Assert.That(result, Is.True);
 
-            var command = new RelayCommand(execute, canExecute);
+            ICommand command = new RelayCommand(execute, canExecute);
             Assert.That(command, Is.Not.Null);
         }
 
@@ -51,14 +52,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtConstuctotKasterArgumentNullExceptionHvisActionErNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
             Predicate<object> canExecute = obj => true;
-            var result = canExecute.Invoke(fixture.Create<object>());
+            bool result = canExecute.Invoke(fixture.Create<object>());
             Assert.That(result, Is.True);
 
+            // ReSharper disable ObjectCreationAsStatement
             Assert.Throws<ArgumentNullException>(() => new RelayCommand(null));
             Assert.Throws<ArgumentNullException>(() => new RelayCommand(null, canExecute));
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         /// <summary>
@@ -67,15 +70,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteReturnererTrueHvisPredicateErNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
             Action<object> execute = obj => { };
             execute.Invoke(fixture.Create<object>());
 
-            var command = new RelayCommand(execute);
+            ICommand command = new RelayCommand(execute);
             Assert.That(command, Is.Not.Null);
 
-            var result = command.CanExecute(fixture.Create<object>());
+            bool result = command.CanExecute(fixture.Create<object>());
             Assert.That(result, Is.True);
         }
 
@@ -85,15 +88,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteReturnererTrueHvisPredicateReturnererTrue()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
             Action<object> execute = obj => { };
             execute.Invoke(fixture.Create<object>());
 
-            var command = new RelayCommand(execute, obj => true);
+            ICommand command = new RelayCommand(execute, obj => true);
             Assert.That(command, Is.Not.Null);
 
-            var result = command.CanExecute(fixture.Create<object>());
+            bool result = command.CanExecute(fixture.Create<object>());
             Assert.That(result, Is.True);
         }
 
@@ -103,15 +106,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteReturnererFalseHvisPredicateReturnererFalse()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
             Action<object> execute = obj => { };
             execute.Invoke(fixture.Create<object>());
 
-            var command = new RelayCommand(execute, obj => false);
+            ICommand command = new RelayCommand(execute, obj => false);
             Assert.That(command, Is.Not.Null);
 
-            var result = command.CanExecute(fixture.Create<object>());
+            bool result = command.CanExecute(fixture.Create<object>());
             Assert.That(result, Is.False);
         }
 
@@ -121,23 +124,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteVideresenderParameterTilPredicate()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
             Action<object> execute = obj => { };
             execute.Invoke(fixture.Create<object>());
 
-            var parameter = fixture.Create<object>();
+            object parameter = fixture.Create<object>();
             Predicate<object> canExecute = obj =>
-                {
-                    Assert.That(obj, Is.Not.Null);
-                    Assert.That(obj, Is.EqualTo(parameter));
-                    return true;
-                };
+            {
+                Assert.That(obj, Is.Not.Null);
+                Assert.That(obj, Is.EqualTo(parameter));
+                return true;
+            };
 
-            var command = new RelayCommand(execute, canExecute);
+            ICommand command = new RelayCommand(execute, canExecute);
             Assert.That(command, Is.Not.Null);
 
-            var result = command.CanExecute(parameter);
+            bool result = command.CanExecute(parameter);
             Assert.That(result, Is.True);
         }
 
@@ -147,15 +150,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtExecuteExecutesAction()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var isAcationCalled = false;
-            var command = new RelayCommand(obj => isAcationCalled = true);
+            bool isActionCalled = false;
+            ICommand command = new RelayCommand(obj => isActionCalled = true);
             Assert.That(command, Is.Not.Null);
 
-            Assert.That(isAcationCalled, Is.False);
+            Assert.That(isActionCalled, Is.False);
             command.Execute(fixture.Create<object>());
-            Assert.That(isAcationCalled, Is.True);
+            Assert.That(isActionCalled, Is.True);
         }
 
         /// <summary>
@@ -164,23 +167,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtExecuteVideresenderParameterTilAction()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var parameter = fixture.Create<object>();
-            var isAcationCalled = false;
+            object parameter = fixture.Create<object>();
+            bool isActionCalled = false;
             Action<object> execute = obj =>
-                {
-                    Assert.That(obj, Is.Not.Null);
-                    Assert.That(obj, Is.EqualTo(parameter));
-                    isAcationCalled = true;
-                };
+            {
+                Assert.That(obj, Is.Not.Null);
+                Assert.That(obj, Is.EqualTo(parameter));
+                isActionCalled = true;
+            };
 
-            var command = new RelayCommand(execute);
+            ICommand command = new RelayCommand(execute);
             Assert.That(command, Is.Not.Null);
 
-            Assert.That(isAcationCalled, Is.False);
+            Assert.That(isActionCalled, Is.False);
             command.Execute(parameter);
-            Assert.That(isAcationCalled, Is.True);
+            Assert.That(isActionCalled, Is.True);
         }
     }
 }

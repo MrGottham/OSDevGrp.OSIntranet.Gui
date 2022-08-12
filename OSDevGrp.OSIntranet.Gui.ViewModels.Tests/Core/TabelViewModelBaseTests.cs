@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
-using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
 {
@@ -40,24 +40,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             /// <summary>
             /// Modellen, der indeholder grundlæggende tabeloplysninger, såsom typer, grupper m.m.
             /// </summary>
-            public new ITabelModelBase Model
-            {
-                get
-                {
-                    return base.Model;
-                }
-            }
+            public new ITabelModelBase Model => base.Model;
 
             /// <summary>
             /// ViewModel for exceptionhandleren.
             /// </summary>
-            public new IExceptionHandlerViewModel ExceptionHandler
-            {
-                get
-                {
-                    return base.ExceptionHandler;
-                }
-            }
+            public new IExceptionHandlerViewModel ExceptionHandler => base.ExceptionHandler;
 
             /// <summary>
             /// Angivelse af, om metoden ModelChanged er kaldt.
@@ -92,7 +80,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
                 {
                     return;
                 }
-                var fixture = new Fixture();
+
+                Fixture fixture = new Fixture();
                 throw new IntranetGuiSystemException(fixture.Create<string>());
             }
 
@@ -105,37 +94,34 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorInitiererTabelViewModelBase()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var tabelModelMock = MockRepository.GenerateMock<ITabelModelBase>();
-            tabelModelMock.Expect(m => m.Id)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
-            tabelModelMock.Expect(m => m.Tekst)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
+            string id = fixture.Create<string>();
+            string tekst = fixture.Create<string>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock(id, tekst);
 
-            var exceptionHandleViewModelMock = MockRepository.GenerateMock<IExceptionHandlerViewModel>();
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock);
+            MyTabelViewModel tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object);
             Assert.That(tabelViewModel, Is.Not.Null);
             Assert.That(tabelViewModel.Id, Is.Not.Null);
             Assert.That(tabelViewModel.Id, Is.Not.Empty);
-            Assert.That(tabelViewModel.Id, Is.EqualTo(tabelModelMock.Id));
+            Assert.That(tabelViewModel.Id, Is.EqualTo(id));
             Assert.That(tabelViewModel.Tekst, Is.Not.Null);
             Assert.That(tabelViewModel.Tekst, Is.Not.Empty);
-            Assert.That(tabelViewModel.Tekst, Is.EqualTo(tabelModelMock.Tekst));
+            Assert.That(tabelViewModel.Tekst, Is.EqualTo(tekst));
             Assert.That(tabelViewModel.DisplayName, Is.Not.Null);
             Assert.That(tabelViewModel.DisplayName, Is.Not.Empty);
-            Assert.That(tabelViewModel.DisplayName, Is.EqualTo(tabelModelMock.Tekst));
+            Assert.That(tabelViewModel.DisplayName, Is.EqualTo(tekst));
             Assert.That(tabelViewModel.Model, Is.Not.Null);
             Assert.That(tabelViewModel.Model, Is.EqualTo(tabelModelMock));
             Assert.That(tabelViewModel.ExceptionHandler, Is.Not.Null);
             Assert.That(tabelViewModel.ExceptionHandler, Is.EqualTo(exceptionHandleViewModelMock));
 
-            tabelModelMock.AssertWasCalled(m => m.Id);
-            tabelModelMock.AssertWasCalled(m => m.Tekst);
-            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            tabelModelMock.Verify(m => m.Id, Times.Once);
+            tabelModelMock.Verify(m => m.Tekst, Times.Once);
+
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -144,10 +130,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisTabelModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyTabelViewModel(null, fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyTabelViewModel(null, fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -161,10 +148,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisExceptionHandleViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyTabelViewModel(fixture.Create<ITabelModelBase>(), null));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyTabelViewModel(fixture.BuildTabelModel(), null));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -178,21 +166,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtTekstSetterOpdatererTekstOnTabelModelBase()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var tabelModelMock = fixture.Create<ITabelModelBase>();
-            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock);
+            ITabelViewModelBase tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object);
             Assert.That(tabelViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             tabelViewModel.Tekst = newValue;
 
-            tabelModelMock.AssertWasCalled(m => m.Tekst = Arg<string>.Is.Equal(newValue));
-            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            tabelModelMock.VerifySet(m => m.Tekst = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -201,25 +187,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtTekstSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var tabelModelMock = MockRepository.GenerateMock<ITabelModelBase>();
-            tabelModelMock.Expect(m => m.Tekst = Arg<string>.Is.Anything)
-                          .Throw(exception)
-                          .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock(setupCallback: mock => mock.SetupSet(m => m.Tekst = It.IsAny<string>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock);
+            ITabelViewModelBase tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object);
             Assert.That(tabelViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             tabelViewModel.Tekst = newValue;
 
-            tabelModelMock.AssertWasCalled(m => m.Tekst = Arg<string>.Is.Equal(newValue));
-            exceptionHandleViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            tabelModelMock.VerifySet(m => m.Tekst = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -231,38 +212,36 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [TestCase("Tekst", "DisplayName")]
         public void TestAtPropertyChangedOnTabelModelEventHandlerRejserPropertyChangedOnTabelModelUpdate(string propertyNameToRaise, string expectPropertyName)
         {
-            var fixture = new Fixture();
-            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var tabelModelMock = fixture.Create<ITabelModelBase>();
-            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock)
-                {
-                    ThrowExceptionInModelChanged = false
-                };
+            MyTabelViewModel tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object)
+            {
+                ThrowExceptionInModelChanged = false
+            };
             Assert.That(tabelViewModel, Is.Not.Null);
             Assert.That(tabelViewModel.ThrowExceptionInModelChanged, Is.False);
 
-            var eventCalled = false;
+            bool eventCalled = false;
             tabelViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.CompareOrdinal(e.PropertyName, expectPropertyName) == 0)
                 {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    if (string.Compare(e.PropertyName, expectPropertyName, StringComparison.Ordinal) == 0)
-                    {
-                        eventCalled = true;
-                    }
-                };
+                    eventCalled = true;
+                }
+            };
 
             Assert.That(eventCalled, Is.False);
             tabelModelMock.Raise(m => m.PropertyChanged += null, tabelModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(eventCalled, Is.True);
 
-            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -274,17 +253,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [TestCase("DisplayName")]
         public void TestAtPropertyChangedOnTabelModelEventHandlerKalderModelChangedOnTabelModelUpdate(string propertyNameToRaise)
         {
-            var fixture = new Fixture();
-            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var tabelModelMock = fixture.Create<ITabelModelBase>();
-            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock)
-                {
-                    ThrowExceptionInModelChanged = false
-                };
+            MyTabelViewModel tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object)
+            {
+                ThrowExceptionInModelChanged = false
+            };
             Assert.That(tabelViewModel, Is.Not.Null);
             Assert.That(tabelViewModel.ThrowExceptionInModelChanged, Is.False);
 
@@ -292,7 +269,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             tabelModelMock.Raise(m => m.PropertyChanged += null, tabelModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(tabelViewModel.IsModelChangedCalled, Is.True);
 
-            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -304,17 +281,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [TestCase("DisplayName")]
         public void TestAtPropertyChangedOnTabelModelEventHandlerKalderHandleExceptionOnExceptionHandlerViewModelHvisModelChangedKasterException(string propertyNameToRaise)
         {
-            var fixture = new Fixture();
-            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var tabelModelMock = fixture.Create<ITabelModelBase>();
-            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock)
-                {
-                    ThrowExceptionInModelChanged = true
-                };
+            MyTabelViewModel tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object)
+            {
+                ThrowExceptionInModelChanged = true
+            };
             Assert.That(tabelViewModel, Is.Not.Null);
             Assert.That(tabelViewModel.ThrowExceptionInModelChanged, Is.True);
 
@@ -322,7 +297,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
             tabelModelMock.Raise(m => m.PropertyChanged += null, tabelModelMock, new PropertyChangedEventArgs(propertyNameToRaise));
             Assert.That(tabelViewModel.IsModelChangedCalled, Is.True);
 
-            exceptionHandleViewModelMock.AssertWasCalled(m => m.HandleException(Arg<IntranetGuiSystemException>.Is.TypeOf));
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.Is<IntranetGuiSystemException>(value => value != null)), Times.Once);
         }
 
         /// <summary>
@@ -331,24 +306,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtPropertyChangedOnTabelModelEventHandlerKasterArgumentNullExceptionHvisSenderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var tabelModelMock = fixture.Create<ITabelModelBase>();
-            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock);
+            ITabelViewModelBase tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object);
             Assert.That(tabelViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => tabelModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => tabelModelMock.Raise(m => m.PropertyChanged += null, null, fixture.Create<PropertyChangedEventArgs>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("sender"));
             Assert.That(exception.InnerException, Is.Null);
 
-            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -357,24 +330,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtPropertyChangedOnTabelModelEventHandlerKasterArgumentNullExceptionHvisEventArgsErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ITabelModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<ITabelModelBase>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var tabelModelMock = fixture.Create<ITabelModelBase>();
-            var exceptionHandleViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
+            Mock<ITabelModelBase> tabelModelMock = fixture.BuildTabelModelMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandleViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var tabelViewModel = new MyTabelViewModel(tabelModelMock, exceptionHandleViewModelMock);
+            ITabelViewModelBase tabelViewModel = new MyTabelViewModel(tabelModelMock.Object, exceptionHandleViewModelMock.Object);
             Assert.That(tabelViewModel, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => tabelModelMock.Raise(m => m.PropertyChanged += null, fixture.Create<object>(), null));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => tabelModelMock.Raise(m => m.PropertyChanged += null, fixture.Create<object>(), null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("eventArgs"));
             Assert.That(exception.InnerException, Is.Null);
 
-            exceptionHandleViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            exceptionHandleViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
     }
 }

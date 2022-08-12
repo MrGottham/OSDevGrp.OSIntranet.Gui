@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
@@ -17,7 +18,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestThatConstructorInitializePrivacyPolicyViewModel()
         {
-            var privacyPolicyViewModel = new PrivacyPolicyViewModel();
+            IPrivacyPolicyViewModel privacyPolicyViewModel = new PrivacyPolicyViewModel();
             Assert.That(privacyPolicyViewModel, Is.Not.Null);
             Assert.That(privacyPolicyViewModel.DisplayName, Is.Not.Null);
             Assert.That(privacyPolicyViewModel.DisplayName, Is.Not.Empty);

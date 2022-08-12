@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 using AutoFixture;
+using Moq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Models.Interfaces.Finansstyring;
@@ -10,7 +12,6 @@ using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Finansstyring;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Finansstyring;
-using Rhino.Mocks;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
@@ -26,6 +27,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         /// </summary>
         private class MyKontoViewModel : KontoViewModelBase<IKontoModelBase, IKontogruppeViewModelBase>
         {
+            #region Private variables
+
+            private readonly Fixture _fixture = new Fixture();
+
+            #endregion
+
             #region Constructor
 
             /// <summary>
@@ -50,57 +57,27 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             /// <summary>
             /// Kontoens værdi pr. opgørelsestidspunktet.
             /// </summary>
-            public override decimal Kontoværdi
-            {
-                get
-                {
-                    return 0M;
-                }
-            }
+            public override decimal Kontoværdi => 0M;
 
             /// <summary>
             /// Kommando til genindlæsning og opdatering.
             /// </summary>
-            public override ICommand RefreshCommand
-            {
-                get
-                {
-                    return MockRepository.GenerateMock<ICommand>();
-                }
-            }
+            public override ICommand RefreshCommand => _fixture.BuildCommand();
 
             /// <summary>
             /// Modellen, der indeholdende grundlæggende kontooplysninger.
             /// </summary>
-            public new IKontoModelBase Model
-            {
-                get
-                {
-                    return base.Model;
-                }
-            }
+            public new IKontoModelBase Model => base.Model;
 
             /// <summary>
             /// Repository til finansstyring.
             /// </summary>
-            public new IFinansstyringRepository FinansstyringRepository
-            {
-                get
-                {
-                    return base.FinansstyringRepository;
-                }
-            }
+            public new IFinansstyringRepository FinansstyringRepository => base.FinansstyringRepository;
 
             /// <summary>
             /// ViewModel for en exceptionhandler.
             /// </summary>
-            public new IExceptionHandlerViewModel ExceptionHandler
-            {
-                get
-                {
-                    return base.ExceptionHandler;
-                }
-            }
+            public new IExceptionHandlerViewModel ExceptionHandler => base.ExceptionHandler;
 
             /// <summary>
             /// Angivelse af, om metoden ModelChanged er kaldt.
@@ -135,8 +112,8 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
                 {
                     return;
                 }
-                var fixture = new Fixture();
-                throw new IntranetGuiSystemException(fixture.Create<string>());
+
+                throw new IntranetGuiSystemException(_fixture.Create<string>());
             }
 
             #endregion
@@ -148,67 +125,45 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorInitiererKontoViewModelBase()
         {
-            var fixture = new Fixture();
-            fixture.Customize<DateTime>(e => e.FromFactory(() => DateTime.Now));
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var regnskabViewModelMock = fixture.Create<IRegnskabViewModel>();
-
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
-            kontoModelMock.Expect(m => m.Kontonummer)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
-            kontoModelMock.Expect(m => m.Kontonavn)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
-            kontoModelMock.Expect(m => m.Beskrivelse)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
-            kontoModelMock.Expect(m => m.Notat)
-                          .Return(fixture.Create<string>())
-                          .Repeat.Any();
-            kontoModelMock.Expect(m => m.StatusDato)
-                          .Return(fixture.Create<DateTime>())
-                          .Repeat.Any();
-
-            var kontogruppeViewModelMock = fixture.Create<IKontogruppeViewModelBase>();
-
-            var displayName = fixture.Create<string>();
-
-            var image = Resource.GetEmbeddedResource("Images.Konto.png");
-
-            var finansstyringRepositoryMock = fixture.Create<IFinansstyringRepository>();
-
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(regnskabViewModelMock, kontoModelMock, kontogruppeViewModelMock, displayName, image, finansstyringRepositoryMock, exceptionHandlerViewModelMock);
+            IRegnskabViewModel regnskabViewModel = fixture.BuildRegnskabViewModel();
+            string kontonummer = fixture.Create<string>();
+            string kontonavn = fixture.Create<string>();
+            string beskrivelse = fixture.Create<string>();
+            DateTime statusDato = fixture.Create<DateTime>();
+            string notat = fixture.Create<string>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock(kontonummer: kontonummer, kontonavn: kontonavn, beskrivelse: beskrivelse, notat: notat, statusDato: statusDato);
+            IKontogruppeViewModel kontogruppeViewModel = fixture.BuildKontogruppeViewModel();
+            string displayName = fixture.Create<string>();
+            byte[] image = Resource.GetEmbeddedResource("Images.Konto.png");
+            IFinansstyringRepository finansstyringRepository = fixture.BuildFinansstyringRepository();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = fixture.BuildExceptionHandlerViewModel();
+            MyKontoViewModel kontoViewModel = new MyKontoViewModel(regnskabViewModel, kontoModelMock.Object, kontogruppeViewModel, displayName, image, finansstyringRepository, exceptionHandlerViewModel);
             Assert.That(kontoViewModel, Is.Not.Null);
             Assert.That(kontoViewModel.Regnskab, Is.Not.Null);
-            Assert.That(kontoViewModel.Regnskab, Is.EqualTo(regnskabViewModelMock));
+            Assert.That(kontoViewModel.Regnskab, Is.EqualTo(regnskabViewModel));
             Assert.That(kontoViewModel.Kontonummer, Is.Not.Null);
             Assert.That(kontoViewModel.Kontonummer, Is.Not.Empty);
-            Assert.That(kontoViewModel.Kontonummer, Is.EqualTo(kontoModelMock.Kontonummer));
+            Assert.That(kontoViewModel.Kontonummer, Is.EqualTo(kontonummer));
             Assert.That(kontoViewModel.KontonummerLabel, Is.Not.Null);
             Assert.That(kontoViewModel.KontonummerLabel, Is.Not.Empty);
             Assert.That(kontoViewModel.KontonummerLabel, Is.EqualTo(Resource.GetText(Text.AccountNumber)));
             Assert.That(kontoViewModel.Kontonavn, Is.Not.Null);
             Assert.That(kontoViewModel.Kontonavn, Is.Not.Empty);
-            Assert.That(kontoViewModel.Kontonavn, Is.EqualTo(kontoModelMock.Kontonavn));
+            Assert.That(kontoViewModel.Kontonavn, Is.EqualTo(kontonavn));
             Assert.That(kontoViewModel.KontonavnLabel, Is.Not.Null);
             Assert.That(kontoViewModel.KontonavnLabel, Is.Not.Empty);
             Assert.That(kontoViewModel.KontonavnLabel, Is.EqualTo(Resource.GetText(Text.AccountName)));
             Assert.That(kontoViewModel.Beskrivelse, Is.Not.Null);
             Assert.That(kontoViewModel.Beskrivelse, Is.Not.Empty);
-            Assert.That(kontoViewModel.Beskrivelse, Is.EqualTo(kontoModelMock.Beskrivelse));
+            Assert.That(kontoViewModel.Beskrivelse, Is.EqualTo(beskrivelse));
             Assert.That(kontoViewModel.Notat, Is.Not.Null);
             Assert.That(kontoViewModel.Notat, Is.Not.Empty);
-            Assert.That(kontoViewModel.Notat, Is.EqualTo(kontoModelMock.Notat));
+            Assert.That(kontoViewModel.Notat, Is.EqualTo(notat));
             Assert.That(kontoViewModel.Kontogruppe, Is.Not.Null);
-            Assert.That(kontoViewModel.Kontogruppe, Is.EqualTo(kontogruppeViewModelMock));
-            Assert.That(kontoViewModel.StatusDato, Is.EqualTo(kontoModelMock.StatusDato));
+            Assert.That(kontoViewModel.Kontogruppe, Is.EqualTo(kontogruppeViewModel));
+            Assert.That(kontoViewModel.StatusDato, Is.EqualTo(statusDato));
             Assert.That(kontoViewModel.Kontoværdi, Is.EqualTo(0M));
             Assert.That(kontoViewModel.DisplayName, Is.Not.Null);
             Assert.That(kontoViewModel.DisplayName, Is.Not.Empty);
@@ -221,16 +176,16 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
             Assert.That(kontoViewModel.Model, Is.Not.Null);
             Assert.That(kontoViewModel.Model, Is.EqualTo(kontoModelMock));
             Assert.That(kontoViewModel.FinansstyringRepository, Is.Not.Null);
-            Assert.That(kontoViewModel.FinansstyringRepository, Is.EqualTo(finansstyringRepositoryMock));
+            Assert.That(kontoViewModel.FinansstyringRepository, Is.EqualTo(finansstyringRepository));
             Assert.That(kontoViewModel.ExceptionHandler, Is.Not.Null);
-            Assert.That(kontoViewModel.ExceptionHandler, Is.EqualTo(exceptionHandlerViewModelMock));
+            Assert.That(kontoViewModel.ExceptionHandler, Is.EqualTo(exceptionHandlerViewModel));
 
-            kontoModelMock.AssertWasCalled(m => m.Kontonummer);
-            kontoModelMock.AssertWasCalled(m => m.Kontonavn);
-            kontoModelMock.AssertWasCalled(m => m.Beskrivelse);
-            kontoModelMock.AssertWasCalled(m => m.Notat);
-            kontoModelMock.AssertWasNotCalled(m => m.Kontogruppe);
-            kontoModelMock.AssertWasCalled(m => m.StatusDato);
+            kontoModelMock.Verify(m => m.Kontonummer, Times.Once);
+            kontoModelMock.Verify(m => m.Kontonavn, Times.Once);
+            kontoModelMock.Verify(m => m.Beskrivelse, Times.Once);
+            kontoModelMock.Verify(m => m.Notat, Times.Once);
+            kontoModelMock.Verify(m => m.Kontogruppe, Times.Never);
+            kontoModelMock.Verify(m => m.StatusDato, Times.Once);
         }
 
         /// <summary>
@@ -239,13 +194,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisRegnskabViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IKontoModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(null, fixture.Create<IKontoModel>(), fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(null, fixture.BuildKontoModelBase(), fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -259,13 +213,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisKontoModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), null, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.BuildRegnskabViewModel(), null, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -279,13 +232,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisKontogruppeViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IKontoModelBase>(), null, fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildKontoModelBase(), null, fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -301,14 +253,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [TestCase("")]
         public void TestAtConstructorKasterArgumentNullExceptionHvisDisplayNameErInvalid(string invalidValue)
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IKontoModelBase>(), fixture.Create<IKontogruppeViewModelBase>(), invalidValue, Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildKontoModelBase(), fixture.BuildKontogruppeViewModelBase(), invalidValue, fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -322,14 +272,11 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisImageErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IKontoModelBase>(), fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), null, fixture.Create<IFinansstyringRepository>(), fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildKontoModelBase(), fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), null, fixture.BuildFinansstyringRepository(), fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -343,14 +290,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IKontoModelBase>(), fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), null, fixture.Create<IExceptionHandlerViewModel>()));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildKontoModelBase(), fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), null, fixture.BuildExceptionHandlerViewModel()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -364,13 +309,12 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisExceptionHandlerViewModelErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), fixture.Create<IKontoModelBase>(), fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), null));
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => new MyKontoViewModel(fixture.BuildRegnskabViewModel(), fixture.BuildKontoModelBase(), fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), null));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -384,25 +328,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtKontonavnSetterOpdatererKontonavnOnKontoModelBase()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var kontoModelMock = fixture.Create<IKontoModelBase>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             kontoViewModel.Kontonavn = newValue;
 
-            kontoModelMock.AssertWasCalled(m => m.Kontonavn = Arg<string>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            kontoModelMock.VerifySet(m => m.Kontonavn = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -411,28 +350,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtKontonavnSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = fixture.Create<Exception>();
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
-            kontoModelMock.Expect(m => m.Kontonavn = Arg<string>.Is.NotNull)
-                          .Throw(exception)
-                          .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock(setupCallback: mock => mock.SetupSet(m => m.Kontonavn = It.IsAny<string>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             kontoViewModel.Kontonavn = newValue;
 
-            kontoModelMock.AssertWasCalled(m => m.Kontonavn = Arg<string>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            kontoModelMock.VerifySet(m => m.Kontonavn = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -441,25 +373,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBeskrivelseSetterOpdatererBeskrivelseOnKontoModelBase()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var kontoModelMock = fixture.Create<IKontoModelBase>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             kontoViewModel.Beskrivelse = newValue;
 
-            kontoModelMock.AssertWasCalled(m => m.Beskrivelse = Arg<string>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            kontoModelMock.VerifySet(m => m.Beskrivelse = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -468,28 +395,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtBeskrivelseSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = fixture.Create<Exception>();
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
-            kontoModelMock.Expect(m => m.Beskrivelse = Arg<string>.Is.NotNull)
-                          .Throw(exception)
-                          .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock(setupCallback: mock => mock.SetupSet(m => m.Beskrivelse = It.IsAny<string>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             kontoViewModel.Beskrivelse = newValue;
 
-            kontoModelMock.AssertWasCalled(m => m.Beskrivelse = Arg<string>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            kontoModelMock.VerifySet(m => m.Beskrivelse = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -498,25 +418,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtNotatSetterOpdatererNotatOnKontoModelBase()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontoModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontoModelBase>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var kontoModelMock = fixture.Create<IKontoModelBase>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             kontoViewModel.Notat = newValue;
 
-            kontoModelMock.AssertWasCalled(m => m.Notat = Arg<string>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            kontoModelMock.VerifySet(m => m.Notat = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -525,28 +440,21 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtNotatSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = fixture.Create<Exception>();
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
-            kontoModelMock.Expect(m => m.Notat = Arg<string>.Is.NotNull)
-                          .Throw(exception)
-                          .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock(setupCallback: mock => mock.SetupSet(m => m.Notat = It.IsAny<string>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             kontoViewModel.Notat = newValue;
 
-            kontoModelMock.AssertWasCalled(m => m.Notat = Arg<string>.Is.Equal(newValue));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(exception)));
+            kontoModelMock.VerifySet(m => m.Notat = It.Is<string>(value => string.CompareOrdinal(value, newValue) == 0), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>
@@ -555,23 +463,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtKontogruppeSetterKalderHandleExceptionOnExceptionHandlerViewModelMedArgumentNullExceptionHvisValueErNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IKontogruppeViewModelBase>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
             kontoViewModel.Kontogruppe = null;
 
-            kontoModelMock.AssertWasNotCalled(m => m.Kontogruppe = Arg<int>.Is.Anything);
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<ArgumentNullException>.Is.TypeOf));
+            kontoModelMock.VerifySet(m => m.Kontogruppe = It.IsAny<int>(), Times.Never);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<ArgumentNullException>(value => value != null)), Times.Once);
         }
 
         /// <summary>
@@ -580,28 +484,24 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtKontogruppeSetterIkkeOpdatererKontogruppeOnKontoModelBaseHvisValueErDenSammeKontogruppeViewModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock();
+            IKontogruppeViewModelBase kontogruppeViewModel = fixture.BuildKontogruppeViewModelBase();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var kontogruppeViewModelMock = MockRepository.GenerateMock<IKontogruppeViewModelBase>();
-
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, kontogruppeViewModelMock, fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, kontogruppeViewModel, fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
             Assert.That(kontoViewModel.Kontogruppe, Is.Not.Null);
-            Assert.That(kontoViewModel.Kontogruppe, Is.EqualTo(kontogruppeViewModelMock));
-            
-            kontoViewModel.Kontogruppe = kontogruppeViewModelMock;
-            Assert.That(kontoViewModel.Kontogruppe, Is.Not.Null);
-            Assert.That(kontoViewModel.Kontogruppe, Is.EqualTo(kontogruppeViewModelMock));
+            Assert.That(kontoViewModel.Kontogruppe, Is.EqualTo(kontogruppeViewModel));
 
-            kontoModelMock.AssertWasNotCalled(m => m.Kontogruppe = Arg<int>.Is.Anything);
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            kontoViewModel.Kontogruppe = kontogruppeViewModel;
+            Assert.That(kontoViewModel.Kontogruppe, Is.Not.Null);
+            Assert.That(kontoViewModel.Kontogruppe, Is.EqualTo(kontogruppeViewModel));
+
+            kontoModelMock.VerifySet(m => m.Kontogruppe = It.IsAny<int>(), Times.Never);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -610,36 +510,26 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtKontogruppeSetterOpdatererKontogruppeOnKontoModelBaseHvisValueIkkeErDenSammeKontogruppeViewModel()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IKontogruppeViewModelBase>();
-                    mock.Expect(m => m.Nummer)
-                        .Return(fixture.Create<int>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock();
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<IKontogruppeViewModelBase>();
+            int nummer = fixture.Create<int>();
+            IKontogruppeViewModelBase newValue = fixture.BuildKontogruppeViewModelBase(nummer);
             Assert.That(newValue, Is.Not.Null);
-            Assert.That(newValue.Nummer, Is.Not.EqualTo(kontoModelMock.Kontogruppe));
+            Assert.That(newValue.Nummer, Is.Not.EqualTo(kontoModelMock.Object.Kontogruppe));
 
             kontoViewModel.Kontogruppe = newValue;
             Assert.That(kontoViewModel.Kontogruppe, Is.Not.Null);
             Assert.That(kontoViewModel.Kontogruppe, Is.EqualTo(newValue));
 
-            kontoModelMock.AssertWasCalled(m => m.Kontogruppe = Arg<int>.Is.Equal(newValue.Nummer));
-            exceptionHandlerViewModelMock.AssertWasNotCalled(m => m.HandleException(Arg<Exception>.Is.Anything));
+            kontoModelMock.VerifySet(m => m.Kontogruppe = It.Is<int>(value => value == newValue.Nummer), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.IsAny<Exception>()), Times.Never);
         }
 
         /// <summary>
@@ -648,38 +538,25 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Finansstyring
         [Test]
         public void TestAtKontogruppeSetterKalderHandleExceptionOnExceptionHandlerViewModelVedExceptions()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IRegnskabViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IRegnskabViewModel>()));
-            fixture.Customize<IFinansstyringRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<IFinansstyringRepository>()));
-            fixture.Customize<IExceptionHandlerViewModel>(e => e.FromFactory(() => MockRepository.GenerateMock<IExceptionHandlerViewModel>()));
-            fixture.Customize<IKontogruppeViewModelBase>(e => e.FromFactory(() =>
-                {
-                    var mock = MockRepository.GenerateMock<IKontogruppeViewModelBase>();
-                    mock.Expect(m => m.Nummer)
-                        .Return(fixture.Create<int>())
-                        .Repeat.Any();
-                    return mock;
-                }));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var excetion = fixture.Create<Exception>();
-            var kontoModelMock = MockRepository.GenerateMock<IKontoModelBase>();
-            kontoModelMock.Expect(m => m.Kontogruppe = Arg<int>.Is.GreaterThan(0))
-                          .Throw(excetion)
-                          .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            Mock<IKontoModelBase> kontoModelMock = fixture.BuildKontoModelBaseMock(setupCallback: mock => mock.SetupSet(m => m.Kontogruppe = It.IsAny<int>()).Throws(exception));
+            Mock<IExceptionHandlerViewModel> exceptionHandlerViewModelMock = fixture.BuildExceptionHandlerViewModelMock();
 
-            var exceptionHandlerViewModelMock = fixture.Create<IExceptionHandlerViewModel>();
-
-            var kontoViewModel = new MyKontoViewModel(fixture.Create<IRegnskabViewModel>(), kontoModelMock, fixture.Create<IKontogruppeViewModelBase>(), fixture.Create<string>(), Resource.GetEmbeddedResource("Images.Konto.png"), fixture.Create<IFinansstyringRepository>(), exceptionHandlerViewModelMock);
+            IKontoViewModelBase<IKontogruppeViewModelBase> kontoViewModel = new MyKontoViewModel(fixture.BuildRegnskabViewModel(), kontoModelMock.Object, fixture.BuildKontogruppeViewModelBase(), fixture.Create<string>(), fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray(), fixture.BuildFinansstyringRepository(), exceptionHandlerViewModelMock.Object);
             Assert.That(kontoViewModel, Is.Not.Null);
 
-            var newValue = fixture.Create<IKontogruppeViewModelBase>();
+            int nummer = fixture.Create<int>();
+            IKontogruppeViewModelBase newValue = fixture.BuildKontogruppeViewModelBase(nummer);
             Assert.That(newValue, Is.Not.Null);
-            Assert.That(newValue.Nummer, Is.Not.EqualTo(kontoModelMock.Kontogruppe));
+            Assert.That(newValue.Nummer, Is.Not.EqualTo(kontoModelMock.Object.Kontogruppe));
 
             kontoViewModel.Kontogruppe = newValue;
 
-            kontoModelMock.AssertWasCalled(m => m.Kontogruppe = Arg<int>.Is.Equal(newValue.Nummer));
-            exceptionHandlerViewModelMock.AssertWasCalled(m => m.HandleException(Arg<Exception>.Is.Equal(excetion)));
+            kontoModelMock.VerifySet(m => m.Kontogruppe = It.Is<int>(value => value == newValue.Nummer), Times.Once);
+            exceptionHandlerViewModelMock.Verify(m => m.HandleException(It.Is<Exception>(value => value != null && value == exception)), Times.Once);
         }
 
         /// <summary>

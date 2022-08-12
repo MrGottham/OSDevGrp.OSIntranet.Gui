@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Input;
 using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.Intrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Resources;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
+using OSDevGrp.OSIntranet.Gui.ViewModels.Interfaces.Core;
 using Text = OSDevGrp.OSIntranet.Gui.Resources.Text;
 
 namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
@@ -22,7 +24,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtConstructorInitiererExceptionHandlerViewModel()
         {
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Last, Is.Null);
             Assert.That(exceptionHandlerViewModel.ShowLast, Is.False);
@@ -44,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtHandleExceptionKasterArgumentNullExceptionHvisExceptionErNull()
         {
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => exceptionHandlerViewModel.HandleException(null));
@@ -56,9 +58,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtHandleExceptionAdderExceptionTilExceptions()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
@@ -75,22 +77,22 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtHandleExceptionKalderOnHandleException()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
 
-            var exceptionToHandle = fixture.Create<Exception>();
-            var eventCalled = false;
+            Exception exceptionToHandle = fixture.Create<Exception>();
+            bool eventCalled = false;
             exceptionHandlerViewModel.OnHandleException += (s, e) =>
-                {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.Error, Is.Not.Null);
-                    Assert.That(e.Error, Is.EqualTo(exceptionToHandle));
-                    Assert.That(e.IsHandled, Is.False);
-                    eventCalled = true;
-                };
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.Error, Is.Not.Null);
+                Assert.That(e.Error, Is.EqualTo(exceptionToHandle));
+                Assert.That(e.IsHandled, Is.False);
+                eventCalled = true;
+            };
 
             Assert.That(eventCalled, Is.False);
             exceptionHandlerViewModel.HandleException(exceptionToHandle);
@@ -103,19 +105,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtHandleExceptionAdderExceptionTilExceptionHvisOnHandleExceptionSetsIsHandledTilFalse()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
 
             exceptionHandlerViewModel.OnHandleException += (s, e) =>
-                {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    e.IsHandled = false;
-                };
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                e.IsHandled = false;
+            };
 
             exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
@@ -129,19 +131,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtHandleExceptionIkkeAdderExceptionTilExceptionHvisOnHandleExceptionSetsIsHandledTilTrue()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Empty);
 
             exceptionHandlerViewModel.OnHandleException += (s, e) =>
-                {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    e.IsHandled = true;
-                };
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                e.IsHandled = true;
+            };
 
             exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
             Assert.That(exceptionHandlerViewModel.Exceptions, Is.Not.Null);
@@ -154,20 +156,20 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtLastExceptionReturnererSenesteException()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Last, Is.Null);
 
-            var repositoryException = fixture.Create<IntranetGuiRepositoryException>();
+            IntranetGuiRepositoryException repositoryException = fixture.Create<IntranetGuiRepositoryException>();
             exceptionHandlerViewModel.HandleException(repositoryException);
             Assert.That(exceptionHandlerViewModel.Last, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Last.Message, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Last.Message, Is.Not.Empty);
             Assert.That(exceptionHandlerViewModel.Last.Message, Is.EqualTo(repositoryException.Message));
 
-            var systemException = fixture.Create<IntranetGuiSystemException>();
+            IntranetGuiSystemException systemException = fixture.Create<IntranetGuiSystemException>();
             exceptionHandlerViewModel.HandleException(systemException);
             Assert.That(exceptionHandlerViewModel.Last, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.Last.Message, Is.Not.Null);
@@ -184,23 +186,23 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [TestCase("ShowLast")]
         public void TestAtHandleExceptionRejserPropertyChangedVedAddException(string propertyNameToRaise)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
 
-            var eventCalled = false;
+            bool eventCalled = false;
             exceptionHandlerViewModel.PropertyChanged += (s, e) =>
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                if (string.CompareOrdinal(e.PropertyName, propertyNameToRaise) == 0)
                 {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    if (string.Compare(e.PropertyName, propertyNameToRaise, StringComparison.InvariantCulture) == 0)
-                    {
-                        eventCalled = true;
-                    }
-                };
+                    eventCalled = true;
+                }
+            };
 
             Assert.That(eventCalled, Is.False);
             exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
@@ -213,9 +215,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtShowLastReturnererTrueVedHandleException()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
             Assert.That(exceptionHandlerViewModel.ShowLast, Is.False);
 
@@ -229,19 +231,19 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtShowLastSetterRejserPropertyChangedVedRettelseAfShowLast()
         {
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
 
-            var eventCalled = false;
+            bool eventCalled = false;
             exceptionHandlerViewModel.PropertyChanged += (s, e) =>
-                {
-                    Assert.That(s, Is.Not.Null);
-                    Assert.That(e, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Null);
-                    Assert.That(e.PropertyName, Is.Not.Empty);
-                    Assert.That(e.PropertyName, Is.EqualTo("ShowLast"));
-                    eventCalled = true;
-                };
+            {
+                Assert.That(s, Is.Not.Null);
+                Assert.That(e, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Null);
+                Assert.That(e.PropertyName, Is.Not.Empty);
+                Assert.That(e.PropertyName, Is.EqualTo("ShowLast"));
+                eventCalled = true;
+            };
 
             Assert.That(eventCalled, Is.False);
             exceptionHandlerViewModel.ShowLast = exceptionHandlerViewModel.ShowLast;
@@ -256,15 +258,15 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core
         [Test]
         public void TestAtExecuteOnHideCommandSetsShowLastTilFalse()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var exceptionHandlerViewModel = new ExceptionHandlerViewModel();
+            IExceptionHandlerViewModel exceptionHandlerViewModel = new ExceptionHandlerViewModel();
             Assert.That(exceptionHandlerViewModel, Is.Not.Null);
 
             exceptionHandlerViewModel.HandleException(fixture.Create<Exception>());
             Assert.That(exceptionHandlerViewModel.ShowLast, Is.True);
 
-            var hideCommand = exceptionHandlerViewModel.HideCommand;
+            ICommand hideCommand = exceptionHandlerViewModel.HideCommand;
             Assert.That(hideCommand, Is.Not.Null);
             Assert.That(hideCommand.CanExecute(null), Is.True);
 

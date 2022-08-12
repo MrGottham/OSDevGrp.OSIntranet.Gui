@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Windows.Input;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Gui.ViewModels.Core.Commands;
 
@@ -16,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         private class MyCommand : CommandBase
         {
             #region Properties
-            
+
             /// <summary>
             /// Angivelse af, om CanExecute er kaldt.
             /// </summary>
@@ -25,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
                 get; 
                 private set;
             }
-            
+
             /// <summary>
             /// Angivelse af, om Execute er kaldt.
             /// </summary>
@@ -34,9 +35,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
                 get; 
                 private set;
             }
-            
+
             #endregion
-            
+
             #region Methods
 
             /// <summary>
@@ -58,7 +59,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
             {
                 IsExecuteCalled = true;
             }
-            
+
             #endregion
         }
 
@@ -68,7 +69,7 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtConstructorInitiererCommandBase()
         {
-            var command = new MyCommand();
+            ICommand command = new MyCommand();
             Assert.That(command, Is.Not.Null);
         }
 
@@ -78,13 +79,13 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtCanExecuteKaldes()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var command = new MyCommand();
+            MyCommand command = new MyCommand();
             Assert.That(command, Is.Not.Null);
             Assert.That(command.IsCanExecuteCalled, Is.False);
 
-            var result = command.CanExecute(fixture.Create<object>());
+            bool result = command.CanExecute(fixture.Create<object>());
             Assert.That(result, Is.True);
 
             Assert.That(command.IsCanExecuteCalled, Is.True);
@@ -96,9 +97,9 @@ namespace OSDevGrp.OSIntranet.Gui.ViewModels.Tests.Core.Commands
         [Test]
         public void TestAtxecuteKaldes()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var command = new MyCommand();
+            MyCommand command = new MyCommand();
             Assert.That(command, Is.Not.Null);
             Assert.That(command.IsExecuteCalled, Is.False);
 
