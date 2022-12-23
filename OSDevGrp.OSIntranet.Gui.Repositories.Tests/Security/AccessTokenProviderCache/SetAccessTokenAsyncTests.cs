@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using Moq;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Core.Interfaces.EventPublisher;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Models;
 using System;
@@ -14,6 +15,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security.AccessTokenProvide
         #region Private variables
 
         private Mock<IAccessTokenProvider> _accessTokenProviderMock;
+        private Mock<IEventPublisher> _eventPublisherMock;
         private Fixture _fixture;
         private Random _random;
 
@@ -23,6 +25,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security.AccessTokenProvide
         public void SetUp()
         {
             _accessTokenProviderMock = new Mock<IAccessTokenProvider>();
+            _eventPublisherMock = new Mock<IEventPublisher>();
             _fixture = new Fixture();
             _random = new Random(_fixture.Create<int>());
         }
@@ -55,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security.AccessTokenProvide
 
         private IAccessTokenSetter CreateSut()
         {
-            return new Repositories.Security.AccessTokenProviderCache(_accessTokenProviderMock.Object);
+            return new Repositories.Security.AccessTokenProviderCache(_accessTokenProviderMock.Object, _eventPublisherMock.Object);
         }
     }
 }

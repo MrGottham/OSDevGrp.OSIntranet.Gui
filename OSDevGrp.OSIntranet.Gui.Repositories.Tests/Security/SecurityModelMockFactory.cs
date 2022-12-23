@@ -6,7 +6,7 @@ using System;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security
 {
-    internal static class SecurityModelMockBuilder
+    internal static class SecurityModelMockFactory
     {
         #region Methods
 

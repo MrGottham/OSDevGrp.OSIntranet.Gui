@@ -1,9 +1,12 @@
-﻿using System;
-using AutoFixture;
+﻿using AutoFixture;
 using Moq;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Core.Interfaces.EventPublisher;
+using OSDevGrp.OSIntranet.Gui.Repositories.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Core.Events;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security.AccessTokenProviderCache
@@ -14,6 +17,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security.AccessTokenProvide
         #region Private variables
 
         private Mock<IAccessTokenProvider> _accessTokenProviderMock;
+        private Mock<IEventPublisher> _eventPublisherMock;
         private Fixture _fixture;
         private Random _random;
 
@@ -23,6 +27,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security.AccessTokenProvide
         public void SetUp()
         {
             _accessTokenProviderMock = new Mock<IAccessTokenProvider>();
+            _eventPublisherMock = new Mock<IEventPublisher>();
             _fixture = new Fixture();
             _random = new Random(_fixture.Create<int>());
         }
@@ -221,12 +226,46 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests.Security.AccessTokenProvide
             }
         }
 
-        private IAccessTokenProvider CreateSut(IAccessTokenModel? accessTokenModel = null)
+        [Test]
+        [Category("UnitTest")]
+        public void GetAccessTokenAsync_WhenIntranetGuiOfflineExceptionWasThrown_AssertPublishAsyncWasCalledOnEventPublisherWithSystemWentOfflineEvent()
         {
-            _accessTokenProviderMock.Setup(m => m.GetAccessTokenAsync())
-                .Returns(Task.FromResult(accessTokenModel ?? _fixture.BuildAccessTokenModelMock().Object));
+            IAccessTokenProvider sut = CreateSut(exception: new IntranetGuiOfflineException(_fixture.Create<string>()));
 
-            return new Repositories.Security.AccessTokenProviderCache(_accessTokenProviderMock.Object);
+            Assert.ThrowsAsync<IntranetGuiOfflineException>(sut.GetAccessTokenAsync);
+
+            _eventPublisherMock.Verify(m => m.PublishAsync(It.IsAny<ISystemWentOfflineEvent>()), Times.Once);
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        public void GetAccessTokenAsync_WhenIntranetGuiOfflineExceptionWasThrown_TrowsIntranetGuiOfflineException()
+        {
+            IntranetGuiOfflineException exception = new IntranetGuiOfflineException(_fixture.Create<string>());
+            IAccessTokenProvider sut = CreateSut(exception: exception);
+
+            IntranetGuiOfflineException? result = Assert.ThrowsAsync<IntranetGuiOfflineException>(sut.GetAccessTokenAsync);
+
+            Assert.That(result, Is.EqualTo(exception));
+        }
+
+        private IAccessTokenProvider CreateSut(IAccessTokenModel? accessTokenModel = null, Exception? exception = null)
+        {
+            if (exception != null)
+            {
+                _accessTokenProviderMock.Setup(m => m.GetAccessTokenAsync())
+                    .Throws(exception);
+            }
+            else
+            {
+                _accessTokenProviderMock.Setup(m => m.GetAccessTokenAsync())
+                    .Returns(Task.FromResult(accessTokenModel ?? _fixture.BuildAccessTokenModelMock().Object));
+            }
+
+            _eventPublisherMock.Setup(m => m.PublishAsync(It.IsAny<IEvent>()))
+                .Returns(Task.CompletedTask);
+
+            return new Repositories.Security.AccessTokenProviderCache(_accessTokenProviderMock.Object, _eventPublisherMock.Object);
         }
 
         private Mock<IAccessTokenModel> CreateNonExpiredAccessTokenModelMock()

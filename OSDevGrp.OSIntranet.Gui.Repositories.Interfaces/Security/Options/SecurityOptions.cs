@@ -1,11 +1,9 @@
-﻿using System;
+﻿using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Core.Options;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Options
 {
-    public class SecurityOptions
+    public class SecurityOptions : OnlineOptions
     {
-        public Uri ApiEndpoint { get; set; } = new Uri("https://localhost");
-
         public string ClientId { get; set; } = string.Empty;
 
         public string ClientSecret { get; set; } = string.Empty;

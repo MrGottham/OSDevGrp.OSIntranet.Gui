@@ -1,9 +1,9 @@
 ﻿using OSDevGrp.OSIntranet.Core;
-using OSDevGrp.OSIntranet.Gui.Repositories.Exceptions;
+using OSDevGrp.OSIntranet.Gui.Repositories.Clients;
 using System;
 using System.Net;
 
-namespace OSDevGrp.OSIntranet.Gui.Repositories.Clients
+namespace OSDevGrp.OSIntranet.Gui.Repositories.Exceptions
 {
     internal static class ApiExceptionExtensions
     {
@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Clients
                     return new IntranetGuiSystemException(HttpStatusCode.InternalServerError.ToString(), apiException);
 
                 default:
-                    return new NotSupportedException("Unhandled exception.", apiException);
+                    return new NotSupportedException($"Unhandled exception: {apiException.StatusCode} - {apiException.Message}", apiException);
             }
         }
 
@@ -51,7 +51,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Clients
                     return new IntranetGuiSystemException(apiException.Result.ErrorMessage, apiException);
 
                 default:
-                    return new NotSupportedException("Unhandled exception.", apiException);
+                    return new NotSupportedException($"Unhandled exception: {apiException.StatusCode} - {apiException.Message}", apiException);
             }
         }
 

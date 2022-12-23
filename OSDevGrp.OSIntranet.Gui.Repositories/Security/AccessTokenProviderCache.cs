@@ -1,4 +1,7 @@
 ﻿using OSDevGrp.OSIntranet.Core;
+using OSDevGrp.OSIntranet.Core.Interfaces.EventPublisher;
+using OSDevGrp.OSIntranet.Gui.Repositories.Core;
+using OSDevGrp.OSIntranet.Gui.Repositories.Exceptions;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Models;
 using System;
@@ -12,26 +15,29 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Security
 
         private IAccessTokenModel? _accessTokenModel;
         private readonly IAccessTokenProvider _accessTokenProvider;
+        private readonly IEventPublisher _eventPublisher;
         private readonly object _syncRoot = new object();
 
         #endregion
 
         #region Constructor
 
-        public AccessTokenProviderCache(IAccessTokenProvider accessTokenProvider)
+        public AccessTokenProviderCache(IAccessTokenProvider accessTokenProvider, IEventPublisher eventPublisher)
         {
-            NullGuard.NotNull(accessTokenProvider, nameof(accessTokenProvider));
+            NullGuard.NotNull(accessTokenProvider, nameof(accessTokenProvider))
+                .NotNull(eventPublisher, nameof(eventPublisher));
 
             _accessTokenProvider = accessTokenProvider;
+            _eventPublisher = eventPublisher;
         }
 
         #endregion
 
         #region Methods
 
-        public Task<IAccessTokenModel> GetAccessTokenAsync()
+        public async Task<IAccessTokenModel> GetAccessTokenAsync()
         {
-            return Task.Run(() =>
+            try
             {
                 lock (_syncRoot)
                 {
@@ -43,7 +49,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Security
                     _accessTokenModel = _accessTokenProvider.GetAccessTokenAsync().GetAwaiter().GetResult();
                     return _accessTokenModel;
                 }
-            });
+            }
+            catch (IntranetGuiOfflineException)
+            {
+                await _eventPublisher.PublishSystemWentOfflineEventAsync();
+
+                throw;
+            }
         }
 
         public Task SetAccessTokenAsync(IAccessTokenModel accessTokenModel)

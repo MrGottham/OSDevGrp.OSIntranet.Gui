@@ -4,6 +4,7 @@ using OSDevGrp.OSIntranet.Core.Interfaces.EventPublisher;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests
@@ -74,6 +75,41 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests
             }
 
             return Task.CompletedTask;
+        }
+
+        public Task<TEvent?> WaitForEventAsync(Task executeAction, TimeSpan timeSpan)
+        {
+            NullGuard.NotNull(executeAction, nameof(executeAction));
+
+            return WaitForEventAsync(executeAction, (int)timeSpan.TotalMilliseconds);
+        }
+
+        public async Task<TEvent?> WaitForEventAsync(Task executeAction, int millisecondsDelay = 2500)
+        {
+            NullGuard.NotNull(executeAction, nameof(executeAction));
+
+            lock (_syncRoot)
+            {
+                _handledEvents.Clear();
+            }
+
+            using CancellationTokenSource cts = new CancellationTokenSource(millisecondsDelay);
+            CancellationToken ct = cts.Token;
+
+            await executeAction;
+
+            while (NumberOfHandledEvents == 0 && ct.IsCancellationRequested == false)
+            {
+                try
+                {
+                    await Task.Delay(250, ct);
+                }
+                catch (TaskCanceledException)
+                {
+                }
+            }
+
+            return HandledEvents.FirstOrDefault();
         }
 
         #endregion

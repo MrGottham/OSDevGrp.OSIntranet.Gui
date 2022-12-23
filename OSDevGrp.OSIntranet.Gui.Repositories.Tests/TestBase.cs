@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using OSDevGrp.OSIntranet.Core;
 using OSDevGrp.OSIntranet.Core.Interfaces.EventPublisher;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Core;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Core.Options;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Options;
 using System;
 
@@ -39,16 +41,44 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests
         {
             IServiceCollection serviceCollection = new ServiceCollection();
 
-            return serviceCollection.AddRepositories(ConfigureTestSecurityOptions);
+            return serviceCollection.AddRepositories(ConfigureTestOnlineOptions, ConfigureTestOfflineOptions, ConfigureTestSecurityOptions);
+        }
+
+        private static void ConfigureTestOnlineOptions(OnlineOptions onlineOptions)
+        {
+            NullGuard.NotNull(onlineOptions, nameof(onlineOptions));
+
+            ConfigureTestOnlineOptions(onlineOptions, CreateTestConfiguration());
+        }
+
+        private static void ConfigureTestOnlineOptions(OnlineOptions onlineOptions, IConfiguration configuration)
+        {
+            NullGuard.NotNull(onlineOptions, nameof(onlineOptions))
+                .NotNull(configuration, nameof(configuration));
+
+            onlineOptions.ApiEndpoint = GetTestApiEndpoint(configuration);
+        }
+
+        private static void ConfigureTestOfflineOptions(OfflineOptions offlineOptions)
+        {
+            NullGuard.NotNull(offlineOptions, nameof(offlineOptions));
+
+            ConfigureTestOfflineOptions(offlineOptions, CreateTestConfiguration());
+        }
+
+        private static void ConfigureTestOfflineOptions(OfflineOptions offlineOptions, IConfiguration configuration)
+        {
+            NullGuard.NotNull(offlineOptions, nameof(offlineOptions))
+                .NotNull(configuration, nameof(configuration));
+
+            offlineOptions.OfflineDataDocument = OfflineDataDocumentFactory.Build();
         }
 
         private static void ConfigureTestSecurityOptions(SecurityOptions securityOptions)
         {
             NullGuard.NotNull(securityOptions, nameof(securityOptions));
 
-            IConfiguration configuration = CreateTestConfiguration();
-
-            ConfigureTestSecurityOptions(securityOptions, configuration);
+            ConfigureTestSecurityOptions(securityOptions, CreateTestConfiguration());
         }
 
         private static void ConfigureTestSecurityOptions(SecurityOptions securityOptions, IConfiguration configuration)
@@ -59,6 +89,13 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Tests
             securityOptions.ApiEndpoint = GetTestApiEndpoint(configuration);
             securityOptions.ClientId = GetTestClientId(configuration);
             securityOptions.ClientSecret = GetTestClientSecret(configuration);
+        }
+
+        protected static IOfflineDataCommitter CreateTestOfflineDataCommitter(IServiceProvider serviceProvider)
+        {
+            NullGuard.NotNull(serviceProvider, nameof(serviceProvider));
+
+            return serviceProvider.GetRequiredService<IOfflineDataCommitter>();
         }
 
         private static Uri GetTestApiEndpoint(IConfiguration configuration)
