@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:OSDevGrp.OSIntranet.Gui.App.Settings"
+             x:DataType="local:SettingsViewModel"
+             x:Class="OSDevGrp.OSIntranet.Gui.App.Settings.SettingsPage"
+             Title="Indstillinger">
+
+    <ScrollView>
+        <VerticalStackLayout Margin="20,0,20,0">
+            <Label Text="Indstillinger" Style="{StaticResource Header1Style}" />
+            <Label Text="OS Development Group Web API:" TextDecorations="Underline" Style="{StaticResource Header2Style}" />
+            <VerticalStackLayout Margin="0,0,0,10">
+                <Label Text="API endpoint" />
+                <Entry Text="{Binding ApiEndpoint, Mode=TwoWay}">
+                    <Entry.Behaviors>
+                        <toolkit:TextValidationBehavior 
+                            InvalidStyle="{StaticResource InvalidEntryStyle}" 
+                            ValidStyle="{StaticResource ValidEntryStyle}" 
+                            Flags="ValidateOnValueChanged"
+                            MinimumLength="1"
+                            MaximumLength="256"
+                            RegexPattern="^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?$" />
+                        <toolkit:UriValidationBehavior
+                            InvalidStyle="{StaticResource InvalidEntryStyle}" 
+                            ValidStyle="{StaticResource ValidEntryStyle}" 
+                            Flags="ValidateOnValueChanged"
+                            UriKind="Absolute" />
+                    </Entry.Behaviors>
+                </Entry>
+            </VerticalStackLayout>
+            <VerticalStackLayout Margin="0,0,0,10">
+                <Label Text="Client Id" />
+                <Entry Text="{Binding ClientId, Mode=TwoWay}">
+                    <Entry.Behaviors>
+                        <toolkit:TextValidationBehavior 
+                            InvalidStyle="{StaticResource InvalidEntryStyle}" 
+                            ValidStyle="{StaticResource ValidEntryStyle}" 
+                            Flags="ValidateOnValueChanged"
+                            MinimumLength="1"
+                            MaximumLength="32"
+                            RegexPattern="^[0-9a-fA-F]{32}$" />
+                    </Entry.Behaviors>
+                </Entry>
+            </VerticalStackLayout>
+            <VerticalStackLayout Margin="0,0,0,10">
+                <Label Text="Client Secret" />
+                <Entry Text="{Binding ClientSecret, Mode=TwoWay}">
+                    <Entry.Behaviors>
+                        <toolkit:TextValidationBehavior 
+                            InvalidStyle="{StaticResource InvalidEntryStyle}" 
+                            ValidStyle="{StaticResource ValidEntryStyle}" 
+                            Flags="ValidateOnValueChanged"
+                            MinimumLength="1"
+                            MaximumLength="32"
+                            RegexPattern="^[0-9a-fA-F]{32}$" />
+                    </Entry.Behaviors>
+                </Entry>
+            </VerticalStackLayout>
+            <Label Text="Lokale datafiler:" TextDecorations="Underline" Style="{StaticResource Header2Style}" />
+            <VerticalStackLayout Margin="0,0,0,10">
+                <Label Text="Lokale data, som bruges, når systemet er offline" />
+                <Entry Text="{Binding OfflineDataFile, Mode=OneWay}" IsReadOnly="true" IsEnabled="false" />
+            </VerticalStackLayout>
+            <VerticalStackLayout>
+                <Button Text="Opdatér" IsVisible="{Binding CanCommitSettings, Mode=OneWay}" Command="{Binding CommitSettings, Mode=OneWay}" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
