@@ -2,6 +2,8 @@
 using OSDevGrp.OSIntranet.Core;
 using OSDevGrp.OSIntranet.Gui.App.Settings;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Core.Options;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security;
+using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Models;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Options;
 
 namespace OSDevGrp.OSIntranet.Gui.App.Core
@@ -17,24 +19,27 @@ namespace OSDevGrp.OSIntranet.Gui.App.Core
         private readonly IOptions<SecurityOptions> _securityOptions;
         private readonly IOptions<AppOptions> _appOptions;
         private readonly IApplicationDataProvider _applicationDataProvider;
+        private readonly IAccessTokenSetter _accessTokenSetter;
 
         #endregion
 
         #region Constructor
 
-        public StartupViewModel(IOptions<OnlineOptions> onlineOptions, IOptions<OfflineOptions> offlineOptions, IOptions<SecurityOptions> securityOptions, IOptions<AppOptions> appOptions, IApplicationDataProvider applicationDataProvider)
+        public StartupViewModel(IOptions<OnlineOptions> onlineOptions, IOptions<OfflineOptions> offlineOptions, IOptions<SecurityOptions> securityOptions, IOptions<AppOptions> appOptions, IApplicationDataProvider applicationDataProvider, IAccessTokenSetter accessTokenSetter)
         {
             NullGuard.NotNull(onlineOptions, nameof(onlineOptions))
                 .NotNull(offlineOptions, nameof(offlineOptions))
                 .NotNull(securityOptions, nameof(securityOptions))
                 .NotNull(appOptions, nameof(appOptions))
-                .NotNull(applicationDataProvider, nameof(applicationDataProvider));
+                .NotNull(applicationDataProvider, nameof(applicationDataProvider))
+                .NotNull(accessTokenSetter, nameof(accessTokenSetter));
 
             _onlineOptions = onlineOptions;
             _offlineOptions = offlineOptions;
             _securityOptions = securityOptions;
             _appOptions = appOptions;
             _applicationDataProvider = applicationDataProvider;
+            _accessTokenSetter = accessTokenSetter;
         }
 
         #endregion
@@ -79,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Gui.App.Core
 
         #region Methods
 
-        public async Task InitializeAsync()
+        internal async Task InitializeAsync()
         {
             Initializing = true;
             try
@@ -88,6 +93,12 @@ namespace OSDevGrp.OSIntranet.Gui.App.Core
                 await InitializeAsync(_offlineOptions.Value);
                 await InitializeAsync(_securityOptions.Value);
                 await InitializeAsync(_appOptions.Value);
+
+                IAccessTokenModel accessTokenModel = await _applicationDataProvider.GetAccessTokenAsync();
+                if (accessTokenModel != null)
+                {
+                    await _accessTokenSetter.SetAccessTokenAsync(accessTokenModel);
+                }
 
                 Initialized = true;
             }
@@ -125,7 +136,6 @@ namespace OSDevGrp.OSIntranet.Gui.App.Core
             NullGuard.NotNull(appOptions, nameof(appOptions));
 
             appOptions.ShouldOpenSettingsOnStartup = await _applicationDataProvider.GetShouldOpenSettingsOnStartupAsync();
-            appOptions.OfflineDataFile = _applicationDataProvider.OfflineDataFile;
         }
 
         #endregion

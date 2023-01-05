@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Logging;
 using OSDevGrp.OSIntranet.Core;
+using OSDevGrp.OSIntranet.Gui.App.Core;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 
@@ -8,15 +10,19 @@ public partial class SettingsPage
 {
     #region Private variables
 
+    private readonly ILogger<SettingsPage> _logger;
     private readonly IDictionary<string, Func<SettingsViewModel, Task>> _settingsCommits = new ConcurrentDictionary<string, Func<SettingsViewModel, Task>>();
 
     #endregion
 
     #region Constructor
 
-    public SettingsPage(SettingsViewModel settingsViewModel)
+    public SettingsPage(SettingsViewModel settingsViewModel, ILogger<SettingsPage> logger)
     {
-        NullGuard.NotNull(settingsViewModel, nameof(settingsViewModel));
+        NullGuard.NotNull(settingsViewModel, nameof(settingsViewModel))
+            .NotNull(logger, nameof(logger));
+
+        _logger = logger;
 
         _settingsCommits.Add("ApiEndpoint", viewModel => viewModel.CommitApiEndpointAsync());
         _settingsCommits.Add("ClientId", viewModel => viewModel.CommitClientIdAsync());
@@ -38,12 +44,27 @@ public partial class SettingsPage
         NullGuard.NotNull(sender, nameof(sender))
             .NotNull(eventArgs, nameof(eventArgs));
 
-        if (eventArgs.PropertyName == null || _settingsCommits.ContainsKey(eventArgs.PropertyName) == false)
+        try
         {
-            return;
-        }
+            SettingsViewModel settingsViewModel = (SettingsViewModel)sender;
+            switch (eventArgs.PropertyName)
+            {
+                case "CommandError":
+                    await settingsViewModel.CommandError.HandleAsync(_logger, this);
+                    return;
+            }
 
-        await _settingsCommits[eventArgs.PropertyName].Invoke((SettingsViewModel)sender);
+            if (eventArgs.PropertyName == null || _settingsCommits.ContainsKey(eventArgs.PropertyName) == false)
+            {
+                return;
+            }
+
+            await _settingsCommits[eventArgs.PropertyName].Invoke(settingsViewModel);
+        }
+        catch (Exception ex)
+        {
+            await ex.HandleAsync(_logger, this);
+        }
     }
 
     #endregion

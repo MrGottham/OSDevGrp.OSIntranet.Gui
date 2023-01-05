@@ -1,4 +1,5 @@
-﻿using OSDevGrp.OSIntranet.Core;
+﻿using Microsoft.Extensions.Logging;
+using OSDevGrp.OSIntranet.Core;
 using OSDevGrp.OSIntranet.Gui.App.Core;
 using OSDevGrp.OSIntranet.Gui.App.Settings;
 using System.ComponentModel;
@@ -12,72 +13,97 @@ public partial class App
     private readonly Func<AppShell> _appShellGetter;
     private readonly Func<SettingsPage> _settingsPageGetter;
     private readonly Func<SettingsViewModel> _settingsViewModelGetter;
+    private readonly ILogger<App> _logger;
 
     #endregion
 
     #region Constructor
 
-    public App(StartupViewModel startupViewModel, Func<StartupPage> startupPageGetter, Func<AppShell> appShellGetter, Func<SettingsPage> settingsPageGetter, Func<SettingsViewModel> settingsViewModelGetter)
+    public App(StartupViewModel startupViewModel, Func<StartupPage> startupPageGetter, Func<AppShell> appShellGetter, Func<SettingsPage> settingsPageGetter, Func<SettingsViewModel> settingsViewModelGetter, ILogger<App> logger)
     {
         NullGuard.NotNull(startupViewModel, nameof(startupViewModel))
             .NotNull(startupPageGetter, nameof(startupPageGetter))
             .NotNull(appShellGetter, nameof(appShellGetter))
             .NotNull(settingsPageGetter, nameof(settingsPageGetter))
-            .NotNull(settingsViewModelGetter, nameof(settingsViewModelGetter));
+            .NotNull(settingsViewModelGetter, nameof(settingsViewModelGetter))
+            .NotNull(logger, nameof(logger));
 
-        startupViewModel.PropertyChanged += StartupViewModelChanged;
+        try
+        {
+            startupViewModel.PropertyChanged += StartupViewModelChanged;
 
-        _appShellGetter = appShellGetter;
-        _settingsPageGetter = settingsPageGetter;
-        _settingsViewModelGetter = settingsViewModelGetter;
+            _appShellGetter = appShellGetter;
+            _settingsPageGetter = settingsPageGetter;
+            _settingsViewModelGetter = settingsViewModelGetter;
+            _logger = logger;
 
-		InitializeComponent();
+            InitializeComponent();
 
-        MainPage = startupPageGetter();
+            MainPage = startupPageGetter();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.ToString());
+            throw;
+        }
     }
 
     #endregion
 
     #region Methods
 
-    private void StartupViewModelChanged(object sender, PropertyChangedEventArgs eventArgs)
+    private async void StartupViewModelChanged(object sender, PropertyChangedEventArgs eventArgs)
     {
         NullGuard.NotNull(sender, nameof(sender))
             .NotNull(eventArgs, nameof(eventArgs));
 
-        switch (eventArgs.PropertyName)
+        try
         {
-            case "Initialized":
-                StartupViewModel startupViewModel = (StartupViewModel)sender;
-                startupViewModel.PropertyChanged -= StartupViewModelChanged;
+            switch (eventArgs.PropertyName)
+            {
+                case "Initialized":
+                    StartupViewModel startupViewModel = (StartupViewModel)sender;
+                    startupViewModel.PropertyChanged -= StartupViewModelChanged;
 
-                AppOptions appOptions = startupViewModel.AppOptions;
-                if (appOptions.ShouldOpenSettingsOnStartup)
-                {
-                    _settingsViewModelGetter.Invoke().PropertyChanged += SettingsViewModelChanged;
+                    AppOptions appOptions = startupViewModel.AppOptions;
+                    if (appOptions.ShouldOpenSettingsOnStartup)
+                    {
+                        _settingsViewModelGetter.Invoke().PropertyChanged += SettingsViewModelChanged;
 
-                    MainPage = _settingsPageGetter.Invoke();
+                        MainPage = _settingsPageGetter.Invoke();
+                        break;
+                    }
+
+                    MainPage = _appShellGetter.Invoke();
                     break;
-                }
-
-                MainPage = _appShellGetter.Invoke();
-                break;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ex.HandleAsync(_logger);
         }
     }
 
-    private void SettingsViewModelChanged(object sender, PropertyChangedEventArgs eventArgs)
+    private async void SettingsViewModelChanged(object sender, PropertyChangedEventArgs eventArgs)
     {
         NullGuard.NotNull(sender, nameof(sender))
             .NotNull(eventArgs, nameof(eventArgs));
 
-        switch (eventArgs.PropertyName)
+        try
         {
-            case "SettingsCommitted":
-                SettingsViewModel settingsViewModel = (SettingsViewModel)sender;
-                settingsViewModel.PropertyChanged -= SettingsViewModelChanged;
+            switch (eventArgs.PropertyName)
+            {
+                case "AllSettingsCommitted":
+                    SettingsViewModel settingsViewModel = (SettingsViewModel)sender;
+                    settingsViewModel.PropertyChanged -= SettingsViewModelChanged;
 
-                MainPage = _appShellGetter.Invoke();
-                break;
+                    MainPage = _appShellGetter.Invoke();
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ex.HandleAsync(_logger);
         }
     }
 

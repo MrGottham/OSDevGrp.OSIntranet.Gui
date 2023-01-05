@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using OSDevGrp.OSIntranet.Core;
 using OSDevGrp.OSIntranet.Gui.App.Core;
 
@@ -5,15 +6,24 @@ namespace OSDevGrp.OSIntranet.Gui.App;
 
 public partial class StartupPage
 {
+    #region Private variables
+
+    private readonly ILogger<StartupPage> _logger;
+
+    #endregion
+
     #region Constructor
 
-    public StartupPage(StartupViewModel startupViewModel)
+    public StartupPage(StartupViewModel startupViewModel, ILogger<StartupPage> logger)
     {
-        NullGuard.NotNull(startupViewModel, nameof(startupViewModel));
+        NullGuard.NotNull(startupViewModel, nameof(startupViewModel))
+            .NotNull(logger, nameof(logger));
+
+        _logger = logger;
 
         BindingContext = startupViewModel;
 
-		InitializeComponent();
+        InitializeComponent();
     }
 
     #endregion
@@ -22,9 +32,16 @@ public partial class StartupPage
 
     protected override async void OnAppearing()
     {
-        base.OnAppearing();
+        try
+        {
+            base.OnAppearing();
 
-        await ((StartupViewModel)BindingContext).InitializeAsync();
+            await ((StartupViewModel)BindingContext).InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            await ex.HandleAsync(_logger, this);
+        }
     }
 
     #endregion

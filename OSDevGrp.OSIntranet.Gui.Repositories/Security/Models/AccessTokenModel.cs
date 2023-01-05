@@ -4,11 +4,11 @@ using System;
 
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Security.Models
 {
-    internal class AccessTokenModel : IAccessTokenModel
+    public class AccessTokenModel : IAccessTokenModel
     {
         #region Constructor
 
-        public AccessTokenModel(string tokenType, string tokenValue, DateTime expires)
+        private AccessTokenModel(string tokenType, string tokenValue, DateTime expires)
         {
             NullGuard.NotNullOrWhiteSpace(tokenType, nameof(tokenType))
                 .NotNullOrWhiteSpace(tokenValue, nameof(tokenValue));
@@ -27,6 +27,18 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Security.Models
         public string TokenValue { get; }
 
         public DateTime Expires { get; }
+
+        #endregion
+
+        #region Methods
+
+        public static IAccessTokenModel Create(string tokenType, string tokenValue, DateTime expires)
+        {
+            NullGuard.NotNullOrWhiteSpace(tokenType, nameof(tokenType))
+                .NotNullOrWhiteSpace(tokenValue, nameof(tokenValue));
+
+            return new AccessTokenModel(tokenType, tokenValue, expires);
+        }
 
         #endregion
     }

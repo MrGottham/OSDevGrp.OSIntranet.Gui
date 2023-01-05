@@ -58,13 +58,19 @@
                     </Entry.Behaviors>
                 </Entry>
             </VerticalStackLayout>
-            <Label Text="Lokale datafiler:" TextDecorations="Underline" Style="{StaticResource Header2Style}" />
+            <Label Text="Lokalt datalager:" TextDecorations="Underline" Style="{StaticResource Header2Style}" />
             <VerticalStackLayout Margin="0,0,0,10">
-                <Label Text="Lokale data, som bruges, når systemet er offline" />
-                <Entry Text="{Binding OfflineDataFile, Mode=OneWay}" IsReadOnly="true" IsEnabled="false" />
+                <HorizontalStackLayout Spacing="10" Margin="0,0,0,5">
+                    <Button Text="Fjern" Command="{Binding RemoveOfflineData, Mode=TwoWay}" />
+                    <Label Text="Lokale datafiler, som bruges, når systemet er offline" VerticalOptions="Center" HorizontalOptions="Fill" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="Fjern" Command="{Binding RemoveTemporaryFiles, Mode=TwoWay}" />
+                    <Label Text="Midlertidige filer, såsom logningsfiler m.fl." VerticalOptions="Center" HorizontalOptions="Fill" />
+                </HorizontalStackLayout>
             </VerticalStackLayout>
-            <VerticalStackLayout>
-                <Button Text="Opdatér" IsVisible="{Binding CanCommitSettings, Mode=OneWay}" Command="{Binding CommitSettings, Mode=OneWay}" />
+            <VerticalStackLayout IsVisible="{Binding Path=CanCommitAllSettings, Mode=TwoWay}">
+                <Button Text="Opdatér" Command="{Binding CommitAllSettings, Mode=TwoWay}" />
             </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

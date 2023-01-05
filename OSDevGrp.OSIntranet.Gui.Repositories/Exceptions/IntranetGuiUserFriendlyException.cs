@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace OSDevGrp.OSIntranet.Gui.Repositories.Exceptions
 {
     [Serializable]
-    internal class IntranetGuiUserFriendlyException : IntranetGuiExceptionBase
+    public class IntranetGuiUserFriendlyException : IntranetGuiExceptionBase
     {
         #region Constructors
 

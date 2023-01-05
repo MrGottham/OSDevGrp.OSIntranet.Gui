@@ -6,8 +6,6 @@
 
         public bool ShouldOpenSettingsOnStartup { get; set; } = true;
 
-        public FileInfo OfflineDataFile { get; set; }
-
         #endregion
     }
 }

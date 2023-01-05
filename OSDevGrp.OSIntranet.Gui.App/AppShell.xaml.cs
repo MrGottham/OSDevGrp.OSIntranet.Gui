@@ -1,32 +1,32 @@
-﻿using OSDevGrp.OSIntranet.Core;
-using OSDevGrp.OSIntranet.Core.Interfaces.EventPublisher;
+﻿using Microsoft.Extensions.Logging;
+using OSDevGrp.OSIntranet.Core;
 using OSDevGrp.OSIntranet.Gui.App.Core;
-using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Core.Events;
-using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Events;
+using OSDevGrp.OSIntranet.Gui.App.Features;
 
 namespace OSDevGrp.OSIntranet.Gui.App;
 
-public partial class AppShell : IEventHandler<ISystemWentOfflineEvent>, IEventHandler<IOfflineDataUpdatedEvent>, IEventHandler<IAccessTokenAcquiredEvent>
+public partial class AppShell : IDisposable
 {
 	#region Private variables
 
     private bool _disposed;
-    private readonly AppShellViewModel _appShellViewModel;
-    private readonly IEventPublisher _eventPublisher;
+    private readonly IEnumerable<IBackgroundFeature> _backgroundFeatures;
+    private readonly ILogger<AppShell> _logger;
 
     #endregion
 
 	#region Constructor
 
-	public AppShell(AppShellViewModel appShellViewModel, IEventPublisher eventPublisher)
+	public AppShell(AppShellViewModel appShellViewModel, IEnumerable<IBackgroundFeature> backgroundFeatures, ILogger<AppShell> logger)
     {
         NullGuard.NotNull(appShellViewModel, nameof(appShellViewModel))
-            .NotNull(eventPublisher, nameof(eventPublisher));
+            .NotNull(backgroundFeatures, nameof(backgroundFeatures))
+            .NotNull(logger, nameof(logger));
 
-        _appShellViewModel = appShellViewModel;
+        _backgroundFeatures = backgroundFeatures;
+        _logger = logger;
 
-        _eventPublisher = eventPublisher;
-        _eventPublisher.AddSubscriber(this);
+        BindingContext = appShellViewModel;
 
         InitializeComponent();
     }
@@ -41,41 +41,48 @@ public partial class AppShell : IEventHandler<ISystemWentOfflineEvent>, IEventHa
         GC.SuppressFinalize(this);
     }
 
-    public Task HandleAsync(ISystemWentOfflineEvent systemWentOfflineEvent)
+    protected override async void OnAppearing()
     {
-        NullGuard.NotNull(systemWentOfflineEvent, nameof(systemWentOfflineEvent));
+        try
+        {
+            base.OnAppearing();
 
-        _appShellViewModel.SystemIsOffline = true;
-
-        return Task.CompletedTask;
+            await Task.WhenAll(_backgroundFeatures.Select(backgroundFeature => backgroundFeature.StartAsync()).ToArray());
+        }
+        catch (Exception ex)
+        {
+            await ex.HandleAsync(_logger, this);
+        }
     }
 
-    public Task HandleAsync(IOfflineDataUpdatedEvent offlineDataUpdatedEvent)
+    protected override async void OnDisappearing()
     {
-        NullGuard.NotNull(offlineDataUpdatedEvent, nameof(offlineDataUpdatedEvent));
+        try
+        {
+            base.OnDisappearing();
 
-        // TODO: Handle the event.
-
-        return Task.CompletedTask;
+            await Task.WhenAll(_backgroundFeatures.Select(backgroundFeature => backgroundFeature.StopAsync()).ToArray());
+        }
+        catch (Exception ex)
+        {
+            await ex.HandleAsync(_logger, this);
+        }
     }
 
-    public Task HandleAsync(IAccessTokenAcquiredEvent accessTokenAcquiredEvent)
-    {
-        NullGuard.NotNull(accessTokenAcquiredEvent, nameof(accessTokenAcquiredEvent));
-
-        // TODO: Handle the event.
-
-        return Task.CompletedTask;
-    }
-
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (_disposed)
         {
             return;
         }
 
-        _eventPublisher.RemoveSubscriber(this);
+        if (disposing)
+        {
+            foreach (IBackgroundFeature backgroundFeature in _backgroundFeatures)
+            {
+                backgroundFeature.Dispose();
+            }
+        }
 
         _disposed = true;
     }

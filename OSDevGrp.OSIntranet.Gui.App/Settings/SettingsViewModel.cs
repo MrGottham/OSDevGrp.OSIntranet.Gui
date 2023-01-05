@@ -3,11 +3,10 @@ using OSDevGrp.OSIntranet.Core;
 using OSDevGrp.OSIntranet.Gui.App.Core;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Core.Options;
 using OSDevGrp.OSIntranet.Gui.Repositories.Interfaces.Security.Options;
-using System.Windows.Input;
 
 namespace OSDevGrp.OSIntranet.Gui.App.Settings
 {
-    public class SettingsViewModel : ViewModelBase
+    public class SettingsViewModel : AsyncRelayCommandViewModelBase
     {
         #region Private variables
 
@@ -39,7 +38,9 @@ namespace OSDevGrp.OSIntranet.Gui.App.Settings
             _clientId = securityOptions.Value.ClientId;
             _clientSecret = securityOptions.Value.ClientSecret;
 
-            CommitSettings = new Command(CommitAll, () => CanCommitSettings);
+            CommitAllSettings = new AsyncRelayCommand(CommitAllSettingsAsync, () => CanCommitAllSettings, HandleCommandErrorAsync);
+            RemoveOfflineData = new AsyncRelayCommand(RemoveOfflineDataAsync, () => _applicationDataProvider.OfflineDataFile.Exists, HandleCommandErrorAsync);
+            RemoveTemporaryFiles = new AsyncRelayCommand(RemoveTemporaryFilesAsync, () => _applicationDataProvider.TemporaryFiles.Count > 0, HandleCommandErrorAsync);
         }
 
         #endregion
@@ -100,19 +101,21 @@ namespace OSDevGrp.OSIntranet.Gui.App.Settings
             }
         }
 
-        public string OfflineDataFile => _appOptions.Value.OfflineDataFile.FullName;
+        public IAsyncRelayCommand RemoveOfflineData { get; }
 
-        public bool CanCommitSettings => _appOptions.Value.ShouldOpenSettingsOnStartup;
+        public IAsyncRelayCommand RemoveTemporaryFiles { get; }
 
-        public bool SettingsCommitted => CanCommitSettings == false;
+        public bool CanCommitAllSettings => _appOptions.Value.ShouldOpenSettingsOnStartup;
 
-        public ICommand CommitSettings { get; }
+        public bool AllSettingsCommitted => CanCommitAllSettings == false;
+
+        public IAsyncRelayCommand CommitAllSettings { get; }
 
         #endregion
 
         #region Methods
 
-        public async Task CommitApiEndpointAsync()
+        internal async Task CommitApiEndpointAsync()
         {
             if (string.IsNullOrWhiteSpace(ApiEndpoint) || Uri.TryCreate(ApiEndpoint, UriKind.Absolute, out Uri apiEndpoint) == false)
             {
@@ -125,7 +128,7 @@ namespace OSDevGrp.OSIntranet.Gui.App.Settings
             await _applicationDataProvider.SetApiEndpointAsync(apiEndpoint);
         }
 
-        public async Task CommitClientIdAsync()
+        internal async Task CommitClientIdAsync()
         {
             if (string.IsNullOrWhiteSpace(ClientId))
             {
@@ -137,7 +140,7 @@ namespace OSDevGrp.OSIntranet.Gui.App.Settings
             await _applicationDataProvider.SetClientIdAsync(ClientId);
         }
 
-        public async Task CommitClientSecretAsync()
+        internal async Task CommitClientSecretAsync()
         {
             if (string.IsNullOrWhiteSpace(ClientSecret))
             {
@@ -149,7 +152,7 @@ namespace OSDevGrp.OSIntranet.Gui.App.Settings
             await _applicationDataProvider.SetClientSecretAsync(ClientSecret);
         }
 
-        private async void CommitAll()
+        private async Task CommitAllSettingsAsync()
         {
             await CommitApiEndpointAsync();
             await CommitClientIdAsync();
@@ -163,7 +166,40 @@ namespace OSDevGrp.OSIntranet.Gui.App.Settings
 
             await _applicationDataProvider.SetShouldOpenSettingsOnStartupAsync(shouldOpenSettingsOnStartup);
 
-            RaisePropertyChanged(nameof(SettingsCommitted));
+            RaisePropertyChanged(nameof(AllSettingsCommitted));
+        }
+
+        private Task RemoveOfflineDataAsync()
+        {
+            return Task.Run(() =>
+            {
+                FileInfo offlineDataFile = _applicationDataProvider.OfflineDataFile;
+                offlineDataFile.Refresh();
+
+                if (offlineDataFile.Exists == false)
+                {
+                    return;
+                }
+
+                offlineDataFile.Delete();
+            });
+        }
+
+        private Task RemoveTemporaryFilesAsync()
+        {
+            return Task.Run(() =>
+            {
+                foreach (FileInfo cachedFile in _applicationDataProvider.TemporaryFiles)
+                {
+                    cachedFile.Refresh();
+                    if (cachedFile.Exists == false)
+                    {
+                        continue;
+                    }
+
+                    cachedFile.Delete();
+                }
+            });
         }
 
         #endregion

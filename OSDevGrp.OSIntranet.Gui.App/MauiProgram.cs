@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using OSDevGrp.OSIntranet.Core;
 using OSDevGrp.OSIntranet.Gui.App.Core;
+using OSDevGrp.OSIntranet.Gui.App.Features;
 using OSDevGrp.OSIntranet.Gui.App.Settings;
 using OSDevGrp.OSIntranet.Gui.Repositories;
 
@@ -22,9 +23,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-#if DEBUG
-        builder.Logging.AddDebug();
-#endif
+        builder.Logging.AddEventSourceLogger();
+        builder.Logging.AddFilter(typeof(MauiApp).Namespace, logLevel => logLevel >= LogLevel.Information);
 
         return builder
             .RegisterAppServices(ApplicationDataProvider.Create(() => SecureStorage.Default, () => FileSystem.Current))
@@ -40,10 +40,14 @@ public static class MauiProgram
 
         mauiAppBuilder.Services
             .Configure<AppOptions>(appOptions => { })
-            .AddSingleton(applicationDataProvider)
             .AddRepositories(onlineOptions => { },
                 offlineOptions => { },
-                securityOptions => { });
+                securityOptions => { })
+            .AddSingleton(applicationDataProvider)
+            .AddScoped<IBackgroundFeature, EventListenerFeature>()
+            .AddScoped<IBackgroundFeature, SystemWentOfflineEventHandlerFeature>()
+            .AddScoped<IBackgroundFeature, OfflineDataUpdatedEventHandlerFeature>()
+            .AddScoped<IBackgroundFeature, AccessTokenAcquiredEventHandlerFeature>();
 
         return mauiAppBuilder;
     }

@@ -11,7 +11,7 @@ namespace OSDevGrp.OSIntranet.Gui.Repositories.Clients
         {
             NullGuard.NotNull(accessTokenModel, nameof(accessTokenModel));
 
-            return new Security.Models.AccessTokenModel(accessTokenModel.TokenType, accessTokenModel.AccessToken, accessTokenModel.Expires.LocalDateTime);
+            return Security.Models.AccessTokenModel.Create(accessTokenModel.TokenType, accessTokenModel.AccessToken, accessTokenModel.Expires.LocalDateTime);
         }
 
         #endregion
